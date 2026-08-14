@@ -11,6 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildIndex } from './lib/indexer.mjs';
 import { buildStructure } from './lib/structure.mjs';
+import { buildJourneys } from './lib/journeys.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..');
@@ -29,6 +30,7 @@ function parseArgs(argv) {
 const args = parseArgs(process.argv.slice(2));
 
 let index = null;
+let journeys = null;
 let indexing = null;
 
 async function refreshIndex(reason = 'startup') {
@@ -37,10 +39,18 @@ async function refreshIndex(reason = 'startup') {
     const started = Date.now();
     try {
       index = await buildIndex(ROOT, args.dir);
+      // journeys resolve against the contracts, so they rebuild together
+      const operationIds = new Set(
+        index.nodes.filter((n) => n.type === 'operation').map((n) => n.name)
+      );
+      journeys = await buildJourneys(ROOT, operationIds);
+
       const { stats } = index;
+      const j = journeys.stats;
       console.log(
         `[index] ${reason}: ${stats.files} files · ${stats.operations} operations · ` +
-          `${stats.schemas} schemas · ${stats.links} links · ${stats.errors} errors ` +
+          `${stats.schemas} schemas · ${stats.links} links · ${stats.errors} errors | ` +
+          `${j.flows} flows · ${j.screens} screens · ${journeys.problems.length} journey problems ` +
           `(${Date.now() - started}ms)`
       );
     } catch (err) {
@@ -93,6 +103,11 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, JSON.stringify(index), MIME['.json']);
     }
 
+    if (url.pathname === '/api/journeys') {
+      if (!journeys) await refreshIndex('on demand');
+      return send(res, 200, JSON.stringify(journeys), MIME['.json']);
+    }
+
     if (url.pathname === '/api/file' || url.pathname === '/api/tree') {
       const rel = url.searchParams.get('path') ?? '';
       // contain reads to the project root
@@ -138,19 +153,25 @@ const server = http.createServer(async (req, res) => {
 
 await refreshIndex();
 
-const watchTarget = path.join(ROOT, args.dir);
-try {
-  watch(watchTarget, { recursive: true }, (_event, filename) => {
-    if (filename && /\.ya?ml$/i.test(filename)) scheduleRebuild(filename);
-  });
-} catch (err) {
-  console.warn(`[watch] disabled: ${err.message}`);
+// flows and screens resolve against the contracts, so all three are watched
+const watchDirs = [args.dir, 'flows', 'screens'];
+const watched = [];
+for (const dir of watchDirs) {
+  const target = path.join(ROOT, dir);
+  try {
+    watch(target, { recursive: true }, (_event, filename) => {
+      if (filename && /\.ya?ml$/i.test(filename)) scheduleRebuild(`${dir}/${filename}`);
+    });
+    watched.push(dir);
+  } catch {
+    // a directory that does not exist yet simply is not watched
+  }
 }
 
 server.listen(args.port, () => {
   const url = `http://localhost:${args.port}`;
   console.log(`\n  TICVAI contract viewer  →  ${url}`);
-  console.log(`  watching ${watchTarget} for changes\n`);
+  console.log(`  watching ${watched.join(', ') || 'nothing'} for changes\n`);
   if (args.open) {
     const cmd =
       process.platform === 'win32' ? `start "" "${url}"`

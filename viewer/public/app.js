@@ -14,7 +14,8 @@ const state = {
   structureFile: null, // file currently diagrammed
   treeCache: new Map(),
   erScope: null,
-  flowScope: null,
+  journeyId: null,
+  journeys: null,
   groupBy: 'contracts',
   sideFilter: '',
   graphScope: 'files',
@@ -50,17 +51,12 @@ const escapeHtml = (s) =>
 let graph;
 let tree;
 let er;
-let flow;
 
 async function boot() {
   const openRow = (row) => {
     if (row.refTarget && state.nodesById.has(row.refTarget)) select(row.refTarget);
   };
   er = new BoxDiagram($('er-canvas'), {
-    onSelect: (node) => select(node.id),
-    onRow: openRow,
-  });
-  flow = new BoxDiagram($('flow-canvas'), {
     onSelect: (node) => select(node.id),
     onRow: openRow,
   });
@@ -104,7 +100,6 @@ async function boot() {
   window.__graph = graph;
   window.__tree = tree;
   window.__er = er;
-  window.__flow = flow;
   await loadIndex();
   bindUI();
   connectLiveReload();
@@ -153,9 +148,7 @@ async function loadIndex() {
     index.nodes.find((n) => n.type === 'file')?.file;
 
   state.erScope = state.erScope ?? defaultFile;
-  state.flowScope = state.flowScope ?? defaultFile;
   fillScopeSelect($('er-scope'), state.erScope);
-  fillScopeSelect($('flow-scope'), state.flowScope);
 
   renderTree();
   renderTypeFilters();
@@ -163,7 +156,6 @@ async function loadIndex() {
   renderAudit();
   renderGraph();
   renderER();
-  renderFlow();
 
   const errors = index.stats.errors;
   const badge = $('audit-count');
@@ -175,7 +167,7 @@ async function loadIndex() {
 // ── mode switching ───────────────────────────────────────────────────
 function setMode(mode) {
   state.mode = mode;
-  for (const view of ['graph', 'structure', 'er', 'flow', 'reader', 'audit']) {
+  for (const view of ['graph', 'structure', 'er', 'journey', 'reader', 'audit']) {
     $(`view-${view}`).hidden = view !== mode;
   }
   for (const button of $('modes').querySelectorAll('.mode')) {
@@ -211,11 +203,7 @@ function setMode(mode) {
     if (!er.userAdjusted) er.fit();
   }
 
-  if (mode === 'flow') {
-    flow.resize();
-    if (!flow.nodes.length) renderFlow({ focus: state.selectedId });
-    if (!flow.userAdjusted) flow.fit();
-  }
+  if (mode === 'journey') renderJourney();
 }
 
 // ── selection ────────────────────────────────────────────────────────
@@ -254,16 +242,6 @@ function syncBoxDiagrams(node) {
     if (state.mode === 'er' && node.type === 'schema') er.focus(node.id, { zoom: Math.max(er.transform.k, 0.9) });
   }
 
-  if (state.flowScope !== file) {
-    state.flowScope = file;
-    fillScopeSelect($('flow-scope'), file);
-    renderFlow({ focus: node.type === 'operation' ? node.id : null });
-  } else {
-    flow.setSelected(node.id);
-    if (state.mode === 'flow' && node.type === 'operation') {
-      flow.focus(node.id, { zoom: Math.max(flow.transform.k, 0.9) });
-    }
-  }
 }
 
 // ── left tree ────────────────────────────────────────────────────────
@@ -800,128 +778,196 @@ function renderER({ focus } = {}) {
 }
 
 // ── Flow diagram ─────────────────────────────────────────────────────
-/** The collection path an operation's first path parameter must come from. */
-function supplyingCollection(urlPath) {
-  const segments = urlPath.split('/').filter(Boolean);
-  const first = segments.findIndex((s) => s.startsWith('{'));
-  if (first <= 0) return null;
-  return '/' + segments.slice(0, first).join('/');
+// ── journey ──────────────────────────────────────────────────────────
+// A flow is one job a person came to do, traced across screens. Steps run left
+// to right; the branches that can derail a step hang underneath it. Everything
+// here is declared in flows/ and screens/ — no sequencing is inferred.
+
+async function loadJourneys() {
+  if (state.journeys) return state.journeys;
+  const res = await fetch('/api/journeys');
+  state.journeys = await res.json();
+  return state.journeys;
 }
 
-/**
- * Two honest kinds of hand-off, both read straight off the contract:
- *
- *   schema — B accepts a schema that A returns.
- *   id     — B's path is parameterised by an identifier that only the
- *            collection operations at A can hand out.
- *
- * Nothing here is inferred sequencing; the contracts declare no transitions and
- * none are invented. Schemas from `shared/` (Problem, Page, Money) are excluded
- * because near-universal payloads would link everything to everything.
- */
-function buildFlow(file) {
-  const operations = state.index.nodes.filter((n) => n.type === 'operation' && n.file === file);
-  if (!operations.length) return { nodes: [], edges: [], schemaEdges: 0, idEdges: 0, total: 0 };
+/** Find the indexed contract operation behind an operationId, if it exists. */
+function operationNodeFor(operationId) {
+  for (const node of state.index.nodes) {
+    if (node.type === 'operation' && node.name === operationId) return node;
+  }
+  return null;
+}
 
-  const domainSchemas = (ids) =>
-    (ids ?? [])
-      .map((id) => state.nodesById.get(id))
-      .filter((s) => s && !s.file.includes('/shared/'));
+async function renderJourney() {
+  const data = await loadJourneys();
+  const body = $('journey-body');
+  const select$ = $('journey-scope');
 
-  const edges = [];
-  const involved = new Set();
-  const seen = new Set();
-  const addEdge = (from, to, label, kind) => {
-    if (from.id === to.id) return;
-    const key = `${from.id}|${to.id}|${kind}`;
-    if (seen.has(key)) return;
-    seen.add(key);
-    edges.push({ source: from.id, target: to.id, label, kind });
-    involved.add(from.id);
-    involved.add(to.id);
-  };
-
-  // ---- schema hand-offs ---------------------------------------------
-  const producedBy = new Map();
-  const consumedBy = new Map();
-  for (const op of operations) {
-    for (const schema of domainSchemas(op.produces)) {
-      if (!producedBy.has(schema.id)) producedBy.set(schema.id, []);
-      producedBy.get(schema.id).push(op);
-    }
-    for (const schema of domainSchemas(op.consumes)) {
-      if (!consumedBy.has(schema.id)) consumedBy.set(schema.id, []);
-      consumedBy.get(schema.id).push(op);
-    }
+  if (!data.flows.length) {
+    body.innerHTML = '';
+    body.append(el('p', 'pane-empty', 'No flows found in flows/.'));
+    $('journey-hint').textContent = '';
+    return;
   }
 
-  const ubiquity = Math.max(3, Math.ceil(operations.length * 0.4));
-  let schemaEdges = 0;
-  for (const [id, producers] of producedBy) {
-    if (!consumedBy.has(id) || producers.length >= ubiquity) continue;
-    const schema = state.nodesById.get(id);
-    for (const from of producers) {
-      for (const to of consumedBy.get(id)) {
-        const before = edges.length;
-        addEdge(from, to, schema.name, 'schema');
-        if (edges.length > before) schemaEdges += 1;
+  if (select$.options.length !== data.flows.length) {
+    select$.innerHTML = '';
+    for (const flow of data.flows) {
+      const option = el('option', null, `${flow.id} — ${flow.name}`);
+      option.value = flow.id;
+      select$.append(option);
+    }
+  }
+  if (!state.journeyId || !data.flows.some((f) => f.id === state.journeyId)) {
+    state.journeyId = data.flows[0].id;
+  }
+  select$.value = state.journeyId;
+
+  const flow = data.flows.find((f) => f.id === state.journeyId);
+  const showBranches = $('journey-branches').checked;
+  const showOps = $('journey-ops').checked;
+
+  const s = data.stats;
+  $('journey-hint').textContent =
+    `${s.flows} flows · ${s.steps} steps · ${s.branches} branches · ` +
+    `${s.screens} screens · ${s.operationsCovered} operations covered`;
+
+  body.innerHTML = '';
+
+  // ---- header ----------------------------------------------------------
+  const head = el('div', 'journey-head');
+  head.append(el('h2', 'journey-title', `${flow.id} — ${flow.name}`));
+
+  const chips = el('div', 'journey-chips');
+  const chip = (label, value, cls = '') => {
+    const c = el('span', `jchip ${cls}`);
+    c.append(el('span', null, label));
+    c.append(el('b', null, String(value)));
+    return c;
+  };
+  if (flow.actor) chips.append(chip('actor', flow.actor));
+  if (flow.criticality) chips.append(chip('criticality', flow.criticality, flow.criticality));
+  if (flow.frequency) chips.append(chip('frequency', flow.frequency));
+  if (flow.wave) chips.append(chip('wave', flow.wave));
+  if (flow.capability) chips.append(chip('capability', flow.capability));
+  for (const platform of flow.platforms) chips.append(chip('platform', platform));
+  head.append(chips);
+
+  if (flow.trigger?.description || flow.offlineBehaviour) {
+    const trigger = el('div', 'journey-trigger');
+    if (flow.trigger?.description) {
+      trigger.append(el('b', null, 'Trigger: '));
+      trigger.append(document.createTextNode(flow.trigger.description));
+    }
+    if (flow.offlineBehaviour) {
+      trigger.append(el('br'));
+      trigger.append(el('b', null, 'Offline: '));
+      trigger.append(document.createTextNode(flow.offlineBehaviour));
+    }
+    head.append(trigger);
+  }
+  body.append(head);
+
+  // ---- the step track --------------------------------------------------
+  const track = el('div', 'journey-track');
+
+  flow.steps.forEach((step, i) => {
+    if (i > 0) track.append(el('div', 'journey-arrow', '→'));
+
+    const column = el('div', 'journey-col');
+    const card = el('div', 'step-card');
+
+    const top = el('div', 'step-top');
+    top.append(el('span', 'step-num', String(step.step)));
+    top.append(el('span', 'step-screen', step.screenId ?? '—'));
+    if (step.platform) top.append(el('span', 'step-platform', step.platform));
+    card.append(top);
+
+    if (step.screenName) card.append(el('div', 'step-screen-name', step.screenName));
+    if (step.action) card.append(el('div', 'step-action', step.action));
+
+    if (showOps && step.operations.length) {
+      const ops = el('div', 'step-ops');
+      for (const op of step.operations) {
+        const row = el('div', `step-op${op.known ? '' : ' unknown'}`);
+        row.append(el('span', 'step-op-dot'));
+        row.append(el('span', null, op.operationId));
+        row.title = op.known
+          ? `Open ${op.operationId} in the contracts`
+          : `${op.operationId} is not declared by any contract`;
+        row.onclick = (e) => {
+          e.stopPropagation();
+          const node = operationNodeFor(op.operationId);
+          if (node) { select(node.id); setMode('reader'); }
+          else toast(`${op.operationId} is not in the contracts`);
+        };
+        ops.append(row);
+      }
+      card.append(ops);
+    }
+
+    if (step.outcome) card.append(el('div', 'step-outcome', step.outcome));
+    if (step.duration) card.append(el('span', 'step-duration', step.duration));
+
+    // clicking the card opens the first operation the step calls
+    card.onclick = () => {
+      const first = step.operations[0];
+      const node = first ? operationNodeFor(first.operationId) : null;
+      if (node) { select(node.id); setMode('reader'); }
+    };
+    column.append(card);
+
+    // branches that can happen at this step
+    const atStep = flow.branches.filter((b) => b.at === step.step);
+    if (showBranches && atStep.length) {
+      column.append(el('div', 'journey-section-label', `${atStep.length} branch${atStep.length === 1 ? '' : 'es'}`));
+      for (const branch of atStep) {
+        const bc = el('div', `branch-card ${branch.severity ?? ''}`);
+        bc.append(el('div', 'branch-cond', branch.condition));
+        if (branch.behaviour) bc.append(el('div', 'branch-behaviour', branch.behaviour));
+        if (branch.severity) bc.append(el('span', 'branch-sev', branch.severity));
+        if (branch.resolvedBy) bc.append(el('div', 'branch-resolved', `resolved by ${branch.resolvedBy}`));
+        column.append(bc);
       }
     }
-  }
 
-  // ---- identifier dependencies ---------------------------------------
-  const byPath = new Map();
-  for (const op of operations) {
-    if (!byPath.has(op.path)) byPath.set(op.path, []);
-    byPath.get(op.path).push(op);
-  }
+    track.append(column);
+  });
 
-  let idEdges = 0;
-  for (const op of operations) {
-    const collection = supplyingCollection(op.path);
-    if (!collection || collection === op.path) continue;
-    const suppliers = (byPath.get(collection) ?? []).filter(
-      (candidate) => candidate.method === 'POST' || candidate.method === 'GET'
-    );
-    const parameter = op.path.match(/\{(\w+)\}/)?.[1] ?? 'id';
-    for (const supplier of suppliers) {
-      const before = edges.length;
-      addEdge(supplier, op, parameter, 'id');
-      if (edges.length > before) idEdges += 1;
+  // ---- exit states -----------------------------------------------------
+  if (flow.exitStates.length) {
+    track.append(el('div', 'journey-arrow', '→'));
+    const exits = el('div', 'journey-exits');
+    exits.append(el('div', 'journey-section-label', 'exit states'));
+    for (const exit of flow.exitStates) {
+      const card = el('div', `exit-card ${exit.state}`);
+      card.append(el('div', 'exit-state', exit.state));
+      card.append(el('div', 'exit-desc', exit.description));
+      exits.append(card);
     }
+    track.append(exits);
+  }
+  body.append(track);
+
+  // branches whose step number does not match any step would otherwise vanish
+  const orphanBranches = flow.branches.filter(
+    (b) => !flow.steps.some((s) => s.step === b.at)
+  );
+  if (showBranches && orphanBranches.length) {
+    const box = el('div', 'journey-questions');
+    box.append(el('b', null, `${orphanBranches.length} branch(es) reference a step that does not exist: `));
+    box.append(document.createTextNode(orphanBranches.map((b) => `step ${b.at} — ${b.condition}`).join('; ')));
+    body.append(box);
   }
 
-  const nodes = operations
-    .filter((op) => involved.has(op.id))
-    .map((op) => ({
-      id: op.id,
-      title: `${op.method} ${op.path}`,
-      badge: op.permission ?? '',
-      color: METHOD_COLORS[op.method] ?? '#8b8b93',
-      rows: [
-        ...domainSchemas(op.consumes).map((s) => ({ label: '← in', value: s.name, refTarget: s.id })),
-        ...domainSchemas(op.produces).map((s) => ({
-          label: '→ out', value: s.name, refTarget: s.id, strong: true,
-        })),
-      ],
-    }));
-
-  return { nodes, edges, schemaEdges, idEdges, total: operations.length };
-}
-
-function renderFlow({ focus } = {}) {
-  const file = state.flowScope;
-  if (!file) return;
-  const { nodes, edges, schemaEdges, idEdges, total } = buildFlow(file);
-  flow.setData(nodes, edges);
-  flow.setSelected(state.selectedId);
-  $('flow-hint').textContent = nodes.length
-    ? `${nodes.length} of ${total} operations · ${idEdges} identifier dependencies · ${schemaEdges} schema hand-offs`
-    : 'Nothing in this contract hands data to anything else';
-  renderBoxLegend($('flow-legend'), [
-    ['#34d399', 'POST'], ['#60a5fa', 'GET'], ['#fbbf24', 'PUT'], ['#f87171', 'DELETE'],
-  ], 'arrow = the target needs an id or schema the source returns');
-  if (focus) flow.onSettle = () => { flow.onSettle = null; if (!flow.userAdjusted) flow.focus(focus, { zoom: 1 }); };
+  if (flow.openQuestions.length) {
+    const box = el('div', 'journey-questions');
+    box.append(el('b', null, 'Open questions'));
+    const list = el('ul');
+    for (const question of flow.openQuestions) list.append(el('li', null, question));
+    box.append(list);
+    body.append(box);
+  }
 }
 
 function renderBoxLegend(container, entries, note) {
@@ -1453,6 +1499,7 @@ function connectLiveReload() {
 
     state.fileCache.clear();
     state.treeCache.clear();
+    state.journeys = null; // flows and screens are watched too
     state.structureFile = null; // force the diagram to rebuild from fresh YAML
     const keepSelection = state.selectedId;
     await loadIndex();
@@ -1517,15 +1564,14 @@ function bindUI() {
     er.userAdjusted = false;
     renderER();
   };
-  $('flow-scope').onchange = (e) => {
-    state.flowScope = e.target.value;
-    flow.userAdjusted = false;
-    renderFlow();
+  $('journey-scope').onchange = (e) => {
+    state.journeyId = e.target.value;
+    renderJourney();
   };
+  $('journey-branches').onchange = () => renderJourney();
+  $('journey-ops').onchange = () => renderJourney();
   $('er-rows').onchange = (e) => { er.showRows = e.target.checked; er.draw(); };
-  $('flow-rows').onchange = (e) => { flow.showRows = e.target.checked; flow.draw(); };
   $('er-fit').onclick = () => { er.resize(); er.fit(); };
-  $('flow-fit').onclick = () => { flow.resize(); flow.fit(); };
 
   for (const button of $('struct-layout').querySelectorAll('button')) {
     button.classList.toggle('active', button.dataset.layout === tree.layoutMode);
@@ -1585,7 +1631,6 @@ function bindUI() {
     graph.draw();
     tree.draw();
     er.draw();
-    flow.draw();
   };
 
   const saved = localStorage.getItem('ticvai-theme');
@@ -1631,7 +1676,7 @@ function bindUI() {
     } else if (e.key === 'g') setMode('graph');
     else if (e.key === 's') setMode('structure');
     else if (e.key === 'e') setMode('er');
-    else if (e.key === 'f') setMode('flow');
+    else if (e.key === 'j') setMode('journey');
     else if (e.key === 'r') setMode('reader');
     else if (e.key === 'a') setMode('audit');
     else if (e.key === 'l' && state.selectedId) {

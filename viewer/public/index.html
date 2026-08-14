@@ -30,7 +30,7 @@
           <button class="mode" data-mode="graph">Graph</button>
           <button class="mode" data-mode="structure">Structure</button>
           <button class="mode" data-mode="er">ER</button>
-          <button class="mode" data-mode="flow">Flow</button>
+          <button class="mode" data-mode="journey">Journey</button>
           <button class="mode" data-mode="reader">Reader</button>
           <button class="mode" data-mode="audit">
             Audit <span class="audit-count" id="audit-count"></span>
@@ -136,18 +136,21 @@
           <div class="graph-legend" id="er-legend"></div>
         </section>
 
-        <section class="view" id="view-flow" hidden>
+        <section class="view journey" id="view-journey" hidden>
           <div class="graph-toolbar">
-            <select class="scope-select" id="flow-scope"></select>
+            <select class="scope-select" id="journey-scope"></select>
             <label class="toggle">
-              <input type="checkbox" id="flow-rows" checked />
-              <span>Payloads</span>
+              <input type="checkbox" id="journey-branches" checked />
+              <span>Branches</span>
             </label>
-            <button class="ghost-btn" id="flow-fit" type="button">Fit</button>
-            <div class="graph-hint" id="flow-hint"></div>
+            <label class="toggle">
+              <input type="checkbox" id="journey-ops" checked />
+              <span>Operations</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="journey-hint"></div>
           </div>
-          <canvas id="flow-canvas"></canvas>
-          <div class="graph-legend" id="flow-legend"></div>
+          <div class="journey-body" id="journey-body"></div>
         </section>
 
         <section class="view reader" id="view-reader" hidden>
