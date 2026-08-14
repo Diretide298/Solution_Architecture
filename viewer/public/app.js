@@ -1002,9 +1002,11 @@ function renderSideNote() {
   } else if (state.layer === 'backend') {
     const s = state.backend?.stats ?? {};
     if (s.tables) {
+      const storageOnly = s.tables - s.linked;
       note.innerHTML =
-        `From <b>${state.backend.file?.split('/').pop()}</b> — ${s.tables} tables, ${s.columns} ` +
-        `columns, all derived from contract schemas. ${s.written}/${s.modules} migrations written.`;
+        `From <b>${state.backend.file}</b> — ${s.tables} tables, ${s.linked} derived from contract ` +
+        `schemas and ${storageOnly} storage-only. <b>${s.inDdl}</b> of them exist as SQL in ` +
+        `${s.migrationFiles} migrations; the rest are planned.`;
       note.hidden = false;
     }
   }
@@ -1736,6 +1738,7 @@ function buildData(module, { inferred = true } = {}) {
   for (const table of [...included.values()]) {
     pull(table.childOf);
     for (const ref of table.references ?? []) pull(ref.toTable);
+    for (const key of table.keys ?? []) pull(key.toTable);
     if (inferred) for (const key of table.foreignKeys ?? []) pull(key.toTable);
   }
 
@@ -1747,10 +1750,16 @@ function buildData(module, { inferred = true } = {}) {
     return {
       id: `table:${table.name}`,
       title: everything ? table.name : table.name.split('.').slice(1).join('.') || table.name,
-      badge: own ? String(columns.length) : table.module,
-      color: !own ? '#fbbf24' : table.childOf ? '#60a5fa' : '#34d399',
+      badge: own ? (table.ddl ? `${columns.length} · sql` : String(columns.length)) : table.module,
+      // green means the migration exists and this table is really there;
+      // blue means it is derived from the contracts and still only planned
+      color: !own ? '#fbbf24' : table.ddl ? '#34d399' : '#60a5fa',
       rows: columns.map((column) => {
-        const target = column.referencesTable ?? (inferred ? column.foreignKeyTable : null) ?? null;
+        const target =
+          column.keyTable ??
+          column.referencesTable ??
+          (inferred ? column.foreignKeyTable : null) ??
+          null;
         return {
           label: `${column.required ? '• ' : ''}${column.name}`,
           value: column.type,
@@ -1772,13 +1781,21 @@ function buildData(module, { inferred = true } = {}) {
     edges.push({ source: `table:${from}`, target: `table:${to}`, label, dashed });
   };
 
-  // declared first, so a pair that is both keeps the solid line
-  let declared = 0;
+  // strongest first, so a pair joined more than one way keeps the solid line:
+  // a REFERENCES clause in the DDL, then a contract $ref, then a name match
   for (const table of included.values()) {
-    if (table.childOf) { push(table.name, table.childOf, 'child of', false); declared++; }
-    for (const ref of table.references ?? []) { push(table.name, ref.toTable, ref.column, false); declared++; }
+    for (const key of table.keys ?? []) {
+      push(table.name, key.toTable, key.columns.join(', '), false);
+    }
   }
-  const declaredPairs = seen.size;
+  const ddlPairs = seen.size;
+
+  for (const table of included.values()) {
+    if (table.childOf) push(table.name, table.childOf, 'child of', false);
+    for (const ref of table.references ?? []) push(table.name, ref.toTable, ref.column, false);
+  }
+  const declaredPairs = seen.size - ddlPairs;
+
   if (inferred) {
     for (const table of included.values()) {
       for (const key of table.foreignKeys ?? []) push(table.name, key.toTable, key.column, true);
@@ -1789,8 +1806,9 @@ function buildData(module, { inferred = true } = {}) {
     nodes,
     edges,
     own: [...included.values()].filter(isOwn).length,
+    ddl: ddlPairs,
     declared: declaredPairs,
-    inferred: seen.size - declaredPairs,
+    inferred: seen.size - ddlPairs - declaredPairs,
   };
 }
 
@@ -1845,15 +1863,17 @@ function renderData({ focus } = {}) {
   } else {
     const module = backend.modules.find((m) => m.name === state.dataModule);
     const pulled = nodes.length - own;
+    const written = [...nodes].filter((n) => !n.external && /sql/.test(String(n.badge))).length;
     $('data-hint').textContent =
-      `${own} tables${pulled ? ` · ${pulled} pulled in from other schemas` : ''} · ` +
-      `${built.declared} declared and ${built.inferred} inferred relationships` +
+      `${own} tables${written ? `, ${written} with DDL` : ''}` +
+      `${pulled ? ` · ${pulled} pulled in from other schemas` : ''} · ` +
+      `${built.ddl} foreign keys, ${built.declared} declared, ${built.inferred} inferred` +
       (module ? ` · migration ${module.migration ?? '—'} (${module.status ?? 'unknown'})` : '');
     renderBoxLegend($('data-legend'), [
-      ['#34d399', 'table in this schema'],
-      ['#60a5fa', 'child table'],
+      ['#34d399', 'created by a migration'],
+      ['#60a5fa', 'derived from the contracts, not written yet'],
       ['#fbbf24', 'table from another schema'],
-    ], 'solid = declared (Child of, or a $ref in the contracts) · dashed = inferred from a *_id column name');
+    ], 'solid = a REFERENCES clause or a contract $ref · dashed = inferred from a *_id column name');
   }
 
   // the layout is seeded in a knot and spreads as it settles, so framing it
@@ -2035,6 +2055,45 @@ function renderTableLinks() {
     return;
   }
 
+  // what the migration actually says, where there is one
+  if (table.ddl) {
+    pane.append(sectionHead('In the database', 1));
+    const facts = el('div', 'ddl-card');
+    const line = (label, value) => {
+      if (!value) return;
+      const row = el('div', 'impl-row');
+      row.append(el('span', 'impl-label', label));
+      row.append(el('code', null, String(value)));
+      facts.append(row);
+    };
+    line('migration', table.ddl.file);
+    line('primary key', table.ddl.primaryKey?.join(', '));
+    line('partition', table.ddl.partitionBy);
+    line('partition of', table.ddl.partitionOf);
+    line('generated', table.ddl.generated?.join(', '));
+    if (table.ddl.rls?.enabled) {
+      line('row security', table.ddl.rls.forced ? 'enabled and FORCED' : 'enabled');
+    }
+    pane.append(facts);
+
+    pane.append(sectionHead('Foreign keys', table.keys?.length ?? 0));
+    for (const key of table.keys ?? []) {
+      const row = el('div', 'link-item');
+      row.append(el('span', 'link-name', key.toTable));
+      row.append(el('span', 'link-weight', key.columns.join(', ')));
+      if (key.onDelete) row.append(el('span', 'link-file', `on delete ${key.onDelete.toLowerCase()}`));
+      else if (key.composite) row.append(el('span', 'link-file', 'composite'));
+      row.onclick = () => selectTable(key.toTable);
+      pane.append(row);
+    }
+    if (!table.keys?.length) pane.append(el('p', 'pane-empty', 'The DDL declares no foreign keys here.'));
+    pane.append(el('p', 'pane-note', 'Read from a REFERENCES clause — declared, not inferred.'));
+  } else if (table.claimsWritten) {
+    pane.append(sectionHead('In the database', 0));
+    pane.append(el('p', 'pane-empty',
+      'The workbook marks this written, but no migration in backend/ creates it.'));
+  }
+
   pane.append(sectionHead('Derived from', table.derivedFrom ? 1 : 0));
   if (table.derivedFrom) {
     const row = el('div', 'link-item');
@@ -2050,6 +2109,8 @@ function renderTableLinks() {
       } else toast(`${table.derivedFrom} is not a schema any contract declares`);
     };
     pane.append(row);
+  } else if (table.storageOnly) {
+    pane.append(el('p', 'pane-empty', table.storageReason ?? 'Storage-only — no contract schema behind it.'));
   } else {
     pane.append(el('p', 'pane-empty', 'No source schema declared.'));
   }
@@ -2078,23 +2139,30 @@ function renderTableLinks() {
     pane.append(el('p', 'pane-empty', 'No relationship the contracts declare as a $ref.'));
   }
 
+  // a table with DDL has real keys; the guesses were dropped for it
   const keys = table.foreignKeys ?? [];
-  pane.append(sectionHead('Inferred keys', keys.length));
-  for (const key of keys) {
-    const row = el('div', 'link-item inferred');
-    row.append(el('span', 'link-name', key.toTable));
-    row.append(el('span', 'link-weight', key.column));
-    if (key.self) row.append(el('span', 'link-file', 'self'));
-    else if (key.crossSchema) row.append(el('span', 'link-file', key.toTable.split('.')[0]));
-    row.onclick = () => selectTable(key.toTable);
-    pane.append(row);
+  if (!table.ddl) {
+    pane.append(sectionHead('Inferred keys', keys.length));
+    for (const key of keys) {
+      const row = el('div', 'link-item inferred');
+      row.append(el('span', 'link-name', key.toTable));
+      row.append(el('span', 'link-weight', key.column));
+      if (key.self) row.append(el('span', 'link-file', 'self'));
+      else if (key.fromDdl) row.append(el('span', 'link-file', 'per DDL'));
+      else if (key.crossSchema) row.append(el('span', 'link-file', key.toTable.split('.')[0]));
+      row.onclick = () => selectTable(key.toTable);
+      pane.append(row);
+    }
+    const learned = keys.filter((k) => k.fromDdl).length;
+    pane.append(
+      el('p', 'pane-note',
+        !keys.length ? 'No column here ends in _id with a table named for it.'
+        : learned
+          ? `Read from *_id column names. ${learned} of them follow a key a migration ` +
+            `already declares elsewhere for the same column name.`
+          : 'Read from *_id column names, not declared anywhere. Treat as a strong hint.')
+    );
   }
-  pane.append(
-    el('p', 'pane-note',
-      keys.length
-        ? 'Read from *_id column names, not declared anywhere. Treat as a strong hint.'
-        : 'No column here ends in _id with a table named for it.')
-  );
 
   // columns pointing at nothing are the interesting gap
   const dangling = (state.backend?.columns?.[table.name] ?? []).filter(
@@ -2151,7 +2219,7 @@ function renderLinksPane(node) {
     }
   }
 
-  // and, for a schema, the table it is persisted into
+  // and, for a schema, the table it is persisted into — or why it is not
   if (node.type === 'schema') {
     const tables = (state.backend?.tables ?? []).filter((t) => t.schemaId === node.id);
     if (tables.length) {
@@ -2160,9 +2228,19 @@ function renderLinksPane(node) {
         const row = el('div', 'link-item');
         row.append(el('span', 'link-name', table.name));
         row.append(el('span', 'link-weight', `${table.columns} cols`));
-        row.append(el('span', 'link-file', table.migration ?? ''));
+        row.append(el('span', 'link-file', table.ddl ? 'in the database' : table.migration ?? ''));
         row.onclick = () => selectTable(table.name);
         pane.append(row);
+      }
+    } else {
+      // the workbook's No table sheet says why, for 162 of them
+      const contract = node.file.split('/').pop().replace(/\.ya?ml$/, '');
+      const reason =
+        state.backend?.notPersisted?.[`${contract}.${node.name}`] ??
+        Object.values(state.backend?.notPersisted ?? {}).find((n) => n.schema === node.name);
+      if (reason) {
+        pane.append(sectionHead('Not persisted', 1));
+        pane.append(el('p', 'pane-note', `No table, deliberately — ${reason.reason}.`));
       }
     }
   }
@@ -2533,9 +2611,12 @@ function auditSummary() {
   if (state.layer === 'backend') {
     const b = state.backend;
     if (!b?.stats?.tables) return 'No schema workbook in backend/.';
+    const s = b.stats;
     return (
-      `${b.stats.tables} tables · ${b.stats.columns} columns · ${b.stats.modules} schemas ` +
-      `(${b.stats.written} migrations written) · all ${b.stats.linked} tables trace to a contract schema · ` +
+      `${s.tables} tables · ${s.columns} columns · ${s.modules} schemas · ` +
+      `${s.inDdl} tables exist in ${s.migrationFiles} migrations with ${s.ddlKeys} real foreign keys, ` +
+      `the other ${s.tables - s.inDdl} are derived from the contracts · ` +
+      `${s.linked} trace to a contract schema, ${s.notPersisted} schemas deliberately have none · ` +
       `${errors(b.problems)} errors`
     );
   }

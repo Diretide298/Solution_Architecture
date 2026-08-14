@@ -65,48 +65,61 @@ reports any that points at something which does not exist.
 
 ## Backend
 
-The schema reference in `backend/` is an `.xlsx`, so it is **read directly rather than
-converted**: the spreadsheet stays the one source of truth and there is no generated copy to
-drift from it. The zip and sheet reader is `lib/xlsx.mjs` — about 200 lines, no dependency.
+Two sources, read together: the **schema reference** `.xlsx` and the **versioned SQL** in
+`backend/`.
+
+The workbook is read directly rather than converted, so the spreadsheet stays the one source of
+truth with no generated copy to drift from it. `lib/xlsx.mjs` is a zip and sheet reader in about
+200 lines, no dependency. It is delivered to more than one folder and the copies drift, so **every
+copy is found and the newest wins** — and a stale one is reported rather than silently preferred.
+
+`lib/migrations.mjs` parses the DDL: `CREATE TABLE`, `REFERENCES`, `ALTER TABLE`, partitioning,
+row-level security, generated columns and enum types. It reads the subset of SQL these files use
+and ignores the rest rather than pretending to be a SQL parser. Its table counts agree with
+`tools/check-migrations.py`.
 
 **Data** — the ER diagram, at two zoom levels.
 
 *Whole database* is one box per schema, each listing which other schemas its keys reach into and
-how many columns do the reaching. 20 boxes rather than 197: all 197 tables at once is a hairball
-with no room for labels. Click a schema to drill into it.
+how many columns do the reaching. 21 boxes rather than 211: every table at once is a hairball with
+no room for labels. Click a schema to drill into it.
 
 *One schema* is its tables as entity boxes, every column with its type and `•` marking required.
-Green is a table in the schema, blue a child table, amber one pulled in from another schema
-because something here points at it.
+**Green means a migration creates it and it is really there; blue means it is derived from the
+contracts and still only planned** — 27 of 211 are green. Amber is a table pulled in from another
+schema because something here points at it.
 
-**Relationships come in two kinds, drawn differently.**
+**Relationships come in three kinds, strongest first.**
 
-- **Solid — declared.** The workbook's `Child of`, and columns whose source property is a `$ref`
-  in the contracts. There are 32 of these.
-- **Dashed — inferred.** A column ending `_id` whose name resolves to a table. `principal_id`
-  matches `identity.principal`; `added_by_principal_id` resolves by trying successively shorter
-  suffixes. A table in the column's own schema wins over one elsewhere, and a name owned by two
-  schemas is refused rather than guessed at. There are 244 of these.
+- **A `REFERENCES` clause** in the DDL — the database saying what is true. 34 of these, 9 of them
+  composite `(id, level)` keys from V0003a. Drawn solid.
+- **Declared in a contract** — a column whose source property is a `$ref`. Drawn solid.
+- **Inferred from a column name** — `_id` resolved by trying successively shorter suffixes, so
+  `added_by_principal_id` finds `identity.principal`. A table in the column's own schema wins over
+  one elsewhere, and a name owned by two schemas is refused rather than guessed at. Drawn dashed,
+  counted separately, switchable off, and dropped entirely for any table the DDL covers.
 
-The workbook has no key column and only 11 relationships survive as `$ref`s, so an ER drawn from
-declarations alone is a page of boxes with almost no lines. The inferred ones make it a diagram —
-but they are switchable off, counted separately, and never presented as declared.
-
-**127 `_id` columns resolve to nothing**, and the ones that recur are reported: `venue_id` appears
-49 times with no `venue` table anywhere.
+**The DDL teaches the inference.** `venue_id` appears on 49 tables and there is no `venue` table —
+a venue is a *level* of `platform.scope_node`, which only the migrations know. Where a migration
+resolves a column name, that answer is reused for the same name elsewhere and labelled `per DDL`.
 
 **Routing** — ADR-0016 made visible: every contract's operations split across primary-write,
 primary-read, replica and analytical.
+
+Selecting a table shows what the migration says about it — primary key, partitioning, whether row
+security is merely enabled or `FORCED` — its real foreign keys with their `ON DELETE`, and any
+`_id` column still pointing at no table at all.
 
 ## Tracing across the layers
 
 The right-hand pane answers "what links to this" about whatever is selected:
 
 - an **operation** → which screens call it, which flows traverse it, what `$ref`s it
-- a **schema** → what references it, and **which table it is persisted as**
+- a **schema** → what references it, and **which table it is persisted as** — or, for 162 of
+  them, why it deliberately has none
 - a **screen** → which flows step through it, which screens reach it
-- a **table** → the contract schema it derives from, its children, its declared references, its
-  inferred keys, and any `_id` column pointing at no table at all
+- a **table** → what the DDL says about it, its real foreign keys, the contract schema it derives
+  from, its inferred keys, and any `_id` column pointing at no table at all
 
 Every one of those is a click, so a database column can be followed back to the screen that
 displays it and forward to the migration that creates it.
@@ -169,9 +182,14 @@ is offline-capable; navigation pointing at a screen that does not exist; flow st
 operation their own screen never declares; route collisions within an app; an offline-capable app
 with no offline package.
 
-**Backend** — a table whose parent is not in the table list, a table deriving from a schema no
-contract declares, a table with no columns, and any `_id` column name used five or more times
-with no table behind it.
+**Backend** — a table the workbook marks written with no migration behind it, a foreign key
+pointing at a table no migration creates, a table created twice, columns the DDL has that the
+workbook does not list, a table deriving from a schema no contract declares, and any `_id` column
+name used five or more times with no table behind it.
+
+A second copy of the workbook that is older than the one being read is reported too. `backend/`
+held a build behind `handoff/` for a while, and whichever folder you happened to open decided
+which numbers you believed.
 
 ## Live
 
@@ -193,6 +211,7 @@ Keys: `Ctrl`/`Cmd`+`K` search · `1` `2` `3` layer · `m` cycle the sidebar grou
 | `lib/journeys.mjs` | joins `flows/` → `screens/` → the contracts, and reads `frontend/` |
 | `lib/xlsx.mjs` | minimal zip + sheet reader, so the workbook needs no dependency |
 | `lib/backend.mjs` | the schema reference and ADRs, joined back to contract schemas |
+| `lib/migrations.mjs` | the versioned SQL — tables, keys, partitioning, row security |
 | `server.mjs` | static server, `/api/index`, `/api/journeys`, `/api/backend`, `/api/file`, `/api/tree`, SSE |
 | `public/graph.js` | force-directed canvas renderer |
 | `public/structure.js` | tree and nested block renderers |
@@ -210,6 +229,7 @@ Node ids are stable and live in the URL hash, so any operation or schema can be 
 - **The 203 inventoried screens** on P02, P03, P04, P07, P08 and P13 have UI/UX boards rather than
   screen files, so they cannot appear until those are converted. 232 inventoried, 102 defined.
 - **`docs/`** — the ADRs and registers are on disk but only ADR-0016 is surfaced, on Routing.
+- **Row-security policies** — the viewer says a table is `FORCED`, not what the 13 policies say.
 
 ## Three things the audit found
 

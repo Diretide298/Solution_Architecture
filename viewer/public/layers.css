@@ -331,6 +331,18 @@ body[data-layer="backend"] { --layer: #fbbf24; --layer-soft: rgba(251, 191, 36, 
   text-transform: uppercase;
 }
 .deploy-value { color: var(--text-dim); font-size: 12px; line-height: 1.45; }
+/* what a migration actually says about a table, as opposed to what is planned */
+.ddl-card {
+  margin: 2px 10px 10px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--satellite) 40%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--satellite) 6%, transparent);
+}
+.ddl-card .impl-row { gap: 8px; font-size: 11.5px; }
+.ddl-card .impl-label { min-width: 84px; }
+.ddl-card code { color: var(--satellite); }
+
 .pane-note {
   margin: 4px 10px 12px;
   color: var(--text-faint);
