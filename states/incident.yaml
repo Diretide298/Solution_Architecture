@@ -1,0 +1,48 @@
+# Incident — state model
+# Contract: maintenance.IncidentStatus
+# Checked by tools/check-states.py.
+
+entity: Incident
+contract: maintenance
+enum: IncidentStatus
+owner: maintenance
+initial:
+- reported
+terminal:
+- closed
+transitions:
+- from: reported
+  to: underInvestigation
+  operation: updateIncident
+  trigger: operation
+  guard: Someone took it
+- from: underInvestigation
+  to: actionRequired
+  operation: updateIncident
+  trigger: operation
+  guard: Findings need work — a work order, a policy change, training
+- from: actionRequired
+  to: underInvestigation
+  operation: updateIncident
+  trigger: operation
+  guard: Action taken, back for review
+- from: underInvestigation
+  to: closed
+  operation: updateIncident
+  trigger: operation
+  guard: '**Closed with findings.** A closed incident with no findings is a lesson nobody learned'
+  requiresApproval: true
+- from: actionRequired
+  to: closed
+  operation: updateIncident
+  trigger: operation
+  guard: Action complete and verified
+  requiresApproval: true
+- from: reported
+  to: closed
+  operation: updateIncident
+  trigger: operation
+  guard: Duplicate or reported in error
+  requiresApproval: true
+notes: No reopen. An incident recurring is a new incident with a link to the old one — merging them
+  hides a pattern that a regulator will ask about.

@@ -1,0 +1,39 @@
+# Content schedule — state model
+# Contract: white-label.ScheduleState
+# Checked by tools/check-states.py.
+
+entity: Content schedule
+contract: white-label
+enum: ScheduleState
+owner: whitelabel
+initial:
+- draft
+terminal:
+- expired
+transitions:
+- from: draft
+  to: scheduled
+  operation: updateBanner
+  trigger: operation
+  guard: Given a start and end
+- from: scheduled
+  to: draft
+  operation: updateBanner
+  trigger: operation
+  guard: Unscheduled before starting
+- from: scheduled
+  to: active
+  trigger: timer
+  guard: Start reached. **The clock is the tenant’s timezone, not the server’s** — a Ramadan banner
+    at midnight UTC is not midnight in Dubai
+- from: active
+  to: expired
+  trigger: timer
+  guard: End reached
+- from: active
+  to: draft
+  operation: updateBanner
+  trigger: operation
+  guard: Pulled early
+  isReversal: true
+notes: Timezone is a region setting. Every scheduling bug in a platform like this is the same bug.

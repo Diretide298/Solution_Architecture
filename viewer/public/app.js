@@ -1,6 +1,8 @@
 import { Graph, colorForNode } from './graph.js';
 import { StructureTree, kindColor } from './structure.js';
 import { BoxDiagram } from './boxdiagram.js';
+import { StateMachine } from './statemachine.js';
+import { installTips, tip, tipFor, GLOSSARY } from './tips.js';
 
 // ── layers ───────────────────────────────────────────────────────────
 // The three parts of the system, and the views that belong to each. Adding a
@@ -11,34 +13,175 @@ const LAYERS = [
     key: 'frontend',
     label: 'Frontend',
     hint: 'screens, journeys and the apps that implement them',
-    modes: [['screen', 'Screen'], ['journey', 'Journey'], ['apps', 'Apps'], ['audit', 'Audit']],
+    tip:
+      'What a person sees. **screens/** defines each one, **flows/** traces a job across ' +
+      'several, **frontend/** says which app builds them, and **wireframes/** draws them. ' +
+      'Every operation a screen names is resolved against the contracts.',
+    modes: [
+      ['screen', 'Screen'], ['journey', 'Journey'], ['apps', 'Apps'],
+      ['waves', 'Waves'], ['audit', 'Audit'],
+    ],
     groups: [['platforms', 'Platforms'], ['modules', 'Modules'], ['waves', 'Waves']],
   },
   {
     key: 'contracts',
     label: 'Contracts',
     hint: 'the API — the join between the other two layers',
+    tip:
+      'The 24 OpenAPI contracts. **The API is the join between every other layer**, so this ' +
+      'sits in the middle and everything else is drawn by resolving against it. Hand-authored; ' +
+      'servers and clients are generated from it, never the reverse.',
     modes: [
       ['graph', 'Graph'], ['structure', 'Structure'], ['er', 'ER'],
-      ['reader', 'Reader'], ['audit', 'Audit'],
+      ['lineage', 'Lineage'], ['reader', 'Reader'], ['audit', 'Audit'],
     ],
     groups: [['contracts', 'Contracts'], ['modules', 'Modules'], ['platforms', 'Platforms']],
+  },
+  {
+    key: 'domain',
+    label: 'Domain',
+    hint: 'states/ and events/ — the legal moves, and what crosses the outbox',
+    tip:
+      'The two artefacts that check each other. **states/** says which moves between statuses ' +
+      'are legal — 38 enums declare what states exist and none says which transitions are ' +
+      'allowed. **events/** says what goes through the outbox when one happens.',
+    modes: [['states', 'States'], ['events', 'Events'], ['audit', 'Audit']],
+    groups: [['entities', 'Entities'], ['contexts', 'Contexts']],
   },
   {
     key: 'backend',
     label: 'Backend',
     hint: 'the SQL in backend/, against the schema reference in handoff/',
+    tip:
+      'The database. The versioned SQL in **backend/** checked against the schema reference in ' +
+      '**handoff/**, so a table that exists can be told from one that is only planned — and ' +
+      'every table traces back to the contract schema it came from.',
     modes: [
       ['data', 'Data'], ['migrations', 'Migrations'], ['routing', 'Routing'], ['audit', 'Audit'],
     ],
     groups: [['modules', 'Schemas'], ['status', 'Status'], ['migration', 'Migration']],
   },
+  {
+    key: 'decisions',
+    label: 'Decisions',
+    hint: 'docs/ — the ADRs, the registers, and the authorisation spec',
+    tip:
+      'Why the shape is the shape. Everything else here is machine-readable and can be checked ' +
+      'mechanically; **docs/** is prose, and prose is where the reasons live. One thing in it is ' +
+      'executable — the permission vectors — so the viewer runs them rather than listing them.',
+    modes: [['decisions', 'Decisions'], ['audit', 'Audit']],
+    groups: [['decisions', 'Decisions'], ['registers', 'Registers']],
+  },
 ];
+
+/**
+ * What each view is for, in one place. Shown on hover over the mode buttons,
+ * and reused by the manual — a view whose purpose has to be explained in a
+ * conversation is a view nobody opens twice.
+ */
+const MODE_TIPS = {
+  graph: {
+    title: 'Graph',
+    body:
+      'The contracts as a network, in five scopes. **Spine** is the architecture picture — ' +
+      'contracts joined by the events between them. The others show `$ref`s, permissions, and ' +
+      'the neighbourhood of whatever is selected.',
+  },
+  structure: {
+    title: 'Structure',
+    body:
+      'What is actually inside one contract file, as a block diagram. Every mapping and ' +
+      'sequence is a block; scalars are rows inside their parent, so an operation is one card ' +
+      'rather than eleven boxes.',
+  },
+  er: {
+    title: 'ER',
+    body:
+      'The schemas of one contract as entity boxes, with every `$ref` between them drawn. ' +
+      'API entities — not database tables, which are the Backend layer.',
+  },
+  reader: {
+    title: 'Reader',
+    body:
+      'The YAML itself, syntax highlighted, with every `$ref` and every permission string ' +
+      'clickable. Unresolved refs are underlined in red.',
+  },
+  screen: {
+    title: 'Screen',
+    body:
+      'One screen: its wireframe, its regions and components, the four states it must handle, ' +
+      'every operation it calls, and where it can be reached from.',
+  },
+  journey: {
+    title: 'Journey',
+    body:
+      'One job a person came to do, traced across screens and the operations each step calls — ' +
+      'with the branches, because a flow with only a happy path describes a demo.',
+  },
+  apps: {
+    title: 'Apps',
+    body:
+      'What actually gets built: the app manifests, their routes, the contracts each consumes, ' +
+      'and the platform wireframes.',
+  },
+  states: {
+    title: 'States',
+    body:
+      'The legal moves between the states of one entity. The contracts declare what states ' +
+      'exist; nothing but this says which transitions are allowed.',
+  },
+  events: {
+    title: 'Events',
+    body:
+      'What crosses `platform.outbox`: who publishes each fact, who consumes it, what the ' +
+      'payload is, and what happens on a redelivery.',
+  },
+  data: {
+    title: 'Data',
+    body:
+      'The database. Zoomed out, the schemas and how they reference each other; drilled in, ' +
+      'one schema’s tables with every column. Green exists in SQL, blue is still only planned.',
+  },
+  migrations: {
+    title: 'Migrations',
+    body: 'The versioned SQL in `backend/` — what each file creates, and the prose beside it.',
+  },
+  routing: {
+    title: 'Routing',
+    body: 'ADR-0016 made visible: every operation split across primary-write, primary-read, replica and analytical.',
+  },
+  lineage: {
+    title: 'Lineage',
+    body:
+      'Which tables each operation actually touches, plus its service and stored procedure — the ' +
+      'join between the Contracts layer and the Backend layer, which nothing else here can make. ' +
+      '**336 of 654 resolve to a table**; the rest mostly return a computed projection and ' +
+      'correctly resolve to none.',
+  },
+  waves: {
+    title: 'Waves',
+    body:
+      'Delivery sequencing. All 347 screens across three waves and twelve platforms, with the ' +
+      '**192 that name no operation** marked — a screen somebody can draw and nobody can build.',
+  },
+  decisions: {
+    title: 'Decisions',
+    body:
+      'The 18 ADRs, the registers, and the authorisation spec **executed rather than listed** — ' +
+      'each permission vector resolved against the rule, because a failing vector is a build failure.',
+  },
+  audit: {
+    title: 'Audit',
+    body:
+      'Everything wrong with **this layer**, from resolving the files rather than reading them. ' +
+      'The badge counts errors. Click a finding to open what it is about.',
+  },
+};
 
 const layerOf = (key) => LAYERS.find((l) => l.key === key) ?? LAYERS[1];
 const VIEWS = [
-  'graph', 'structure', 'er', 'journey', 'screen', 'apps',
-  'data', 'migrations', 'routing', 'reader', 'audit',
+  'graph', 'structure', 'er', 'lineage', 'journey', 'screen', 'apps', 'waves',
+  'states', 'events', 'data', 'migrations', 'routing', 'reader', 'decisions', 'audit',
 ];
 
 // ── state ────────────────────────────────────────────────────────────
@@ -57,21 +200,66 @@ const state = {
   journeyId: null,
   journeys: null,
   backend: null,
+  domain: null,
+  lineage: null, // operation -> tables, and screen -> everything
+  tooltips: null, // the delivery's own hover text, 340 entries
+  decisions: null, // the ADRs, the registers and the permission vectors
+  lineageScope: 'operations',
+  lineageFilter: '',
+  lineageUnresolved: true,
+  decisionsScope: 'adrs',
+  decisionsFilter: '',
+  adrId: null,
+  wavesUnbuilt: true,
+  wavesOffline: false,
+  machineId: null, // state model on screen
+  stateName: null, // state selected within it
+  eventId: null, // event opened in the events view, or null for the catalogue
   screenId: null,
+  boardId: null, // a UI/UX board opened in place of a screen
   tableName: null,
   dataModule: null,
   dataRows: true,
   // each layer groups its sidebar by something different, so this is per layer
-  groupBy: { frontend: 'platforms', contracts: 'contracts', backend: 'modules' },
+  groupBy: {
+    frontend: 'platforms', contracts: 'contracts', domain: 'entities',
+    backend: 'modules', decisions: 'decisions',
+  },
   sideFilter: '',
-  graphScope: 'files',
+  graphScope: 'spine',
   typeFilter: new Set(['operation', 'schema']),
   auditFilter: 'all',
   expandedFiles: new Set(),
   fileCache: new Map(),
+  drawer: null, // 'left' | 'right' | null — only meaningful below the phone breakpoint
 };
 
 const groupBy = () => state.groupBy[state.layer];
+
+// ── drawers ──────────────────────────────────────────────────────────
+// On a phone both rails are off-canvas. The state is one field; CSS does the
+// animation off body.dataset, so nothing here measures or positions anything.
+function setDrawer(next) {
+  state.drawer = next;
+  if (next) document.body.dataset.drawer = next;
+  else delete document.body.dataset.drawer;
+  $('drawer-left-toggle').setAttribute('aria-expanded', String(next === 'left'));
+  $('drawer-right-toggle').setAttribute('aria-expanded', String(next === 'right'));
+}
+
+/**
+ * The links pane is a reverse index of a selection. Before there is one — and
+ * on the Decisions layer, which never fills it — the toggle would open an
+ * empty drawer, so it is not offered. Read off the pane rather than a list of
+ * views, so a view that starts filling it needs no change here.
+ */
+function syncLinksToggle() {
+  const pane = $('links-pane');
+  const filled = state.layer !== 'decisions'
+    && [...pane.children].some((child) => !child.classList.contains('pane-empty'));
+  $('drawer-right-toggle').hidden = !filled;
+  if (!filled && state.drawer === 'right') setDrawer(null);
+}
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, className, text) => {
@@ -95,13 +283,128 @@ const TYPE_LABEL = {
 const escapeHtml = (s) =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
+/**
+ * The `notes` fields in states/ and events/ are prose with **bold** and `code`
+ * in it, and the bold is always the sentence that matters — "**held → refunded
+ * is not a transition.**". Escaped first, so only these two ever become markup.
+ */
+// ── explaining things ────────────────────────────────────────────────
+// Two sources, and the delivery's own words always win over the viewer's.
+
+/**
+ * A component kind, region or pattern, explained from `screens/_components.yaml`
+ * — the file that exists precisely so the vocabulary is shared and reviewed. A
+ * kind that is not in there is a finding, so that is what the tip says.
+ */
+function vocabularyTip(element, name) {
+  const entry = state.journeys?.vocabulary?.[name];
+  if (!entry) {
+    return tip(element, name,
+      `Not in the shared component library. A \`kind\` used on a screen must exist in ` +
+      `screens/_components.yaml — free-text names are how one product ends up with four date pickers.`);
+  }
+  // 14 of the 46 entries are primitives the library describes only by naming —
+  // `textField`, `toggle`, `primaryButton`. Saying so is better than an empty
+  // panel, and the states it must handle are useful on their own.
+  const described = [entry.description, entry.notes].filter(Boolean).join('\n\n');
+  return tip(
+    element,
+    `${entry.id} — ${entry.group}`,
+    described ||
+      'In the shared component library, which declares the states it must handle but no ' +
+      'description — one of the primitives taken as self-evident.',
+    entry.states.length ? `must handle: ${entry.states.join(', ')}` : null
+  );
+}
+
+/**
+ * The delivery's own hover text, from `handoff/tooltips.json` — 340 entries
+ * across nine categories, generated from the contracts, the schema reference and
+ * the ADRs.
+ *
+ * This is the half a glossary cannot hold. `GLOSSARY` explains what a *kind* of
+ * thing is — what "ambient" means, what a spine contract is. This explains the
+ * individual thing: what `platform.outbox` is for, what `catalogue` covers, what
+ * ADR-0013 decided. So the two compose, and where both have something the
+ * delivery's own words win, for the same reason a component description does.
+ *
+ * `extra` carries the metadata that shipped alongside the tip — column counts,
+ * operation counts, whether a platform is offline-capable — because the file
+ * went to the trouble of including it and it is exactly what you want on the
+ * same card.
+ */
+function deliveryTip(element, category, key, { fallback = null } = {}) {
+  const entry = state.tooltips?.entries?.[category]?.[key];
+  // 202 of the 230 table tips say only "Derived from access.AccessPoint." — where
+  // the row came from, which the viewer already shows, rather than why the thing
+  // exists, which it cannot. The delivery's own README calls that "the same
+  // failure wearing text", so a caller with something better to say wins here.
+  if (!entry?.tip || (entry.restated && fallback)) {
+    if (fallback) return tip(element, fallback.title, fallback.body, fallback.extra);
+    return element;
+  }
+  const facts = [];
+  const note = (label, value) => {
+    if (value === undefined || value === null || value === '') return;
+    facts.push(typeof value === 'boolean' ? (value ? label : null) : `${label} ${value}`);
+  };
+  note('columns', entry.columns);
+  note('tables', entry.tables);
+  note('operations', entry.operations);
+  note('screens', entry.screens);
+  note('steps', entry.steps);
+  note('branches', entry.branches);
+  note('tier', entry.tier);
+  note('offline-capable', entry.offline);
+  const title = entry.title ?? entry.name ?? entry.short ?? key;
+  return tip(element, title, entry.tip, facts.filter(Boolean).join(' · ') || null);
+}
+
+/** A permission, explained from the vocabulary in `shared/permissions.yaml`. */
+function permissionTip(element, name) {
+  const node = state.nodesById?.get(`perm:${name}`);
+  if (node && !node.declared) {
+    return tip(element, name,
+      `**No contract declares this permission.** It is used here but is not in the enum in ` +
+      `shared/permissions.yaml, which is the single source for backend authz, frontend ` +
+      `navigation and AI scoping — so nothing will grant it.`);
+  }
+  return tip(
+    element,
+    name,
+    `A permission from the single enum in **shared/permissions.yaml** — the one source used for ` +
+    `backend authorisation, frontend navigation and AI scoping. Whoever holds it can do this; ` +
+    `whoever does not never sees the control.`,
+    node?.useCount ? `used by ${node.useCount} operation${node.useCount === 1 ? '' : 's'}` : null
+  );
+}
+
+const inlineMarkdown = (text) =>
+  escapeHtml(String(text ?? ''))
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+
 // ── boot ─────────────────────────────────────────────────────────────
 let graph;
 let tree;
 let er;
 let data;
+let machine;
 
 async function boot() {
+  machine = new StateMachine($('states-canvas'), {
+    onSelect: (node) => {
+      state.stateName = node.name;
+      renderStateLinks();
+    },
+    onEdge: (edge) => {
+      const m = currentMachine();
+      $('states-hint').textContent = edge
+        ? describeTransition(edge)
+        : m ? describeMachine(m) : '';
+    },
+  });
+
   const openRow = (row) => {
     if (row.refTarget && state.nodesById.has(row.refTarget)) select(row.refTarget);
   };
@@ -163,14 +466,21 @@ async function boot() {
   window.__tree = tree;
   window.__er = er;
   window.__data = data;
+  window.__machine = machine;
   window.__state = state;
   await loadIndex();
   renderLayers();
   bindUI();
   connectLiveReload();
+  // delegated, so everything rendered from here on carries its tips without
+  // being wired up individually
+  installTips();
 
   // the scrolling panes pan like the canvases do
-  for (const id of ['journey-body', 'screen-body', 'apps-body', 'routing-body', 'migrations-body']) {
+  for (const id of [
+    'journey-body', 'screen-body', 'apps-body', 'routing-body', 'migrations-body',
+    'lineage-body', 'waves-body', 'decisions-body',
+  ]) {
     enableDragScroll($(id));
   }
 
@@ -185,6 +495,17 @@ async function boot() {
 }
 
 // ── layer switching ──────────────────────────────────────────────────
+/**
+ * Below 1100px the two topbar rails scroll instead of wrapping, so the button
+ * that just became active can be off screen. Scroll it back — a segmented
+ * control that does not show its own selection is worse than a wrapped one.
+ */
+function revealActive(rail) {
+  const active = rail.querySelector('.active');
+  if (!active || rail.scrollWidth <= rail.clientWidth) return;
+  active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+}
+
 function renderLayers() {
   const bar = $('layers');
   bar.innerHTML = '';
@@ -193,6 +514,7 @@ function renderLayers() {
     const button = el('button', null, layer.label);
     button.dataset.layer = layer.key;
     button.title = layer.hint;
+    tip(button, layer.label, layer.tip ?? layer.hint);
     button.classList.toggle('active', layer.key === state.layer);
     button.onclick = () => setLayer(layer.key);
     bar.append(button);
@@ -207,6 +529,8 @@ function renderModes() {
     const button = el('button', 'mode', label);
     button.dataset.mode = key;
     button.classList.toggle('active', key === state.mode);
+    const about = MODE_TIPS[key];
+    if (about) tip(button, about.title, about.body);
     if (key === 'audit') {
       const badge = el('span', 'audit-count');
       badge.id = 'audit-count';
@@ -226,6 +550,7 @@ function setLayer(key) {
   for (const button of $('layers').querySelectorAll('button')) {
     button.classList.toggle('active', button.dataset.layer === key);
   }
+  revealActive($('layers'));
   document.body.dataset.layer = key;
 
   // stay on the current view if this layer also has it, else open its first
@@ -243,14 +568,22 @@ function setLayer(key) {
 async function loadIndex() {
   // all three layers resolve against the contracts and rebuild together, so
   // they are fetched together — the audit needs every layer's problems anyway
-  const [index, journeys, backend] = await Promise.all([
+  const [index, journeys, backend, domain, lineage, tooltips, decisions] = await Promise.all([
     fetch('/api/index').then((r) => r.json()),
     fetch('/api/journeys').then((r) => r.json()).catch(() => null),
     fetch('/api/backend').then((r) => r.json()).catch(() => null),
+    fetch('/api/domain').then((r) => r.json()).catch(() => null),
+    fetch('/api/lineage').then((r) => r.json()).catch(() => null),
+    fetch('/api/tooltips').then((r) => r.json()).catch(() => null),
+    fetch('/api/decisions').then((r) => r.json()).catch(() => null),
   ]);
   state.index = index;
   state.journeys = journeys;
   state.backend = backend;
+  state.domain = domain;
+  state.lineage = lineage;
+  state.tooltips = tooltips;
+  state.decisions = decisions;
 
   state.nodesById = new Map(index.nodes.map((n) => [n.id, n]));
 
@@ -287,6 +620,10 @@ async function loadIndex() {
   // opens on the whole database, so the first thing seen is the shape of it
   state.dataModule = state.dataModule ?? (backend?.modules?.length ? ALL_SCHEMAS : null);
   state.screenId = state.screenId ?? journeys?.screens?.[0]?.id ?? null;
+  // the order machine first: fourteen transitions, four reversals and every
+  // approval rule in the platform, so it shows what the view is for
+  state.machineId =
+    state.machineId ?? domain?.machines?.find((m) => m.id === 'order')?.id ?? domain?.machines?.[0]?.id ?? null;
 
   renderSideGroups();
   renderTree();
@@ -296,13 +633,23 @@ async function loadIndex() {
   renderGraph();
   renderER();
   renderData(); // laid out at load, so the backend layer opens already settled
+  fillMachineSelect();
+  fillEventSelect();
 }
 
 /** Problems belong to the layer that produced them. */
 function layerProblems(key = state.layer) {
   if (key === 'frontend') return state.journeys?.problems ?? [];
   if (key === 'backend') return state.backend?.problems ?? [];
-  return state.index?.problems ?? [];
+  if (key === 'domain') return state.domain?.problems ?? [];
+  // the tooltips are generated from the contracts and the lineage joins them to
+  // the tables, so both of those are findings about the API rather than about docs
+  if (key === 'decisions') return state.decisions?.problems ?? [];
+  return [
+    ...(state.index?.problems ?? []),
+    ...(state.lineage?.problems ?? []),
+    ...(state.tooltips?.problems ?? []),
+  ];
 }
 
 function updateAuditBadge() {
@@ -326,10 +673,14 @@ function setMode(mode) {
   }
 
   state.mode = mode;
+  // whatever asked for this view — a mode button, a tree row, a search hit —
+  // the point was to look at it, so nothing may be left covering it
+  setDrawer(null);
   for (const view of VIEWS) $(`view-${view}`).hidden = view !== mode;
   for (const button of $('modes').querySelectorAll('.mode')) {
     button.classList.toggle('active', button.dataset.mode === mode);
   }
+  revealActive($('modes'));
   if (mode === 'graph') {
     // the canvas measures 0x0 while hidden, so re-measure now that it is laid out
     graph.resize();
@@ -367,9 +718,20 @@ function setMode(mode) {
     else if (!data.userAdjusted) data.fit();
   }
 
+  if (mode === 'states') {
+    // measured 0x0 while hidden, like every other canvas here
+    machine.resize();
+    if (!machine.nodes.length) renderStates();
+    if (!machine.userAdjusted) machine.fit();
+  }
+  if (mode === 'events') renderEvents();
+
   if (mode === 'journey') renderJourney();
   if (mode === 'screen') renderScreen();
   if (mode === 'apps') renderApps();
+  if (mode === 'waves') renderWaves();
+  if (mode === 'lineage') renderLineage();
+  if (mode === 'decisions') renderDecisions();
   if (mode === 'migrations') renderMigrations();
   if (mode === 'routing') renderRouting();
 }
@@ -386,6 +748,7 @@ function select(id, { scroll = true } = {}) {
   if (state.graphScope === 'local') renderGraph();
 
   renderLinksPane(node);
+  syncLinksToggle();
   renderReader(node, { scroll });
   renderStructure(node);
   syncBoxDiagrams(node);
@@ -459,7 +822,92 @@ function renderSideGroups() {
 function renderTree() {
   if (state.layer === 'frontend') return renderScreenTree();
   if (state.layer === 'backend') return renderTableTree();
+  if (state.layer === 'domain') return renderDomainTree();
+  if (state.layer === 'decisions') return renderDecisionsTree();
   return renderContractTree();
+}
+
+/** The ADRs and the registers, as a list you can jump from. */
+function renderDecisionsTree() {
+  const box = $('tree');
+  box.innerHTML = '';
+  const needle = state.sideFilter;
+  const hit = (s) => !needle || String(s ?? '').toLowerCase().includes(needle);
+  const decisions = state.decisions;
+  if (!decisions?.present) {
+    box.append(el('p', 'pane-empty', 'No docs/ in this package.'));
+    return;
+  }
+
+  let count = 0;
+  const section = (label, sub, color) => {
+    const group = el('div', 'tree-group');
+    const head = el('div', 'tree-group-head');
+    const dot = el('span', 'tree-group-dot');
+    dot.style.background = color;
+    head.append(dot, el('span', null, label));
+    const badge = el('span', 'tree-group-count');
+    head.append(badge);
+    group.append(head);
+    group.append(el('div', 'tree-group-sub', sub));
+    return { group, badge };
+  };
+
+  if (groupBy() === 'decisions') {
+    const { group, badge } = section('Decisions', 'docs/adr/', '#a78bfa');
+    let shown = 0;
+    for (const adr of decisions.adrs) {
+      if (!hit(adr.title) && !hit(adr.id) && !hit(adr.closes)) continue;
+      shown += 1;
+      count += 1;
+      const row = el('div', 'tree-file');
+      row.append(el('span', 'tree-file-name', `${adr.id} ${adr.title}`));
+      const mark = el('span', 'tree-file-count', adr.partlySuperseded ? 'part' : (adr.verdict ?? '—'));
+      if (adr.partlySuperseded) row.classList.add('problem');
+      row.append(mark);
+      deliveryTip(row, 'adrs', adr.id, {
+        fallback: { title: `ADR-${adr.id}`, body: adr.decision || adr.lead },
+      });
+      row.onclick = () => {
+        state.decisionsScope = 'adrs';
+        state.decisionsFilter = adr.id;
+        $('decisions-filter').value = adr.id;
+        setLayer('decisions');
+        setMode('decisions');
+      };
+      group.append(row);
+    }
+    badge.textContent = String(shown);
+    box.append(group);
+  } else {
+    for (const [key, label, sub, color] of [
+      ['register', 'Registers', 'docs/registers/', '#34d399'],
+      ['handoff', 'Handoff', 'handoff/', '#60a5fa'],
+      ['architecture', 'Architecture', 'docs/architecture/', '#fbbf24'],
+      ['active', 'In flight', 'docs/active/', '#f472b6'],
+      ['guide', 'Guides', 'docs/', '#94a3b8'],
+    ]) {
+      const list = decisions.documents.filter(
+        (d) => d.group === key && (hit(d.title) || hit(d.id) || hit(d.lead))
+      );
+      if (!list.length) continue;
+      const { group, badge } = section(label, sub, color);
+      badge.textContent = String(list.length);
+      for (const doc of list) {
+        count += 1;
+        const row = el('div', 'tree-file');
+        row.append(el('span', 'tree-file-name', doc.title));
+        if (doc.rows) row.append(el('span', 'tree-file-count', String(doc.rows)));
+        tip(row, doc.title, doc.lead || 'No lead paragraph.',
+          `${doc.lines} lines · ${doc.rows} table rows`);
+        row.onclick = () => openDoc(doc.file);
+        group.append(row);
+      }
+      box.append(group);
+    }
+  }
+
+  $('file-count').textContent = `${count} items`;
 }
 
 function renderContractTree() {
@@ -490,6 +938,8 @@ function renderContractTree() {
       const row = el('div', 'tree-file');
       row.dataset.id = file.id;
       row.append(el('span', 'tree-file-name', file.name));
+      // what this contract is for, in the delivery's own words
+      deliveryTip(row, 'contracts', file.file.split('/').pop().replace(/\.ya?ml$/, ''));
 
       const children = state.byFile.get(file.file) ?? [];
       const visible = children.filter((c) => state.typeFilter.has(c.type));
@@ -577,9 +1027,51 @@ function renderScreenTree() {
     box.append(section);
   }
 
+  // ---- design boards ---------------------------------------------------
+  // Listed on their own rather than under a platform group: the board for a
+  // platform with no screen definitions has no group to sit in, and that is
+  // exactly the case worth surfacing.
+  const shown = boards().filter(matchesBoardFilter);
+  if (shown.length) {
+    const section = el('div', 'tree-group');
+    const head = el('div', 'tree-group-head');
+    const dot = el('span', 'tree-group-dot');
+    dot.style.background = '#f0abfc';
+    head.append(dot, el('span', null, 'DESIGN BOARDS'));
+    head.append(el('span', 'tree-group-count', String(shown.length)));
+    section.append(head);
+    section.append(el('div', 'tree-group-sub', 'UIUX_html · exported HTML'));
+
+    for (const board of shown) {
+      const row = el('div', 'tree-file board-row');
+      row.dataset.id = `board:${board.id}`;
+      row.append(el('span', 'tree-file-code', board.platform ?? '—'));
+      row.append(el('span', 'tree-file-name', board.name + (board.revision ? ` ${board.revision}` : '')));
+      row.title =
+        `${board.file}\n${board.platform ? `${board.platform} ${board.platformName}` : 'no platform matched'}` +
+        `${board.inferred ? ` (inferred from the file name)` : ''}`;
+      row.onclick = () => selectBoard(board.id);
+      section.append(row);
+    }
+    box.append(section);
+  }
+
   const noun = groupBy() === 'waves' ? 'waves' : groupBy() === 'modules' ? 'modules' : 'platforms';
-  $('file-count').textContent = `${groups.size} ${noun} · ${screens.length} screens`;
+  $('file-count').textContent =
+    `${groups.size} ${noun} · ${screens.length} screens` +
+    (shown.length ? ` · ${shown.length} boards` : '');
   markTreeSelection();
+}
+
+function matchesBoardFilter(board) {
+  const needle = state.sideFilter;
+  if (!needle) return true;
+  return (
+    board.name.toLowerCase().includes(needle) ||
+    (board.platform ?? '').toLowerCase().includes(needle) ||
+    (board.platformName ?? '').toLowerCase().includes(needle) ||
+    'design board'.includes(needle)
+  );
 }
 
 function matchesScreenFilter(screen) {
@@ -627,6 +1119,21 @@ function renderTableTree() {
     dot.style.background = written ? '#34d399' : '#fbbf24';
     head.append(dot, el('span', null, group));
     head.append(el('span', 'tree-group-count', String(list.length)));
+    // The 14 August workbook added "What it is" and "Why it is separate" — the
+    // best short description of a schema anywhere in the delivery, and until
+    // now readable only by opening the spreadsheet.
+    if (module?.what || module?.why) {
+      tip(
+        head,
+        `${module.name}${module.tier ? ` — ${module.tier}` : ''}`,
+        [module.what, module.why && `**Why it is separate.** ${module.why}`].filter(Boolean).join('\n\n'),
+        [
+          module.tables != null ? `${module.tables} tables` : null,
+          module.operations != null ? `${module.operations} operations` : null,
+          module.contract ? `contract ${module.contract}` : null,
+        ].filter(Boolean).join(' · ') || null
+      );
+    }
     section.append(head);
     if (groupBy() !== 'status' && module?.migration) {
       section.append(el('div', 'tree-group-sub', module.migration));
@@ -640,6 +1147,23 @@ function renderTableTree() {
         : table.name;
       row.append(el('span', 'tree-file-name', label));
       row.append(el('span', 'tree-file-count', String(table.columns ?? 0)));
+      // "Table tips say why, not what" — the column list is already on screen
+      deliveryTip(row, 'tables', table.name, {
+        fallback: {
+          title: table.name,
+          // the workbook's own reason for the table is the better answer, and it
+          // is the one the tooltip file was supposed to be carrying
+          body:
+            table.storageReason ||
+            (table.ddl
+              ? `Created by ${table.ddl.file}. No reason for it is recorded anywhere.`
+              : '**Planned — no migration writes it yet**, and no reason for it is recorded.'),
+          extra: [
+            table.derivedFrom ? `from ${table.derivedFrom}` : null,
+            table.columns ? `${table.columns} columns` : null,
+          ].filter(Boolean).join(' · ') || null,
+        },
+      });
       row.title =
         `${table.name}\n` +
         `${table.ddl ? `created by ${table.ddl.file}` : 'planned — no migration yet'}\n` +
@@ -700,7 +1224,10 @@ function fillChildren(container, children) {
 
 /** What the left pane should be highlighting, whichever layer is showing. */
 function currentSideId() {
-  if (state.layer === 'frontend') return state.screenId ? `screen:${state.screenId}` : null;
+  if (state.layer === 'frontend') {
+    if (state.boardId) return `board:${state.boardId}`;
+    return state.screenId ? `screen:${state.screenId}` : null;
+  }
   if (state.layer === 'backend') return state.tableName ? `table:${state.tableName}` : null;
   return state.selectedId;
 }
@@ -721,10 +1248,19 @@ function renderGraph() {
   let viewEdges = [];
   let hint = '';
 
-  if (state.graphScope === 'files') {
+  if (state.graphScope === 'spine') {
+    return renderSpine();
+  } else if (state.graphScope === 'files') {
+    graph.reserveBottom = 0;
     viewNodes = nodes.filter((n) => n.type === 'file');
     viewEdges = fileEdges;
-    hint = 'Contracts, sized by how much links to them';
+    // Every one of these 44 edges points at shared/common or shared/permissions;
+    // no contract $refs another. Saying so is more use than a hint claiming the
+    // dots are sized by something, when a file node's degree is always zero.
+    const toShared = fileEdges.filter((e) => /\/shared\//.test(e.target)).length;
+    hint =
+      `${viewNodes.length} contracts · ${fileEdges.length} $ref links, ${toShared} of them to ` +
+      `shared/. Spine has the picture that distinguishes them.`;
   } else if (state.graphScope === 'schemas') {
     const keep = new Set(['schema', 'param', 'response', 'requestBody']);
     viewNodes = nodes.filter((n) => keep.has(n.type));
@@ -755,9 +1291,23 @@ function renderGraph() {
       renderLegend();
       return;
     }
+    const anchorNode = state.nodesById.get(anchor);
     const keep = new Set([anchor]);
-    let frontier = new Set([anchor]);
-    for (let hop = 0; hop < 2; hop++) {
+
+    // A contract has no $refs of its own — its operations and schemas do, and
+    // the adjacency map deliberately leaves out `contains`. Walking from a file
+    // node therefore found nothing at all, so a whole contract is seeded with
+    // everything defined inside it and the walk starts from there.
+    const isFile = anchorNode?.type === 'file';
+    if (isFile) {
+      for (const child of state.byFile.get(anchorNode.file) ?? []) keep.add(child.id);
+    }
+
+    // A contract is already dozens of nodes before the walk starts, so one hop
+    // from it reaches as far as two hops from a single operation.
+    const hops = isFile ? 1 : 2;
+    let frontier = new Set(keep);
+    for (let hop = 0; hop < hops; hop++) {
       const next = new Set();
       for (const id of frontier) {
         for (const edge of state.outgoing.get(id) ?? []) if (!keep.has(edge.target)) next.add(edge.target);
@@ -768,8 +1318,22 @@ function renderGraph() {
       if (keep.size > 220) break; // hub nodes like Money would swamp the view
     }
     viewNodes = nodes.filter((n) => keep.has(n.id));
-    viewEdges = edges.filter((e) => keep.has(e.source) && keep.has(e.target) && e.kind !== 'contains');
-    hint = `${viewNodes.length} nodes within 2 hops of ${state.nodesById.get(anchor)?.name ?? ''}`;
+    // `contains` is structure rather than reference, so it stays out — except
+    // from the contract itself, which would otherwise float unattached to the
+    // components that are the reason it is on screen
+    viewEdges = edges.filter(
+      (e) =>
+        keep.has(e.source) &&
+        keep.has(e.target) &&
+        (e.kind !== 'contains' || (isFile && e.source === anchor))
+    );
+    const name = anchorNode?.name ?? '';
+    hint =
+      viewNodes.length === 1
+        ? `${name} references nothing and nothing references it`
+        : isFile
+          ? `${name} — what it defines and everything those reference · ${viewNodes.length} nodes`
+          : `${viewNodes.length} nodes within 2 hops of ${name}`;
   }
 
   graph.colorBy = state.graphScope === 'files' ? 'group' : 'type';
@@ -788,9 +1352,198 @@ function renderGraph() {
   }, 400);
 }
 
+// ── contracts: the spine ─────────────────────────────────────────────
+// The Files graph draws 24 contracts and 44 links, and every single link points
+// at shared/common or shared/permissions. Not one contract $refs another. So
+// the picture it produces is a two-pointed starburst that is true of everything
+// and distinguishes nothing — the same defect the schema notes call out for
+// venue_id and principal_id in the data view.
+//
+// The contracts are not joined by $refs. They are joined by events: `order.paid`
+// is published by orders and consumed by catalogue, finance, inventory,
+// marketing and reporting. Until states/ and events/ arrived there was nothing
+// to draw that from. Now there is, so this is what the layer opens on.
+//
+// Position carries meaning here and the force layout is switched off: shared at
+// the centre because everything rests on it, spine in the inner ring, satellites
+// outside. Within each ring the order is settled by pulling contracts that
+// exchange events next to each other, so the arrows stay short.
+const SPINE_RING = 215;
+const SATELLITE_RING = 395;
+
+function renderSpine() {
+  const contracts = state.index.nodes.filter((n) => n.type === 'file');
+  const byFile = new Map(contracts.map((c) => [c.file, c]));
+
+  // one edge per ordered pair of contracts, carrying every event between them
+  const pairs = new Map();
+  for (const link of state.domain?.contextEdges ?? []) {
+    if (!link.fromContract || !link.toContract || link.fromContract === link.toContract) continue;
+    if (!byFile.has(link.fromContract) || !byFile.has(link.toContract)) continue;
+    const key = `${link.fromContract}|${link.toContract}`;
+    if (!pairs.has(key)) {
+      pairs.set(key, {
+        source: `file:${link.fromContract}`,
+        target: `file:${link.toContract}`,
+        events: [],
+        critical: 0,
+      });
+    }
+    const edge = pairs.get(key);
+    edge.events.push(link.event);
+    if (link.critical) edge.critical += 1;
+  }
+
+  const showShared = $('graph-shared')?.checked;
+  const sharedEdges = showShared
+    ? state.index.fileEdges.filter((e) => /\/shared\//.test(e.target))
+    : [];
+
+  // ---- placement ---------------------------------------------------------
+  const ringOf = (node) => (node.group === 'shared' ? 0 : node.group === 'spine' ? 1 : 2);
+  const rings = [[], [], []];
+  for (const contract of contracts) rings[ringOf(contract)].push(contract);
+  for (const ring of rings) ring.sort((a, b) => a.name.localeCompare(b.name));
+
+  // neighbours by event, in both directions — adjacency is what decides the order
+  const near = new Map(contracts.map((c) => [c.id, []]));
+  for (const edge of pairs.values()) {
+    near.get(edge.source)?.push(edge.target);
+    near.get(edge.target)?.push(edge.source);
+  }
+
+  const angle = new Map();
+  for (const ring of rings) {
+    ring.forEach((node, i) => angle.set(node.id, (i / Math.max(1, ring.length)) * Math.PI * 2));
+  }
+
+  // Settle each ring by circular barycentre: a contract drifts towards the mean
+  // direction of whatever it exchanges events with, then the ring is re-spaced
+  // evenly in the new order. Re-spacing is what stops everything collapsing onto
+  // the busiest quarter of the circle.
+  for (let pass = 0; pass < 30; pass++) {
+    const next = new Map(angle);
+    for (const node of contracts) {
+      const neighbours = near.get(node.id) ?? [];
+      if (!neighbours.length) continue;
+      let sin = 0;
+      let cos = 0;
+      for (const id of neighbours) {
+        sin += Math.sin(angle.get(id) ?? 0);
+        cos += Math.cos(angle.get(id) ?? 0);
+      }
+      if (sin === 0 && cos === 0) continue;
+      next.set(node.id, Math.atan2(sin, cos));
+    }
+    for (const ring of rings) {
+      if (ring.length < 2) continue;
+      const sorted = [...ring].sort(
+        (a, b) => (next.get(a.id) ?? 0) - (next.get(b.id) ?? 0) || a.name.localeCompare(b.name)
+      );
+      sorted.forEach((node, i) => angle.set(node.id, (i / ring.length) * Math.PI * 2));
+      ring.splice(0, ring.length, ...sorted);
+    }
+  }
+
+  const viewNodes = contracts.map((contract) => {
+    const ring = ringOf(contract);
+    const members = state.byFile.get(contract.file) ?? [];
+    const operations = members.filter((m) => m.type === 'operation').length;
+    const theta = angle.get(contract.id) ?? 0;
+    const radius = ring === 0 ? (rings[0].length > 1 ? 62 : 0) : ring === 1 ? SPINE_RING : SATELLITE_RING;
+    return {
+      ...contract,
+      // sized by what a contract actually contains, not by its degree — which
+      // is zero for every one of them
+      weight: Math.max(1, operations),
+      operations,
+      x: Math.cos(theta - Math.PI / 2) * radius,
+      y: Math.sin(theta - Math.PI / 2) * radius,
+    };
+  });
+
+  const light = document.documentElement.dataset.theme === 'light';
+  const viewEdges = [
+    ...sharedEdges.map((edge) => ({
+      ...edge,
+      width: 0.6,
+      color: light ? 'rgba(0,0,0,.09)' : 'rgba(255,255,255,.07)',
+      shared: true,
+    })),
+    ...[...pairs.values()].map((edge) => ({
+      source: edge.source,
+      target: edge.target,
+      kind: 'event',
+      weight: edge.events.length,
+      events: edge.events,
+      // a critical consumer is one the business breaks without: a dead-lettered
+      // order.paid means a guest paid and holds nothing
+      width: 1.1 + edge.events.length * 0.5 + (edge.critical ? 0.8 : 0),
+      color: edge.critical
+        ? (light ? 'rgba(180,83,9,.72)' : 'rgba(251,191,36,.72)')
+        : (light ? 'rgba(37,99,235,.5)' : 'rgba(96,165,250,.5)'),
+    })),
+  ];
+
+  graph.colorBy = 'group';
+  // the spine legend is the tallest in the app — seven rows — so the frame has
+  // to keep the ring out from under it
+  graph.reserveBottom = 150;
+  graph.setData(viewNodes, viewEdges, { placed: true, directed: true });
+  graph.setSelected(state.selectedId);
+
+  const d = state.domain?.stats;
+  $('graph-hint').textContent = d
+    ? `${contracts.length} contracts · ${pairs.size} event links between them · ` +
+      `${d.criticalConsumers} critical consumers` +
+      (showShared ? ` · ${sharedEdges.length} shared $refs` : '')
+    : `${contracts.length} contracts · events/ not readable, so no links between them`;
+
+  renderLegend();
+  graph.hasFramed = true;
+  requestAnimationFrame(() => {
+    graph.resize();
+    graph.recenter();
+  });
+}
+
+/** Controls that only mean something in one scope are hidden in the others. */
+function syncGraphControls() {
+  const spine = state.graphScope === 'spine';
+  for (const node of document.querySelectorAll('.spine-only')) node.hidden = !spine;
+  // the spine layout is placed rather than simulated, so there is nothing to
+  // recenter that Fit does not already do
+  $('graph-recenter').textContent = spine ? 'Fit' : 'Recenter';
+}
+
 function renderLegend() {
   const legend = $('graph-legend');
   legend.innerHTML = '';
+  if (state.graphScope === 'spine') {
+    for (const [key, label] of [
+      ['spine', 'spine — the inner ring'],
+      ['satellite', 'satellite — the outer ring'],
+      ['shared', 'shared — the centre, refd by all 22'],
+    ]) {
+      const row = el('div', 'legend-row');
+      const dot = el('span', 'legend-dot');
+      dot.style.background = colorForNode({ group: key, type: 'file' }, 'group');
+      legend.append(row);
+      row.append(dot, el('span', null, label));
+    }
+    for (const [color, label] of [
+      ['#fbbf24', 'an event with a critical consumer'],
+      ['#60a5fa', 'an event — the arrow runs publisher → consumer'],
+    ]) {
+      const row = el('div', 'legend-row');
+      const dot = el('span', 'legend-dot');
+      dot.style.background = color;
+      row.append(dot, el('span', null, label));
+      legend.append(row);
+    }
+    legend.append(el('div', 'legend-row', 'dot size is the operation count · hover a contract to isolate its events'));
+    return;
+  }
   const entries =
     state.graphScope === 'files'
       ? [['spine', 'spine'], ['satellite', 'satellite'], ['shared', 'shared']]
@@ -1011,11 +1764,35 @@ function renderSideNote() {
     note.hidden = false;
   } else if (state.layer === 'frontend') {
     const screens = state.journeys?.screens ?? [];
-    const platforms = new Set(screens.map((s) => s.platform)).size;
+    const defined = new Set(screens.map((s) => s.platform));
+    // the full vocabulary is the deployment table's twelve, not the ones that
+    // happen to have screen files today — the gap is the point
+    const all = state.journeys?.allPlatforms ?? [];
+    const missing = all.filter((p) => !defined.has(p.code));
     note.innerHTML =
-      `<b>${screens.length} screens</b> across ${platforms} platforms. The other platforms have ` +
-      `UI/UX boards rather than screen files, so they are absent here — a gap in the ` +
-      `definitions, not in the product.`;
+      `<b>${screens.length} screens</b> across ${defined.size} platforms` +
+      (missing.length
+        ? `. ${missing.length} more — ${missing.map((p) => p.code).join(', ')} — have no screen ` +
+          `files yet, so they are absent here: a gap in the definitions, not in the product.`
+        : `, which is every platform in the deployment table.`);
+    note.hidden = false;
+  } else if (state.layer === 'domain') {
+    const s = state.domain?.stats ?? {};
+    if (groupBy() === 'contexts') {
+      note.innerHTML =
+        `<b>${s.contextEdges} links between ${s.contexts} contexts</b>, every one of them an ` +
+        `event. The contracts do not <b>$ref</b> each other at all — all 44 of their file-level ` +
+        `links point at <b>shared/</b> — so this is the only place the coupling between bounded ` +
+        `contexts is written down.`;
+    } else {
+      const unmodelled = (s.statusEnums ?? 0) - (s.statusEnumsModelled ?? 0);
+      note.innerHTML =
+        `<b>${s.machines} state models</b> covering ${s.states} states and ${s.transitions} ` +
+        `transitions. The contracts declare <b>${s.statusEnums} status enums</b>` +
+        (unmodelled > 0
+          ? `; ${unmodelled} of them have no model, so nothing says which of their moves are legal.`
+          : `, and every one of them has a model.`);
+    }
     note.hidden = false;
   } else if (state.layer === 'backend') {
     const s = state.backend?.stats ?? {};
@@ -1192,7 +1969,8 @@ async function renderJourney() {
 
   // ---- header ----------------------------------------------------------
   const head = el('div', 'journey-head');
-  head.append(el('h2', 'journey-title', `${flow.id} — ${flow.name}`));
+  // the delivery narrates each flow in a paragraph — who arrives, wanting what
+  head.append(deliveryTip(el('h2', 'journey-title', `${flow.id} — ${flow.name}`), 'flows', flow.id));
 
   const chips = el('div', 'journey-chips');
   const chip = (label, value, cls = '') => {
@@ -1316,6 +2094,29 @@ async function renderJourney() {
     body.append(box);
   }
 
+  // ---- the design boards for the platforms this flow runs on -----------
+  // A flow names its platforms as "P01 Guest Web Storefront"; a board knows
+  // its code, so match on the code rather than the whole label.
+  const codes = new Set(
+    flow.platforms
+      .map((p) => /\bP\d{2}\b/.exec(String(p))?.[0])
+      .concat(flow.steps.map((s) => s.platform))
+      .filter(Boolean)
+  );
+  // This journey drawn end to end. The flat flow-fNN.html renders are generated
+  // from the step list and say nothing the step list above does not; the boards
+  // hold the drawn screens, so the journey is better told by walking its own
+  // steps and showing each screen's frame in order.
+  body.append(journeyFrames(flow));
+
+  const flowBoards = currentOnly(boards().filter((b) => codes.has(b.platform)));
+  body.append(
+    boardSection(flowBoards, {
+      label: 'design board · this journey’s platform',
+      height: 460,
+    })
+  );
+
   if (flow.openQuestions.length) {
     const box = el('div', 'journey-questions');
     box.append(el('b', null, 'Open questions'));
@@ -1324,6 +2125,478 @@ async function renderJourney() {
     box.append(list);
     body.append(box);
   }
+}
+
+// ── frontend: the design boards ──────────────────────────────────────
+// The exported UI/UX boards in UIUX_html/, framed live rather than as a
+// screenshot — they are working HTML, so scrolling and hovering them works.
+//
+// Which platform a board belongs to is inferred from its file name, so every
+// place one is shown says so. See lib/boards.mjs.
+
+const boards = () => state.journeys?.boards ?? [];
+
+/**
+ * An earlier revision of a board that is also here is history, not a second
+ * design — `Park POS v1` is not another board beside `Park POS`.
+ */
+function currentOnly(list) {
+  const current = new Set(list.filter((b) => !b.revision).map((b) => b.name));
+  return list.filter((b) => !b.revision || !current.has(b.name));
+}
+
+/**
+ * The board to show beside a screen or a journey. A board a screen names
+ * outright wins; failing that, the ones matched to its platform.
+ */
+function boardsFor({ platform = null, screenId = null } = {}) {
+  const declared = screenId ? boards().filter((b) => b.screens.includes(screenId)) : [];
+  if (declared.length) return declared;
+  return currentOnly(boards().filter((b) => platform && b.platform === platform));
+}
+
+const formatBytes = (n) => (n > 1024 * 1024 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.round(n / 1024)} KB`);
+
+/**
+ * One board, framed. The boards are laid out for a full desktop window, so the
+ * frame renders at that size and is scaled down to whatever room it has —
+ * shrinking the viewport instead would trigger their own responsive rules and
+ * show a layout nobody designed.
+ */
+/**
+ * An exported HTML page framed and scaled to whatever width it is given.
+ *
+ * Both the design boards and the wireframes are self-contained pages authored
+ * at a fixed width, so the only honest way to show one inside a card is to
+ * render it at its own width and scale the whole frame down. Zooming the page
+ * instead would reflow it, and a reflowed wireframe is not the wireframe.
+ */
+/**
+ * A screen, followed all the way down: operations, the services behind them,
+ * and the tables those services actually touch.
+ *
+ * The screen already lists its operations, and that is where the trail stopped —
+ * an operation is a name, and a name does not tell you that this screen writes
+ * to the ledger. `handoff/screen-index.json` carries the whole chain
+ * pre-computed, so this is the frontend end of the same join the Lineage view
+ * shows from the contracts end.
+ *
+ * A screen naming no operation gets the honest version rather than an empty
+ * block: 192 of the 347 are in that state, and it is the most useful thing this
+ * page can tell you about them.
+ */
+function screenReach(screen) {
+  const box = document.createDocumentFragment();
+  const entry = state.lineage?.screens?.find((s) => s.id === screen.id);
+  if (!entry) return box;
+
+  if (!entry.operations.length) {
+    box.append(el('div', 'journey-section-label', 'reaches'));
+    box.append(
+      el('p', 'pane-note board-empty',
+        `This screen names no operation, so it reaches nothing. It can be drawn and it cannot be ` +
+        `built — and 192 of the 347 screens are in the same position.`)
+    );
+    return box;
+  }
+
+  const tables = [...new Set([...entry.writes, ...entry.reads])];
+  box.append(
+    el('div', 'journey-section-label',
+      `reaches · ${entry.services.length} service${entry.services.length === 1 ? '' : 's'} · ` +
+      `${tables.length} table${tables.length === 1 ? '' : 's'}`)
+  );
+
+  const card = el('div', 'reach-card');
+  const line = (label, nodes, note) => {
+    if (!nodes.length) return;
+    const row = el('div', 'reach-row');
+    const key = el('span', 'reach-label', label);
+    if (note) tip(key, label, note);
+    row.append(key);
+    const values = el('span', 'reach-values');
+    for (const node of nodes) values.append(node);
+    row.append(values);
+    card.append(row);
+  };
+
+  line('services', entry.services.map((name) => {
+    const chip = el('span', 'lineage-service', name);
+    const ops = state.lineage?.operations?.filter((o) => o.service === name) ?? [];
+    tip(chip, name, `Owns ${ops.length} of the 654 operations.`);
+    return chip;
+  }), 'The service that runs the operations this screen calls. 22 across the platform.');
+
+  line('writes', entry.writes.map((t) => tableChip(t, { write: true })),
+    'Tables this screen causes to change. The ones that make it a risk to get wrong.');
+  line('reads', entry.reads.filter((t) => !entry.writes.includes(t)).map((t) => tableChip(t)),
+    'Tables it reads and does not change.');
+  line('stored procedures', entry.storedProcedures.map((p) => {
+    const chip = el('span', 'lineage-procedure', p);
+    tip(chip, 'Stored procedure',
+      'This screen drives one of the few operations that runs as a stored procedure rather than in a service.');
+    return chip;
+  }), 'Eight operations in the platform run as a stored procedure. This screen calls one.');
+
+  if (!tables.length) {
+    card.append(
+      el('div', 'reach-row',
+        el('span', 'pane-note',
+          `It calls ${entry.operations.join(', ')}, and none of those resolves to a table — usually ` +
+          `because the operation returns a computed projection rather than reading one.`))
+    );
+  }
+  box.append(card);
+  box.append(
+    el('p', 'pane-note',
+      'From handoff/screen-index.json — the same chain the Lineage view shows from the contracts end.')
+  );
+  return box;
+}
+
+function frameStage(url, { height = 420, design = 1440, title = 'preview', kind = 'board' } = {}) {
+  const stage = el('div', `board-stage ${kind}-stage`);
+  stage.style.height = `${height}px`;
+
+  const frame = document.createElement('iframe');
+  // both kinds share the scaling and the frame styling, but a wireframe and an
+  // exported design board are different claims and have to be distinguishable
+  frame.className = `board-frame ${kind}-frame`;
+  frame.src = url;
+  frame.loading = 'lazy';
+  frame.setAttribute('title', title);
+  // local, static and trusted, but nothing here needs to navigate the viewer
+  frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups');
+  frame.style.width = `${design}px`;
+  stage.append(frame);
+
+  // A board is authored for a 1240–1440px window. Following the container all
+  // the way down puts it at 0.27 on a 390px phone, which is not a small
+  // preview but an unreadable one — and it costs the same full page load to
+  // render. So the scale has a floor. Below it the board stops shrinking and
+  // the stage scrolls sideways instead, which at least admits there is more
+  // board than screen, and the card's "Open full size" link is promoted to a
+  // button at the same width, because reading one properly is what a whole tab
+  // is for. 0.42 is where the boards' 12–14px body text stops being a texture.
+  const MIN_SCALE = 0.42;
+
+  const fit = () => {
+    const width = stage.clientWidth;
+    if (!width) return;
+    const scale = Math.max(width / design, MIN_SCALE);
+    const frameHeight = Math.round(height / scale);
+    frame.style.height = `${frameHeight}px`;
+    frame.style.transform = `scale(${scale})`;
+    // a transform does not shrink the box the layout reserves, so the stage
+    // would report 1440px of scroll however far the frame is scaled down.
+    // Pull the reserved box back to what is actually drawn.
+    frame.style.marginRight = `${Math.floor(-design * (1 - scale))}px`;
+    frame.style.marginBottom = `${Math.floor(-frameHeight * (1 - scale))}px`;
+  };
+  // the card is built before it is in the document, so measure on the next frame
+  requestAnimationFrame(fit);
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(stage);
+  return stage;
+}
+
+function boardCard(board, { height = 420, design = 1440 } = {}) {
+  const card = el('div', 'board-card');
+
+  const head = el('div', 'board-head');
+  const title = el('div', 'board-title');
+  title.append(el('b', null, board.name));
+  if (board.revision) title.append(el('span', 'board-rev', board.revision));
+  head.append(title);
+
+  const meta = el('div', 'board-meta');
+  if (board.platform) {
+    const chip = el('span', `board-platform${board.inferred ? ' inferred' : ''}`);
+    chip.textContent = `${board.platform} ${board.platformName}`;
+    chip.title = board.inferred
+      ? `Matched by ${board.matchedBy} — inferred from the file name, not declared anywhere.`
+      : `Matched by ${board.matchedBy}.`;
+    meta.append(chip);
+  }
+  meta.append(el('span', 'board-size', formatBytes(board.bytes)));
+  const open = el('a', 'board-open', 'Open full size ↗');
+  open.href = board.url;
+  open.target = '_blank';
+  open.rel = 'noopener';
+  meta.append(open);
+  head.append(meta);
+  card.append(head);
+
+  card.append(frameStage(board.url, { height, design, title: `${board.name} design board` }));
+
+  if (board.inferred) {
+    card.append(
+      el('p', 'board-note',
+        `Attached to ${board.platform} by ${board.matchedBy} — inferred from the file name. ` +
+        `Nothing declares which platform a board is for.`)
+    );
+  }
+  return card;
+}
+
+// ── wireframes ───────────────────────────────────────────────────────
+// One rendered wireframe per screen, flow and platform, in `wireframes/`.
+//
+// These are attached by name — `screens/acc-001.html` is screen ACC-001, full
+// stop — where a design board has to be matched to a platform by reading its
+// file name and hoping. So there is no "inferred" caveat here and none is
+// shown: 180 of 180 screens have one.
+
+const wireframes = () => state.journeys?.wireframes ?? null;
+const wireframeFor = (kind, id) => (id ? wireframes()?.[kind]?.[id] ?? null : null);
+
+/**
+ * @param entry  one wireframes.screens / .flows / .platforms record
+ * @param label  what it draws, said plainly — this is the only caption
+ */
+function wireframeSection(entry, { label = 'wireframe', height = 520, design = 1240, empty = null, name = null } = {}) {
+  const box = document.createDocumentFragment();
+  if (!entry || (!entry.file && !entry.board)) {
+    if (empty) {
+      box.append(el('div', 'journey-section-label', label));
+      box.append(el('p', 'pane-note board-empty', empty));
+    }
+    return box;
+  }
+
+  // Two drawings can exist for one screen and they are not equal. The board
+  // frame is the drawn one — the platform board is 347 screens of design intent,
+  // with real field names, states and deny reasons read off the package. The
+  // standalone file is a structure-only render generated from the screen
+  // definition, and says so itself: "Nothing here is a design decision."
+  //
+  // So the board wins when there is one, and the generated one is offered
+  // underneath rather than dropped, because it is the thing that stays in step
+  // with the definition automatically.
+  const board = entry.board?.frameUrl ? entry.board : null;
+  const primary = board
+    ? {
+        url: board.frameUrl,
+        openUrl: board.url,
+        // the board's own <title> names the whole board, so it is the wrong
+        // caption for one frame out of it — the subject names itself
+        title: name ?? entry.title ?? board.anchor?.toUpperCase() ?? label,
+        source: board.file.split('/').pop(),
+        anchor: board.anchor,
+        chip: board.anchor ? 'from the platform board' : 'the platform board',
+        why: board.anchor
+          ? `${board.file}#${board.anchor} — this screen's frame, lifted out of the board it is ` +
+            `drawn on. The link is declared by the screen itself, not matched by file name.`
+          : `${board.file} — every screen on this platform, drawn, in one file. The platform ` +
+            `declares this board itself, so nothing is matched by guessing.`,
+        bytes: null,
+      }
+    : {
+        url: entry.url,
+        openUrl: entry.url,
+        title: entry.title ?? entry.file.split('/').pop(),
+        source: entry.file,
+        chip: 'named for what it draws',
+        why:
+          `${entry.file} — matched by file name, so nothing here is inferred. Structure only: ` +
+          `generated from the screen definition, so it carries no design decision.`,
+        bytes: entry.bytes,
+      };
+
+  box.append(el('div', 'journey-section-label', label));
+  const card = el('div', 'board-card wireframe-card');
+
+  const head = el('div', 'board-head');
+  const title = el('div', 'board-title');
+  title.append(el('b', null, primary.title));
+  head.append(title);
+
+  const meta = el('div', 'board-meta');
+  const declared = el('span', `board-platform${board ? ' from-board' : ''}`);
+  declared.textContent = primary.chip;
+  declared.title = primary.why;
+  tip(declared, board ? 'From the platform board' : 'Generated from the definition', primary.why);
+  meta.append(declared);
+  if (primary.bytes) meta.append(el('span', 'board-size', formatBytes(primary.bytes)));
+  const open = el('a', 'board-open', board ? 'Open the board ↗' : 'Open full size ↗');
+  open.href = primary.openUrl;
+  open.target = '_blank';
+  open.rel = 'noopener';
+  meta.append(open);
+  head.append(meta);
+  card.append(head);
+
+  card.append(
+    frameStage(primary.url, { height, design, title: primary.title, kind: 'wireframe' })
+  );
+  box.append(card);
+
+  // the generated render, folded away — same screen, different claim
+  if (board && entry.file) {
+    const extra = el('details', 'wireframe-alt');
+    const summary = el('summary', null, 'also: the structure-only render generated from the definition');
+    tip(summary, 'The other drawing',
+      `\`${entry.file}\` is generated from the screen definition — template, regions and component ` +
+      `kinds. It stays in step with the definition automatically, and states outright that nothing ` +
+      `in it is a design decision. The board above is the drawn one.`);
+    extra.append(summary);
+    extra.append(frameStage(entry.url, { height: 420, design, title: entry.title ?? label, kind: 'wireframe' }));
+    box.append(extra);
+  }
+  return box;
+}
+
+/**
+ * A journey as the screens it visits, in order, each lifted out of its board.
+ *
+ * The alternative is `wireframes/flow-f01.html`, which is generated from the
+ * same step list this page has already drawn above — so it repeats the page
+ * rather than adding to it. These are the drawn screens.
+ */
+function journeyFrames(flow) {
+  const box = document.createDocumentFragment();
+  const steps = flow.steps.filter((s) => s.screenId);
+  const drawn = steps
+    .map((step) => ({ step, entry: wireframeFor('screens', step.screenId) }))
+    .filter((s) => s.entry?.board?.frameUrl);
+
+  if (!drawn.length) {
+    const fallback = wireframeFor('flows', flow.id);
+    return wireframeSection(fallback, {
+      label: 'wireframe · this journey, screen by screen',
+      height: 620,
+      name: `${flow.id} — ${flow.name}`,
+      empty: `No screen on this journey resolves to a board frame.`,
+    });
+  }
+
+  box.append(
+    el('div', 'journey-section-label',
+      `drawn · ${drawn.length} of ${steps.length} steps, each screen lifted from its platform board`)
+  );
+
+  const strip = el('div', 'journey-frames');
+  for (const { step, entry } of drawn) {
+    const card = el('div', 'journey-frame-card');
+    const head = el('div', 'journey-frame-head');
+    head.append(el('span', 'journey-frame-step', String(step.step)));
+    const name = el('button', 'journey-frame-name', `${step.screenId} ${step.screenName ?? ''}`.trim());
+    name.onclick = () => { state.screenId = step.screenId; setMode('screen'); };
+    head.append(name);
+    if (step.platform) {
+      head.append(deliveryTip(el('span', 'journey-frame-platform', step.platform), 'platforms', step.platform));
+    }
+    card.append(head);
+    if (step.action) card.append(el('div', 'journey-frame-action', step.action));
+    card.append(
+      frameStage(entry.board.frameUrl, {
+        height: 460, design: 1240, title: step.screenName ?? step.screenId, kind: 'wireframe',
+      })
+    );
+    strip.append(card);
+  }
+  box.append(strip);
+
+  const skipped = steps.length - drawn.length;
+  if (skipped) {
+    box.append(
+      el('p', 'pane-note board-empty',
+        `${skipped} step${skipped > 1 ? 's are' : ' is'} not shown: the screen has no board frame declared.`)
+    );
+  }
+  return box;
+}
+
+/** The "design board" block used by the screen, journey and apps views. */
+function boardSection(list, { label = 'design board', height = 420, empty = null } = {}) {
+  const box = document.createDocumentFragment();
+  if (!list.length) {
+    if (empty) {
+      box.append(el('div', 'journey-section-label', label));
+      box.append(el('p', 'pane-note board-empty', empty));
+    }
+    return box;
+  }
+  box.append(
+    el('div', 'journey-section-label', `${label}${list.length > 1 ? ` · ${list.length}` : ''}`)
+  );
+  for (const board of list) box.append(boardCard(board, { height }));
+  return box;
+}
+
+function selectBoard(id, { open = true } = {}) {
+  state.boardId = id;
+  state.screenId = null;
+  if (state.layer !== 'frontend' && open) { setLayer('frontend'); setMode('screen'); return; }
+  markTreeSelection();
+  if (state.mode === 'screen') renderScreen();
+  else if (open) setMode('screen');
+}
+
+/** A board on its own page, for a platform that has no screen definitions. */
+function renderBoardPage(board) {
+  const body = $('screen-body');
+  body.innerHTML = '';
+  $('screen-hint').textContent =
+    `design board · ${formatBytes(board.bytes)} · ${board.file}`;
+
+  const head = el('div', 'journey-head');
+  head.append(el('h2', 'journey-title', board.name + (board.revision ? ` ${board.revision}` : '')));
+
+  const chips = el('div', 'journey-chips');
+  const chip = (label, value, cls = '') => {
+    const c = el('span', `jchip ${cls}`);
+    c.append(el('span', null, label));
+    c.append(el('b', null, String(value)));
+    return c;
+  };
+  if (board.platform) chips.append(chip('platform', `${board.platform} ${board.platformName}`));
+  if (board.platformApp) chips.append(chip('app', board.platformApp));
+  if (board.revision) chips.append(chip('revision', board.revision));
+  chips.append(chip('source', board.dir ?? 'designs'));
+  if (board.screens.length) chips.append(chip('drawn into', `${board.screens.length} screens`));
+  head.append(chips);
+  body.append(head);
+
+  const screens = board.platform
+    ? (state.journeys?.screens ?? []).filter((s) => s.platform === board.platform)
+    : [];
+
+  head.append(
+    el('div', 'journey-trigger',
+      screens.length
+        ? `The design board for ${board.platformName}. That platform has ${screens.length} ` +
+          `screen definitions — the board is how it looks, the screen files are what it does.`
+        : `The design board for ${board.platformName ?? 'an unmatched platform'}. That platform ` +
+          `has no screen definitions yet, so this board is the only description of it. ` +
+          `The frontend plan was built from boards like this one.`)
+  );
+
+  body.append(boardCard(board, { height: 620 }));
+
+  if (screens.length) {
+    body.append(el('div', 'journey-section-label', `screens on ${board.platform}`));
+    const row = el('div', 'nav-row');
+    for (const screen of screens) {
+      const pill = el('button', 'nav-pill', `${screen.id} ${screen.name}`);
+      pill.onclick = () => selectScreen(screen.id);
+      row.append(pill);
+    }
+    body.append(row);
+  }
+
+  const others = boards().filter((b) => b.id !== board.id);
+  if (others.length) {
+    body.append(el('div', 'journey-section-label', 'other boards'));
+    const row = el('div', 'nav-row');
+    for (const other of others) {
+      const pill = el('button', 'nav-pill', other.name + (other.revision ? ` ${other.revision}` : ''));
+      pill.onclick = () => selectBoard(other.id);
+      row.append(pill);
+    }
+    body.append(row);
+  }
+
+  markTreeSelection();
 }
 
 // ── frontend: one screen ─────────────────────────────────────────────
@@ -1336,6 +2609,7 @@ function screenById(id) {
 
 function selectScreen(id, { open = true } = {}) {
   state.screenId = id;
+  state.boardId = null;
   if (state.layer !== 'frontend' && open) { setLayer('frontend'); setMode('screen'); return; }
   markTreeSelection();
   if (state.mode === 'screen') renderScreen();
@@ -1363,16 +2637,45 @@ function renderScreen() {
     return;
   }
 
-  if (picker.options.length !== screens.length) {
+  // the picker carries the design boards too, so a platform with no screen
+  // definitions is still reachable from the screens page
+  const wanted = screens.length + boards().length;
+  if (picker.options.length !== wanted) {
     picker.innerHTML = '';
+    const screenGroup = boards().length ? el('optgroup') : picker;
+    if (screenGroup !== picker) {
+      screenGroup.label = 'Screens';
+      picker.append(screenGroup);
+    }
     for (const s of screens) {
       const option = el('option', null, `${s.id} — ${s.name}`);
-      option.value = s.id;
-      picker.append(option);
+      option.value = `screen:${s.id}`;
+      screenGroup.append(option);
+    }
+    if (boards().length) {
+      const group = el('optgroup');
+      group.label = 'Design boards';
+      for (const b of boards()) {
+        const option = el('option', null,
+          `${b.platform ?? '—'} ${b.name}${b.revision ? ` ${b.revision}` : ''}`);
+        option.value = `board:${b.id}`;
+        group.append(option);
+      }
+      picker.append(group);
     }
   }
+
+  // ---- a board opened in place of a screen ------------------------------
+  const board = state.boardId ? boards().find((b) => b.id === state.boardId) : null;
+  if (board) {
+    picker.value = `board:${board.id}`;
+    renderBoardPage(board);
+    renderSidePane();
+    return;
+  }
+
   if (!state.screenId || !screens.some((s) => s.id === state.screenId)) state.screenId = screens[0].id;
-  picker.value = state.screenId;
+  picker.value = `screen:${state.screenId}`;
 
   const screen = screenById(state.screenId);
   const showNotes = $('screen-notes').checked;
@@ -1386,6 +2689,10 @@ function renderScreen() {
   // ---- header ----------------------------------------------------------
   const head = el('div', 'journey-head');
   head.append(el('h2', 'journey-title', `${screen.id} — ${screen.name}`));
+  if (screen.platform) {
+    head.dataset.platform = screen.platform;
+    deliveryTip(head.lastChild, 'platforms', screen.platform);
+  }
 
   const chips = el('div', 'journey-chips');
   const chip = (label, value, cls = '') => {
@@ -1414,16 +2721,31 @@ function renderScreen() {
       const card = el('div', 'region-card');
       const top = el('div', 'region-head');
       top.append(el('span', 'region-name', region.name));
-      if (region.ref) top.append(el('span', 'region-ref', region.ref));
-      top.append(el('span', 'region-count', String(region.components.length)));
+      // a region is a slot the template exposes; the library says what each one
+      // is for, and until now that was only readable by opening the YAML
+      if (region.ref) top.append(vocabularyTip(el('span', 'region-ref', region.ref), region.ref));
+      top.append(
+        tip(el('span', 'region-count', String(region.components.length)),
+          'Components in this region',
+          'A screen places components into a region; it does not position them. The template decides that.')
+      );
       card.append(top);
 
       for (const component of region.components) {
         const item = el('div', 'component-row');
-        item.append(el('span', 'component-kind', component.kind));
+        item.append(vocabularyTip(el('span', 'component-kind', component.kind), component.kind));
         if (component.label) item.append(el('span', 'component-label', component.label));
-        if (component.bindsTo) item.append(el('code', 'component-binds', component.bindsTo));
-        if (component.permission) item.append(el('span', 'component-perm', component.permission));
+        if (component.bindsTo) {
+          item.append(
+            tip(el('code', 'component-binds', component.bindsTo),
+              'Binds to',
+              `This control reads or writes \`${component.bindsTo}\`. The binding is what makes a ` +
+              `screen traceable to the API — change the field and this is what breaks.`)
+          );
+        }
+        if (component.permission) {
+          item.append(permissionTip(el('span', 'component-perm', component.permission), component.permission));
+        }
         if (showNotes && component.notes) item.append(el('div', 'component-notes', component.notes));
         card.append(item);
       }
@@ -1445,7 +2767,7 @@ function renderScreen() {
     if (!value && !required.includes(key)) continue;
     const card = el('div', `state-card ${key}${value ? '' : ' missing'}`);
     const top = el('div', 'state-head');
-    top.append(el('span', 'state-name', key));
+    top.append(tipFor(el('span', 'state-name', key), key));
     top.append(el('span', 'state-when', STATE_NOTE[key]));
     card.append(top);
     card.append(el('div', 'state-desc', value ?? 'not declared'));
@@ -1460,7 +2782,9 @@ function renderScreen() {
     for (const api of screen.apis) {
       const node = operationNodeFor(api.operationId);
       const row = el('div', `api-row${node ? '' : ' unknown'}`);
-      if (api.trigger) row.append(el('span', `api-trigger ${api.trigger}`, api.trigger));
+      if (api.trigger) {
+        row.append(tipFor(el('span', `api-trigger ${api.trigger}`, api.trigger), api.trigger));
+      }
       if (node) row.append(el('span', `method ${node.method}`, node.method));
       row.append(el('span', 'api-id', api.operationId));
       if (api.purpose) row.append(el('span', 'api-purpose', api.purpose));
@@ -1473,6 +2797,9 @@ function renderScreen() {
     }
     body.append(list);
   }
+
+  // ---- what this screen reaches ----------------------------------------
+  body.append(screenReach(screen));
 
   // ---- navigation ------------------------------------------------------
   const entryFrom = screen.navigation?.entryFrom ?? [];
@@ -1535,6 +2862,28 @@ function renderScreen() {
     body.append(grid);
   }
 
+  // ---- the wireframe ---------------------------------------------------
+  // This screen's own drawing, matched by id rather than guessed at.
+  body.append(
+    wireframeSection(wireframeFor('screens', screen.id), {
+      label: 'wireframe',
+      height: 560,
+      name: `${screen.id} — ${screen.name}`,
+      empty:
+        `Nothing draws ${screen.id}: no wireframes/screens/${screen.id.toLowerCase()}.html, and no ` +
+        `board frame declared on the screen.`,
+    })
+  );
+
+  // ---- the design board ------------------------------------------------
+  // The wireframe status says how far the design got; this is the design.
+  body.append(
+    boardSection(boardsFor({ platform: screen.platform, screenId: screen.id }), {
+      label: 'design board · the exported artboard this platform was drawn from',
+      height: 460,
+    })
+  );
+
   // ---- implementation --------------------------------------------------
   if (screen.implementation) {
     body.append(el('div', 'journey-section-label', 'implementation'));
@@ -1596,8 +2945,11 @@ function renderApps() {
 
     const meta = el('div', 'app-meta');
     if (app.runtime) meta.append(el('span', 'jchip', app.runtime));
-    for (const platform of app.platforms) meta.append(el('span', 'jchip', platform));
-    if (app.offlineCapable) meta.append(el('span', 'jchip', 'offline'));
+    for (const platform of app.platforms) {
+      // audience, form factor, screen count and whether it must work offline
+      meta.append(deliveryTip(el('span', 'jchip', platform), 'platforms', platform));
+    }
+    if (app.offlineCapable) meta.append(tipFor(el('span', 'jchip', 'offline'), 'offline'));
     for (const dir of app.directions) meta.append(el('span', 'jchip', dir));
     card.append(meta);
 
@@ -1642,6 +2994,735 @@ function renderApps() {
     grid.append(card);
   }
   body.append(grid);
+
+  // ---- the platform wireframes -----------------------------------------
+  // One page per platform, showing every screen on it. This is the closest
+  // thing the delivery has to "what the app looks like", and unlike the boards
+  // it exists for all eight platforms that have screens.
+  const wf = wireframes();
+  // ---- the platform boards ----------------------------------------------
+  // The board is the drawing: every screen on a platform, drawn, in one file —
+  // P08's is 713KB and holds 73 of them. The thin `p08.html` beside it is
+  // generated from the screen list and shows the same list this page already
+  // has. So the board is what gets framed, and the platform each one belongs to
+  // is declared by that platform rather than read off the file name.
+  const platformBoards = Object.entries(wf?.platformBoards ?? {}).filter(([, b]) => b);
+  if (platformBoards.length) {
+    const frames = platformBoards.reduce((n, [, b]) => n + (b.frames ?? 0), 0);
+    body.append(
+      el('div', 'journey-section-label',
+        `platform boards · ${platformBoards.length} boards, ${frames} screens drawn`)
+    );
+    body.append(
+      el('p', 'pane-note',
+        `Every screen on a platform, drawn, in one file. Each platform declares its own board in ` +
+        `\`platform.wireframeBoard\`, so nothing here is matched by guessing — which is the ` +
+        `difference between these and the design boards below.`)
+    );
+    for (const [code, board] of platformBoards.sort(([a], [b]) => a.localeCompare(b))) {
+      const platform = state.journeys?.platforms?.find((p) => p.code === code);
+      body.append(
+        wireframeSection(
+          // a whole board rather than one frame out of it, so the frame url is
+          // the board itself and there is no anchor
+          { board: { ...board, frameUrl: board.url, url: board.url, anchor: null } },
+          {
+            label: `${code} — ${platform?.shortName ?? platform?.name ?? code} · ${board.frames} screens`,
+            height: 620,
+            design: 1240,
+            name: board.title ?? `${code} board`,
+          }
+        )
+      );
+    }
+  }
+
+  // ---- the design boards -----------------------------------------------
+  // frontend/README.md: the boards are what the frontend plan was built from,
+  // and the two apps that were missed were missed because they had no board.
+  // So they belong on the page about what actually gets built.
+  if (boards().length) {
+    const unbuilt = boards().filter((b) => b.platform && !b.platformHasScreens);
+    body.append(el('div', 'journey-section-label', `design boards · ${boards().length}`));
+    body.append(
+      el('p', 'pane-note',
+        unbuilt.length
+          ? `The frontend plan was built from boards like these. ${unbuilt.length} of them are for ` +
+            `a platform with no screen definitions yet — the board is the only description of it.`
+          : 'The frontend plan was built from boards like these.')
+    );
+    for (const board of boards()) {
+      const card = boardCard(board, { height: 480 });
+      const openHere = el('button', 'ghost-btn board-page', 'Open as a page');
+      openHere.onclick = () => selectBoard(board.id);
+      card.querySelector('.board-meta').prepend(openHere);
+      body.append(card);
+    }
+    $('apps-hint').textContent += ` · ${boards().length} design boards`;
+  }
+}
+
+// ── domain: states and events ────────────────────────────────────────
+// The contracts declare 38 status enums. Not one of them says which moves
+// between those states are legal, so nothing catches an order going from `held`
+// to `refunded` without ever having been paid. states/ says which are legal;
+// events/ says what crosses the outbox when one happens. Each checks the other.
+
+const machines = () => state.domain?.machines ?? [];
+const domainEvents = () => state.domain?.events ?? [];
+const currentMachine = () => machines().find((m) => m.id === state.machineId) ?? machines()[0] ?? null;
+
+const TRIGGER_LABEL = {
+  operation: 'called by an operation',
+  timer: 'a timer, with nobody watching',
+  job: 'a background job',
+  externalEvent: 'an event from elsewhere',
+  cascade: 'a cascade from a parent',
+};
+
+function describeMachine(m) {
+  const anchored = m.enumValues
+    ? `checked against ${m.contract}.${m.enum}`
+    : `${m.contract}.${m.enum} is not an enum, so nothing checks these states`;
+  return (
+    `${m.stats.states} states · ${m.stats.transitions} transitions · ` +
+    `${m.stats.reversals} reversals · ${anchored}`
+  );
+}
+
+function describeTransition(t) {
+  const cause = t.operation ? t.operation : TRIGGER_LABEL[t.trigger] ?? t.trigger ?? 'nothing declared';
+  const marks = [
+    t.isReversal ? 'reversal' : null,
+    t.requiresApproval ? 'needs approval' : null,
+    t.emits.length ? `emits ${t.emits.join(', ')}` : null,
+  ].filter(Boolean);
+  return `${t.from} → ${t.to} · ${cause}${marks.length ? ` · ${marks.join(' · ')}` : ''}`;
+}
+
+function fillMachineSelect() {
+  const select = $('states-scope');
+  if (!select) return;
+  select.innerHTML = '';
+  for (const m of machines()) {
+    const option = el('option', null, `${m.entity} — ${m.stats.states} states`);
+    option.value = m.id;
+    if (m.id === state.machineId) option.selected = true;
+    select.append(option);
+  }
+}
+
+function renderStates() {
+  const m = currentMachine();
+  if (!m) {
+    machine.setData(null);
+    $('states-hint').textContent = 'No state models in states/';
+    return;
+  }
+  state.machineId = m.id;
+  machine.setData(m);
+  machine.setSelected(state.stateName);
+  machine.resize();
+  if (!machine.userAdjusted) machine.fit();
+  $('states-hint').textContent = describeMachine(m);
+  renderStateLegend(m);
+  renderStateLinks();
+}
+
+function renderStateLegend(m) {
+  const entries = [
+    ['#34d399', 'initial'],
+    ['#a78bfa', 'terminal'],
+    ['#60a5fa', 'operation moves it'],
+    ['#34d399', 'timer or job — dashed, because no operation causes it'],
+    ['#fbbf24', 'reversal — value moving backwards'],
+  ];
+  if (m.stats.approvals) entries.push(['transparent', '✓ on a label means it needs approval']);
+  if (m.stats.offline) entries.push(['transparent', `${m.stats.offline} states reachable offline`]);
+  renderBoxLegend(
+    $('states-legend'),
+    entries,
+    'drag a state to move it · scroll to zoom · hover a transition for its guard'
+  );
+}
+
+/** The right pane for the states view: the guard, and what it publishes. */
+function renderStateLinks() {
+  const pane = $('links-pane');
+  const m = currentMachine();
+  if (!m) return;
+  pane.innerHTML = '';
+
+  const name = state.stateName;
+  pane.append(sectionHead(name ?? m.entity, name ? `state of ${m.entity}` : `${m.contract}.${m.enum}`));
+
+  if (!name) {
+    const facts = el('div', 'links-section');
+    facts.append(sectionHead('The model', m.stats.states));
+    for (const [label, value] of [
+      ['Owner', m.owner ?? '—'],
+      ['Initial', m.initial.join(', ') || '—'],
+      ['Terminal', m.terminal.join(', ') || '—'],
+      ['Reachable offline', m.offlineReachable.join(', ') || 'none'],
+    ]) {
+      const row = el('div', 'impl-row');
+      row.append(el('span', 'impl-label', label), el('code', null, value));
+      facts.append(row);
+    }
+    pane.append(facts);
+
+    if (!m.enumValues) {
+      const warn = el('div', 'pane-warn');
+      warn.innerHTML =
+        `<b>${m.contract}.${m.enum}</b> is not an enum — it declares no values. These ` +
+        `${m.states.length} states are checked against nothing, which is the one thing this ` +
+        `file exists to prevent.`;
+      pane.append(warn);
+    }
+    if (m.notes) pane.append(noteBlock('Note', m.notes));
+    for (const q of m.openQuestions) pane.append(noteBlock('Open question', q));
+    return;
+  }
+
+  const outgoing = m.transitions.filter((t) => t.from === name);
+  const incoming = m.transitions.filter((t) => t.to === name);
+  for (const [label, group] of [['Leaves by', outgoing], ['Arrives by', incoming]]) {
+    const section = el('div', 'links-section');
+    section.append(sectionHead(label, group.length));
+    if (!group.length) {
+      section.append(el('p', 'pane-empty', label === 'Leaves by'
+        ? 'Nothing. This is where a record stops.'
+        : 'Nothing — records begin here.'));
+    }
+    for (const t of group) {
+      const item = el('div', 'link-item transition-item');
+      const top = el('div', 'transition-head');
+      top.append(el('span', 'transition-arrow', label === 'Leaves by' ? `→ ${t.to}` : `${t.from} →`));
+      if (t.isReversal) top.append(tipFor(el('span', 'tag reversal', 'reversal'), 'reversal'));
+      if (t.requiresApproval) top.append(tipFor(el('span', 'tag approval', 'approval'), 'approval'));
+      item.append(top);
+
+      if (t.operation) {
+        const op = el('button', 'link-op', t.operation);
+        op.disabled = !t.operationKnown;
+        op.title = t.operationKnown ? 'Open in the contracts' : 'No contract declares this operation';
+        op.onclick = () => openOperation(t.operation);
+        item.append(op);
+      } else if (t.trigger) {
+        item.append(
+          tipFor(el('div', 'link-trigger', TRIGGER_LABEL[t.trigger] ?? t.trigger), t.trigger)
+        );
+      }
+      if (t.guard) {
+        item.append(
+          tip(el('div', 'link-guard', t.guard), 'Guard',
+            'What must be true for this move to be allowed. Stated here so it is not only in ' +
+            'whoever wrote the handler.')
+        );
+      }
+      for (const emit of t.emitsKnown ?? []) {
+        const chip = el('button', `emit-chip${emit.known ? '' : ' missing'}`, `publishes ${emit.name}`);
+        chip.onclick = () => emit.known && openEvent(emit.name);
+        chip.disabled = !emit.known;
+        if (!emit.known) chip.title = 'The event catalogue has no such event';
+        item.append(chip);
+      }
+      section.append(item);
+    }
+    pane.append(section);
+  }
+}
+
+function noteBlock(label, text) {
+  const box = el('div', 'links-section');
+  box.append(sectionHead(label, ''));
+  const body = el('div', 'link-guard');
+  body.innerHTML = inlineMarkdown(text);
+  box.append(body);
+  return box;
+}
+
+/** Jump to an operation in the contracts layer by its operationId. */
+function openOperation(operationId) {
+  const node = state.index.nodes.find((n) => n.type === 'operation' && n.name === operationId);
+  if (!node) return toast(`No contract declares ${operationId}`);
+  select(node.id);
+  setLayer('contracts');
+  setMode('reader');
+}
+
+function openEvent(name) {
+  state.eventId = name;
+  fillEventSelect();
+  if (state.layer !== 'domain') setLayer('domain');
+  setMode('events');
+  renderEvents();
+}
+
+// ── domain: the event catalogue ──────────────────────────────────────
+const ALL_EVENTS = '__all__';
+
+function fillEventSelect() {
+  const select = $('events-scope');
+  if (!select) return;
+  select.innerHTML = '';
+  const all = el('option', null, `All events — ${domainEvents().length}`);
+  all.value = ALL_EVENTS;
+  if (!state.eventId) all.selected = true;
+  select.append(all);
+  for (const event of domainEvents()) {
+    const option = el('option', null, `${event.name} — ${event.consumers.length} consumers`);
+    option.value = event.name;
+    if (event.name === state.eventId) option.selected = true;
+    select.append(option);
+  }
+}
+
+function renderEvents() {
+  const body = $('events-body');
+  body.innerHTML = '';
+  const events = domainEvents();
+  if (!events.length) {
+    body.append(el('p', 'pane-empty', 'No events in events/'));
+    return;
+  }
+  if (state.eventId) {
+    const event = events.find((e) => e.name === state.eventId);
+    if (event) {
+      renderEventPage(body, event);
+      renderEventLinks();
+      return;
+    }
+    state.eventId = null;
+  }
+  renderEventCatalogue(body, events);
+  renderEventLinks();
+}
+
+/**
+ * The right pane for the events view: which contexts talk to which, counted.
+ * Reporting consumes nine events and publishes none; marketing seven. That
+ * asymmetry is the shape of the platform, and it is only legible as a list.
+ */
+function renderEventLinks() {
+  const pane = $('links-pane');
+  pane.innerHTML = '';
+  const event = state.eventId ? domainEvents().find((e) => e.name === state.eventId) : null;
+
+  if (event) {
+    pane.append(sectionHead(event.name, `v${event.version}`));
+    const facts = el('div', 'links-section');
+    for (const [label, value] of [
+      ['Publisher', event.publisher ?? '—'],
+      ['Aggregate', event.aggregate ?? '—'],
+      ['Retention', event.retention ?? 'not stated'],
+      ['Critical', `${event.critical} of ${event.consumers.length} consumers`],
+    ]) {
+      const row = el('div', 'impl-row');
+      row.append(el('span', 'impl-label', label), el('code', null, value));
+      facts.append(row);
+    }
+    pane.append(facts);
+    if (event.notes) pane.append(noteBlock('Note', event.notes));
+    return;
+  }
+
+  const contexts = state.domain?.contexts ?? [];
+  pane.append(sectionHead('Contexts', contexts.length));
+  for (const context of [...contexts].sort(
+    (a, b) => b.consumes.length + b.publishes.length - (a.consumes.length + a.publishes.length)
+  )) {
+    const row = el('div', 'link-item');
+    row.append(el('span', 'link-name', context.name));
+    row.append(el('span', 'link-weight', `${context.publishes.length}↑ ${context.consumes.length}↓`));
+    row.title =
+      `publishes ${context.publishes.join(', ') || 'nothing'}\n` +
+      `consumes ${context.consumes.join(', ') || 'nothing'}`;
+    if (context.contract) {
+      row.onclick = () => {
+        const node = state.nodesById.get(`file:${context.contract}`);
+        if (node) { select(node.id); setLayer('contracts'); setMode('reader'); }
+      };
+    }
+    pane.append(row);
+  }
+  pane.append(el('p', 'pane-note', '↑ publishes · ↓ consumes. A context that only consumes is a read model; one that only publishes has nobody depending on it yet.'));
+}
+
+/**
+ * The catalogue, read as a ledger of who tells whom. Each row is one event with
+ * its publisher on the left and every consumer on the right, critical ones
+ * marked — a dead-lettered critical event is a page, not a dashboard.
+ */
+function renderEventCatalogue(body, events) {
+  const s = state.domain.stats;
+  $('events-hint').textContent =
+    `${s.events} events · ${s.consumers} consumers · ${s.criticalConsumers} critical · ` +
+    `${s.contexts} contexts`;
+
+  const lede = el('div', 'journey-trigger');
+  lede.innerHTML =
+    `<b>platform.outbox</b> has always existed and has always been correct — publication is ` +
+    `atomic with the state change. What never existed was a description of what it carries. ` +
+    `These are the ${s.events} facts that cross it, and the ${s.consumers} consumers that are ` +
+    `waiting for them.`;
+  body.append(lede);
+
+  for (const event of events) {
+    const card = el('div', 'event-card');
+    const head = el('div', 'event-head');
+    const title = el('button', 'event-name', event.name);
+    title.onclick = () => openEvent(event.name);
+    head.append(title);
+    head.append(el('span', 'event-version', `v${event.version}`));
+    if (event.critical) {
+      head.append(tipFor(el('span', 'tag critical', `${event.critical} critical`), 'critical'));
+    }
+    card.append(head);
+    if (event.description) card.append(el('div', 'event-desc', event.description));
+
+    const wire = el('div', 'event-wire');
+    const from = el('div', 'event-side');
+    from.append(el('div', 'event-side-label', 'published by'));
+    from.append(contextChip(event.publisher, event.publisherContract));
+    wire.append(from);
+
+    const arrow = el('div', 'event-arrow');
+    arrow.append(el('div', 'event-arrow-line'));
+    arrow.append(el('div', 'event-arrow-note', event.emittedWhen ?? 'no transition stated'));
+    wire.append(arrow);
+
+    const to = el('div', 'event-side consumers');
+    to.append(el('div', 'event-side-label', `consumed by ${event.consumers.length}`));
+    const chips = el('div', 'event-chips');
+    for (const consumer of event.consumers) {
+      const chip = contextChip(consumer.context, consumer.contract);
+      chip.classList.toggle('critical', consumer.isCritical);
+      tip(
+        chip,
+        `${consumer.context}${consumer.isCritical ? ' — critical' : ''}`,
+        consumer.purpose,
+        `idempotency: ${consumer.idempotencyKey ?? 'NOT DECLARED'} · on failure: ${consumer.onFailure ?? 'not stated'}`
+      );
+      chips.append(chip);
+    }
+    to.append(chips);
+    wire.append(to);
+    card.append(wire);
+
+    // an event no state model emits is the other half of the pairing: the
+    // catalogue claims a fact that nothing in states/ produces
+    if (!event.emittedBy.length) {
+      const warn = el('div', 'event-warn');
+      warn.textContent =
+        'No state model emits this. Either the transition that publishes it is not written ' +
+        'down, or it is published from somewhere the models do not cover.';
+      card.append(warn);
+    }
+    body.append(card);
+  }
+}
+
+function contextChip(name, contract) {
+  const chip = el('button', 'context-chip', name ?? '—');
+  if (contract) {
+    chip.onclick = () => {
+      const node = state.nodesById.get(`file:${contract}`);
+      if (!node) return;
+      select(node.id);
+      setLayer('contracts');
+      setMode('reader');
+    };
+  } else {
+    chip.classList.add('unknown');
+    chip.disabled = true;
+    chip.title = 'No contract of this name';
+  }
+  return chip;
+}
+
+/** One event, in full: payload, consumers, and the transition that emits it. */
+function renderEventPage(body, event) {
+  $('events-hint').textContent =
+    `${event.payload.length} payload fields · ${event.consumers.length} consumers · ` +
+    `${event.critical} critical`;
+
+  const back = el('button', 'ghost-btn', '← all events');
+  back.onclick = () => { state.eventId = null; fillEventSelect(); renderEvents(); };
+  body.append(back);
+
+  const head = el('div', 'journey-head');
+  head.append(el('div', 'journey-title', event.name));
+  const chips = el('div', 'journey-chips');
+  chips.append(el('span', 'jchip', `v${event.version}`));
+  chips.append(el('span', 'jchip', `aggregate ${event.aggregate ?? '—'}`));
+  if (event.publisher) chips.append(el('span', 'jchip', `published by ${event.publisher}`));
+  if (event.retention) chips.append(el('span', 'jchip', event.retention));
+  head.append(chips);
+  body.append(head);
+
+  if (event.description) {
+    const lede = el('div', 'journey-trigger');
+    lede.innerHTML = inlineMarkdown(event.description);
+    body.append(lede);
+  }
+
+  // where it comes from
+  const origin = el('div', 'journey-section');
+  origin.append(el('div', 'journey-section-label', 'Emitted when'));
+  if (event.emittedBy.length) {
+    for (const source of event.emittedBy) {
+      const row = el('div', 'emit-source');
+      const jump = el('button', 'link-op', `${source.entity}: ${source.from} → ${source.to}`);
+      jump.onclick = () => openMachine(source.file, source.to);
+      row.append(jump);
+      if (source.operation) row.append(el('span', 'link-trigger', `via ${source.operation}`));
+      origin.append(row);
+    }
+  } else {
+    const warn = el('div', 'event-warn');
+    warn.textContent = `${event.emittedWhen ?? 'Stated nowhere'} — but no state model declares this transition emits it.`;
+    origin.append(warn);
+  }
+  body.append(origin);
+
+  // payload
+  const payload = el('div', 'journey-section');
+  payload.append(el('div', 'journey-section-label', `Payload · ${event.payload.length} fields`));
+  const table = el('table', 'domain-table');
+  const thead = el('thead');
+  const hrow = el('tr');
+  for (const h of ['Field', 'Type', '', 'Notes']) hrow.append(el('th', null, h));
+  thead.append(hrow);
+  table.append(thead);
+  const tbody = el('tbody');
+  for (const field of event.payload) {
+    const row = el('tr');
+    row.append(el('td', 'mono strong', field.field));
+    row.append(el('td', 'mono', field.type));
+    row.append(el('td', 'dim', field.required ? 'required' : 'optional'));
+    row.append(el('td', 'dim', field.notes ?? ''));
+    tbody.append(row);
+  }
+  table.append(tbody);
+  payload.append(table);
+  body.append(payload);
+
+  // consumers — the part the schema calls the rule that matters
+  const consumers = el('div', 'journey-section');
+  consumers.append(el('div', 'journey-section-label', `Consumers · ${event.consumers.length}`));
+  const ctable = el('table', 'domain-table');
+  const chead = el('thead');
+  const crow = el('tr');
+  for (const h of ['Context', 'Purpose', 'Idempotency key', 'On failure', '']) {
+    crow.append(el('th', null, h));
+  }
+  chead.append(crow);
+  ctable.append(chead);
+  const cbody = el('tbody');
+  for (const consumer of event.consumers) {
+    const row = el('tr');
+    row.classList.toggle('critical-row', consumer.isCritical);
+    const first = el('td');
+    first.append(contextChip(consumer.context, consumer.contract));
+    row.append(first);
+    row.append(el('td', 'dim', consumer.purpose));
+    const key = el('td', 'mono', consumer.idempotencyKey ?? 'NOT DECLARED');
+    if (!consumer.idempotencyKey) key.classList.add('missing');
+    tipFor(key, 'idempotencyKey');
+    row.append(key);
+    row.append(tipFor(el('td', 'mono dim', consumer.onFailure ?? '—'), consumer.onFailure));
+    row.append(
+      consumer.isCritical ? tipFor(el('td', null, 'critical'), 'critical') : el('td', null, '')
+    );
+    cbody.append(row);
+  }
+  ctable.append(cbody);
+  consumers.append(ctable);
+  body.append(consumers);
+
+  if (event.notes) {
+    const notes = el('div', 'journey-section');
+    notes.append(el('div', 'journey-section-label', 'Note'));
+    const text = el('div', 'journey-trigger');
+    text.innerHTML = inlineMarkdown(event.notes);
+    notes.append(text);
+    body.append(notes);
+  }
+}
+
+/** Open a state model, optionally with one state already selected. */
+function openMachine(file, stateName = null) {
+  const found = machines().find((m) => m.file === file || m.id === file);
+  if (!found) return;
+  state.machineId = found.id;
+  state.stateName = stateName;
+  machine.userAdjusted = false;
+  fillMachineSelect();
+  if (state.layer !== 'domain') setLayer('domain');
+  setMode('states');
+  renderStates();
+}
+
+// ── sidebar: domain layer ────────────────────────────────────────────
+function renderDomainTree() {
+  const box = $('tree');
+  box.innerHTML = '';
+  const needle = state.sideFilter;
+  const hit = (s) => !needle || String(s).toLowerCase().includes(needle);
+
+  if (groupBy() === 'contexts') return renderContextTree(box, hit);
+
+  let count = 0;
+  const models = el('div', 'tree-group');
+  const head = el('div', 'tree-group-head');
+  const dot = el('span', 'tree-group-dot');
+  dot.style.background = '#60a5fa';
+  head.append(dot, el('span', null, 'State models'));
+  head.append(el('span', 'tree-group-count', String(machines().length)));
+  models.append(head);
+  models.append(el('div', 'tree-group-sub', 'states/'));
+
+  for (const m of machines()) {
+    if (!hit(m.entity) && !hit(m.enum) && !m.states.some((s) => hit(s.name))) continue;
+    count += 1;
+    const row = el('div', 'tree-file machine-row');
+    row.dataset.id = `machine:${m.id}`;
+    row.append(el('span', 'tree-file-name', m.entity));
+    const counts = el('span', 'tree-file-count', `${m.stats.states}/${m.stats.transitions}`);
+    // the bare "9/14" is the one unlabelled number in the sidebar, and the two
+    // halves are what the whole layer is about: the contracts declare the states,
+    // and only this file says which moves between them are legal
+    tip(
+      counts,
+      `${m.stats.states} states, ${m.stats.transitions} transitions`,
+      `${m.entity} can be in **${m.stats.states}** states, with **${m.stats.transitions}** legal moves ` +
+      `between them. The contract enum declares the states; nothing but this file says which moves ` +
+      `are allowed.`,
+      [
+        m.stats.reversals ? `${m.stats.reversals} reversals` : null,
+        m.stats.approvals ? `${m.stats.approvals} need approval` : null,
+        m.enumValues ? null : 'not checked against an enum',
+      ].filter(Boolean).join(' · ') || null
+    );
+    row.append(counts);
+    if (!m.enumValues) row.classList.add('problem');
+    row.onclick = () => openMachine(m.id);
+    models.append(row);
+  }
+  box.append(models);
+
+  const catalogue = el('div', 'tree-group');
+  const ehead = el('div', 'tree-group-head');
+  const edot = el('span', 'tree-group-dot');
+  edot.style.background = '#f472b6';
+  ehead.append(edot, el('span', null, 'Events'));
+  ehead.append(el('span', 'tree-group-count', String(domainEvents().length)));
+  catalogue.append(ehead);
+  catalogue.append(el('div', 'tree-group-sub', 'events/'));
+
+  for (const event of domainEvents()) {
+    if (!hit(event.name) && !hit(event.publisher)) continue;
+    count += 1;
+    const row = el('div', 'tree-file event-row');
+    row.dataset.id = `event:${event.name}`;
+    row.append(el('span', 'tree-file-name', event.name));
+    const consumers = el('span', 'tree-file-count', String(event.consumers.length));
+    const critical = event.consumers.filter((c) => c.critical).length;
+    tip(
+      consumers,
+      `${event.consumers.length} consumer${event.consumers.length === 1 ? '' : 's'}`,
+      event.consumers.length
+        ? `Contexts that react to this fact. Delivery is at-least-once, so each one declares an ` +
+          `idempotency key and what to do on failure.`
+        : '**Nothing consumes this event.** It is published and nobody is listening.',
+      [
+        critical ? `${critical} critical` : null,
+        event.emittedBy.length ? null : 'no transition emits it',
+      ].filter(Boolean).join(' · ') || null
+    );
+    row.append(consumers);
+    if (!event.emittedBy.length) row.classList.add('problem');
+    row.onclick = () => openEvent(event.name);
+    catalogue.append(row);
+  }
+  box.append(catalogue);
+
+  // The most actionable list in the layer: the status enums nobody has modelled.
+  // Each one is a set of states with no statement of which moves between them
+  // are legal — which is the gap the whole folder exists to close.
+  const unmodelled = (state.domain?.statusEnums ?? []).filter((e) => !e.modelled);
+  if (unmodelled.length) {
+    const gap = el('div', 'tree-group');
+    const ghead = el('div', 'tree-group-head');
+    const gdot = el('span', 'tree-group-dot');
+    gdot.style.background = '#fbbf24';
+    ghead.append(gdot, el('span', null, 'Enums with no model'));
+    ghead.append(el('span', 'tree-group-count', String(unmodelled.length)));
+    gap.append(ghead);
+    gap.append(el('div', 'tree-group-sub', 'states exist; the legal moves between them do not'));
+
+    for (const entry of unmodelled) {
+      if (!hit(entry.name) && !hit(entry.contract)) continue;
+      count += 1;
+      const row = el('div', 'tree-file enum-row');
+      row.append(el('span', 'tree-file-name', entry.name));
+      const values = el('span', 'tree-file-count', `${entry.values}`);
+      tip(
+        values,
+        `${entry.values} states, no model`,
+        `\`${entry.contract}.${entry.name}\` declares **${entry.values}** states and nothing says which ` +
+        `moves between them are legal. So any value can follow any other, and no reviewer can tell a ` +
+        `wrong transition from a right one.`
+      );
+      row.append(values);
+      row.title = `${entry.contract}.${entry.name} — ${entry.values} states, no model`;
+      row.onclick = () => {
+        const node = state.index.nodes.find(
+          (n) => n.type === 'schema' && n.name === entry.name && n.file.includes(`/${entry.contract}.`)
+        );
+        if (node) { select(node.id); setLayer('contracts'); setMode('reader'); }
+      };
+      gap.append(row);
+    }
+    box.append(gap);
+  }
+
+  const s = state.domain?.stats ?? {};
+  $('file-count').textContent = `${s.states ?? 0} states · ${s.events ?? 0} events${
+    needle ? ` · ${count} match` : ''
+  }`;
+  markTreeSelection();
+}
+
+/**
+ * The other reading: not the artefacts, but the bounded contexts and what they
+ * owe each other. This is the only place in the viewer where contract-to-
+ * contract coupling is visible, because the contracts do not $ref each other.
+ */
+function renderContextTree(box, hit) {
+  const contexts = state.domain?.contexts ?? [];
+  for (const context of contexts) {
+    if (!hit(context.name)) continue;
+    const row = el('div', 'tree-file context-row');
+    row.dataset.id = `context:${context.name}`;
+    row.append(el('span', 'tree-file-name', context.name));
+    const counts = el('span', 'tree-file-count');
+    counts.textContent = `${context.publishes.length}↑ ${context.consumes.length}↓`;
+    row.append(counts);
+    row.title =
+      `publishes ${context.publishes.join(', ') || 'nothing'}\n` +
+      `consumes ${context.consumes.join(', ') || 'nothing'}`;
+    if (!context.contract) row.classList.add('problem');
+    row.onclick = () => {
+      if (!context.contract) return;
+      const node = state.nodesById.get(`file:${context.contract}`);
+      if (node) { select(node.id); setLayer('contracts'); setMode('reader'); }
+    };
+    box.append(row);
+  }
+  const s = state.domain?.stats ?? {};
+  $('file-count').textContent = `${contexts.length} contexts · ${s.contextEdges ?? 0} links`;
 }
 
 // ── backend: the data model ──────────────────────────────────────────
@@ -1738,25 +3819,53 @@ function buildSchemaMap() {
  * The tables of one schema module, plus any table they relate to in another —
  * drawn external, so a cross-schema relationship is visible rather than implied.
  */
-function buildData(module, { inferred = true } = {}) {
+function buildData(module, { inferred = true, ambient = false } = {}) {
   const backend = state.backend;
   const all = new Map(backend.tables.map((t) => [t.name, t]));
   const everything = module === ALL_SCHEMAS;
   const included = new Map();
+
+  // A default partition has no columns of its own — it inherits them from the
+  // parent. handoff/schema-viewer-notes.md asks for these to be kept out of the
+  // entity view rather than drawn as empty boxes.
+  const isDefaultPartition = (table) =>
+    Boolean(table.ddl?.partitionOf) && (backend.columns[table.name] ?? []).length === 0;
+
   for (const table of backend.tables) {
+    if (isDefaultPartition(table)) continue;
     if (everything || table.module === module) included.set(table.name, table);
   }
+
+  // handoff/relationships.csv, where it exists, is the stated answer — and the
+  // only source that says what *kind* each relationship is
+  const stated = backend.relationships?.present ? backend.relationships : null;
+  const relevant = stated
+    ? stated.edges.filter(
+        (e) => (ambient || e.kind !== 'ambient') && (inferred || e.declared)
+      )
+    : [];
 
   const pull = (name) => {
     if (!name || included.has(name)) return;
     const table = all.get(name);
-    if (table) included.set(name, table);
+    if (table && !isDefaultPartition(table)) included.set(name, table);
   };
   for (const table of [...included.values()]) {
     pull(table.childOf);
     for (const ref of table.references ?? []) pull(ref.toTable);
     for (const key of table.keys ?? []) pull(key.toTable);
-    if (inferred) for (const key of table.foreignKeys ?? []) pull(key.toTable);
+    if (!stated && inferred) for (const key of table.foreignKeys ?? []) pull(key.toTable);
+  }
+  // A reference leaving the schema is drawn on the column rather than by
+  // dragging the other table in — schema-viewer-notes.md asks for "catalogue as
+  // thirteen tables and their real relationships", not thirteen tables and
+  // nineteen visitors. A child's parent is the exception: where a row belongs
+  // to a row in another schema, that parent is part of this schema's shape.
+  if (stated && !everything) {
+    const here = new Set(included.keys());
+    for (const edge of relevant) {
+      if (edge.kind === 'child' && here.has(edge.from)) pull(edge.to);
+    }
   }
 
   const isOwn = (table) => everything || table.module === module;
@@ -1777,11 +3886,16 @@ function buildData(module, { inferred = true } = {}) {
           column.referencesTable ??
           (inferred ? column.foreignKeyTable : null) ??
           null;
+        // a relationship that leaves this schema has no box on screen, so the
+        // column says where it goes instead of pointing at nothing
+        const leaves =
+          target && !everything && !included.has(target) && all.has(target) ? target : null;
         return {
           label: `${column.required ? '• ' : ''}${column.name}`,
-          value: column.type,
+          value: leaves ? `→ ${leaves}` : column.type,
           strong: column.required,
           refTarget: target,
+          external: Boolean(leaves),
         };
       }),
       external: !own,
@@ -1790,42 +3904,62 @@ function buildData(module, { inferred = true } = {}) {
 
   const edges = [];
   const seen = new Set();
-  const push = (from, to, label, dashed) => {
-    if (!included.has(from) || !included.has(to) || from === to) return;
+  const push = (from, to, label, { dashed = false, kind = 'reference' } = {}) => {
+    if (!included.has(from) || !included.has(to) || from === to) return false;
     const key = `${from}|${to}`;
-    if (seen.has(key)) return; // one line per pair, however many columns join them
+    if (seen.has(key)) return false; // one line per pair, however many columns join them
     seen.add(key);
-    edges.push({ source: `table:${from}`, target: `table:${to}`, label, dashed });
+    edges.push({ source: `table:${from}`, target: `table:${to}`, label, dashed, kind });
+    return true;
   };
 
-  // strongest first, so a pair joined more than one way keeps the solid line:
-  // a REFERENCES clause in the DDL, then a contract $ref, then a name match
-  for (const table of included.values()) {
-    for (const key of table.keys ?? []) {
-      push(table.name, key.toTable, key.columns.join(', '), false);
+  const counts = { child: 0, reference: 0, ambient: 0, declared: 0, inferred: 0 };
+
+  if (stated) {
+    // child first, so a pair joined more than one way keeps the stronger kind
+    const order = { child: 0, reference: 1, ambient: 2 };
+    for (const edge of [...relevant].sort((a, b) => order[a.kind] - order[b.kind])) {
+      const label = edge.kind === 'child' ? `child · ${edge.column}` : edge.column;
+      if (push(edge.from, edge.to, label, { dashed: !edge.declared, kind: edge.kind })) {
+        counts[edge.kind] += 1;
+        counts[edge.declared ? 'declared' : 'inferred'] += 1;
+      }
     }
-  }
-  const ddlPairs = seen.size;
-
-  for (const table of included.values()) {
-    if (table.childOf) push(table.name, table.childOf, 'child of', false);
-    for (const ref of table.references ?? []) push(table.name, ref.toTable, ref.column, false);
-  }
-  const declaredPairs = seen.size - ddlPairs;
-
-  if (inferred) {
+  } else {
+    // no relationships.csv — fall back to reading the DDL and column names
     for (const table of included.values()) {
-      for (const key of table.foreignKeys ?? []) push(table.name, key.toTable, key.column, true);
+      for (const key of table.keys ?? []) {
+        if (push(table.name, key.toTable, key.columns.join(', '), {})) counts.declared += 1;
+      }
+      if (table.childOf && push(table.name, table.childOf, 'child of', { kind: 'child' })) counts.child += 1;
+      for (const ref of table.references ?? []) {
+        if (push(table.name, ref.toTable, ref.column, {})) counts.declared += 1;
+      }
+    }
+    if (inferred) {
+      for (const table of included.values()) {
+        for (const key of table.foreignKeys ?? []) {
+          if (push(table.name, key.toTable, key.column, { dashed: true })) counts.inferred += 1;
+        }
+      }
     }
   }
+
+  // how many ambient edges are being withheld, so the toggle can say so
+  const hiddenAmbient =
+    stated && !ambient
+      ? stated.edges.filter(
+          (e) => e.kind === 'ambient' && included.has(e.from) && (inferred || e.declared)
+        ).length
+      : 0;
 
   return {
     nodes,
     edges,
     own: [...included.values()].filter(isOwn).length,
-    ddl: ddlPairs,
-    declared: declaredPairs,
-    inferred: seen.size - ddlPairs - declaredPairs,
+    stated: Boolean(stated),
+    hiddenAmbient,
+    ...counts,
   };
 }
 
@@ -1852,18 +3986,24 @@ function renderData({ focus } = {}) {
       picker.append(option);
     }
   }
+  // A workbook whose Modules sheet cannot be read leaves this empty. That is
+  // reported in the audit; it must not also take the whole app down, which is
+  // what indexing [0] of an empty list did — every view went blank because one
+  // spreadsheet column had been renamed.
   const valid = state.dataModule === ALL_SCHEMAS || backend.modules.some((m) => m.name === state.dataModule);
-  if (!valid) state.dataModule = backend.modules[0].name;
+  if (!valid) state.dataModule = backend.modules[0]?.name ?? ALL_SCHEMAS;
   picker.value = state.dataModule;
 
   const inferred = $('data-inferred').checked;
+  const ambient = $('data-ambient')?.checked ?? false;
   const wholeDatabase = state.dataModule === ALL_SCHEMAS;
-  const built = wholeDatabase ? buildSchemaMap() : buildData(state.dataModule, { inferred });
+  const built = wholeDatabase ? buildSchemaMap() : buildData(state.dataModule, { inferred, ambient });
   const { nodes, edges, own } = built;
 
   data.showRows = state.dataRows;
   $('data-rows').checked = data.showRows;
   $('data-inferred').disabled = wholeDatabase;
+  if ($('data-ambient')) $('data-ambient').disabled = wholeDatabase;
 
   data.setData(nodes, edges);
   data.setSelected(state.tableName && !wholeDatabase ? `table:${state.tableName}` : null);
@@ -1884,13 +4024,23 @@ function renderData({ focus } = {}) {
     $('data-hint').textContent =
       `${own} tables${written ? `, ${written} with DDL` : ''}` +
       `${pulled ? ` · ${pulled} pulled in from other schemas` : ''} · ` +
-      `${built.ddl} foreign keys, ${built.declared} declared, ${built.inferred} inferred` +
+      (built.stated
+        ? `${built.child} child, ${built.reference} reference` +
+          (ambient ? `, ${built.ambient} ambient` : '') +
+          ` · ${built.declared} declared, ${built.inferred} inferred` +
+          (built.hiddenAmbient ? ` · ${built.hiddenAmbient} ambient hidden` : '')
+        : `${built.declared} declared, ${built.inferred} inferred`) +
       (module ? ` · migration ${module.migration ?? '—'} (${module.status ?? 'unknown'})` : '');
     renderBoxLegend($('data-legend'), [
       ['#34d399', 'created by a migration'],
       ['#60a5fa', 'derived from the contracts, not written yet'],
       ['#fbbf24', 'table from another schema'],
-    ], 'solid = a REFERENCES clause or a contract $ref · dashed = inferred from a *_id column name');
+    ], built.stated
+      ? 'thick = child (belongs to) · plain = reference · solid = declared, dashed = inferred' +
+        (built.hiddenAmbient
+          ? ` · ${built.hiddenAmbient} ambient keys hidden — venue, principal, subject, tenant`
+          : '')
+      : 'solid = a REFERENCES clause or a contract $ref · dashed = inferred from a *_id column name');
   }
 
   // the layout is seeded in a knot and spreads as it settles, so framing it
@@ -2112,6 +4262,725 @@ function renderRouting() {
     'writes always go to the primary; reads are declared per operation and enforced by the router');
 }
 
+// ── contracts: lineage ───────────────────────────────────────────────
+// Which tables an operation touches. This cannot be derived from the contracts
+// — `x-ticvai-persistence` says which schemas become tables, not which
+// operations reach them — so it arrives as data, and the data is candid about
+// how much of itself is guesswork. That candour is the design constraint here:
+// an unresolved operation is drawn, not dropped.
+
+const ROUTING_COLOR = {
+  primary: '#f87171',
+  replica: '#34d399',
+  analytical: '#c084fc',
+};
+
+/** A table name that opens the table in the Backend layer, if it exists there. */
+function tableChip(name, { write = false } = {}) {
+  const chip = el('button', `lineage-table${write ? ' write' : ''}`, name);
+  const known = (state.backend?.tables ?? []).some((t) => t.name === name);
+  deliveryTip(chip, 'tables', name, {
+    fallback: {
+      title: name,
+      body: known
+        ? 'A table in the schema reference. No tip shipped for it.'
+        : '**The schema workbook does not list this table.** The lineage names it, so either the ' +
+          'table was renamed or the lineage was generated against a different schema.',
+    },
+  });
+  chip.classList.toggle('unknown', !known);
+  chip.onclick = () => {
+    if (!known) return toast(`${name} is not in the schema reference`);
+    selectTable(name);
+    setLayer('backend');
+    setMode('data');
+  };
+  return chip;
+}
+
+function renderLineage() {
+  const body = $('lineage-body');
+  const lineage = state.lineage;
+  body.innerHTML = '';
+
+  if (!lineage?.present) {
+    body.append(el('p', 'pane-empty', 'No handoff/api-data-lineage.json in this package.'));
+    $('lineage-hint').textContent = '';
+    return;
+  }
+
+  const s = lineage.stats;
+  $('lineage-hint').textContent =
+    `${s.operations} operations · ${s.resolved} resolved · ${s.unresolved} unresolved · ` +
+    `${s.tablesTouched} tables · ${s.services} services · ${s.storedProcedures} stored procedures`;
+
+  const needle = state.lineageFilter.trim().toLowerCase();
+  const hit = (text) => !needle || String(text).toLowerCase().includes(needle);
+
+  // The honest header. Every other view in the app can state a total and mean
+  // it; this one cannot, and saying so once at the top is cheaper than marking
+  // every row.
+  const head = el('div', 'journey-head');
+  head.append(el('h2', 'journey-title', 'Operation to table'));
+  const chips = el('div', 'journey-chips');
+  for (const [label, value, cls] of [
+    ['resolved', `${s.resolved} of ${s.operations}`, 'ok'],
+    ['derived', s.derived, ''],
+    ['hand-mapped', s.handMapped, ''],
+    ['unresolved', s.unresolved, 'warn'],
+  ]) {
+    const chip = el('span', `jchip ${cls}`);
+    chip.append(el('span', null, label), el('b', null, String(value)));
+    chips.append(chip);
+  }
+  head.append(chips);
+  head.append(
+    el(
+      'div',
+      'journey-trigger',
+      `${s.resolved} of ${s.operations} resolve to a table — ${s.derived} derived from persistence ` +
+        `markers, ${s.handMapped} projections mapped by hand. The other ${s.unresolved} are not a ` +
+        `defect list: most return a computed projection like OrderSummary or MediaEntitlements, ` +
+        `which has no persistence marker because there is nothing to mark. The rest are commands ` +
+        `with no body, health checks and sync endpoints. They are shown, dimmed, because ` +
+        `${s.resolved} rows presented as the whole set would be the more misleading number.`
+    )
+  );
+  // two sources state this join, and one of them is lossy
+  if (s.routingFromWorkbook) {
+    head.append(
+      el(
+        'div',
+        'journey-trigger',
+        `Built from two sources that state the same thing: handoff/api-data-lineage.json and the ` +
+          `Data lineage sheet of the schema workbook. They agree wherever both speak — but the JSON ` +
+          `left the routing blank on ${s.routingFromWorkbook} operations that the workbook decides, ` +
+          `so those are filled from the sheet and marked.`
+      )
+    );
+  }
+  body.append(head);
+
+  if (state.lineageScope === 'tables') return renderLineageByTable(body, hit);
+  if (state.lineageScope === 'services') return renderLineageByService(body, hit);
+  return renderLineageByOperation(body, hit);
+}
+
+function renderLineageByOperation(body, hit) {
+  const rows = state.lineage.operations.filter(
+    (o) =>
+      (state.lineageUnresolved || o.resolved) &&
+      (hit(o.name) || hit(o.path ?? '') || hit(o.service ?? '') ||
+        o.reads.some(hit) || o.writes.some(hit))
+  );
+
+  const byContract = new Map();
+  for (const op of rows) {
+    const key = op.contract ?? '—';
+    if (!byContract.has(key)) byContract.set(key, []);
+    byContract.get(key).push(op);
+  }
+
+  body.append(el('div', 'journey-section-label', `${rows.length} operations`));
+
+  for (const [contract, ops] of [...byContract].sort((a, b) => b[1].length - a[1].length)) {
+    const section = el('details', 'lineage-group');
+    section.open = byContract.size <= 4 || Boolean(state.lineageFilter);
+    const summary = el('summary', 'lineage-group-head');
+    const title = el('span', 'lineage-group-name', contract);
+    deliveryTip(title, 'contracts', contract);
+    summary.append(title);
+    const resolved = ops.filter((o) => o.resolved).length;
+    summary.append(el('span', 'lineage-group-count', `${resolved} of ${ops.length} resolved`));
+    section.append(summary);
+
+    for (const op of ops) {
+      const row = el('div', `lineage-row${op.resolved ? '' : ' unresolved'}`);
+
+      const name = el('button', 'lineage-op', op.name);
+      name.onclick = () => openOperation(op.name);
+      row.append(name);
+
+      const meta = el('div', 'lineage-meta');
+      if (op.verb) meta.append(el('span', `verb ${op.verb.toLowerCase()}`, op.verb));
+      if (op.path) meta.append(el('span', 'lineage-path', op.path));
+      if (op.routing) {
+        const chip = el('span', `lineage-routing${op.routingFrom === 'workbook' ? ' from-workbook' : ''}`, op.routing);
+        chip.style.borderColor = ROUTING_COLOR[op.routing] ?? 'currentColor';
+        const ROUTING_WHY = {
+          replica: 'A read that may be served from a replica. ADR-0016 — the write path and the read path are separated deliberately.',
+          analytical: 'Served from the analytical store. Never on a transaction path.',
+          write: 'A write. It goes to the primary by definition.',
+          primary: 'Must hit the primary. Either it writes, or it reads something it just wrote.',
+        };
+        tip(chip, `Routed to the ${op.routing}`,
+          ROUTING_WHY[op.routing] ?? 'Routing stated by the schema reference.',
+          op.routingFrom === 'workbook'
+            ? 'from the workbook — api-data-lineage.json left this blank'
+            : null);
+        meta.append(chip);
+      }
+      if (op.procedure) {
+        const chip = el('span', 'lineage-procedure', op.procedure);
+        tip(chip, 'Stored procedure',
+          `One of the few operations that runs as a stored procedure. **Services for all 654 ` +
+          `operations, stored procedures for ten** — a procedure per operation would be a second ` +
+          `codebase in a second language, with no type checking against the contracts.`);
+        meta.append(chip);
+      }
+      if (op.scope) {
+        const chip = el('span', 'lineage-scope', op.scope);
+        tip(chip, `Scoped to a ${op.scope}`,
+          'The level in the seven-level hierarchy this operation is authorised at. A grant here ' +
+          'inherits downward and never bubbles up.');
+        meta.append(chip);
+      }
+      if (op.offline) meta.append(tipFor(el('span', 'lineage-offline', 'offline'), 'offline'));
+      if (op.service) {
+        const chip = el('span', 'lineage-service', op.service);
+        tip(chip, op.service, 'The service that owns this operation. 22 services across 654 operations.');
+        meta.append(chip);
+      }
+      row.append(meta);
+
+      if (op.reads.length || op.writes.length) {
+        const tables = el('div', 'lineage-tables');
+        for (const t of op.writes) tables.append(tableChip(t, { write: true }));
+        for (const t of op.reads) tables.append(tableChip(t));
+        row.append(tables);
+      } else {
+        const none = el('div', 'lineage-tables');
+        const chip = el('span', 'lineage-unresolved-chip', 'no table');
+        tip(chip, 'Resolves to no table',
+          'Marked `unresolved` by the lineage rather than left blank. **Usually correct rather than ' +
+          'missing**: an operation returning a computed projection has no persistence marker because ' +
+          'there is nothing to mark. Commands with no body, health checks and sync endpoints are ' +
+          'the same. 318 of the 654 are in this state.');
+        none.append(chip);
+        row.append(none);
+      }
+      section.append(row);
+    }
+    body.append(section);
+  }
+}
+
+function renderLineageByTable(body, hit) {
+  const rows = state.lineage.tables.filter(
+    (t) => hit(t.table) || t.reads.some(hit) || t.writes.some(hit)
+  );
+  const s = state.lineage.stats;
+
+  // The workbook's own reverse index reaches further than the lineage does,
+  // because it carries the screens too. Its subtitle is the reason to show it:
+  // what breaks if this table changes.
+  const unreached = (state.lineage.whereUsed ?? []).filter((t) => !t.reached);
+  if (unreached.length) {
+    const note = el('div', 'lineage-note');
+    note.innerHTML = inlineMarkdown(
+      `Of the ${s.tablesIndexed} tables in the schema reference, **${s.tablesReachedByAnOperation}** ` +
+      `are reached by an operation and **${s.tablesReachedByAScreen}** by a screen. The other ` +
+      `**${unreached.length}** are reached by nothing at all — written by a job, a migration or a ` +
+      `trigger, or by nothing yet.`
+    );
+    body.append(note);
+    const list = el('div', 'lineage-tables wrap');
+    for (const entry of unreached) {
+      const chip = tableChip(entry.table);
+      chip.classList.add('unreached');
+      tip(chip, entry.table,
+        '**No operation in any contract reads or writes this table.** Not necessarily wrong — a job, ' +
+        'a migration or a trigger may. But nothing in the API reaches it.');
+      list.append(chip);
+    }
+    body.append(list);
+  }
+
+  body.append(
+    el('div', 'journey-section-label', `${rows.length} tables reached by an operation`)
+  );
+  // A table written by many operations is the one a schema change costs most to
+  // make, and that is not visible anywhere else in the viewer.
+  const max = Math.max(1, ...rows.map((t) => t.reads.length + t.writes.length));
+  const table = el('div', 'routing-table');
+  for (const entry of rows) {
+    const line = el('div', 'routing-row');
+    const name = el('button', 'routing-name', entry.table);
+    deliveryTip(name, 'tables', entry.table);
+    name.onclick = () => { selectTable(entry.table); setLayer('backend'); setMode('data'); };
+    line.append(name);
+
+    const bar = el('div', 'routing-bar');
+    bar.style.width = `${((entry.reads.length + entry.writes.length) / max) * 100}%`;
+    for (const [count, label, color] of [
+      [entry.writes.length, 'written by', '#f87171'],
+      [entry.reads.length, 'read by', '#34d399'],
+    ]) {
+      if (!count) continue;
+      const seg = el('div', 'routing-seg', String(count));
+      seg.style.flexGrow = String(count);
+      seg.style.background = color;
+      seg.title = `${label} ${count} operation${count === 1 ? '' : 's'}`;
+      bar.append(seg);
+    }
+    line.append(bar);
+    line.append(el('span', 'routing-total', String(entry.reads.length + entry.writes.length)));
+    table.append(line);
+  }
+  body.append(table);
+
+  const legend = el('div', 'inline-legend');
+  body.append(legend);
+  renderBoxLegend(legend, [['#f87171', 'written by'], ['#34d399', 'read by']],
+    'only the 165 tables some operation reaches — the other 65 are written by nothing the lineage resolved');
+}
+
+function renderLineageByService(body, hit) {
+  const rows = state.lineage.services.filter(
+    (s) => hit(s.name) || s.operations.some(hit) || s.writes.some(hit)
+  );
+  body.append(el('div', 'journey-section-label', `${rows.length} services`));
+
+  // A table two services both write is a boundary somebody drew in the wrong
+  // place, so it is worth computing rather than leaving to the eye.
+  const writers = new Map();
+  for (const service of state.lineage.services) {
+    for (const t of service.writes) {
+      if (!writers.has(t)) writers.set(t, []);
+      writers.get(t).push(service.name);
+    }
+  }
+  const shared = [...writers].filter(([, list]) => list.length > 1);
+
+  for (const service of rows) {
+    const card = el('div', 'lineage-service-card');
+    const head = el('div', 'lineage-group-head');
+    const name = el('span', 'lineage-group-name', service.name);
+    tip(name, service.name,
+      `One of the 22 services the 654 operations divide into. It owns ${service.operations.length} ` +
+      `operation${service.operations.length === 1 ? '' : 's'}.`);
+    head.append(name);
+    head.append(el('span', 'lineage-group-count',
+      `${service.operations.length} operations · writes ${service.writes.length} · reads ${service.reads.length}`));
+    card.append(head);
+
+    if (service.writes.length) {
+      const line = el('div', 'lineage-tables');
+      line.append(el('span', 'lineage-label', 'writes'));
+      for (const t of service.writes) {
+        const chip = tableChip(t, { write: true });
+        if (writers.get(t)?.length > 1) chip.classList.add('contested');
+        line.append(chip);
+      }
+      card.append(line);
+    }
+    body.append(card);
+  }
+
+  if (shared.length) {
+    body.append(el('div', 'journey-section-label', `${shared.length} tables written by more than one service`));
+    const note = el('div', 'lineage-note');
+    note.innerHTML = inlineMarkdown(
+      `A table two services both write is a boundary drawn in the wrong place — whichever service ` +
+      `does not own it is reaching across one. Not a defect on its own, but every one of these is a ` +
+      `question worth asking before the code exists.`
+    );
+    body.append(note);
+    const list = el('div', 'lineage-tables wrap');
+    for (const [table, services] of shared.sort((a, b) => b[1].length - a[1].length)) {
+      const chip = tableChip(table, { write: true });
+      chip.classList.add('contested');
+      chip.append(el('span', 'lineage-count', String(services.length)));
+      tip(chip, table, `Written by **${services.join('**, **')}**.`);
+      list.append(chip);
+    }
+    body.append(list);
+  }
+}
+
+// ── frontend: waves ──────────────────────────────────────────────────
+// Delivery sequencing. Every screen carries a wave and a wave is a commitment,
+// so this is the one view that answers "what did we say we would ship first".
+function renderWaves() {
+  const body = $('waves-body');
+  const lineage = state.lineage;
+  body.innerHTML = '';
+
+  if (!lineage?.present || !lineage.waves.length) {
+    body.append(el('p', 'pane-empty', 'No handoff/screen-index.json in this package, so no wave is stated for any screen.'));
+    $('waves-hint').textContent = '';
+    return;
+  }
+
+  const screens = lineage.screens.filter((s) => !state.wavesOffline || s.offline);
+  const unbuildable = screens.filter((s) => !s.operations.length).length;
+  $('waves-hint').textContent =
+    `${screens.length} screens · ${lineage.waves.length} waves · ` +
+    `${screens.length - unbuildable} name an operation`;
+
+  const head = el('div', 'journey-head');
+  head.append(el('h2', 'journey-title', 'What ships when'));
+  const chips = el('div', 'journey-chips');
+  for (const wave of lineage.waves) {
+    const inWave = screens.filter((s) => String(s.wave ?? 'unsequenced') === String(wave.wave));
+    const chip = el('span', 'jchip');
+    chip.append(el('span', null, `wave ${wave.wave}`), el('b', null, String(inWave.length)));
+    chips.append(chip);
+  }
+  head.append(chips);
+  head.append(
+    el(
+      'div',
+      'journey-trigger',
+      `A screen that names no operation is a screen somebody can draw and nobody can build. ` +
+        `${unbuildable} of ${screens.length} are in that state, and they are not evenly spread — ` +
+        `which is the useful part.`
+    )
+  );
+  body.append(head);
+
+  const platformName = (code) =>
+    state.journeys?.platforms?.find((p) => p.code === code)?.shortName ??
+    state.journeys?.platforms?.find((p) => p.code === code)?.name ?? code;
+
+  for (const wave of lineage.waves) {
+    const inWave = screens.filter((s) => String(s.wave ?? 'unsequenced') === String(wave.wave));
+    if (!inWave.length) continue;
+
+    body.append(
+      el('div', 'journey-section-label',
+        `wave ${wave.wave} — ${inWave.length} screens, ` +
+        `${inWave.filter((s) => s.operations.length).length} buildable`)
+    );
+
+    const byPlatform = new Map();
+    for (const screen of inWave) {
+      const key = screen.platform ?? '—';
+      if (!byPlatform.has(key)) byPlatform.set(key, []);
+      byPlatform.get(key).push(screen);
+    }
+
+    const grid = el('div', 'wave-grid');
+    for (const [platform, list] of [...byPlatform].sort((a, b) => b[1].length - a[1].length)) {
+      const card = el('div', 'wave-card');
+      const title = el('div', 'wave-card-head');
+      const code = el('span', 'wave-platform', platform);
+      deliveryTip(code, 'platforms', platform);
+      title.append(code, el('span', 'wave-platform-name', platformName(platform)));
+      title.append(el('span', 'wave-count', String(list.length)));
+      card.append(title);
+
+      const cells = el('div', 'wave-cells');
+      for (const screen of list.sort((a, b) => a.id.localeCompare(b.id))) {
+        const buildable = screen.operations.length > 0;
+        const cell = el('button', `wave-cell${!buildable && state.wavesUnbuilt ? ' unbuildable' : ''}`, screen.id);
+        if (screen.reads.length || screen.writes.length) cell.classList.add('reaches-data');
+        tip(
+          cell,
+          `${screen.id} — ${screen.name}`,
+          buildable
+            ? `Calls **${screen.operations.join('**, **')}**.` +
+              (screen.services.length ? ` Served by ${screen.services.join(', ')}.` : '')
+            : '**Names no operation.** Real screen, not yet specified — the index says so by returning ' +
+              'an empty list rather than guessing one.',
+          [screen.route, screen.offline ? 'offline-capable' : null,
+           screen.storedProcedures.length ? `sproc: ${screen.storedProcedures.join(', ')}` : null]
+            .filter(Boolean).join(' · ') || null
+        );
+        cell.onclick = () => { state.screenId = screen.id; setLayer('frontend'); setMode('screen'); };
+        cells.append(cell);
+      }
+      card.append(cells);
+      grid.append(card);
+    }
+    body.append(grid);
+  }
+
+  const legend = el('div', 'inline-legend');
+  body.append(legend);
+  renderBoxLegend(
+    legend,
+    [['var(--accent)', 'reaches a table'], ['var(--text-dim)', 'names an operation'], ['#f87171', 'names none']],
+    'wave and operations both from handoff/screen-index.json; the tables from the lineage behind it'
+  );
+}
+
+// ── decisions ────────────────────────────────────────────────────────
+function renderDecisions() {
+  const body = $('decisions-body');
+  const decisions = state.decisions;
+  body.innerHTML = '';
+
+  if (!decisions?.present) {
+    body.append(el('p', 'pane-empty', 'No docs/ in this package.'));
+    $('decisions-hint').textContent = '';
+    return;
+  }
+
+  const s = decisions.stats;
+  $('decisions-hint').textContent =
+    `${s.adrs} ADRs · ${s.documents} documents · ${s.vectorsPassed}/${s.vectors} vectors pass · ` +
+    `${s.artefactGaps} open artefact gaps`;
+
+  const needle = state.decisionsFilter.trim().toLowerCase();
+  const hit = (text) => !needle || String(text ?? '').toLowerCase().includes(needle);
+
+  if (state.decisionsScope === 'permissions') return renderPermissionVectors(body, hit);
+  if (state.decisionsScope === 'gaps') return renderArtefactGaps(body, hit);
+  if (state.decisionsScope === 'registers') return renderRegisters(body, hit);
+  return renderAdrs(body, hit);
+}
+
+function renderAdrs(body, hit) {
+  const adrs = state.decisions.adrs.filter(
+    (a) => hit(a.title) || hit(a.id) || hit(a.decision) || hit(a.closes)
+  );
+  body.append(el('div', 'journey-section-label', `${adrs.length} decisions`));
+
+  for (const adr of adrs) {
+    const card = el('div', 'adr-card');
+    const head = el('div', 'adr-card-head');
+    const number = el('span', 'adr-number', `ADR-${adr.id}`);
+    deliveryTip(number, 'adrs', adr.id);
+    head.append(number);
+    const title = el('button', 'adr-title', adr.title);
+    title.onclick = () => openDoc(adr.file);
+    head.append(title);
+
+    const verdict = el('span', `adr-status ${String(adr.verdict ?? '').toLowerCase()}`, adr.verdict ?? '—');
+    if (adr.partlySuperseded) {
+      verdict.classList.add('partial');
+      tip(verdict, 'Accepted, and partly superseded',
+        `**${adr.qualifier}** — which is the case that misleads: it reads as current in a list, and ` +
+        `the part that was superseded is not current.`);
+    } else {
+      tip(verdict, adr.status ?? 'No status',
+        adr.status
+          ? 'The decision’s standing. Only Accepted is binding.'
+          : '**This ADR states no status**, so whether it is binding cannot be told from the file.');
+    }
+    head.append(verdict);
+    if (adr.date) head.append(el('span', 'adr-date', adr.date));
+    card.append(head);
+
+    if (adr.decision) {
+      const text = el('div', 'adr-decision');
+      text.innerHTML = inlineMarkdown(adr.decision);
+      card.append(text);
+    }
+
+    const meta = el('div', 'adr-meta');
+    for (const [label, value] of [
+      ['closes', adr.closes], ['withdraws', adr.withdraws], ['supersedes', adr.supersedes],
+    ]) {
+      if (!value) continue;
+      const chip = el('span', 'jchip');
+      chip.append(el('span', null, label), el('b', null, value));
+      meta.append(chip);
+    }
+    for (const target of adr.constrains) {
+      const chip = el('span', 'adr-constrains', target);
+      tip(chip, 'Constrains', `**${target}** is bound by this decision. Changing it needs this ADR revisited first.`);
+      meta.append(chip);
+    }
+    if (adr.amended) {
+      const chip = el('span', 'adr-amended', 'amended');
+      tip(chip, 'Amended after acceptance',
+        'The accepted date is not the date of what this ADR now says. Read the amendment before acting on the decision.');
+      meta.append(chip);
+    }
+    if (meta.children.length) card.append(meta);
+    body.append(card);
+  }
+}
+
+function renderPermissionVectors(body, hit) {
+  const spec = state.decisions.permissions;
+  if (!spec) {
+    body.append(el('p', 'pane-empty', 'No permission-vectors.json in this package.'));
+    return;
+  }
+
+  const head = el('div', 'journey-head');
+  head.append(el('h2', 'journey-title', 'Authorisation, executed'));
+  const chips = el('div', 'journey-chips');
+  const pass = el('span', `jchip ${spec.stats.failed ? 'warn' : 'ok'}`);
+  pass.append(el('span', null, 'vectors'), el('b', null, `${spec.stats.passed} of ${spec.stats.total} pass`));
+  chips.append(pass);
+  if (spec.fixture) {
+    const chip = el('span', 'jchip');
+    chip.append(el('span', null, 'fixture'), el('b', null, spec.fixture));
+    chips.append(chip);
+  }
+  head.append(chips);
+  head.append(el('div', 'journey-trigger',
+    spec.note ??
+    'Each vector is a set of grants, a query and the verdict the platform must reach.'));
+  head.append(el('div', 'journey-trigger',
+    'The viewer resolves each one against the rule rather than listing it: a grant applies when its ' +
+    'permission matches and its scope is an ancestor of the query; any applicable DENY wins, however ' +
+    'specific the ALLOW; nothing bubbles upward.'));
+  body.append(head);
+
+  const rows = spec.vectors.filter((v) => hit(v.id) || hit(v.proves) || hit(v.query.permission));
+  body.append(el('div', 'journey-section-label', `${rows.length} vectors`));
+
+  for (const vector of rows) {
+    const card = el('div', `vector-card${vector.pass ? '' : ' failed'}`);
+    const head2 = el('div', 'vector-head');
+    head2.append(el('span', 'vector-id', vector.id));
+    head2.append(el('span', 'vector-proves', vector.proves));
+    const mark = el('span', `vector-verdict ${vector.pass ? 'pass' : 'fail'}`,
+      vector.pass ? vector.actual : `${vector.actual} ≠ ${vector.expect}`);
+    tip(mark, vector.pass ? 'Resolves as specified' : 'Does not resolve as specified',
+      vector.pass
+        ? `The rule produces **${vector.actual}**, which is what the spec requires.`
+        : `The spec requires **${vector.expect}** and the rule produces **${vector.actual}**. ` +
+          `The file says a failing vector is a build failure.`);
+    head2.append(mark);
+    card.append(head2);
+
+    const grants = el('div', 'vector-grants');
+    if (!vector.grants.length) {
+      const chip = el('span', 'vector-grant none', 'no grants');
+      tip(chip, 'Nothing granted', 'The default-deny case. Absence of a grant is a denial, not an error.');
+      grants.append(chip);
+    }
+    for (const grant of vector.grants) {
+      const chip = el('span', `vector-grant ${grant.effect.toLowerCase()}`);
+      chip.append(el('b', null, grant.effect));
+      chip.append(el('span', null, grant.permission));
+      chip.append(el('span', 'vector-scope', grant.scope));
+      grants.append(chip);
+    }
+    card.append(grants);
+
+    const query = el('div', 'vector-query');
+    query.append(el('span', 'vector-label', 'asks'));
+    query.append(el('b', null, vector.query.permission));
+    query.append(el('span', 'vector-scope', vector.query.scope));
+    card.append(query);
+    body.append(card);
+  }
+}
+
+function renderArtefactGaps(body, hit) {
+  const gaps = state.decisions.gaps.filter((g) => hit(g.class) || hit(g.verdict));
+  const s = state.decisions.stats;
+
+  const head = el('div', 'journey-head');
+  head.append(el('h2', 'journey-title', 'What the requirements demand and the package does not have'));
+  const chips = el('div', 'journey-chips');
+  for (const [label, value, cls] of [
+    ['classes', s.artefactClasses, ''],
+    ['open', s.artefactGaps, 'warn'],
+    ['requirements behind them', s.requirementsUnserved, 'warn'],
+  ]) {
+    const chip = el('span', `jchip ${cls}`);
+    chip.append(el('span', null, label), el('b', null, String(value)));
+    chips.append(chip);
+  }
+  head.append(chips);
+  head.append(el('div', 'journey-trigger',
+    'The delivery’s own audit, not the viewer’s. Every other view here measures what is present; ' +
+    'this is the only one that counts what is absent — and it is derived from the requirement text ' +
+    'rather than from a checklist.'));
+  body.append(head);
+
+  body.append(el('div', 'journey-section-label', `${gaps.length} artefact classes`));
+  const max = Math.max(1, ...gaps.map((g) => g.requirements));
+  const table = el('div', 'routing-table');
+  for (const gap of gaps) {
+    const line = el('div', 'routing-row');
+    const name = el('span', `gap-name ${gap.state}`, gap.class);
+    tip(name, gap.class,
+      gap.state === 'covered'
+        ? `Covered — ${gap.verdict.replace(/^[✅🟡🔴]\s*/, '')}`
+        : `**${gap.verdict.replace(/^[✅🟡🔴]\s*/, '')}**`,
+      gap.holding ? `holding: ${gap.holding}` : null);
+    line.append(name);
+
+    const bar = el('div', 'routing-bar');
+    bar.style.width = `${(gap.requirements / max) * 100}%`;
+    const seg = el('div', 'routing-seg', String(gap.requirements));
+    seg.style.flexGrow = '1';
+    seg.style.background =
+      gap.state === 'missing' ? '#f87171' : gap.state === 'partial' ? '#fbbf24' : '#34d399';
+    bar.append(seg);
+    line.append(bar);
+    line.append(el('span', 'routing-total', gap.state));
+    table.append(line);
+  }
+  body.append(table);
+
+  const legend = el('div', 'inline-legend');
+  body.append(legend);
+  renderBoxLegend(legend,
+    [['#f87171', 'nothing behind it'], ['#fbbf24', 'partial'], ['#34d399', 'covered']],
+    'bar length is the number of requirements that need an artefact of this class');
+}
+
+function renderRegisters(body, hit) {
+  const docs = state.decisions.documents.filter(
+    (d) => hit(d.title) || hit(d.lead) || hit(d.id)
+  );
+  const GROUPS = [
+    ['register', 'Registers — living reference data'],
+    ['handoff', 'Handoff — the build artefacts and the narratives beside them'],
+    ['architecture', 'Architecture — how it is built'],
+    ['active', 'Active — what is in flight'],
+    ['guide', 'Guides'],
+  ];
+
+  for (const [group, label] of GROUPS) {
+    const list = docs.filter((d) => d.group === group);
+    if (!list.length) continue;
+    body.append(el('div', 'journey-section-label', `${label} · ${list.length}`));
+    const grid = el('div', 'doc-grid');
+    for (const doc of list) {
+      const card = el('button', 'doc-card');
+      card.append(el('span', 'doc-title', doc.title));
+      if (doc.lead) card.append(el('span', 'doc-lead', doc.lead));
+      const meta = el('span', 'doc-meta');
+      meta.append(el('span', null, doc.file));
+      if (doc.rows) meta.append(el('b', null, `${doc.rows} rows`));
+      card.append(meta);
+      tip(card, doc.title, doc.lead || 'No lead paragraph.',
+        `${doc.lines} lines · ${doc.tables.length} table${doc.tables.length === 1 ? '' : 's'}`);
+      card.onclick = () => openDoc(doc.file);
+      grid.append(card);
+    }
+    body.append(grid);
+  }
+}
+
+/** Prose has no node in the graph, so it opens in the reader as source. */
+async function openDoc(file) {
+  const view = $('view-reader');
+  setMode('reader');
+  $('reader-empty').hidden = true;
+  $('reader-body').hidden = false;
+  $('reader-head').innerHTML = '';
+  $('reader-meta').innerHTML = '';
+  $('reader-head').append(el('h1', 'reader-title', file.split('/').pop()));
+  $('reader-meta').append(el('span', 'reader-file', file));
+  const source = $('reader-source');
+  source.textContent = 'Loading…';
+  try {
+    const text = await fetch(`/api/file?path=${encodeURIComponent(file)}`).then((r) => {
+      if (!r.ok) throw new Error(String(r.status));
+      return r.text();
+    });
+    source.innerHTML = '';
+    const pre = el('pre', 'doc-source');
+    pre.textContent = text;
+    source.append(pre);
+    if (view) view.scrollTop = 0;
+  } catch {
+    source.textContent = `Could not read ${file}`;
+  }
+}
+
 function renderBoxLegend(container, entries, note) {
   container.innerHTML = '';
   for (const [color, label] of entries) {
@@ -2127,8 +4996,19 @@ function renderBoxLegend(container, entries, note) {
 // ── right pane ───────────────────────────────────────────────────────
 /** Each layer answers "what links to this" about a different kind of thing. */
 function renderSidePane() {
+  fillSidePane();
+  // the phone toggle only exists when there is something behind it
+  syncLinksToggle();
+}
+
+function fillSidePane() {
   if (state.layer === 'frontend') return renderScreenLinks();
   if (state.layer === 'backend') return renderTableLinks();
+  // the states view explains a state in here; the events view is already a full
+  // page about one event, so leaving the last state model up is just stale
+  if (state.layer === 'domain') {
+    return state.mode === 'events' ? renderEventLinks() : renderStateLinks();
+  }
   const node = state.selectedId ? state.nodesById.get(state.selectedId) : null;
   if (node) renderLinksPane(node);
 }
@@ -2137,6 +5017,54 @@ function renderSidePane() {
 function renderScreenLinks() {
   const pane = $('links-pane');
   pane.innerHTML = '';
+
+  // a board is open in place of a screen — say what it is and what it covers
+  const board = state.boardId ? boards().find((b) => b.id === state.boardId) : null;
+  if (board) {
+    pane.append(sectionHead('Design board', 1));
+    const facts = el('div', 'impl-card');
+    const line = (label, value) => {
+      if (!value) return;
+      const row = el('div', 'impl-row');
+      row.append(el('span', 'impl-label', label));
+      row.append(el('code', null, String(value)));
+      facts.append(row);
+    };
+    line('file', board.file);
+    line('platform', board.platform ? `${board.platform} ${board.platformName}` : 'unmatched');
+    line('matched by', board.matchedBy ?? '—');
+    line('size', formatBytes(board.bytes));
+    if (board.revision) line('revision', board.revision);
+    pane.append(facts);
+    pane.append(
+      el('p', 'pane-note',
+        board.inferred
+          ? 'The platform is inferred from the file name. Renaming the file with the platform ' +
+            'code, or naming the board in a screen’s wireframe block, makes it declared.'
+          : 'The platform is declared.')
+    );
+
+    const on = board.platform
+      ? (state.journeys?.screens ?? []).filter((s) => s.platform === board.platform)
+      : [];
+    pane.append(sectionHead('Screens on this platform', on.length));
+    if (!on.length) {
+      pane.append(
+        el('p', 'pane-note',
+          'None yet. This platform has no screen definitions, which is why the board is the ' +
+          'only description of it.')
+      );
+    } else {
+      for (const screen of on) {
+        const row = el('div', 'link-item');
+        row.append(el('span', 'link-name', `${screen.id} ${screen.name}`));
+        row.onclick = () => selectScreen(screen.id);
+        pane.append(row);
+      }
+    }
+    return;
+  }
+
   const screen = screenById(state.screenId);
   if (!screen) {
     pane.append(el('p', 'pane-empty', 'Select a screen.'));
@@ -2188,6 +5116,61 @@ function renderTableLinks() {
   if (!table) {
     pane.append(el('p', 'pane-empty', 'Select a table.'));
     return;
+  }
+
+  // ---- what reaches this table -------------------------------------------
+  // The workbook's Where used sheet, whose own subtitle is the reason to lead
+  // with it: what breaks if this table changes. A foreign key says what this
+  // table is joined to; this says who would notice if it moved.
+  const used = (state.lineage?.whereUsed ?? []).find((t) => t.table === table.name);
+  if (used) {
+    pane.append(sectionHead('Operations that touch it', used.operations.length));
+    if (!used.operations.length) {
+      pane.append(
+        el('p', 'pane-empty',
+          'No operation in any contract reads or writes this table. A job, a migration or a ' +
+          'trigger may — but nothing in the API reaches it.')
+      );
+    }
+    for (const name of used.operations) {
+      const op = state.lineage?.operations?.find((o) => o.name === name);
+      const row = el('div', 'link-item');
+      row.append(el('span', 'link-name', name));
+      // says whether this operation writes the table or only reads it
+      const writes = op?.writes?.includes(table.name);
+      row.append(el('span', `link-weight${writes ? ' writes' : ''}`, writes ? 'writes' : 'reads'));
+      if (op?.service) row.append(el('span', 'link-file', op.service));
+      row.onclick = () => openOperation(name);
+      pane.append(row);
+    }
+
+    pane.append(sectionHead('Screens that reach it', used.screens.length));
+    if (!used.screens.length) {
+      pane.append(
+        el('p', 'pane-empty',
+          'No screen reaches this table. 180 of the 230 tables are in that position — the API ' +
+          'reaches them and no drawn screen does.')
+      );
+    }
+    for (const ref of used.screens) {
+      // the sheet writes these as "P01 WEB-002"
+      const id = /([A-Z]{2,4}-\d{3})/.exec(ref)?.[1] ?? ref;
+      const screen = state.journeys?.screens?.find((s) => s.id === id);
+      const row = el('div', 'link-item');
+      row.append(el('span', 'link-name', screen ? `${id} ${screen.name}` : ref));
+      if (screen?.platform) row.append(el('span', 'link-file', screen.platform));
+      row.onclick = () => {
+        if (!screen) return toast(`${id} is not defined in screens/`);
+        state.screenId = id;
+        setLayer('frontend');
+        setMode('screen');
+      };
+      pane.append(row);
+    }
+    pane.append(
+      el('p', 'pane-note',
+        'From the Where used sheet of the schema reference — "what breaks if this table changes".')
+    );
   }
 
   // what the migration actually says, where there is one
@@ -2743,6 +5726,32 @@ function auditSummary() {
       `${errors(j.problems)} errors`
     );
   }
+  if (state.layer === 'domain') {
+    const d = state.domain;
+    if (!d?.present) return 'No state models in states/ and no events in events/.';
+    const s = d.stats;
+    return (
+      `${s.machines} state models · ${s.states} states · ${s.transitions} transitions ` +
+      `(${s.reversals} reversals, ${s.approvals} needing approval) · ` +
+      `${s.statusEnumsModelled} of ${s.statusEnums} status enums have a model · ` +
+      `${s.events} events · ${s.consumers} consumers, ${s.criticalConsumers} critical · ` +
+      `${s.emitted} of ${s.events} events are emitted by a modelled transition · ` +
+      `${errors(d.problems)} errors`
+    );
+  }
+  if (state.layer === 'decisions') {
+    const d = state.decisions;
+    if (!d?.present) return 'No docs/ in this package.';
+    const s = d.stats;
+    return (
+      `${s.adrs} ADRs (${s.accepted} accepted, ${s.amended} amended after acceptance) · ` +
+      `${s.documents} documents holding ${s.rows} rows of reference data · ` +
+      `${s.vectorsPassed} of ${s.vectors} permission vectors resolve as the spec requires · ` +
+      `${s.artefactGaps} of ${s.artefactClasses} artefact classes are open, with ` +
+      `${s.requirementsUnserved} requirements behind them · ` +
+      `${errors(d.problems)} errors`
+    );
+  }
   if (state.layer === 'backend') {
     const b = state.backend;
     if (!b?.stats?.tables) return 'No schema workbook in backend/.';
@@ -2802,6 +5811,13 @@ function renderAudit() {
     item.append(body);
     item.append(el('span', 'audit-kind', problem.kind));
     item.onclick = () => {
+      // a domain problem names a file in states/ or events/, which the contract
+      // index has never heard of — open the artefact itself instead
+      if (problem.file?.startsWith('states/')) return openMachine(problem.file);
+      if (problem.file?.startsWith('events/')) {
+        const event = domainEvents().find((e) => e.file === problem.file);
+        if (event) return openEvent(event.name);
+      }
       const id = problem.nodeId && state.nodesById.has(problem.nodeId) ? problem.nodeId : `file:${problem.file}`;
       if (state.nodesById.has(id)) { select(id); setMode('reader'); }
     };
@@ -2916,10 +5932,25 @@ function connectLiveReload() {
   const source = new EventSource('/api/events');
   const dot = $('live-dot');
 
+  // the server process this page was served by
+  let boot = null;
+
   source.onopen = () => dot.classList.remove('stale');
   source.onerror = () => dot.classList.add('stale');
   source.onmessage = async (event) => {
     const data = JSON.parse(event.data);
+
+    // The browser reconnects by itself when the connection drops, and a
+    // reconnect carries no reload event — so after the server restarts this
+    // page keeps running the JavaScript it was served beforehand. It does not
+    // look stale; it looks broken, because a view added since is simply absent.
+    // A different boot id means a different server, so take the whole page back.
+    if (data.type === 'hello') {
+      if (boot && boot !== data.boot) return location.reload();
+      boot = data.boot;
+      return;
+    }
+
     if (data.type !== 'reload') return;
 
     state.fileCache.clear();
@@ -3029,13 +6060,32 @@ function bindUI() {
       for (const other of $('graph-scope').querySelectorAll('button')) {
         other.classList.toggle('active', other === button);
       }
+      syncGraphControls();
       renderGraph();
       setMode('graph');
     };
   }
+  syncGraphControls();
 
   $('graph-labels').onchange = (e) => { graph.showLabels = e.target.checked; graph.draw(); };
-  $('graph-recenter').onclick = () => graph.recenter();
+  $('graph-recenter').onclick = () => { graph.resize(); graph.recenter(); };
+  $('graph-shared').onchange = () => renderGraph();
+
+  $('states-scope').onchange = (e) => {
+    state.machineId = e.target.value;
+    state.stateName = null;
+    machine.userAdjusted = false;
+    renderStates();
+  };
+  $('states-guards').onchange = (e) => {
+    machine.showGuards = e.target.checked;
+    machine.draw();
+  };
+  $('states-fit').onclick = () => { machine.resize(); machine.fit(); };
+  $('events-scope').onchange = (e) => {
+    state.eventId = e.target.value === ALL_EVENTS ? null : e.target.value;
+    renderEvents();
+  };
 
   $('side-filter').oninput = (e) => {
     state.sideFilter = e.target.value.trim().toLowerCase();
@@ -3054,8 +6104,45 @@ function bindUI() {
   $('journey-branches').onchange = () => renderJourney();
   $('journey-ops').onchange = () => renderJourney();
 
-  $('screen-scope').onchange = (e) => selectScreen(e.target.value, { open: false });
+  $('screen-scope').onchange = (e) => {
+    const [kind, ...rest] = e.target.value.split(':');
+    const id = rest.join(':');
+    if (kind === 'board') selectBoard(id, { open: false });
+    else selectScreen(id, { open: false });
+  };
   $('screen-notes').onchange = () => renderScreen();
+
+  // ---- the three views the handoff joins made possible -------------------
+  for (const button of $('lineage-scope').querySelectorAll('button')) {
+    button.classList.toggle('active', button.dataset.scope === state.lineageScope);
+    button.onclick = () => {
+      state.lineageScope = button.dataset.scope;
+      for (const other of $('lineage-scope').querySelectorAll('button')) {
+        other.classList.toggle('active', other === button);
+      }
+      renderLineage();
+    };
+  }
+  $('lineage-filter').oninput = (e) => { state.lineageFilter = e.target.value; renderLineage(); };
+  $('lineage-unresolved').onchange = (e) => {
+    state.lineageUnresolved = e.target.checked;
+    renderLineage();
+  };
+
+  $('waves-unbuilt').onchange = (e) => { state.wavesUnbuilt = e.target.checked; renderWaves(); };
+  $('waves-offline').onchange = (e) => { state.wavesOffline = e.target.checked; renderWaves(); };
+
+  for (const button of $('decisions-scope').querySelectorAll('button')) {
+    button.classList.toggle('active', button.dataset.scope === state.decisionsScope);
+    button.onclick = () => {
+      state.decisionsScope = button.dataset.scope;
+      for (const other of $('decisions-scope').querySelectorAll('button')) {
+        other.classList.toggle('active', other === button);
+      }
+      renderDecisions();
+    };
+  }
+  $('decisions-filter').oninput = (e) => { state.decisionsFilter = e.target.value; renderDecisions(); };
 
   $('data-scope').onchange = (e) => {
     state.dataModule = e.target.value;
@@ -3070,6 +6157,10 @@ function bindUI() {
     data.draw();
   };
   $('data-inferred').onchange = () => {
+    data.userAdjusted = false;
+    renderData({ focus: state.tableName });
+  };
+  $('data-ambient').onchange = () => {
     data.userAdjusted = false;
     renderData({ focus: state.tableName });
   };
@@ -3120,6 +6211,22 @@ function bindUI() {
   };
   $('search-trigger').onclick = openPalette;
 
+  // ── drawers ───────────────────────────────────────────────────────
+  $('drawer-left-toggle').onclick = () => setDrawer(state.drawer === 'left' ? null : 'left');
+  $('drawer-right-toggle').onclick = () => setDrawer(state.drawer === 'right' ? null : 'right');
+  $('drawer-backdrop').onclick = () => setDrawer(null);
+
+  // Picking something in the tree is the whole reason the drawer was opened,
+  // so get out of the way of the answer. A row that only discloses its
+  // children has not answered anything yet, so it stays.
+  $('tree').addEventListener('click', (event) => {
+    if (!state.drawer) return;
+    const row = event.target.closest('.tree-child, .tree-file');
+    if (!row) return;
+    const discloses = row.nextElementSibling?.classList.contains('tree-children');
+    if (!discloses) setDrawer(null);
+  });
+
   $('palette-input').oninput = (e) => runSearch(e.target.value);
   $('palette').onclick = (e) => { if (e.target === $('palette')) closePalette(); };
 
@@ -3166,6 +6273,14 @@ function bindUI() {
         const node = paletteItems[paletteActive];
         if (node) { select(node.id); setMode('reader'); closePalette(); }
       }
+      return;
+    }
+
+    // before the input guard below: escape has to work from the tree's own
+    // filter box, which is the field most likely to have focus inside a drawer
+    if (e.key === 'Escape' && state.drawer) {
+      e.preventDefault();
+      setDrawer(null);
       return;
     }
 

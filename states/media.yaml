@@ -1,0 +1,50 @@
+# Media asset — state model
+# Contract: assets.MediaStatus
+# Checked by tools/check-states.py.
+
+entity: Media asset
+contract: assets
+enum: MediaStatus
+owner: assets
+initial:
+- processing
+terminal:
+- ready
+- quarantined
+- failed
+- archived
+transitions:
+- from: processing
+  to: ready
+  trigger: job
+  guard: Derivatives generated and the virus scan passed
+- from: processing
+  to: quarantined
+  trigger: job
+  guard: '**Scan flagged it.** Quarantined rather than deleted — a false positive on a tenant’s hero
+    image must be recoverable'
+- from: processing
+  to: failed
+  trigger: job
+  guard: Unreadable, or a format nothing can derive from
+- from: quarantined
+  to: ready
+  operation: updateMediaAsset
+  trigger: operation
+  guard: Reviewed and cleared
+  isReversal: true
+  requiresApproval: true
+- from: ready
+  to: archived
+  operation: updateMediaAsset
+  trigger: operation
+  guard: '**Refused while in use.** An archived asset still referenced by a live homepage is a broken
+    image on a guest surface'
+- from: archived
+  to: ready
+  operation: updateMediaAsset
+  trigger: operation
+  guard: Restored
+  isReversal: true
+notes: '`processing` is the state most systems omit and the one that breaks things. An upload completes
+  before its derivatives exist, and a screen showing "done" too early produces a broken image.'

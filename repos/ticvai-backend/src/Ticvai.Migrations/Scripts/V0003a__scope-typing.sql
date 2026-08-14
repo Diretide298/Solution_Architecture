@@ -210,11 +210,33 @@ COMMENT ON COLUMN platform.tenant.suspension_mode IS
 
 CREATE INDEX tenant_status ON platform.tenant (status);
 
--- No RLS. A cell holds exactly one tenant, so there is nothing to isolate from —
--- and a policy here would suggest otherwise to whoever reads it next.
+-- RLS. This table originally had none, on the stated grounds that a cell holds
+-- exactly one tenant (ADR-0014). The 14 August kick-off confirmed a second hosting
+-- model — a shared TICVAI database holding many small tenants, isolated logically
+-- by site id — which makes that assumption false and this table a cross-tenant
+-- leak on any shared cell.
+--
+-- The policy costs nothing on a dedicated cell, where it matches every row. Adding
+-- it later, after a shared cell exists, would be a migration against live data
+-- protecting something already exposed.
+ALTER TABLE platform.tenant ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform.tenant FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_scope ON platform.tenant
+    USING (EXISTS (
+        SELECT 1 FROM platform.scope_node n
+        WHERE n.id = platform.tenant.id
+          AND n.level = 'tenant'
+          AND platform.in_scope(n.path)
+    ));
+
+COMMENT ON POLICY tenant_scope ON platform.tenant IS
+  'A tenant row is visible only to a principal whose granted scope contains that '
+  'tenant node. On a dedicated cell this matches the single row and costs nothing. '
+  'On a shared cell it is the boundary between two paying customers.';
+
 COMMENT ON INDEX platform.tenant_status IS
-  'A cell holds one tenant. This table has one row in practice; the index exists '
-  'for the suspended-tenant check on the hot path, not for selectivity.';
+  'Supports the suspended-tenant check on the hot path. On a shared cell this table '
+  'has many rows, not one — sized accordingly.';
 
 -- -----------------------------------------------------------------------------
 -- 4. A view that answers "what is this scope node, really".

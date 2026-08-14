@@ -1,0 +1,340 @@
+# P08 — Venue Back Office
+#
+# STARTED, NOT COMPLETE. The page inventory counts 73 back office screens and
+# itemises none of them — a figure carried from v1 with no list behind it.
+# These six are the queue integration surface the client decided on 14 August,
+# plus a parking placeholder pending that day's MoM.
+
+platform:
+  code: P08
+  audience: staff
+  formFactor: web
+  shortName: Staff Web
+  name: Staff Web — Venue Back Office
+  surface: staffFacing
+  runtime: reactWeb
+  offlineCapable: false
+  themes:
+  - light
+  - dark
+  directions:
+  - ltr
+  - rtl
+  screenCount: 6
+  app: backoffice
+  appStatus: scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: browser, desktop
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: venue-owned workstation
+    networkAssumption: venue LAN
+    releaseCadence: weekly
+screens:
+- id: BO-001
+  name: Queue Directory
+  module: Queue Management
+  purpose: See every queue in the venue and whether its data is arriving.
+  capability: C05
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        bindsTo: Queue[]
+        notes: Current wait, source, feed health, status
+      - kind: banner
+        notes: Queues whose feed has gone quiet. The first thing a duty manager checks
+  states:
+    loading: Table skeleton
+    empty: No queues configured, with the action to create one
+    error: Queue service unavailable. Manual wait times can still be set — the fallback must not depend
+      on the thing that failed
+  wireframe:
+    status: notStarted
+  permission: QUEUE_VIEW
+  apis:
+  - operationId: listQueues
+    contract: queue
+    purpose: Every queue with its current wait
+    trigger: onLoad
+  - operationId: listQueueFeeds
+    contract: queue
+    purpose: Feed health per queue
+    trigger: onLoad
+  notes: A queue on the manual adaptor shows "manual" rather than "no feed". It is configured and working;
+    treating it as unconfigured makes the health view lie.
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-directory
+    component: apps/backoffice/src/routes/queue-management/QueueDirectoryList.tsx
+    status: notStarted
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - BO-002
+    - BO-003
+    - BO-004
+    - BO-005
+    inferred: true
+- id: BO-002
+  name: Queue Configuration
+  module: Queue Management
+  purpose: Create a queue and set how it behaves.
+  capability: C05
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+        label: Name
+      - kind: selectField
+        label: Attraction or resource
+      - kind: numberField
+        label: Capacity per call
+      - kind: toggle
+        label: Guests may join from the app
+      - kind: numberField
+        label: Redemption window (minutes)
+        notes: How long after being called before the entry expires
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Save
+  states:
+    loading: Form skeleton
+    empty: Not applicable
+    error: Save failed, with the field named. Values are never silently dropped
+  wireframe:
+    status: notStarted
+  permission: QUEUE_MANAGE
+  apis:
+  - operationId: createQueue
+    contract: queue
+    purpose: Create
+    trigger: onAction
+  - operationId: updateQueue
+    contract: queue
+    purpose: Amend
+    trigger: onAction
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-configuration
+    component: apps/backoffice/src/routes/queue-management/QueueConfigurationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-003
+  name: Queue Integration Setup
+  module: Queue Management
+  purpose: Connect a queue to an on-site system, or leave it on manual entry.
+  capability: C05
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: selectField
+        label: Source
+        notes: Manual, sensor API, webhook, MQTT, vendor poll, turnstile count, CV camera. Manual is
+          the default and a valid end state
+      - kind: textField
+        label: Endpoint or topic
+        notes: Hidden when the source is manual
+      - kind: textField
+        label: Credential reference
+        notes: A key vault reference, never the secret. A secret typed into a form ends up in a screenshot
+      - kind: numberField
+        label: Expected interval (seconds)
+        notes: Drives the went-quiet alarm. Too tight and a duty manager learns to ignore it
+      - kind: secondaryButton
+        label: Test connection
+        notes: Runs testQueueFeed. Configuring an integration without a test is configuring it blind
+      - kind: detailPanel
+        bindsTo: FeedTestResult
+        notes: Five checks, plus the mapped sample reading and the raw payload. A source that is reachable
+          and returns a shape nobody mapped looks like silence, not an error
+      - kind: toggle
+        label: Enabled
+        notes: Disabled by default. A feed goes live only after a passing test
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Save
+  states:
+    loading: Form skeleton
+    empty: Not applicable
+    error: Save failed. The test result stays on screen — losing it forces the configurer to run the
+      test again
+  wireframe:
+    status: notStarted
+  permission: QUEUE_MANAGE
+  apis:
+  - operationId: configureQueueFeed
+    contract: queue
+    purpose: Set the source
+    trigger: onAction
+  - operationId: testQueueFeed
+    contract: queue
+    purpose: One exchange with the configured source
+    trigger: onAction
+  - operationId: getQueueFeedHealth
+    contract: queue
+    purpose: Current feed state
+    trigger: onLoad
+  notes: ADR-0012, adaptor-first. A named vendor is a driver behind a stable inbound shape, so adding
+    one is configuration plus a driver rather than a core change. Vendor selection is CF-33a and deliberately
+    late.
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-integration-setup
+    component: apps/backoffice/src/routes/queue-management/QueueIntegrationSetupForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-004
+  name: Manual Wait Time Entry
+  module: Queue Management
+  purpose: Set a wait time by hand, whether or not a feed exists.
+  capability: C05
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: Queue[]
+        notes: One row per queue with a stepper and the current value
+      - kind: banner
+        notes: Where a feed is live, a manual entry overrides it for a stated period and then reverts.
+          A permanent silent override is how a broken sensor goes unnoticed for a season
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Publish
+  states:
+    loading: Rows skeleton. Current values render immediately
+    empty: No queues configured
+    error: Publish failed. The entered value is kept on screen
+  wireframe:
+    status: notStarted
+  permission: QUEUE_MANAGE
+  apis:
+  - operationId: setWaitTime
+    contract: queue
+    purpose: Set or override the wait
+    trigger: onAction
+  - operationId: listQueues
+    contract: queue
+    purpose: Current values
+    trigger: onLoad
+  notes: The screen the client asked for on 14 August. Available regardless of integration state — a
+    venue with no sensors runs entirely from here, and a venue whose sensor failed falls back to it.
+  implementation:
+    app: backoffice
+    route: /queue-management/manual-wait-time-entry
+    component: apps/backoffice/src/routes/queue-management/ManualWaitTimeEntryForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-005
+  name: Queue Monitor
+  module: Queue Management
+  purpose: Watch queues during operation and call parties forward.
+  capability: C05
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Waiting, called, expired, average wait
+      - kind: dataTable
+        bindsTo: QueueEntry[]
+      - kind: chart
+        notes: Wait over the day. Stale where the feed has gone quiet
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Call next
+  states:
+    loading: Tiles skeleton
+    empty: Nobody waiting
+    error: Live data unavailable. Last known values shown with their age
+  wireframe:
+    status: notStarted
+  permission: QUEUE_VIEW
+  apis:
+  - operationId: listQueueEntries
+    contract: queue
+    purpose: Who is waiting
+    trigger: onInterval
+  - operationId: callNextParties
+    contract: queue
+    purpose: Call forward
+    trigger: onAction
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Current waits
+    trigger: onInterval
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-monitor
+    component: apps/backoffice/src/routes/queue-management/QueueMonitorDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-006
+  name: Parking Configuration
+  module: Parking
+  purpose: TODO — pending the 14 August MoM.
+  capability: C39
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: TODO
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  notes: Placeholder. Parking was discussed on 14 August and the MoM has not yet been received.
+  openQuestions:
+  - 'Awaiting the 14 August MoM. Scope unknown: whether parking is barrier integration, space counting,
+    pre-booking, or all three. `parking` is already a module key in the White Label Builder with nothing
+    behind it — the same gap as diningAndFnb and push.'
+  implementation:
+    app: backoffice
+    route: /parking/parking-configuration
+    component: apps/backoffice/src/routes/parking/ParkingConfigurationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true

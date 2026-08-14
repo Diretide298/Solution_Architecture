@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 17
+  x-ticvai-screen-count: 18
   x-ticvai-tier: satellite
   x-ticvai-module: "20 — Marketing & CRM"
   x-ticvai-requirements: 319
@@ -811,6 +811,8 @@ paths:
   /campaigns:
     get:
       operationId: listCampaigns
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       x-ticvai-read-routing: replica
       summary: List campaigns
       tags: [campaign]
@@ -1019,6 +1021,71 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /campaigns/{campaignId}/pause:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: pauseCampaign
+      summary: Pause a campaign mid-send
+      description: >
+        Halts sending. **Recipients already sent to are not unsent** — pausing stops the next message, not the last one.
+
+        Resuming continues from where it stopped rather than from the start, which is why `paused` cannot return to `scheduled`.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /campaigns/{campaignId}/unschedule:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: unscheduleCampaign
+      summary: Pull a scheduled campaign before it sends
+      description: >
+        Returns it to draft. Distinct from stopping: nothing has been sent, so there is no partial audience to reason about.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /campaigns/{campaignId}/stop:
     parameters:
       - name: campaignId
@@ -1114,6 +1181,7 @@ paths:
 
     post:
       operationId: createMessageTemplate
+      x-ticvai-config-scope: tenant
       summary: Create a message template
       description: >
         Per-language bodies with named merge fields. A template missing a version in an
@@ -1121,7 +1189,7 @@ paths:
         English when they chose Arabic is a defect, not a graceful degradation.
       tags: [message]
       x-ticvai-permission: MARKETING_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1387,6 +1455,44 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/CaseMessage' }
 
+  /cases/{caseId}/reopen:
+    parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: reopenCase
+      summary: Reopen a resolved case
+      description: >
+        The guest came back on the same issue. Reopening rather than raising a new case is what makes repeat problems visible — a second case looks like a second problem.
+
+        Refused once closed: the reopen window has passed and a genuinely new contact deserves its own case.
+      tags: [case]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /cases/{caseId}/escalate:
     parameters:
       - name: caseId
@@ -1445,6 +1551,7 @@ paths:
 
     post:
       operationId: createLoyaltyProgramme
+      x-ticvai-config-scope: tenant
       summary: Create a loyalty programme
       description: >
         Earn rules, tiers and redemption options. **Points are a liability** and post to the
@@ -1452,7 +1559,7 @@ paths:
         earned.
       tags: [loyalty]
       x-ticvai-permission: MARKETING_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1572,6 +1679,7 @@ paths:
       operationId: submitReview
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
+        - "P02 GST-035 Feedback & Ratings"
       security:
         - guestAuth: []
       x-ticvai-self-scoped: subject

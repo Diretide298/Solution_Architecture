@@ -251,6 +251,7 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: updateRegionSettings
+      x-ticvai-config-scope: region
       summary: Update region settings
       description: >
         Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
@@ -348,6 +349,7 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: configureWorkstation
+      x-ticvai-config-scope: venue
       summary: Configure a workstation
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
@@ -495,6 +497,7 @@ paths:
 
     post:
       operationId: createSaleBoard
+      x-ticvai-config-scope: venue
       summary: Create a sale board
       description: >
         Tiles reference catalogue variants and are grouped into pages. A cashier finds an item
@@ -532,6 +535,7 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: updateSaleBoard
+      x-ticvai-config-scope: venue
       summary: Update a sale board
       description: >
         Changes reach terminals with the next catalogue bundle, not immediately — a board that
@@ -891,15 +895,24 @@ components:
       enum:
         - receiptPrinter
         - ticketPrinter
+        - labelPrinter
         - cashDrawer
         - barcodeScanner
         - rfidReader
         - nfcReader
+        - cardReader
+        - idReader
+        - biometricReader
+        - accessReader
         - paymentTerminal
         - customerDisplay
-        - biometricReader
-        - idReader
         - signageDisplay
+        - kitchenDisplay
+        - turnstileController
+        - wristbandEncoder
+        - signaturePad
+        - scale
+        - camera
 
     DeviceBinding:
       x-ticvai-persistence: "platform.device"

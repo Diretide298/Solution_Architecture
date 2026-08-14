@@ -1,0 +1,69 @@
+<!doctype html><meta charset=utf-8><title>Guest App — Mobile</title><style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f4f5;color:#18181b;
+     font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+a{color:#18181b}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 22px 60px}
+h1{font-size:20px;margin:0 0 4px;font-weight:650}
+h2{font-size:15px;margin:34px 0 10px;font-weight:650}
+.sub{color:#71717a;margin:0 0 22px;max-width:70ch}
+.note{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #a1a1aa;
+      padding:10px 13px;margin:0 0 22px;max-width:74ch;color:#3f3f46}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #e4e4e7;padding:13px;text-decoration:none;display:block}
+.card:hover{border-color:#a1a1aa}
+.card h3{margin:0 0 3px;font-size:13px;font-weight:650}
+.card .m{color:#71717a;font-size:11px}
+
+/* the frame */
+.frame{background:#fff;border:1px solid #d4d4d8;margin:0 0 26px}
+.frame .bar{background:#fafafa;border-bottom:1px solid #e4e4e7;padding:7px 11px;
+            font-size:11px;color:#52525b;display:flex;justify-content:space-between}
+.frame .body{padding:0}
+.rg{border-bottom:1px dashed #e4e4e7;padding:11px 13px}
+.rg:last-child{border-bottom:none}
+.rg-l{font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#a1a1aa;margin-bottom:7px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-start}
+.el{background:#f4f4f5;border:1px solid #e4e4e7;flex:1;min-width:150px;
+    display:flex;align-items:center;justify-content:center;color:#71717a;font-size:11px;
+    text-align:center;padding:5px}
+.el.sm{flex:0 0 auto;min-width:104px}
+.el.btn-primary{background:#3f3f46;color:#fff;border-color:#3f3f46}
+.el.btn-danger{background:#fff;border-color:#a1a1aa;color:#52525b}
+.el.banner{background:#fafafa;border-style:dashed}
+.el.scan,.el.seatmap,.el.board,.el.preview{background:repeating-linear-gradient(45deg,#fafafa,#fafafa 7px,#f4f4f5 7px,#f4f4f5 14px)}
+.tip{color:#71717a;font-size:10.5px;margin:4px 0 0;max-width:66ch;font-style:italic}
+.el-full{flex:1 1 100%;min-width:0}
+table.wf{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e4e4e7}
+table.wf th{background:#fafafa;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+            color:#71717a;text-align:left;padding:6px 8px;border-bottom:1px solid #e4e4e7;font-weight:600}
+table.wf td{padding:6px 8px;border-bottom:1px solid #f4f4f5;color:#52525b;font-size:11.5px}
+.src{font-size:10px;color:#a1a1aa;margin:4px 0 0}
+.fields{background:#fff;border:1px solid #e4e4e7}
+.fld{display:flex;justify-content:space-between;padding:6px 9px;border-bottom:1px solid #f4f4f5;font-size:11.5px}
+.fld:last-child{border-bottom:none}
+.fld span{color:#71717a}.fld i{font-style:normal;color:#3f3f46}
+.fld.tot{background:#fafafa;font-weight:650}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.cardbox{background:#fff;border:1px solid #e4e4e7}
+.el.tile{flex:1 1 130px;min-width:130px;flex-direction:column;gap:2px;padding:11px;min-height:64px}
+.el.tile b{font-size:19px;color:#3f3f46;font-weight:650}
+.el.tile span{font-size:10px;color:#a1a1aa}
+.el.field{justify-content:space-between;padding:9px 11px}
+.el.field i{font-style:normal;color:#a1a1aa;font-size:10.5px}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px}
+.tilebox{background:#fff;border:1px solid #e4e4e7;padding:15px 8px;text-align:center;
+         font-size:11px;color:#52525b}
+
+table.st{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e4e4e7;margin:0 0 22px}
+table.st td,table.st th{border:1px solid #e4e4e7;padding:6px 9px;text-align:left;vertical-align:top;font-size:12px}
+table.st th{background:#fafafa;font-weight:650;width:104px;color:#52525b}
+.pill{display:inline-block;background:#f4f4f5;border:1px solid #e4e4e7;padding:1px 7px;
+      font-size:10.5px;color:#52525b;margin:0 4px 4px 0}
+.pill.off{background:#3f3f46;color:#fff;border-color:#3f3f46}
+.crumb{font-size:11px;color:#71717a;margin:0 0 16px}
+.flowstep{display:flex;gap:11px;align-items:flex-start;margin:0 0 9px}
+.flowstep .n{background:#3f3f46;color:#fff;width:21px;height:21px;flex:0 0 21px;
+             display:flex;align-items:center;justify-content:center;font-size:11px}
+.br{color:#71717a;font-size:11.5px;margin:2px 0 0 32px}
+</style><div class=wrap><p class=crumb><a href='index.html'>index</a></p><h1>Guest App — Mobile</h1><p class=sub>guest on mobileApp, app <code>guest</code>. 62 screens. <b>Offline-capable.</b></p><div class=grid><a class=card href='screens/gst-001.html'><h3>GST-001 Home – Default</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-002.html'><h3>GST-002 Explore Categories</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-003.html'><h3>GST-003 Attractions List</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-004.html'><h3>GST-004 Attraction Details</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-005.html'><h3>GST-005 What&#x27;s On</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-006.html'><h3>GST-006 Event / Exhibition Details</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-007.html'><h3>GST-007 Select Date &amp; Time</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-008.html'><h3>GST-008 Tickets &amp; Add-ons</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-009.html'><h3>GST-009 Review &amp; Payment</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-010.html'><h3>GST-010 Booking Confirmation</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-011.html'><h3>GST-011 Wallet Overview</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-012.html'><h3>GST-012 My Tickets</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-013.html'><h3>GST-013 Ticket Details</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-014.html'><h3>GST-014 Ticket Transfer</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-015.html'><h3>GST-015 Memberships</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-016.html'><h3>GST-016 My Reservations</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-017.html'><h3>GST-017 Reservation Details</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-018.html'><h3>GST-018 Add to Calendar / Reminders</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-019.html'><h3>GST-019 Order History (Wallet)</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-020.html'><h3>GST-020 Saved Items / Wishlist</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-021.html'><h3>GST-021 Interactive Map</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-022.html'><h3>GST-022 Attraction Wait Times</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-023.html'><h3>GST-023 Virtual Queue / Join Queue</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-024.html'><h3>GST-024 F&amp;B – Browse &amp; Order</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-025.html'><h3>GST-025 F&amp;B – Order Tracking</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-026.html'><h3>GST-026 Retail / Merchandise</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-027.html'><h3>GST-027 Parking – Reserve &amp; Pay</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-028.html'><h3>GST-028 Parking – Reservation Confirmed</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-029.html'><h3>GST-029 Venue Info &amp; Services</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-030.html'><h3>GST-030 In-Venue Notifications</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-031.html'><h3>GST-031 AI Concierge – Home</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-032.html'><h3>GST-032 AI Concierge – Chat</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-033.html'><h3>GST-033 AI Concierge – Contextual Help</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-034.html'><h3>GST-034 Lost &amp; Found</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-035.html'><h3>GST-035 Feedback &amp; Ratings</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-036.html'><h3>GST-036 Loyalty &amp; Rewards</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-037.html'><h3>GST-037 Offers &amp; Promotions</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-038.html'><h3>GST-038 Digital Companion Mode</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-039.html'><h3>GST-039 Profile</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-040.html'><h3>GST-040 Help &amp; Support</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-041.html'><h3>GST-041 Checkout Entry</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-042.html'><h3>GST-042 Simple Registration &amp; OTP</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-043.html'><h3>GST-043 Arabic / RTL Experience</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-044.html'><h3>GST-044 Multi-Currency &amp; Pricing</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-045.html'><h3>GST-045 Ticket Delivery &amp; Sharing</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-046.html'><h3>GST-046 Branded Queue / Waiting Room</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-047.html'><h3>GST-047 Maintenance Page</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-048.html'><h3>GST-048 Upsell / Cross-Sell</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-049.html'><h3>GST-049 Interactive Seat Selection</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-050.html'><h3>GST-050 Resource Booking – Cabana</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-051.html'><h3>GST-051 Plan Your Adventure – Start</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-052.html'><h3>GST-052 Suggested Itineraries</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-053.html'><h3>GST-053 Build Your Own Itinerary</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-054.html'><h3>GST-054 AI Optimized Itinerary</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-055.html'><h3>GST-055 Dynamic QR Ticket</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-056.html'><h3>GST-056 Bundle Package</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-057.html'><h3>GST-057 Accessibility Information</h3><div class=m>TODO · wave 2 · notStarted</div></a><a class=card href='screens/gst-058.html'><h3>GST-058 Resource Availability (Cabana)</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-059.html'><h3>GST-059 Plan My Day – In Progress</h3><div class=m>TODO · wave 3 · notStarted</div></a><a class=card href='screens/gst-060.html'><h3>GST-060 Maintenance / Upgrade Page</h3><div class=m>TODO · wave 1 · notStarted</div></a><a class=card href='screens/gst-061.html'><h3>GST-061 Menu Item Detail</h3><div class=m>In-Venue Experience · wave 2 · notStarted</div></a><a class=card href='screens/gst-062.html'><h3>GST-062 Shop &amp; Drop Collection</h3><div class=m>In-Venue Experience · wave 3 · notStarted</div></a></div><p class=crumb style='margin-top:40px'><a href='index.html'>index</a></p></div>

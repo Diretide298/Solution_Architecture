@@ -1,0 +1,63 @@
+# Rollout — state model
+# Contract: platform-ops.RolloutStatus
+# Checked by tools/check-states.py.
+
+entity: Rollout
+contract: platform-ops
+enum: RolloutStatus
+owner: control
+initial:
+- queued
+terminal:
+- complete
+- failed
+- rolledBack
+transitions:
+- from: queued
+  to: canary
+  operation: startRollout
+  trigger: operation
+  guard: '**First cell only.** A canary that is itself a shared cell risks many tenants, so the orchestrator
+    prefers a dedicated cell or the smallest shared one (ADR-0001)'
+  requiresApproval: true
+- from: canary
+  to: rolling
+  operation: startRollout
+  trigger: operation
+  guard: Canary held. Fanning out
+  requiresApproval: true
+- from: canary
+  to: rolledBack
+  operation: rollbackRollout
+  trigger: operation
+  guard: Canary failed. **This is the canary working**
+  isReversal: true
+- from: rolling
+  to: paused
+  operation: pauseRollout
+  trigger: operation
+  guard: Halted mid-fan-out. Cells already upgraded stay upgraded
+- from: paused
+  to: rolling
+  operation: startRollout
+  trigger: operation
+  guard: Resumed
+  requiresApproval: true
+- from: rolling
+  to: complete
+  trigger: job
+  guard: Every targeted cell upgraded and verified
+- from: rolling
+  to: failed
+  trigger: job
+  guard: A cell failed and rollback did not restore it
+- from: paused
+  to: rolledBack
+  operation: rollbackRollout
+  trigger: operation
+  guard: Abandoned and reversed
+  isReversal: true
+  requiresApproval: true
+notes: '`paused` leaves the estate at two schema versions on purpose. That is expected during a rollout
+  and a defect outside one, and the skew report is what tells them apart — with on-premise cells a third
+  case, legitimately behind indefinitely (ADR-0017).'

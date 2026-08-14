@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Cross-Cell
   version: 0.1.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 1
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — multi-region"
   x-ticvai-capabilities: [C56, C37]
@@ -324,6 +324,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getRedemptionRight
+      x-ticvai-consumed-by:
+        - "P07 SCN-011 Delegated right"
       x-ticvai-read-routing: replica
       summary: Read a redemption right
       tags: [redemption]
@@ -613,6 +615,7 @@ paths:
 
     put:
       operationId: setWalletAllocationPolicy
+      x-ticvai-config-scope: region
       summary: Set the allocation cap policy
       tags: [wallet]
       x-ticvai-permission: REGION_CONFIGURE

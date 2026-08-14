@@ -1,45 +1,29 @@
-# Build Handoff
+# Handoff
 
-> **Purpose:** The three artefacts a development team starts from
-> **Owner:** Chinmay
-> **Status:** Wave 1 complete for closed contexts
-
-Architecture decisions live in [adr](../adr/README.md). Requirements live in
-[registers](../registers/README.md). **This directory is what the team actually consumes.**
-
-| Artefact | What it answers | Consumed by |
-|---|---|---|
-| [api-list](api-list.md) | What endpoints exist, what they need | Backend, frontend |
-| [page-inventory](page-inventory.md) | **305 screens** across 9 platforms, with capability and API mapping |
-| [schema](schema.md) | What tables exist, keys, indexes, RLS | Backend, DBA |
-
-## Traceability
-
-    Requirement ID  →  Capability  →  API operation  →  Table
-                                   ↘  Page
-
-Every row in every artefact carries its capability ID. A page with no API is a
-**local-first read** ([ADR-0013](../adr/0013-local-first-point-of-sale.md)). An API with no
-page is a partner endpoint or a gap.
-
-## Status meaning
+Everything a new person needs, and the answers to the questions they will ask second.
 
 | | |
 |---|---|
-| ✅ Published | OpenAPI written, schemas defined, errors enumerated. **Buildable** |
-| 🟡 Specified | Path, method, permission and offline policy known. **Estimable, not buildable** |
-| ⬜ Not specified | Context has not been through the contract loop |
+| `TICVAI_Schema_Reference.xlsx` | **230 tables, 2,026 columns, eight sheets.** Modules with a rationale, relationships, where-used |
+| **`services-and-procedures.md`** | 22 services, ten stored procedures, and why only ten |
+| **`screen-index.json`** | Every screen joined to its board, operations, service, tables and procedure |
+| **`api-data-lineage.json`** | Every operation against its tables, service and procedure — machine-readable |
+| `storage-design.md` | The 30% of a migration that does not derive from the contracts |
+| `page-inventory.md` | All 347 screens, every one defined |
+| `platform-deployment.md` | Twelve platforms, where each runs and how it ships |
+| `screen-contract-linkage.md` | Which operations reach a screen, and the 499 that do not |
+| `requirements-coverage.md` | 2,842 of 3,184 covered, and where the rest sits |
+| `artefact-audit.md` | Fifteen artefact classes, four closed |
+| `integration-register.md` | 35 named integrations tested against 642 operations |
+| `relationships.csv` | 406 table relationships with an edge kind |
+| `tooltips.json` | 340 hover entries for the visualizer |
+| `deployment-models.md` | Shared, dedicated, additional region, on-premise |
+| `schema-viewer-notes.md` | Why clicking a catalogue table lands in platform |
+| `api-list.md` · `schema.md` | The operation and table indexes |
+| `migrations-README.md` | Why no SQL exists, and what resumes it |
 
-The gap between 🟡 and ✅ is request and response schemas plus error enumeration. That is
-the contract-authoring work, and it is the current bottleneck.
+## The two to read first
 
-## What a team can start on today
-
-| Team | Work | Depends on |
-|---|---|---|
-| **Backend** | Tenant resolution · RLS · session registry · permission resolver · migration orchestrator · `ltree` tree · outbox · bundle signing and delta | **Nothing** — internal |
-| **Frontend** | `offline-core` sync, bundle apply, lease hold, staleness bound · `design-tokens` · `ui` primitives · POS and scanner shells | **Nothing** — generated types + Prism mock |
-| **Both** | Everything in ✅ contexts — identity, tenancy, shift, access | Published contracts |
-
-That is roughly **6 weeks of work for 8 people with no contract dependency**, which is the
-runway available while the remaining contracts are authored.
+**The workbook** if you are building anything that stores data. **`platform-deployment.md`**
+if you are building anything a person looks at — it carries the definition-depth table, which
+is the difference between 347 screens defined and 27 specified.

@@ -92,6 +92,21 @@ limits, reserved connection minimums — with one addition:
 This is the concrete form of "venues share a primary" being an accepted risk rather than an
 ignored one.
 
+### Beyond a cell — launch another cluster
+
+Amended 14 August. **Capacity is driven by traffic and concurrent users, not by tenant count.**
+Forty quiet tenants may load a cell less than three busy ones.
+
+Scaling out is **launching another identical cluster** and placing or moving tenants onto it —
+same shape, same tier, same schema version, copied from a model cell rather than specified. A
+cluster at a different version is not capacity; it is a second thing to maintain.
+
+`getCellCapacity` reports per dimension — concurrent users, transactions, scans, connections,
+storage, replication lag — because the response differs by which one is short.
+
+A tenant already on a hot cell moves with `planTenantMigration`, which is the same machinery
+that upgrades a tenant from shared to dedicated infrastructure.
+
 ### Beyond a cell — split the cell
 
 **The cell is the shard boundary** (ADR-0014). A tenant-region that outgrows one primary is

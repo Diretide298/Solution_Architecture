@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 5
+  x-ticvai-screen-count: 6
   x-ticvai-tier: satellite
   x-ticvai-module: "17 — Guest Mobile App & Branding (builder)"
   x-ticvai-requirements: 107
@@ -145,6 +145,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
+        - "P02 GST-047 Maintenance Page"
+        - "P02 GST-060 Maintenance / Upgrade Page"
       x-ticvai-read-routing: replica
       summary: App status and recent changes
       description: >
@@ -488,6 +490,7 @@ paths:
 
     put:
       operationId: setHomepageLayout
+      x-ticvai-config-scope: tenant
       summary: Set homepage section order
       description: >
         The drag-and-drop builder. Sections are an ordered list; the order here is the order
@@ -847,6 +850,7 @@ paths:
         schema: { $ref: '#/components/schemas/PolicyKind' }
     put:
       operationId: setPolicy
+      x-ticvai-config-scope: tenant
       summary: Publish a policy version
       description: >
         **Policies are versioned and never overwritten.** A guest who consented to version 3
@@ -912,6 +916,7 @@ paths:
 
     put:
       operationId: setModuleEnablement
+      x-ticvai-config-scope: tenant
       summary: Enable or disable modules
       description: >
         A disabled module is **hidden from the guest app entirely** — not shown and refused.
@@ -957,6 +962,8 @@ paths:
   /tenant-config/features:
     get:
       operationId: getFeatureToggles
+      x-ticvai-consumed-by:
+        - "P02 GST-038 Digital Companion Mode"
       x-ticvai-read-routing: replica
       summary: Read tenant feature toggles
       tags: [modules]
@@ -975,6 +982,7 @@ paths:
 
     put:
       operationId: setFeatureToggles
+      x-ticvai-config-scope: tenant
       summary: Set feature toggles
       description: >
         Finer-grained than modules — digital companion mode, AI concierge, push, social
@@ -1116,6 +1124,7 @@ paths:
   /tenant-config/publish:
     post:
       operationId: publishTenantConfig
+      x-ticvai-config-scope: tenant
       summary: Publish the working draft
       description: >
         Validates, snapshots, versions and activates atomically. Guests receive the new

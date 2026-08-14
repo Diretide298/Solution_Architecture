@@ -1,6 +1,7 @@
 # ADR-0001: Cell architecture — one tenant per jurisdiction
 
-**Status:** Accepted — split rule **superseded by [ADR-0014](0014-cell-per-region.md)**  
+**Status:** Accepted — split rule **superseded by [ADR-0014](0014-cell-per-region.md)**;
+isolation claim **amended 14 August 2026**  
 **Date:** 12 August 2026
 
 ## Context
@@ -70,3 +71,45 @@ it.** Not as a default posture.
 | Shared multi-tenant cluster | Fails residency; noisy neighbour; connection exhaustion |
 | Cell per tenant, ignoring jurisdiction | An Omani venue's data would sit in Dubai |
 | Cell per venue | Breaks cross-venue passes, wallets, memberships and consolidated reporting |
+
+---
+
+## Amendment — 14 August 2026
+
+**"Each tenant has its own isolated database" is no longer universally true.**
+
+This ADR recorded that as a client decision on 10 August. On 14 August the client confirmed a
+second model alongside it: a **shared TICVAI database holding many small tenants**, isolated
+logically by scope, sold as the cheaper package. A tenant wanting physical isolation pays for
+a dedicated cell and **can be migrated to one later** — the shared start is not permanent.
+
+See the amendment in [ADR-0014](0014-cell-per-region.md) for the operative model.
+
+### Two claims in this ADR that the shared cell breaks
+
+**"Blast radius of a bad migration is one tenant."** On a shared cell it is every tenant on
+that cell. This does not change the migration strategy — canary first, halt on failure — but it
+does change what a canary is worth. A canary that is itself a shared cell risks many tenants;
+a canary should be a **dedicated cell or the smallest shared one**, and the orchestrator should
+prefer that rather than picking by size alone.
+
+**"Own cloud environment, cluster and database per tenant."** True for dedicated cells only.
+On a shared cell, isolation is `FORCE` row-level security and nothing else, which is why the
+migration checker fails any table carrying `scope_path` or `venue_id` without a policy, and why
+`platform.tenant` gained one on 14 August.
+
+### What still stands
+
+Cells exist for residency, blast radius and tiering. Region is still a placement constraint.
+Cross-cell entitlements still work by pseudonymous link. None of that depends on how many
+tenants share a cell.
+
+### Worth saying to a client
+
+A dedicated cell survives an application bug that a shared cell does not. That is the concrete
+answer to what the extra cost buys, and it is more honest than describing the shared option as
+equivalently isolated.
+
+> **Cell kinds are now stated in [ADR-0017](0017-deployment-models.md)**, which consolidates
+> the material amended into this ADR and into ADR-0014. This document remains the record of
+> how the model got here; ADR-0017 is what is true now.

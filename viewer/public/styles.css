@@ -32,6 +32,12 @@
 
   --topbar-h: 48px;
   --radius: 8px;
+
+  /* Wide enough for a two-level tree row without truncating every name, and
+     narrow enough that the content behind an open drawer is still readable —
+     which is what tells you the drawer is temporary. */
+  --drawer-w: 284px;
+  --drawer-ease: 0.22s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 :root[data-theme="light"] {
@@ -209,6 +215,59 @@ kbd {
   font-size: 13px;
 }
 .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* ── drawer toggles ─────────────────────────────────────────────── */
+/* Only meaningful once the rails are off-canvas, so they are absent from the
+   layout at every wider width rather than merely invisible. */
+.drawer-toggle { display: none; }
+
+.icon-menu {
+  position: relative;
+  display: block;
+  width: 15px; height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.icon-menu::before, .icon-menu::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 15px; height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.icon-menu::before { top: -5px; }
+.icon-menu::after { top: 5px; }
+
+/* the links pane is a list of things pointing at the selection, so this is a
+   list — deliberately not another stack of bars, which would read as a second
+   menu rather than as a different pane */
+.icon-links {
+  position: relative;
+  display: block;
+  width: 15px; height: 11px;
+}
+.icon-links::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 1px;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 6px 0 currentColor;
+}
+.icon-links::after {
+  content: "";
+  position: absolute;
+  left: 7px; top: 2px;
+  width: 8px; height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  box-shadow: 0 6px 0 currentColor;
+}
+
+/* ── drawer backdrop ────────────────────────────────────────────── */
+.drawer-backdrop { display: none; }
 
 .sidebar-left { grid-area: left; border-right: 1px solid var(--border); }
 .sidebar-right { grid-area: right; border-left: 1px solid var(--border); }
@@ -413,8 +472,11 @@ kbd {
 }
 .scope-select:focus { outline: none; border-color: var(--accent); }
 
-#graph-canvas, #struct-canvas, #er-canvas, #data-canvas, #flow-canvas {
+#graph-canvas, #struct-canvas, #er-canvas, #data-canvas, #flow-canvas, #states-canvas {
   position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab;
+  /* the canvases pan and pinch themselves. Without this the browser claims the
+     gesture first and scrolls the page instead, and the handler never sees it. */
+  touch-action: none;
 }
 #graph-canvas.dragging { cursor: grabbing; }
 
@@ -852,7 +914,238 @@ pre.code {
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
 }
 
+/* ── responsive ─────────────────────────────────────────────────── */
+/* Two breakpoints, both measured off this layout rather than copied from a
+   device table.
+     1100px  The topbar's own children need 1074px on the Contracts layer —
+             six modes, the widest of the five. Below that the bar and two
+             fixed rails cannot share the width. The right pane goes first
+             because it is a reverse index, not navigation: everything in it
+             is reachable another way.
+      760px  With the 220px tree rail still in place .main falls under 540px,
+             and the widest fixed content (the 330px app card, the 290px wave
+             card, the 210px lineage label column) stops fitting. No amount of
+             narrowing the rail recovers that, so the rails leave the grid. */
+
 @media (max-width: 1100px) {
   .app { grid-template-columns: 220px 1fr; grid-template-areas: "top top" "left main"; }
   .sidebar-right { display: none; }
+
+  /* The bar is now narrower than its contents. Scrolling the two rails keeps
+     every destination reachable; wrapping would cost a whole row to spare the
+     user a swipe, and the active button is scrolled into view on change. */
+  .seg-layer, .modes {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .seg-layer::-webkit-scrollbar, .modes::-webkit-scrollbar { display: none; }
+  .seg-layer button, .mode { flex: none; white-space: nowrap; }
+
+  /* same argument for the per-view toolbars, which are just as dense */
+  .graph-toolbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .graph-toolbar::-webkit-scrollbar { display: none; }
+}
+
+@media (max-width: 760px) {
+  :root {
+    /* two rows: the layer rail cannot share one with the mode rail and leave
+       either wide enough to read a label in */
+    --topbar-h: 84px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+
+  .app {
+    grid-template-columns: 100%;
+    grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
+    grid-template-areas:
+      "top"
+      "main";
+  }
+
+  /* above the drawers, and never covered by the backdrop, so the button that
+     opened a drawer is always the button that closes it */
+  .topbar {
+    position: relative;
+    z-index: 42;
+    flex-wrap: wrap;
+    /* Not `center`: if the children ever wrap to more rows than --topbar-h
+       allows, centring pushes the first row above the top edge, where it is
+       unreachable — the toggle that opens the tree included. Starting at the
+       top makes the failure visible instead of invisible. */
+    align-content: flex-start;
+    gap: 6px 8px;
+    padding: 4px calc(10px + var(--safe-right)) 4px calc(10px + var(--safe-left));
+    padding-top: calc(4px + var(--safe-top));
+  }
+
+  .drawer-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 34px; height: 34px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .drawer-toggle[aria-expanded="true"] {
+    border-color: var(--layer, var(--accent));
+    color: var(--layer, var(--accent));
+    background: var(--layer-soft, var(--accent-soft));
+  }
+
+  /* "contract graph" is a subtitle for a window with room for one */
+  .brand { flex: none; gap: 6px; }
+  .brand-sub { display: none; }
+
+  /* the icon alone still opens the palette, and the shortcut hint is a lie on
+     a device with no Ctrl key */
+  .search-trigger {
+    flex: none;
+    width: 34px; height: 34px;
+    justify-content: center;
+    padding: 0;
+    gap: 0;
+  }
+  .search-trigger-text, .search-trigger kbd { display: none; }
+
+  /* Basis 0, not auto. With `auto` the rail asks for the width of all five
+     buttons at once, which no longer fits beside the toggle and the brand, so
+     it wraps to a row of its own and takes the bar to four rows inside a box
+     sized for two. Basis 0 lets it take what is left of the first row and
+     scroll within it, which is what the 1100px rule already assumes. */
+  .seg-layer { flex: 1 1 0; min-width: 0; }
+  .seg-layer button { padding: 6px 9px; min-height: 30px; }
+
+  /* the wordmark is the first thing to give up its width to the layer rail;
+     the mark alone still says which window this is */
+  .brand-name { display: none; }
+
+  /* the mode rail takes the second row whole — six labels have nowhere else
+     to go, and it is the control used most */
+  .modes {
+    order: 2;
+    flex: 1 0 100%;
+    min-width: 0;
+  }
+  .mode { min-height: 30px; display: inline-flex; align-items: center; }
+
+  .topbar-right { flex: none; gap: 8px; }
+  .icon-btn { width: 34px; height: 34px; }
+
+  /* ── off-canvas rails ─────────────────────────────────────────── */
+  .sidebar-left, .sidebar-right {
+    position: fixed;
+    top: calc(var(--topbar-h) + var(--safe-top));
+    bottom: 0;
+    z-index: 41;
+    display: flex;
+    width: min(var(--drawer-w), 86vw);
+    border: 0;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.45);
+    /* a closed drawer is out of the tab order as well as off screen, so tab
+       does not walk into a pane nobody can see */
+    visibility: hidden;
+    transition: transform var(--drawer-ease), visibility 0s linear 0.22s;
+  }
+  .sidebar-left {
+    left: 0;
+    padding-left: var(--safe-left);
+    border-right: 1px solid var(--border);
+    transform: translateX(calc(-100% - 32px));
+  }
+  .sidebar-right {
+    right: 0;
+    padding-right: var(--safe-right);
+    border-left: 1px solid var(--border);
+    transform: translateX(calc(100% + 32px));
+  }
+  body[data-drawer="left"] .sidebar-left,
+  body[data-drawer="right"] .sidebar-right {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--drawer-ease);
+  }
+
+  /* stops below the topbar, so a tap on the backdrop dismisses and a tap on
+     the toggle still toggles */
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: calc(var(--topbar-h) + var(--safe-top)) 0 0 0;
+    z-index: 40;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--drawer-ease), visibility 0s linear 0.22s;
+  }
+  body[data-drawer] .drawer-backdrop {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--drawer-ease);
+  }
+
+  /* the home indicator sits over the last row of whatever is scrolled here */
+  .tree { padding-bottom: calc(20px + var(--safe-bottom)); }
+  .links-pane { padding-bottom: calc(24px + var(--safe-bottom)); }
+
+  /* ── views ────────────────────────────────────────────────────── */
+  .graph-toolbar { gap: 8px; padding: 8px 10px; }
+  .graph-toolbar > * { flex: none; }
+  /* nothing is right-aligned once the row scrolls */
+  .graph-toolbar .spacer { display: none; }
+  .struct-filter, .side-filter { width: 140px; }
+  .scope-select { max-width: 190px; }
+  /* the hint carries counts, so it stays and takes its turn in the scroll
+     rather than being dropped */
+  .struct-file { max-width: 150px; }
+  .graph-hint { white-space: nowrap; }
+
+  .graph-legend {
+    left: 8px;
+    bottom: calc(8px + var(--safe-bottom));
+    max-width: calc(100vw - 16px);
+    font-size: 10.5px;
+  }
+  .graph-tooltip { max-width: min(320px, calc(100vw - 24px)); }
+
+  .reader-body { padding: 16px 14px calc(60px + var(--safe-bottom)); }
+  .reader-title { font-size: 18px; }
+  .audit { padding: 16px 14px calc(60px + var(--safe-bottom)); }
+  .audit-head h2 { font-size: 17px; }
+  .journey-body { padding: 8px 12px calc(40px + var(--safe-bottom)); }
+  .journey-title { font-size: 17px; }
+  .journey-exits { margin-left: 0; width: 100%; }
+
+  /* line numbers cost a seventh of a 390px viewport and are only useful next
+     to a line long enough to need them */
+  .ln { width: 30px; padding-right: 8px; }
+  .code-line { padding: 0 10px; }
+
+  .palette { width: calc(100vw - 20px); }
+  .palette-backdrop { padding-top: calc(6vh + var(--safe-top)); }
+  .palette-foot { flex-wrap: wrap; gap: 6px 10px; }
+  .toast { bottom: calc(18px + var(--safe-bottom)); max-width: calc(100vw - 24px); }
+}
+
+/* A drawer that slides is telling you where it came from. Somebody who has
+   asked for less of that still needs it to open. */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-left, .sidebar-right, .drawer-backdrop {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
 }

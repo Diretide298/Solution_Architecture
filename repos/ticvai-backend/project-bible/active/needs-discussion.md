@@ -300,3 +300,22 @@ Not decisions, but the MoM record needs amending.
 **Item 1 is the only one holding contract work today.** Items 2, 3 and 4 hold hardware and
 acceptance, which becomes critical in three to four weeks. Everything else can wait a
 fortnight without cost.
+
+## FX — one derivation to confirm
+
+CF-37 is closed on the principle Allam stated on 14 August: **every transaction stores the base
+currency of the region it was transacted in.** That answers foreign tender completely and was
+said in those words.
+
+**The cross-region inter-entity split was not asked and is derived, not quoted.** Applying the
+same principle twice gives: the obligation arises at redemption, in the consuming entity's base
+currency, at that date's rate; the movement to settlement is FX gain or loss on the selling
+entity.
+
+That is the standard treatment and it follows from what was said. It is still a derivation, and
+it is worth **one line of confirmation from Finance** rather than a discovery at first close.
+The specific question: *when a pass sold in Dubai is redeemed in Doha, does the Qatari entity
+book its share at the redemption-date rate, and does the UAE entity carry the FX movement?*
+
+If the answer is no, the correction is small now and a restatement later — the ledger is
+append-only.

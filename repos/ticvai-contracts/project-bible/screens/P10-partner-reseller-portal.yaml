@@ -4,7 +4,10 @@
 
 platform:
   code: P10
-  name: Partner & Reseller Portal
+  audience: partner
+  formFactor: web
+  shortName: Partner Web
+  name: Partner Web — Reseller Portal
   surface: partner
   runtime: reactWeb
   offlineCapable: false

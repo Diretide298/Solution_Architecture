@@ -1,0 +1,57 @@
+# Game — state model
+# Contract: games.GameStatus
+# Checked by tools/check-states.py.
+
+entity: Game
+contract: games
+enum: GameStatus
+owner: games
+initial:
+- inService
+terminal:
+- retired
+transitions:
+- from: inService
+  to: outOfService
+  operation: updateGame
+  trigger: operation
+  guard: Taken out by an operator
+- from: inService
+  to: maintenance
+  operation: completeWorkOrder
+  trigger: cascade
+  guard: A work order opened against its asset
+- from: maintenance
+  to: inService
+  operation: verifyWorkOrder
+  trigger: cascade
+  guard: '**Verified back into service, not merely completed.** A game returning on the word of the
+    person who fixed it is the gap ADR-0015 closes'
+  requiresApproval: true
+  emits:
+  - maintenance.assetReturnedToService
+- from: outOfService
+  to: inService
+  operation: updateGame
+  trigger: operation
+  guard: Returned by an operator
+  isReversal: true
+- from: maintenance
+  to: outOfService
+  operation: updateGame
+  trigger: operation
+  guard: Work finished, still not accepting play
+- from: inService
+  to: retired
+  operation: updateGame
+  trigger: operation
+  guard: Removed permanently
+  requiresApproval: true
+- from: outOfService
+  to: retired
+  operation: updateGame
+  trigger: operation
+  guard: Removed permanently
+  requiresApproval: true
+notes: Bound to a maintenance asset. The cascade is the point — a chiller failing takes the game with
+  it, and nobody has to remember to switch it off.

@@ -1,0 +1,118 @@
+# F10 — Partner books, uses and settles
+#
+# The B2B lifecycle end to end, and the only flow where two businesses reconcile.
+# The scanner half is offline, which is what makes the dispute at step 7 possible.
+#
+# Validated by tools/check-flows.py.
+
+id: F10
+name: Partner books, uses and settles
+actor: partner
+capability: C41
+wave: 1
+frequency: weekly
+criticality: revenue
+platforms:
+- P10 Partner Web
+- P07 Staff Scanner
+- P08 Staff Web
+offlineBehaviour: Partner portal is online only. The redemption half runs on the scanner and is fully
+  offline — a coach party arriving at a gate does not wait for a partner's credit check.
+trigger:
+  description: A tour operator books a block, distributes vouchers to their customers, those customers
+    arrive over weeks, and at month end the two businesses reconcile.
+  entryScreen: PTR-001
+  entryPoints:
+  - Contracted allocation
+  - Ad-hoc block booking
+  - API integration
+steps:
+- step: 1
+  screen: PTR-001
+  action: Signs in and sees the allocation
+  operations:
+  - getB2bCredit
+  outcome: Knows what they may sell and what they owe
+- step: 2
+  screen: PTR-005
+  action: Books against the allocation
+  operations:
+  - createOrder
+  outcome: Held on credit, not paid
+- step: 3
+  screen: PTR-008
+  action: Receives vouchers
+  operations:
+  - listOrders
+  outcome: Distributes to their own customers
+- step: 4
+  screen: SCN-004
+  action: A customer arrives and is admitted
+  operations:
+  - validateAccess
+  outcome: The voucher is redeemed at a gate, possibly offline
+- step: 5
+  screen: PTR-015
+  action: Reviews usage
+  operations:
+  - listOrders
+  outcome: Sees what was used and what expired
+- step: 6
+  screen: BO-008
+  action: Venue reconciles and invoices
+  operations:
+  - listInterEntityObligations
+  outcome: Usage becomes money owed
+branches:
+- at: 2
+  condition: Booking exceeds the credit limit
+  behaviour: Refused, or requires an override. `overrideCreditLimit` exists and records who and why
+    — a partner who can silently exceed their limit is a bad debt nobody saw.
+  severity: requiresStaff
+  resolvedBy: Finance
+- at: 2
+  condition: Allocation exhausted
+  behaviour: Refused. **The partner may buy at retail instead**, which is a different price and must
+    be shown as one.
+  severity: recoverable
+  resolvedBy: Partner
+- at: 4
+  condition: Voucher presented after expiry
+  behaviour: Denied at the gate. The partner sold it and the guest is standing there — this is the most
+    common partner dispute and the deny reason must name the expiry date.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 4
+  condition: Voucher already redeemed
+  behaviour: Denied. Either duplicated by the partner or presented twice, and the scan history says
+    which.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 4
+  condition: Gate is offline when a partner voucher is presented
+  behaviour: Admitted from the bundle if the voucher is in it. **A voucher issued after the last sync
+    is not**, and the guest is admitted on a manual override rather than turned away.
+  severity: recoverable
+  resolvedBy: Steward
+- at: 5
+  condition: Allocation unused at expiry
+  behaviour: Released back or forfeited, per contract. This is a commercial term, not a system default,
+    and it must be configurable.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 6
+  condition: Usage disputed at reconciliation
+  behaviour: Scan records are the evidence. This is why `scan_event` is retained and why offline scans
+    carry both recordedAt and syncedAt.
+  severity: requiresStaff
+  resolvedBy: Finance
+exitStates:
+- state: completed
+  description: Booked, used, reconciled and settled
+- state: deferred
+  description: Partially used, balance carried
+- state: escalated
+  description: Usage disputed
+openQuestions:
+- Unused allocation at expiry — released or forfeited — is a contract term with no default in the platform.
+  It needs a per-partner setting.

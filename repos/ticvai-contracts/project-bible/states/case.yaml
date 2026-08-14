@@ -1,0 +1,60 @@
+# Service case — state model
+# Contract: marketing-crm.CaseStatus
+# Checked by tools/check-states.py.
+
+entity: Service case
+contract: marketing-crm
+enum: CaseStatus
+owner: marketing
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: inProgress
+  operation: updateCase
+  trigger: operation
+  guard: Agent picked it up
+- from: inProgress
+  to: awaitingGuest
+  operation: updateCase
+  trigger: operation
+  guard: '**The SLA clock pauses here and only here.** Waiting on an internal team is still our time'
+- from: awaitingGuest
+  to: inProgress
+  operation: addCaseMessage
+  trigger: operation
+  guard: Guest replied
+- from: inProgress
+  to: escalated
+  operation: escalateCase
+  trigger: operation
+  guard: Escalated with a reason
+- from: escalated
+  to: inProgress
+  operation: updateCase
+  trigger: operation
+  guard: Taken back by a supervisor
+- from: inProgress
+  to: resolved
+  operation: updateCase
+  trigger: operation
+  guard: Resolution recorded. **A case closed with no findings is a lesson nobody learned**
+- from: escalated
+  to: resolved
+  operation: updateCase
+  trigger: operation
+  guard: Resolved after escalation
+- from: resolved
+  to: inProgress
+  operation: reopenCase
+  trigger: operation
+  guard: Guest came back on the same issue
+  isReversal: true
+- from: resolved
+  to: closed
+  trigger: timer
+  guard: No further contact within the window
+notes: '`resolved` and `closed` differ by the reopen window. Closing immediately would make every follow-up
+  a new case and hide repeat problems.'

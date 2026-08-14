@@ -1,0 +1,36 @@
+# Inventory lease — state model
+# Contract: catalogue.LeaseStatus
+# Checked by tools/check-states.py.
+
+entity: Inventory lease
+contract: catalogue
+enum: LeaseStatus
+owner: catalogue
+initial:
+- active
+terminal:
+- expired
+- released
+- forceReleased
+offlineReachable:
+- active
+transitions:
+- from: active
+  to: released
+  operation: releaseLease
+  trigger: operation
+  guard: Terminal returned what it did not sell
+- from: active
+  to: expired
+  trigger: timer
+  guard: TTL passed without renewal. **The capacity returns automatically** — a terminal that dies holding
+    a lease must not strand its allocation
+- from: active
+  to: forceReleased
+  operation: forceReleaseLease
+  trigger: operation
+  guard: A supervisor reclaimed it from an unreachable terminal. Recorded separately because it may
+    double-sell what the terminal already sold offline
+  requiresApproval: true
+notes: '`forceReleased` is deliberately distinct from `released`. One is a terminal reporting; the other
+  is a human overriding a terminal that cannot report, and the reconciliation afterwards is different.'

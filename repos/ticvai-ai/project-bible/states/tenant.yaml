@@ -1,0 +1,59 @@
+# Tenant — state model
+# Contract: subscription.TenantStatus
+# Checked by tools/check-states.py.
+
+entity: Tenant
+contract: subscription
+enum: TenantStatus
+owner: control
+initial:
+- onboarding
+terminal:
+- terminated
+transitions:
+- from: onboarding
+  to: active
+  operation: updateTenant
+  trigger: operation
+  guard: Cell provisioned and licence issued
+- from: active
+  to: suspended
+  operation: suspendTenant
+  trigger: operation
+  guard: Commercial or compliance. **Access validation continues under every mode** — a dispute must
+    not strand guests at a gate
+  requiresApproval: true
+  emits:
+  - tenant.suspended
+- from: suspended
+  to: active
+  operation: reactivateTenant
+  trigger: operation
+  guard: Resolved
+  isReversal: true
+  requiresApproval: true
+- from: active
+  to: terminating
+  operation: terminateTenant
+  trigger: operation
+  guard: Notice period begins. Data is retained through it
+  requiresApproval: true
+- from: suspended
+  to: terminating
+  operation: terminateTenant
+  trigger: operation
+  guard: Terminated while suspended
+  requiresApproval: true
+- from: terminating
+  to: active
+  operation: reactivateTenant
+  trigger: operation
+  guard: Cancelled within the notice period
+  isReversal: true
+  requiresApproval: true
+- from: terminating
+  to: terminated
+  trigger: timer
+  guard: Notice period elapsed. **Data export must have been offered before this point**, not after
+notes: '`terminating` is a window, not a state change. Everything still works; the clock is running,
+  and the export offer belongs inside it.'

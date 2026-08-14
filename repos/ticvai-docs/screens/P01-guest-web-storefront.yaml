@@ -7,7 +7,10 @@
 
 platform:
   code: P01
-  name: Guest Web Storefront
+  audience: guest
+  formFactor: web
+  shortName: Guest Web
+  name: Guest Web — Storefront
   surface: guestFacing
   runtime: reactWeb
   offlineCapable: false

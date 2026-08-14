@@ -1,0 +1,93 @@
+$id: "ticvai/events/_schema.yaml"
+title: TICVAI domain event
+
+description: >
+  ## What this is
+
+  **What goes through the outbox.**
+
+  `platform.outbox` exists and is correct — publication is atomic with the state change, so a
+  crash cannot leave an event unpublished for a change that happened. What has never existed
+  is a description of what it carries: who publishes, who consumes, what the payload is, what
+  happens on a retry, and what a consumer does with a duplicate.
+
+  Without that, an event is a contract between two services that neither one wrote down.
+
+  ## The rules this file enforces
+
+  **Every event has at least one consumer.** An event nobody consumes is a write nobody reads —
+  either the consumer was never built, or the event should not be published.
+
+  **Every consumer states its idempotency key.** Events are delivered at least once. A consumer
+  that cannot say what makes a delivery a duplicate will process one twice, and the second time
+  will be a Saturday.
+
+  **Every event is versioned, and the version is in the payload.** A consumer running an older
+  version must be able to tell. Adding a field is a minor bump and is safe; removing or
+  retyping one is a new event name, because a consumer cannot be asked to handle both.
+
+  **Ordering is per aggregate, never global.** Two orders may be processed in any order. Two
+  events about the *same* order may not, and the sequence is what makes that enforceable.
+
+  ## What is deliberately not here
+
+  Commands. This catalogue is facts that have already happened — `order.paid`, not
+  `payOrder`. A published event a consumer can refuse is a distributed transaction wearing a
+  disguise.
+
+type: object
+required: [name, version, publisher, description, aggregate, payload, consumers]
+properties:
+  name:
+    type: string
+    pattern: '^[a-z][a-zA-Z]*\.[a-z][a-zA-Z]*$'
+    description: '`aggregate.pastTenseFact`. A name in the present tense is a command.'
+  version: { type: integer, minimum: 1 }
+  publisher:
+    type: string
+    description: The one context that may publish it. Two publishers means two meanings.
+  description: { type: string }
+  aggregate:
+    type: string
+    description: What the event is about. Ordering is guaranteed within one instance of this.
+  emittedWhen:
+    type: string
+    description: The state transition that causes it. Cross-checked against states/.
+  payload:
+    type: array
+    items:
+      type: object
+      required: [field, type]
+      properties:
+        field: { type: string }
+        type: { type: string }
+        required: { type: boolean, default: true }
+        notes: { type: string }
+  consumers:
+    type: array
+    minItems: 1
+    description: >
+      At least one. An event nobody consumes is a write nobody reads.
+    items:
+      type: object
+      required: [context, purpose, idempotencyKey]
+      properties:
+        context: { type: string }
+        purpose: { type: string }
+        idempotencyKey:
+          type: string
+          description: >
+            What makes a redelivery a duplicate. Required, because at-least-once delivery makes
+            this the difference between a correct consumer and one that works until it doesn't.
+        onFailure:
+          type: string
+          enum: [retry, retryThenDeadLetter, deadLetterImmediately, ignore]
+        isCritical:
+          type: boolean
+          description: >
+            True where the business breaks if this consumer never runs. Drives alerting — a
+            dead-lettered critical event is a page, not a dashboard.
+  retention:
+    type: string
+    description: How long the outbox row is kept after publication.
+  notes: { type: string }

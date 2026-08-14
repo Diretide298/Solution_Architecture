@@ -1,0 +1,110 @@
+# F12 — Asset fails and closes a queue
+#
+# The cascade ADR-0015 describes, walked end to end. Two critical event consumers
+# sit inside step 5, and they are the reason the event exists separately from completion.
+#
+# Validated by tools/check-flows.py.
+
+id: F12
+name: Asset fails and closes a queue
+actor: technician
+capability: C31
+wave: 2
+frequency: weekly
+criticality: safety
+platforms:
+- P06 Staff App
+- P08 Staff Web
+- P02 Guest App
+offlineBehaviour: The employee app half works offline — a technician in a plant room has no signal and
+  still needs to record what they found. The cascade to the queue and the guest app does not.
+trigger:
+  description: A ride stops. A technician is dispatched, works on it, and it returns to service — or
+    does not. The guest app must stop advertising a queue for a ride nobody can board.
+  entryScreen: EMP-026
+  entryPoints:
+  - Operator reports a fault
+  - Sensor or alarm
+  - Scheduled inspection finds it
+steps:
+- step: 1
+  screen: EMP-026
+  action: Reports the fault
+  operations:
+  - reportIncident
+  outcome: The asset goes out of service. **The queue closes with it** — nobody has to remember
+- step: 2
+  screen: EMP-004
+  action: Technician picks up the work order
+  operations:
+  - listWorkOrders
+  outcome: Assigned, with the asset history attached
+- step: 3
+  screen: EMP-005
+  action: Works and records findings
+  operations:
+  - completeWorkOrder
+  outcome: Parts and time recorded. Completed, not yet in service
+- step: 4
+  screen: BO-030
+  action: Supervisor verifies
+  operations:
+  - verifyWorkOrder
+  outcome: '**By someone other than the person who did the work.** Safety-critical assets cannot return
+    without it'
+- step: 5
+  screen: BO-031
+  action: Asset returns to service
+  operations:
+  - updateAsset
+  outcome: The queue reopens and the guest app offers it again
+branches:
+- at: 1
+  condition: Asset is not safety-critical
+  behaviour: Verification is still required but does not block return. The distinction is on the asset,
+    not the judgement of whoever is on shift.
+  severity: recoverable
+  resolvedBy: Supervisor
+- at: 3
+  condition: Part not in stock
+  behaviour: Blocks on awaitingParts, and a requisition is raised. **The queue stays closed** — an asset
+    waiting for a part is not an asset in service.
+  severity: requiresStaff
+  resolvedBy: Storekeeper
+- at: 3
+  condition: Technician has no signal in the plant room
+  behaviour: Findings queue locally. The work order state moves on sync, and the queue stays closed
+    until it does.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 4
+  condition: Verifier is the person who did the work
+  behaviour: '**Refused.** This is the control, and it is enforced rather than trusted.'
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 5
+  condition: Queue does not reopen after the asset returns
+  behaviour: The cascade failed. `maintenance.assetReturnedToService` has two critical consumers for
+    this reason — a ride verified and back in service whose queue never reopened is a closed attraction
+    nobody closed.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 1
+  condition: Fault is reported during trading with a full queue
+  behaviour: Waiting parties are released rather than silently dropped, and told. A guest holding a
+    virtual queue place for a closed ride will come back to ask.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 3
+  condition: Second fault found during the work
+  behaviour: A new work order linked to the first rather than expanding the original. The asset history
+    has to show both.
+  severity: recoverable
+  resolvedBy: Technician
+exitStates:
+- state: completed
+  description: Repaired, verified, back in service, queue reopened
+- state: deferred
+  description: Awaiting parts, asset out of service
+- state: escalated
+  description: Safety incident referred

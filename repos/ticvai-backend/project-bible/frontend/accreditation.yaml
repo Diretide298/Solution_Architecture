@@ -1,9 +1,9 @@
-# accreditation — screen and route manifest
-# Derived from screens/*.yaml by tools/link-frontend.py. Do not hand-edit.
-# Routes and component paths are conventional; a route that exists in code but
-# not here, or here but not in code, is caught by tools/check-frontend.py.
+# accreditation — public · web
+# Screen and route manifest. Derived from screens/*.yaml. Do not hand-edit.
 
 app: accreditation
+audience: public
+formFactor: web
 status: not scaffolded
 runtime: reactWeb
 offlineCapable: false
@@ -11,7 +11,7 @@ directions:
 - ltr
 - rtl
 platforms:
-- P11 Accreditation Portal
+- P11 Public Web — Accreditation
 packages:
 - design-tokens
 - ui
@@ -29,7 +29,7 @@ screens:
 - id: ACC-002
   name: Registration Form
   route: /applicant-journey/registration-form
-  component: apps/accreditation/src/routes/applicant-journey/RegistrationFormForm.tsx
+  component: apps/accreditation/src/routes/applicant-journey/RegistrationForm.tsx
   wave: 3
   status: notStarted
 - id: ACC-003
@@ -59,7 +59,7 @@ screens:
 - id: ACC-007
   name: Reviewer Application Detail
   route: /reviewer-internal/reviewer-application-detail
-  component: apps/accreditation/src/routes/reviewer-internal/ReviewerApplicationDetailDetail.tsx
+  component: apps/accreditation/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx
   wave: 3
   status: notStarted
 - id: ACC-008

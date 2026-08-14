@@ -1,0 +1,552 @@
+# P05 — Guest Kiosk — Self-Service
+#
+# Derived from the wireframe board on 14 August. **Purposes and navigation are real;
+# components, states and operations are not yet written.** Every screen carries
+# wireframe.status drafted so the gap is visible rather than implied.
+
+platform:
+  code: P05
+  audience: guest
+  formFactor: kiosk
+  shortName: Guest Kiosk
+  name: Guest Kiosk — Self-Service
+  surface: guestFacing
+  runtime: reactWeb
+  app: guest
+  appStatus: scaffolded
+  offlineCapable: false
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: kiosk hardware, kiosk-mode shell
+    distribution: device management push
+    bundleUpdate: on deploy
+    hosting: in-cell
+    storeReview: false
+    deviceOwnership: venue-owned, unattended
+    networkAssumption: venue LAN, generally reliable
+    releaseCadence: monthly, out of hours
+  screenCount: 14
+  wireframeBoard: wireframes/P05 Guest Kiosk.dc.html
+screens:
+- id: KSK-001
+  name: Attract Loop
+  module: Sell
+  purpose: Pull somebody standing in a queue out of it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Not applicable — the attract loop is the idle state
+    empty: Not applicable
+    error: Falls through to KSK-014 if the kiosk cannot reach the server
+    offline: '**Not available.** An unattended terminal selling from a stale catalogue oversells with
+      nobody watching'
+  navigation:
+    exitTo:
+    - KSK-002
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/attract-loop
+    component: apps/guest/src/routes/sell/AttractLoopDetail.tsx
+    status: notStarted
+- id: KSK-002
+  name: Language Select
+  module: Sell
+  purpose: Ask the only question that changes everything else.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Languages from tenant config
+    empty: Not applicable
+    error: Defaults to the venue language and continues
+    offline: Not available
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/language-select
+    component: apps/guest/src/routes/sell/LanguageSelectDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-003
+  name: What are you buying
+  module: Sell
+  purpose: Get to a product in one touch.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Product categories
+    empty: Nothing on sale today — a real answer, not an error
+    error: Catalogue unavailable. KSK-014
+    offline: Not available
+  navigation:
+    exitTo:
+    - KSK-004
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-003
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/what-are-you-buying
+    component: apps/guest/src/routes/sell/WhatAreYouBuyingDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-004
+  name: Choose tickets
+  module: Sell
+  purpose: Quantities, with targets a gloved hand can hit.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Variants and prices
+    empty: No variants for this product
+    error: Pricing unavailable
+    offline: Not available
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/choose-tickets
+    component: apps/guest/src/routes/sell/ChooseTicketsDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-005
+  name: Choose a session
+  module: Sell
+  purpose: Pick a time that still has room.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Live availability, never cached
+    empty: '**Sold out.** Offers the next available session rather than a dead end'
+    error: Availability unavailable. Selection is blocked — overselling is worse than waiting
+    offline: Not available
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/choose-a-session
+    component: apps/guest/src/routes/sell/ChooseASessionDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: acquireLease
+    contract: catalogue
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-006
+  name: Review
+  module: Sell
+  purpose: Show what is being bought before money moves.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Promotion evaluation
+    empty: Cart empty — returns to KSK-003
+    error: Pricing failed. The guest is not asked to pay an amount nobody computed
+    offline: Not available
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/review
+    component: apps/guest/src/routes/sell/ReviewDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-007
+  name: Payment
+  module: Sell
+  purpose: Take a card, and nothing else.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Terminal state, shown plainly
+    empty: Not applicable
+    error: Declined, with the reason. The lease is held for the remaining window so a second card is
+      possible
+    offline: Not available. **Card only, and card needs the acquirer**
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/payment
+    component: apps/guest/src/routes/sell/PaymentDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: createPayment
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-009
+  name: Ticket issued
+  module: Sell
+  purpose: Get the ticket into the guest’s hand.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Printing
+    empty: Not applicable
+    error: Print failed — falls through to KSK-010
+    offline: Not applicable
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-009
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/ticket-issued
+    component: apps/guest/src/routes/sell/TicketIssuedDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getOrder
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-011
+  name: Collect a booking
+  module: Sell
+  purpose: Turn a reference into media.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Reference entry
+    empty: Not applicable
+    error: Lookup unavailable
+    offline: Not available
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/collect-a-booking
+    component: apps/guest/src/routes/sell/CollectABookingDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: lookupTicket
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-012
+  name: Booking found
+  module: Sell
+  purpose: Confirm it is the right booking, then print.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Booking detail
+    empty: No booking for that reference
+    error: Not found. Offers KSK-013
+    offline: Not available
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/booking-found
+    component: apps/guest/src/routes/sell/BookingFoundDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getOrder
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-008
+  name: Payment unresolved
+  module: Sell
+  purpose: Handle the state that has nobody standing next to it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Inquiry in progress
+    empty: Not applicable
+    error: '**The important screen.** A card charged with no response. It inquires rather than retries,
+      and prints nothing until it knows'
+    offline: Not applicable
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/payment-unresolved
+    component: apps/guest/src/routes/sell/PaymentUnresolvedDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-010
+  name: Print failure
+  module: Sell
+  purpose: Recover when the paper runs out mid-sale.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Sending by email and rendering the QR
+    empty: Not applicable
+    error: '**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks
+      itself degraded rather than dead'
+    offline: Not applicable
+  navigation:
+    exitTo:
+    - KSK-013
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/print-failure
+    component: apps/guest/src/routes/sell/PrintFailureDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: reprintOrder
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: KSK-013
+  name: Call staff
+  module: Sell
+  purpose: Get a human, without leaving the kiosk.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Alerting staff
+    empty: Not applicable
+    error: '**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner'
+    offline: Shows the counter location
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/call-staff
+    component: apps/guest/src/routes/sell/CallStaffDetail.tsx
+    status: notStarted
+- id: KSK-014
+  name: Out of service
+  module: Sell
+  purpose: Fail in a way that does not strand anybody.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Not applicable
+    empty: Not applicable
+    error: This is the error state
+    offline: This is the offline state. It does not attempt a cached sale
+  navigation:
+    exitTo:
+    - KSK-001
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-014
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest
+    route: /sell/out-of-service
+    component: apps/guest/src/routes/sell/OutOfServiceDetail.tsx
+    status: notStarted

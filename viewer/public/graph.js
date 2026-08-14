@@ -4,6 +4,8 @@
 // renders, and it keeps the layout stable and dependency-free. The simulation
 // cools with an alpha decay and parks itself, then only re-heats on interaction.
 
+import { enableTouch } from './touch.js';
+
 const TYPE_COLORS = {
   file: '#a78bfa',
   operation: '#60a5fa',
@@ -85,26 +87,33 @@ export class Graph {
   }
 
   // ── data ────────────────────────────────────────────────────────
-  setData(nodes, links) {
+  /**
+   * @param options.placed  the caller has set x/y on every node and the
+   *                        simulation should leave them alone. Used by the
+   *                        spine view, where position carries meaning — a
+   *                        contract's ring is its tier — and a force layout
+   *                        would throw that away.
+   * @param options.directed  draw arrowheads. Publisher and consumer are not
+   *                          interchangeable, so the direction has to be visible.
+   */
+  setData(nodes, links, options = {}) {
+    this.placed = Boolean(options.placed);
+    this.directed = Boolean(options.directed);
     // preserve positions of nodes that survive a reload so the layout doesn't jump
     const previous = new Map(this.nodes.map((n) => [n.id, n]));
     // Seed on a phyllotaxis spiral scaled to the node count. Spacing the seeds
     // properly matters: nodes that start nearly coincident produce enormous
     // repulsion spikes that blow the integrator up.
-    const spread = 26 * Math.sqrt(Math.max(1, nodes.length));
+    const spread = 42 * Math.sqrt(Math.max(1, nodes.length));
 
     this.nodes = nodes.map((source, i) => {
       const old = previous.get(source.id);
       const angle = i * 2.399963; // golden angle
       const r = spread * Math.sqrt((i + 0.5) / nodes.length);
-      return {
-        ...source,
-        x: old?.x ?? Math.cos(angle) * r,
-        y: old?.y ?? Math.sin(angle) * r,
-        vx: 0,
-        vy: 0,
-        degree: 0,
-      };
+      const seeded = this.placed
+        ? { x: source.x, y: source.y }
+        : { x: old?.x ?? Math.cos(angle) * r, y: old?.y ?? Math.sin(angle) * r };
+      return { ...source, ...seeded, vx: 0, vy: 0, degree: 0 };
     });
 
     this.byId = new Map(this.nodes.map((n) => [n.id, n]));
@@ -114,7 +123,17 @@ export class Graph {
       const source = this.byId.get(link.source);
       const target = this.byId.get(link.target);
       if (!source || !target) continue;
-      this.links.push({ source, target, weight: link.weight ?? 1, kind: link.kind });
+      // carry the caller's own styling through — the spine view colours an edge
+      // by whether the consumer is critical, which is the whole point of it
+      this.links.push({
+        source,
+        target,
+        weight: link.weight ?? 1,
+        kind: link.kind,
+        color: link.color,
+        width: link.width,
+        events: link.events,
+      });
       source.degree += 1;
       target.degree += 1;
     }
@@ -127,19 +146,45 @@ export class Graph {
       this.neighbours.get(link.target.id).add(link.source.id);
     }
 
-    for (const node of this.nodes) node.r = this._radius(node);
+    for (const node of this.nodes) {
+      node.r = this._radius(node);
+      // Half the width of the label drawn under this node. What makes a graph
+      // look cluttered is almost never the dots touching — it is the names
+      // overlapping, and a name is far wider than the dot it belongs to. So the
+      // collision pass below separates on this rather than on the radius.
+      const label = node.name.length > 30 ? 30 : node.name.length;
+      node.halfLabel = Math.max(node.r, label * 2.9);
+    }
 
     this.userAdjusted = false; // a fresh layout may frame itself again
-    this.reheat(1);
+    // a placed layout is already where it belongs; running the simulation over
+    // it would only undo the arrangement
+    if (this.placed) {
+      this.alpha = 0;
+      this.draw();
+    } else {
+      this.reheat(1);
+    }
   }
 
   _radius(node) {
+    // A caller that has worked out its own weight — operations, say — knows
+    // better than the degree does. In the contracts view every file node has a
+    // degree of zero, so sizing by it made every contract the same dot.
+    if (node.weight != null) return 6 + Math.min(20, Math.sqrt(node.weight) * 1.5);
     const base = node.type === 'file' ? 7 : 4;
     return base + Math.min(11, Math.sqrt(node.degree) * 1.7);
   }
 
   // ── simulation ──────────────────────────────────────────────────
   reheat(alpha = 0.65) {
+    // A placed layout has meaning in its coordinates. Dragging a node still
+    // moves it — the mousemove handler writes x/y directly — but nothing else
+    // is allowed to drift, so the simulation never restarts.
+    if (this.placed) {
+      this.draw();
+      return;
+    }
     this.alpha = Math.max(this.alpha, alpha);
     if (!this.running) {
       this.running = true;
@@ -156,8 +201,8 @@ export class Graph {
       // distance is floored: an unclamped 1/d^2 term between two nearly
       // coincident nodes produces a velocity spike that diverges immediately.
       // The floor keeps small graphs (the contract view) well separated.
-      const repulsion = Math.max(1100, 260 + n * 2);
-      const MIN_DISTANCE = 14;
+      const repulsion = Math.max(2600, 600 + n * 5);
+      const MIN_DISTANCE = 18;
       const CUTOFF = 1.2e6; // beyond ~1100px the contribution is negligible
       for (let i = 0; i < n; i++) {
         const a = nodes[i];
@@ -188,8 +233,8 @@ export class Graph {
         const dx = b.x - a.x;
         const dy = b.y - a.y;
         const d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-        const rest = 46 + (a.r + b.r) * 1.5;
-        const strength = 0.045 * Math.min(3, Math.log2(link.weight + 1) + 1);
+        const rest = 78 + (a.r + b.r) * 1.6;
+        const strength = 0.032 * Math.min(3, Math.log2(link.weight + 1) + 1);
         const force = (d - rest) * strength;
         const fx = (dx / d) * force;
         const fy = (dy / d) * force;
@@ -197,12 +242,20 @@ export class Graph {
         b.vx -= fx; b.vy -= fy;
       }
 
-      // gravity to origin + integrate, with a speed cap as a divergence backstop
+      // Gravity to origin + integrate, with a speed cap as a divergence backstop.
+      //
+      // Gravity is only here to stop disconnected components drifting off; it is
+      // not a layout force. Set too high it fights the repulsion and packs
+      // everything into the middle, which is what "cluttered" looks like. It also
+      // has to weaken as the graph grows, because it pulls on every node while
+      // repulsion falls off with distance — so a constant here crushes a large
+      // graph much harder than a small one.
+      const gravity = 0.0032 * Math.min(1, 40 / Math.max(40, n));
       const MAX_SPEED = 55;
       for (const node of nodes) {
         if (node === this._drag?.node) continue;
-        node.vx -= node.x * 0.008;
-        node.vy -= node.y * 0.008;
+        node.vx -= node.x * gravity;
+        node.vy -= node.y * gravity;
         node.vx *= 0.82;
         node.vy *= 0.82;
 
@@ -219,21 +272,45 @@ export class Graph {
       // Collision resolution. Hub nodes are pulled to the centre by dozens of
       // springs, which overwhelms the repulsion term and stacks them on top of
       // each other; separating positions directly guarantees readable labels.
+      //
+      // Two passes, because a node occupies two different shapes. The dot is a
+      // circle; the label under it is a wide, short box, and the box is what
+      // collides first — `removeBlacklistEntry` is ~90px wide against a 10px
+      // dot. Resolving only the circles leaves the dots tidy and the names in a
+      // heap, which is exactly the cluttered case.
+      const LABEL_BAND = 16; // labels only clash if they sit on nearly the same line
       for (let i = 0; i < n; i++) {
         const a = nodes[i];
         for (let j = i + 1; j < n; j++) {
           const b = nodes[j];
-          const minDistance = a.r + b.r + 12;
           const dx = b.x - a.x;
           const dy = b.y - a.y;
           const d2 = dx * dx + dy * dy;
-          if (d2 >= minDistance * minDistance || d2 === 0) continue;
-          const d = Math.sqrt(d2);
-          const push = (minDistance - d) / 2;
-          const ux = dx / d;
-          const uy = dy / d;
-          if (a !== this._drag?.node) { a.x -= ux * push; a.y -= uy * push; }
-          if (b !== this._drag?.node) { b.x += ux * push; b.y += uy * push; }
+
+          // ---- the dots
+          const minDistance = a.r + b.r + 14;
+          if (d2 < minDistance * minDistance && d2 > 0) {
+            const d = Math.sqrt(d2);
+            const push = (minDistance - d) / 2;
+            const ux = dx / d;
+            const uy = dy / d;
+            if (a !== this._drag?.node) { a.x -= ux * push; a.y -= uy * push; }
+            if (b !== this._drag?.node) { b.x += ux * push; b.y += uy * push; }
+          }
+
+          // ---- the labels, pushed apart sideways only
+          if (!this.showLabels) continue;
+          if (Math.abs(b.y - a.y) > LABEL_BAND) continue;
+          const gap = a.halfLabel + b.halfLabel + 6;
+          const horizontal = b.x - a.x;
+          const spread = Math.abs(horizontal);
+          if (spread >= gap) continue;
+          // pushing vertically would just fight the springs; sliding sideways
+          // separates the text and leaves the graph's shape intact
+          const push = (gap - spread) / 2;
+          const dir = horizontal === 0 ? (i % 2 ? 1 : -1) : Math.sign(horizontal);
+          if (a !== this._drag?.node) a.x -= dir * push * 0.5;
+          if (b !== this._drag?.node) b.x += dir * push * 0.5;
         }
       }
 
@@ -293,10 +370,13 @@ export class Graph {
     }
     const spanX = Math.max(1, maxX - minX);
     const spanY = Math.max(1, maxY - minY);
-    const k = Math.min(this.width / (spanX + 120), this.height / (spanY + 120), 2.2);
+    // the legend sits over the bottom left; a node parked underneath it reads
+    // as missing, so the frame gives it room rather than drawing behind it
+    const reserve = this.reserveBottom ?? 0;
+    const k = Math.min(this.width / (spanX + 120), (this.height - reserve) / (spanY + 120), 2.2);
     this.transform.k = Math.max(0.12, k);
     this.transform.x = -((minX + maxX) / 2) * this.transform.k;
-    this.transform.y = -((minY + maxY) / 2) * this.transform.k;
+    this.transform.y = -((minY + maxY) / 2) * this.transform.k - reserve / 2;
     this.draw();
   }
 
@@ -327,6 +407,17 @@ export class Graph {
   }
 
   // ── hit testing ─────────────────────────────────────────────────
+  /**
+   * The click behaviour, addressed by position rather than by a node picked up
+   * on mousedown. A tap has no press-then-release to hold a node across, so it
+   * hit-tests where the finger landed and calls the same onSelect a click does.
+   */
+  _selectAt(sx, sy) {
+    const node = this.nodeAt(sx, sy);
+    if (node) this.onSelect(node);
+    return Boolean(node);
+  }
+
   nodeAt(sx, sy) {
     const world = this.toWorld(sx, sy);
     let best = null;
@@ -361,25 +452,56 @@ export class Graph {
     const hasFocus = this.highlighted.size > 0;
     const { k } = this.transform;
 
-    // links
-    for (const link of this.links) {
+    // links — active ones last so a highlighted edge is never drawn over
+    const isActive = (link) =>
+      hasFocus && this.highlighted.has(link.source.id) && this.highlighted.has(link.target.id);
+    const ordered = this.directed
+      ? [...this.links].sort((a, b) => Number(isActive(a)) - Number(isActive(b)))
+      : this.links;
+
+    for (const link of ordered) {
       const a = this.toScreen(link.source.x, link.source.y);
       const b = this.toScreen(link.target.x, link.target.y);
-      const active =
-        hasFocus && (this.highlighted.has(link.source.id) && this.highlighted.has(link.target.id));
+      const active = isActive(link);
 
+      // A directed edge stops at the node's rim rather than its centre, or the
+      // arrowhead disappears underneath the circle it is pointing at.
+      const angle = Math.atan2(b.y - a.y, b.x - a.x);
+      const rim = this.directed ? link.target.r * Math.min(1.8, Math.max(0.55, k)) + 2 : 0;
+      const tip = { x: b.x - Math.cos(angle) * rim, y: b.y - Math.sin(angle) * rim };
+
+      ctx.save();
+      if (active && this.directed) {
+        ctx.shadowColor = link.color ?? (isLight ? 'rgba(124,58,237,.6)' : 'rgba(167,139,250,.6)');
+        ctx.shadowBlur = 10;
+      }
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.lineWidth = Math.min(3.5, 0.5 + Math.log2(link.weight + 1) * 0.55) * Math.min(1.6, k);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.lineWidth = link.width
+        ? link.width * (active ? 2 : 1) * Math.min(1.7, Math.max(0.6, k))
+        : Math.min(3.5, 0.5 + Math.log2(link.weight + 1) * 0.55) * Math.min(1.6, k);
       if (active) {
-        ctx.strokeStyle = isLight ? 'rgba(124,58,237,.55)' : 'rgba(167,139,250,.55)';
+        ctx.strokeStyle = link.color ?? (isLight ? 'rgba(124,58,237,.75)' : 'rgba(167,139,250,.75)');
       } else if (hasFocus) {
         ctx.strokeStyle = isLight ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.035)';
       } else {
-        ctx.strokeStyle = isLight ? 'rgba(0,0,0,.11)' : 'rgba(255,255,255,.09)';
+        ctx.strokeStyle =
+          link.color ?? (isLight ? 'rgba(0,0,0,.11)' : 'rgba(255,255,255,.09)');
       }
       ctx.stroke();
+      ctx.restore();
+
+      if (this.directed && !(hasFocus && !active)) {
+        const size = (active ? 9 : 7) * Math.min(1.5, Math.max(0.6, k));
+        ctx.beginPath();
+        ctx.moveTo(tip.x, tip.y);
+        ctx.lineTo(tip.x - size * Math.cos(angle - 0.4), tip.y - size * Math.sin(angle - 0.4));
+        ctx.lineTo(tip.x - size * Math.cos(angle + 0.4), tip.y - size * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+      }
     }
 
     // nodes
@@ -421,7 +543,7 @@ export class Graph {
       if (labelWorthy) {
         const label = node.name.length > 30 ? node.name.slice(0, 29) + '…' : node.name;
         ctx.globalAlpha = faded ? 0.2 : 1;
-        ctx.font = `${node.type === 'file' ? '600 ' : ''}${Math.min(13, 10 + k)}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.font = `${node.type === 'file' ? '600 ' : ''}${Math.max(9, 11 * k)}px ui-sans-serif, system-ui, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         const y = p.y + r + 3;
@@ -518,6 +640,15 @@ export class Graph {
     canvas.addEventListener('dblclick', (e) => {
       const node = this.nodeAt(e.offsetX, e.offsetY);
       if (node) this.onSelect(node, { open: true });
+    });
+
+    // Fingers. Dragging a node is deliberately not offered: one finger has to
+    // pan, or the graph cannot be moved at all, and there is no second button
+    // to put the other gesture on.
+    enableTouch(canvas, this, {
+      min: 0.08,
+      max: 6,
+      onTap: (x, y) => this._selectAt(x, y),
     });
   }
 

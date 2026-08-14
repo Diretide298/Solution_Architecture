@@ -4,7 +4,10 @@
 
 platform:
   code: P12
-  name: Support Agent Console
+  audience: staff
+  formFactor: web
+  shortName: Staff Web
+  name: Staff Web — Support Console
   surface: staffFacing
   runtime: reactWeb
   offlineCapable: false

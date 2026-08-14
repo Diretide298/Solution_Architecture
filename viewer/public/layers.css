@@ -7,7 +7,9 @@
 body { --layer: var(--accent); --layer-soft: var(--accent-soft); }
 body[data-layer="frontend"] { --layer: #38bdf8; --layer-soft: rgba(56, 189, 248, 0.16); }
 body[data-layer="contracts"] { --layer: var(--accent); --layer-soft: var(--accent-soft); }
+body[data-layer="domain"] { --layer: #34d399; --layer-soft: rgba(52, 211, 153, 0.16); }
 body[data-layer="backend"] { --layer: #fbbf24; --layer-soft: rgba(251, 191, 36, 0.16); }
+body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 250, 0.16); }
 
 .seg-layer button { padding: 5px 13px; font-weight: 550; }
 .seg-layer button.active { background: var(--layer-soft); color: var(--layer); }
@@ -366,3 +368,703 @@ body[data-layer="backend"] { --layer: #fbbf24; --layer-soft: rgba(251, 191, 36, 
 .doc-card { margin-top: 22px; max-width: 900px; }
 /* a table already in the database reads as settled; a planned one does not */
 .tree-file.written .tree-file-name { color: var(--text); }
+
+/* ── design boards: the exported UI/UX HTML ─────────────────────── */
+/* The boards are laid out for a full desktop window, so the frame renders at
+   that size and is scaled down — shrinking the viewport instead would trigger
+   their own responsive rules and show a layout nobody designed. */
+.board-card {
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-panel);
+  overflow: hidden;
+  max-width: 1100px;
+}
+.board-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg-raised);
+}
+.board-title { display: flex; align-items: baseline; gap: 7px; font-size: 13.5px; }
+.board-rev {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.board-meta { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.board-platform {
+  font-size: 11px;
+  color: var(--satellite);
+  border: 1px solid var(--satellite);
+  border-radius: 20px;
+  padding: 1px 8px;
+}
+/* the platform is read off the file name, so it is drawn like every other
+   inferred link in the viewer: dashed */
+.board-platform.inferred {
+  color: var(--text-dim);
+  border-style: dashed;
+  border-color: var(--border);
+}
+.board-size { font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+.board-open {
+  font-size: 11.5px;
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.board-open:hover { background: var(--accent-soft); border-color: var(--accent); }
+.board-page { font-size: 11.5px; padding: 2px 8px; }
+
+.board-stage {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+.board-frame {
+  border: 0;
+  transform-origin: top left;
+  display: block;
+}
+.board-note {
+  margin: 0;
+  padding: 7px 12px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.board-empty { margin: 0 0 14px; }
+.tree-file.board-row .tree-file-code { color: var(--text-faint); }
+.tree-file.board-row .tree-file-name { color: var(--text); }
+
+/* ── domain layer: states and events ────────────────────────────────── */
+/* The states view is canvas; what needs styling is the right pane that
+   explains a transition, and the event catalogue, which is a sheet. */
+
+.transition-item { display: block; padding: 8px 10px; }
+.transition-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.transition-arrow {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text);
+}
+.tag {
+  font-size: 10px;
+  border-radius: 999px;
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+}
+.tag.reversal {
+  color: var(--shared);
+  border-color: color-mix(in srgb, var(--shared) 45%, transparent);
+}
+.tag.approval {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.tag.critical {
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 45%, transparent);
+}
+
+.link-op {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--spine);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.link-op:hover { text-decoration: underline; }
+.link-op:disabled {
+  color: var(--error);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.link-trigger {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--satellite);
+}
+/* the guard is the reason the move is allowed, and the reason states/ exists */
+.link-guard {
+  margin-top: 5px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.link-guard code {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--satellite);
+}
+.emit-chip {
+  display: inline-block;
+  margin: 6px 5px 0 0;
+  font-size: 10.5px;
+  font-family: var(--mono);
+  color: var(--permission);
+  background: color-mix(in srgb, var(--permission) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--permission) 35%, transparent);
+  border-radius: 999px;
+  padding: 2px 9px;
+  cursor: pointer;
+}
+.emit-chip:hover { background: color-mix(in srgb, var(--permission) 20%, transparent); }
+.emit-chip.missing {
+  color: var(--error);
+  border-color: var(--error);
+  background: none;
+  cursor: not-allowed;
+}
+.pane-warn {
+  margin: 10px 0;
+  padding: 9px 11px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  border-left: 3px solid var(--error);
+  background: color-mix(in srgb, var(--error) 7%, transparent);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ── the event catalogue ───────────────────────────────────────────── */
+.event-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  padding: 13px 15px;
+  margin-bottom: 12px;
+}
+.event-head { display: flex; align-items: center; gap: 9px; }
+.event-name {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.event-name:hover { color: var(--accent); }
+.event-version { font-size: 11px; color: var(--text-faint); }
+.event-desc {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+/* publisher on the left, consumers on the right, the transition in between —
+   the shape of the claim the event makes */
+.event-wire {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) minmax(90px, 1fr) minmax(160px, 2fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 11px;
+}
+.event-side-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  margin-bottom: 5px;
+}
+.event-arrow { text-align: center; }
+.event-arrow-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin-bottom: 5px;
+}
+.event-arrow-note {
+  font-size: 10.5px;
+  color: var(--text-faint);
+  line-height: 1.4;
+}
+.event-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.context-chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+.context-chip:hover { border-color: var(--accent); color: var(--text); }
+/* a consumer the business breaks without: dead-lettering it is a page */
+.context-chip.critical {
+  color: var(--shared);
+  border-color: color-mix(in srgb, var(--shared) 50%, transparent);
+  background: color-mix(in srgb, var(--shared) 9%, transparent);
+}
+.context-chip.unknown {
+  color: var(--error);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+.event-warn {
+  margin-top: 10px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  border-left: 3px solid var(--warning);
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--warning) 7%, transparent);
+  border-radius: 0 6px 6px 0;
+}
+.emit-source { margin-bottom: 7px; }
+.emit-source .link-op { display: inline-block; margin: 0 8px 0 0; }
+.emit-source .link-trigger { display: inline; margin: 0; }
+
+.domain-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.domain-table th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  font-weight: 500;
+  padding: 5px 10px 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.domain-table td {
+  padding: 6px 10px 6px 0;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.domain-table td.mono { font-family: var(--mono); font-size: 11px; }
+.domain-table td.strong { color: var(--text); }
+.domain-table td.dim { color: var(--text-dim); }
+.domain-table td.missing { color: var(--error); font-weight: 600; }
+.domain-table tr.critical-row td:last-child { color: var(--shared); font-size: 11px; }
+
+/* a state model with no enum behind it, or an event nothing emits */
+.tree-file.problem .tree-file-name { color: var(--warning); }
+.tree-file.machine-row .tree-file-count,
+.tree-file.event-row .tree-file-count,
+.tree-file.context-row .tree-file-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+.tree-file.enum-row .tree-file-name { font-family: var(--mono); font-size: 11.5px; }
+.tree-file.enum-row .tree-file-count { color: var(--warning); }
+
+/* ── hover tips ─────────────────────────────────────────────────────── */
+/* The browser's own title= takes about a second, cannot be styled and cannot
+   hold a heading. This can, and it draws from the delivery's own descriptions
+   wherever there is one. */
+.tip-panel {
+  position: fixed;
+  z-index: 90;
+  max-width: 330px;
+  padding: 9px 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg-raised);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+  pointer-events: none;
+  font-size: 12px;
+  line-height: 1.5;
+}
+:root[data-theme="light"] .tip-panel { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14); }
+.tip-title {
+  font-weight: 650;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.tip-body { color: var(--text-dim); white-space: pre-wrap; }
+.tip-body b { color: var(--text); font-weight: 600; }
+.tip-body code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--layer);
+}
+.tip-extra {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+/* anything explainable says so, quietly */
+[data-tip]:not(button):not(td):not(input) { cursor: help; }
+
+/* ── wireframes ─────────────────────────────────────────────────────── */
+/* Named for exactly what they draw, so unlike a design board there is no
+   caveat to show — the chip says so rather than warning. */
+.wireframe-card .board-platform {
+  color: var(--satellite);
+  border-color: color-mix(in srgb, var(--satellite) 40%, transparent);
+  background: color-mix(in srgb, var(--satellite) 8%, transparent);
+}
+
+/* ── lineage ─────────────────────────────────────────────────────────── */
+/* The join between the contracts and the tables. An unresolved row is drawn
+   rather than dropped, so it needs to read as "nobody knows" and not as
+   "nothing here" — hence a dimmed row with an explicit chip, not a blank. */
+.lineage-group { border-bottom: 1px solid var(--border-soft); }
+.lineage-group[open] { padding-bottom: 8px; }
+.lineage-group-head {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 9px 4px; cursor: pointer; list-style: none;
+}
+.lineage-group-head::-webkit-details-marker { display: none; }
+.lineage-group-name { font-weight: 600; color: var(--layer); font-size: 13px; }
+.lineage-group-count { font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+
+.lineage-row {
+  display: grid; grid-template-columns: 210px 1fr; gap: 8px 14px;
+  padding: 7px 4px 7px 16px; align-items: baseline;
+  border-top: 1px solid var(--border-soft);
+}
+.lineage-row.unresolved { opacity: 0.62; }
+.lineage-op {
+  font-family: var(--mono); font-size: 12px; color: var(--text);
+  background: none; border: 0; padding: 0; text-align: left; cursor: pointer;
+}
+.lineage-op:hover { color: var(--layer); text-decoration: underline; }
+.lineage-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.lineage-path { font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+.lineage-routing, .lineage-scope, .lineage-offline, .lineage-service {
+  font-size: 10px; padding: 1px 6px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-dim); white-space: nowrap;
+}
+.lineage-routing { border-width: 1px; font-family: var(--mono); }
+.lineage-offline { color: var(--satellite); border-color: color-mix(in srgb, var(--satellite) 40%, transparent); }
+.lineage-service { color: var(--layer); border-color: color-mix(in srgb, var(--layer) 34%, transparent); }
+
+.lineage-tables { grid-column: 2; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.lineage-tables.wrap { grid-column: 1 / -1; padding: 4px 0 12px; }
+.lineage-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+.lineage-table {
+  font-family: var(--mono); font-size: 10.5px; padding: 2px 7px;
+  border-radius: 4px; border: 1px solid var(--border-soft);
+  background: var(--bg-panel); color: var(--text-dim); cursor: pointer;
+}
+.lineage-table:hover { border-color: var(--layer); color: var(--text); }
+/* written, not merely read — the direction is the whole point of the view */
+.lineage-table.write {
+  color: #f87171; border-color: rgba(248, 113, 113, 0.34);
+  background: rgba(248, 113, 113, 0.07);
+}
+.lineage-table.unknown { text-decoration: line-through; opacity: 0.6; }
+.lineage-table.contested { box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.55); }
+.lineage-count {
+  margin-left: 5px; font-weight: 700; color: #fbbf24;
+}
+.lineage-unresolved-chip {
+  font-size: 10.5px; color: var(--text-faint); font-style: italic;
+  border: 1px dashed var(--border); border-radius: 4px; padding: 2px 7px;
+}
+.lineage-service-card {
+  padding: 10px 4px; border-bottom: 1px solid var(--border-soft);
+}
+.lineage-note {
+  padding: 6px 4px 10px; font-size: 12px; line-height: 1.6; color: var(--text-dim);
+  max-width: 76ch;
+}
+.lineage-note b { color: var(--text); }
+
+/* ── waves ───────────────────────────────────────────────────────────── */
+.wave-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px; padding: 4px 0 14px;
+}
+.wave-card {
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  padding: 10px 12px; background: var(--bg-panel);
+}
+.wave-card-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.wave-platform { font-family: var(--mono); font-size: 11px; color: var(--layer); font-weight: 650; }
+.wave-platform-name { font-size: 12px; color: var(--text-dim); }
+.wave-count { margin-left: auto; font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+.wave-cells { display: flex; flex-wrap: wrap; gap: 4px; }
+.wave-cell {
+  font-family: var(--mono); font-size: 10px; padding: 3px 6px;
+  border-radius: 4px; border: 1px solid var(--border-soft);
+  background: transparent; color: var(--text-faint); cursor: pointer;
+}
+.wave-cell:hover { border-color: var(--layer); color: var(--text); }
+/* it names an operation AND the operation resolves to a table — buildable end to end */
+.wave-cell.reaches-data {
+  color: var(--layer); border-color: color-mix(in srgb, var(--layer) 40%, transparent);
+  background: color-mix(in srgb, var(--layer) 8%, transparent);
+}
+/* somebody can draw it and nobody can build it */
+.wave-cell.unbuildable {
+  color: #f87171; border-color: rgba(248, 113, 113, 0.3);
+  border-style: dashed; background: transparent;
+}
+
+/* ── decisions ───────────────────────────────────────────────────────── */
+.adr-card {
+  border-bottom: 1px solid var(--border-soft); padding: 12px 4px;
+}
+.adr-card-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.adr-number { font-family: var(--mono); font-size: 11px; color: var(--layer); font-weight: 650; }
+.adr-title {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: var(--text); text-align: left;
+}
+.adr-title:hover { color: var(--layer); text-decoration: underline; }
+.adr-status {
+  font-size: 10px; padding: 1px 7px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-dim); text-transform: lowercase;
+}
+.adr-status.accepted { color: #34d399; border-color: rgba(52, 211, 153, 0.4); }
+/* Accepted and partly superseded is the case that misleads: it reads as
+   current in a list, and the part that was superseded is not. */
+.adr-status.partial { color: #fbbf24; border-color: rgba(251, 191, 36, 0.5); }
+.adr-date { margin-left: auto; font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+.adr-decision {
+  margin: 7px 0 0; font-size: 12.5px; line-height: 1.65; color: var(--text-dim); max-width: 84ch;
+}
+.adr-decision b { color: var(--text); }
+.adr-decision code { font-family: var(--mono); font-size: 11.5px; color: var(--layer); }
+.adr-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.adr-constrains, .adr-amended {
+  font-size: 10px; padding: 1px 7px; border-radius: 4px;
+  border: 1px solid var(--border-soft); color: var(--text-faint); font-family: var(--mono);
+}
+.adr-amended { color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); }
+
+/* the permission spec, executed rather than listed */
+.vector-card {
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 8px; background: var(--bg-panel);
+}
+.vector-card.failed { border-color: rgba(248, 113, 113, 0.55); }
+.vector-head { display: flex; align-items: baseline; gap: 10px; }
+.vector-id { font-family: var(--mono); font-size: 11px; color: var(--layer); font-weight: 650; }
+.vector-proves { font-size: 12.5px; color: var(--text); }
+.vector-verdict {
+  margin-left: auto; font-family: var(--mono); font-size: 10.5px;
+  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border);
+}
+.vector-verdict.pass { color: #34d399; border-color: rgba(52, 211, 153, 0.42); }
+.vector-verdict.fail { color: #f87171; border-color: rgba(248, 113, 113, 0.5); }
+.vector-grants { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.vector-grant {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  font-family: var(--mono); font-size: 10.5px; padding: 2px 8px;
+  border-radius: 4px; border: 1px solid var(--border-soft); color: var(--text-dim);
+}
+.vector-grant.allow { border-color: rgba(52, 211, 153, 0.35); }
+.vector-grant.allow b { color: #34d399; }
+.vector-grant.deny { border-color: rgba(248, 113, 113, 0.35); }
+.vector-grant.deny b { color: #f87171; }
+.vector-grant.none { font-style: italic; border-style: dashed; }
+.vector-scope { color: var(--text-faint); }
+.vector-query {
+  display: flex; align-items: baseline; gap: 8px; margin-top: 7px;
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-dim);
+}
+.vector-label { text-transform: uppercase; letter-spacing: 0.07em; font-size: 9.5px; color: var(--text-faint); }
+
+/* the artefact audit — the one register that counts what is absent */
+.gap-name { font-size: 12px; color: var(--text-dim); }
+.gap-name.missing { color: #f87171; font-weight: 600; }
+.gap-name.partial { color: #fbbf24; }
+
+.doc-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 10px; padding: 4px 0 14px;
+}
+.doc-card {
+  display: flex; flex-direction: column; gap: 5px; text-align: left;
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  padding: 11px 13px; background: var(--bg-panel); cursor: pointer;
+}
+.doc-card:hover { border-color: var(--layer); }
+.doc-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.doc-lead {
+  font-size: 11.5px; line-height: 1.55; color: var(--text-dim);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.doc-meta {
+  display: flex; justify-content: space-between; gap: 8px;
+  font-family: var(--mono); font-size: 10px; color: var(--text-faint);
+}
+.doc-source {
+  font-family: var(--mono); font-size: 12px; line-height: 1.7;
+  white-space: pre-wrap; color: var(--text-dim); padding: 4px 0;
+}
+
+/* the frame lifted out of a platform board, as opposed to the structure-only
+   render generated from the screen definition — different claims, so they must
+   be distinguishable at a glance */
+.board-platform.from-board {
+  color: var(--spine);
+  border-color: color-mix(in srgb, var(--spine) 42%, transparent);
+  background: color-mix(in srgb, var(--spine) 9%, transparent);
+}
+.wireframe-alt { margin: 6px 0 20px; }
+.wireframe-alt > summary {
+  cursor: pointer; font-size: 11.5px; color: var(--text-faint);
+  padding: 6px 2px; list-style: none;
+}
+.wireframe-alt > summary::-webkit-details-marker { display: none; }
+.wireframe-alt > summary::before { content: "▸ "; }
+.wireframe-alt[open] > summary::before { content: "▾ "; }
+.wireframe-alt > summary:hover { color: var(--text-dim); }
+
+/* â”€â”€ a journey as its screens, in order â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Each step's frame lifted out of the platform board it is drawn on, rather
+   than the flat flow render generated from the same step list this page has
+   already drawn above. */
+.journey-frames { display: flex; flex-direction: column; gap: 14px; padding: 4px 0 16px; }
+.journey-frame-card {
+  border: 1px solid var(--border-soft); border-radius: 9px;
+  background: var(--bg-panel); overflow: hidden;
+}
+.journey-frame-head {
+  display: flex; align-items: baseline; gap: 9px;
+  padding: 9px 12px; border-bottom: 1px solid var(--border-soft);
+}
+.journey-frame-step {
+  flex: none; width: 20px; height: 20px; border-radius: 5px;
+  background: var(--layer-soft); color: var(--layer);
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.journey-frame-name {
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+  font-size: 12.5px; font-weight: 600; color: var(--text);
+}
+.journey-frame-name:hover { color: var(--layer); text-decoration: underline; }
+.journey-frame-platform {
+  margin-left: auto; font-family: var(--mono); font-size: 10px;
+  color: var(--text-faint); border: 1px solid var(--border-soft);
+  border-radius: 4px; padding: 1px 6px;
+}
+.journey-frame-action {
+  padding: 7px 12px 0; font-size: 11.5px; color: var(--text-dim);
+}
+
+/* routing filled from the workbook because the JSON export lost it */
+.lineage-routing.from-workbook { border-style: dashed; }
+.lineage-procedure {
+  font-family: var(--mono); font-size: 10px; padding: 1px 6px;
+  border-radius: 999px; border: 1px solid rgba(192, 132, 252, 0.45);
+  color: #c084fc; white-space: nowrap;
+}
+/* a table no operation in any contract reaches */
+.lineage-table.unreached {
+  border-style: dashed; color: var(--text-faint);
+  background: transparent;
+}
+
+/* â”€â”€ what a screen reaches â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* The frontend end of the operation-to-table join. */
+.reach-card {
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  background: var(--bg-panel); padding: 10px 13px; margin: 8px 0 22px;
+  max-width: 1100px;
+}
+.reach-row { display: flex; gap: 12px; padding: 5px 0; align-items: baseline; }
+.reach-label {
+  flex: none; min-width: 108px; font-size: 10px; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.reach-values { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+
+/* the reverse index in the right-hand pane */
+.link-weight.writes { color: #f87171; }
+
+/* ── phone ──────────────────────────────────────────────────────────── */
+/* The shell breakpoints are argued in styles.css; this is the same 760px seen
+   from the content side. Loaded after styles.css, so the view rules that
+   have to be undone are undone here or not at all. */
+@media (max-width: 760px) {
+  /* 20px each side is 10% of a 390px viewport spent on nothing */
+  .sheet-body {
+    padding: 8px 12px calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Every multi-column grid here was sized for a pane 600px and wider. At 366px
+     of content the second column can only be bought out of the first. */
+  .wave-grid,
+  .doc-grid,
+  .state-grid,
+  .app-grid,
+  .deploy-grid,
+  .event-wire {
+    grid-template-columns: 1fr;
+  }
+
+  .screen-board { flex-direction: column; }
+  .region-card { max-width: none; }
+
+  /* the operation and what it touches, stacked — 210px of label column is more
+     than half the width, and the tables are the point of the row */
+  .lineage-row { grid-template-columns: 1fr; }
+  .lineage-tables { grid-column: 1; }
+
+  /* the contract name reads as a heading over its bar rather than a column */
+  .routing-row { flex-wrap: wrap; gap: 4px 10px; }
+  .routing-name { width: auto; text-align: left; }
+  .routing-bar { flex: none; min-width: 40%; }
+
+  .reach-row { display: block; }
+  .reach-label { min-width: 0; display: block; margin-bottom: 3px; }
+
+  /* a real table is the one thing here that cannot be made to stack, so it
+     scrolls inside itself; the page never does */
+  .domain-table {
+    display: block;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .nav-note, .reach-card, .routing-table, .board-card { max-width: none; }
+
+  /* ── design boards and wireframes ─────────────────────────────────── */
+  /* frameStage clamps the scale rather than following the container down to
+     0.27; see the note there. The stage takes the overflow that buys, and the
+     full-size link is promoted from a footnote to the obvious way in. */
+  .board-stage {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .board-head { flex-wrap: wrap; gap: 6px 8px; }
+  .board-meta { margin-left: 0; width: 100%; }
+  .board-open {
+    flex: 1;
+    text-align: center;
+    padding: 7px 8px;
+    font-size: 12.5px;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+}

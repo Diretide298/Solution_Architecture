@@ -261,6 +261,7 @@ paths:
                 items: { $ref: '#/components/schemas/AccountMapping' }
     put:
       operationId: setAccountMappings
+      x-ticvai-config-scope: region
       summary: Set posting mappings
       tags: [accounts]
       x-ticvai-permission: ACCOUNT_CONFIGURE
@@ -774,6 +775,42 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /journal-entries/{entryId}/reject:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rejectJournal
+      summary: Reject a journal awaiting approval
+      description: >
+        Returns it to draft with comments. Approval existed and rejection did not, which left a preparer whose entry could be approved and never refused.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /journal-entries/{entryId}/reverse:
     parameters:
       - name: entryId
@@ -820,6 +857,214 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   # ---------------------------------------------------------------- ledger
+  /fx-rates:
+    get:
+      operationId: listFxRates
+      summary: The rates in force
+      description: >
+        **Policy, settled 14 August: every transaction is stored in the base currency of the
+        region it was transacted in.**
+
+        A guest paying USD 100 in a UAE venue has the dirham equivalent stored at the
+        configured rate. The foreign amount is retained for the cashier's declaration and for
+        the foreign-tender report — it is never what the ledger holds.
+
+        The consequence is that most of the questions FX usually raises do not arise. There is
+        no rate to lock at redemption, none at expiry, and none at refund, because the stored
+        amount was never in a foreign currency. Allam: *"the value of the currency doesn't
+        matter whether it goes high or down. They are purchasing a product equivalent to that
+        currency… at the end they are paying that base currency value, and they get a refund
+        for the base currency value."*
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: asAt
+          in: query
+          description: Rates in force at this instant. Defaults to now.
+          schema: { type: string, format: date-time }
+        - name: purpose
+          in: query
+          schema: { $ref: '#/components/schemas/FxRatePurpose' }
+      responses:
+        '200':
+          description: Rates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FxRate' }
+
+    put:
+      operationId: setFxRate
+      x-ticvai-config-scope: region
+      summary: Set a rate
+      description: >
+        Rates are **configured, not fetched live**. A published market rate moving mid-shift
+        would mean two guests paying different dirham amounts for the same product minutes
+        apart, and a cashier unable to explain either.
+
+        A rate change is a new row with its own effective window; the old one is never edited.
+        A transaction posted last Tuesday must still reconcile at last Tuesday's rate.
+
+        **Tender rates carry a spread.** The rate a venue accepts dollars at is not the
+        interbank rate, and pretending otherwise makes every foreign-tender sale look like a
+        small loss.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FxRate' }
+      responses:
+        '201':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FxRate' }
+        '409':
+          description: Effective window overlaps an existing rate for the same pair and purpose
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fx/foreign-tender:
+    get:
+      operationId: getForeignTenderReport
+      summary: What was taken in which currency
+      description: >
+        Per cashier, per shift, per currency: the foreign amount taken, the rate applied, and
+        the base-currency equivalent posted.
+
+        Named explicitly on 14 August — *"a clear reporting that says foreign currency
+        transactions report, it will show you that this cashier has taken 100 dollars, 200
+        Qatari riyal."* A cashier declaring a drawer holding three currencies needs this to
+        reconcile, and without it the variance is unexplainable.
+      tags: [reporting]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: shiftId
+          in: query
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Foreign tender
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ForeignTenderReport' }
+
+  /fx/inter-entity:
+    get:
+      operationId: listInterEntityObligations
+      summary: What one entity owes another
+      description: >
+        A pass sold by the UAE entity and redeemed at a Qatari venue creates an obligation
+        between two legal entities holding two base currencies.
+
+        **The rule follows from the policy rather than extending it.** The sale was stored in
+        the selling entity's base currency, because that is where it was transacted. The
+        obligation arises **at redemption**, because that is when the consuming entity provides
+        the service, and it is denominated in the consuming entity's base currency at the rate
+        in force on that date.
+
+        Between the obligation arising and being settled, the rate moves. That movement is an
+        FX gain or loss on the **selling** entity's books — it holds the liability, so it
+        carries the exposure. Revalued at period close alongside every other monetary balance.
+
+        Neither entity ever holds a balance in a currency that is not its own. That is the
+        whole of the policy, applied twice.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: fromLegalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: toLegalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [outstanding, settled, disputed]
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Obligations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/InterEntityObligation' }
+
+  /fx/revaluation:
+    post:
+      operationId: runFxRevaluation
+      summary: Revalue monetary balances at close
+      description: >
+        Restates open inter-entity obligations and any foreign-denominated balance at the
+        closing rate, posting the movement to FX gain and loss.
+
+        Part of period close and refused outside one — revaluing mid-period produces a figure
+        that disagrees with itself the next day.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fiscalPeriodId]
+              properties:
+                fiscalPeriodId: { type: string, format: uuid }
+                dryRun: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Revaluation result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FxRevaluationResult' }
+        '409':
+          description: Period is not closing, or is already closed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /ledger/entries:
     get:
       operationId: listLedgerEntries
@@ -1210,6 +1455,106 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/FiscalPeriod' }
+
+  /fiscal-periods/{periodId}/begin-close:
+    parameters:
+      - name: periodId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: beginPeriodClose
+      summary: Begin closing a period
+      description: >
+        **Postings to the period stop here**, before reconciliation starts. Without this step the balance moves while it is being counted, and the two never agree.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fiscal-periods/{periodId}/abandon-close:
+    parameters:
+      - name: periodId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: abandonPeriodClose
+      summary: Abandon a close in progress
+      description: >
+        An exception was found that needs the period open again. Postings resume.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fiscal-periods/{periodId}/reopen:
+    parameters:
+      - name: periodId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: reopenPeriod
+      summary: Reopen a closed period
+      description: >
+        **Rare and heavily controlled.** Reopening restates figures somebody has already reported, so it requires an approver who is not the requester and records why.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+                approverPrincipalId: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /fiscal-periods/{periodId}/close:
     parameters:
@@ -1712,6 +2057,131 @@ components:
         reviewedByPrincipalId: { type: string, format: uuid, nullable: true }
         journalEntryId: { type: string, nullable: true }
         occurredAt: { type: string, format: date-time }
+
+    FxRatePurpose:
+      type: string
+      description: >
+        A venue does not accept dollars at the rate it books an intercompany balance at.
+        Separating them is what stops a spread on the counter appearing as a loss in the
+        accounts.
+      enum:
+        - tender          # what the counter accepts foreign cash at. Carries a spread
+        - interEntity     # obligations between legal entities
+        - reporting       # consolidation into a presentation currency
+        - revaluation     # period close
+
+    FxRate:
+      type: object
+      x-ticvai-persistence: "ledger.fx_rate"
+      required: [fromCurrency, toCurrency, rate, purpose, effectiveFrom]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        fromCurrency: { type: string, pattern: '^[A-Z]{3}$' }
+        toCurrency: { type: string, pattern: '^[A-Z]{3}$' }
+        rate:
+          type: number
+          description: >
+            Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place
+            rate on a three-place currency loses money on every transaction, quietly.
+        purpose: { $ref: '#/components/schemas/FxRatePurpose' }
+        source:
+          type: string
+          enum: [manual, centralBank, provider]
+          description: >
+            Configured, not fetched live. A market rate moving mid-shift means two guests pay
+            different dirham amounts for the same product minutes apart.
+        effectiveFrom: { type: string, format: date-time }
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            A rate change is a new row. The old one is never edited — a transaction posted last
+            Tuesday must still reconcile at last Tuesday's rate.
+        setByPrincipalId: { type: string, format: uuid, readOnly: true }
+
+    ForeignTenderReport:
+      type: object
+      x-ticvai-persistence: "none — aggregated from payment"
+      required: [lines, asAt]
+      properties:
+        asAt: { type: string, format: date-time }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              shiftId: { type: string }
+              principalId: { type: string, format: uuid }
+              principalName: { type: string }
+              currency: { type: string, pattern: '^[A-Z]{3}$' }
+              foreignAmount:
+                type: number
+                description: What was physically taken. The cashier counts this in the drawer.
+              rateApplied: { type: number }
+              baseAmount:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Money'
+                description: What the ledger holds. The only figure that reconciles.
+              transactionCount: { type: integer }
+
+    InterEntityObligation:
+      type: object
+      x-ticvai-persistence: "ledger.inter_entity_obligation"
+      required: [id, fromLegalEntityId, toLegalEntityId, arisingAmount, arisingAt, status]
+      properties:
+        id: { type: string }
+        fromLegalEntityId:
+          type: string
+          format: uuid
+          description: The selling entity. Holds the liability, and therefore the FX exposure.
+        toLegalEntityId:
+          type: string
+          format: uuid
+          description: The consuming entity, which provided the service at redemption.
+        entitlementId: { type: string }
+        orderId: { type: string }
+        arisingAmount:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            In the **consuming** entity's base currency, at the rate in force on the redemption
+            date. Neither entity ever holds a balance in a currency that is not its own.
+        rateApplied: { type: number }
+        arisingAt:
+          type: string
+          format: date-time
+          description: Redemption. Not sale — the obligation exists when the service is given.
+        status:
+          type: string
+          enum: [outstanding, settled, disputed]
+        settledAt: { type: string, format: date-time, nullable: true }
+        settlementRate: { type: number, nullable: true }
+        fxMovement:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            Rate movement between arising and settling. Posts to FX gain and loss on the
+            selling entity, which carried the balance.
+
+    FxRevaluationResult:
+      type: object
+      x-ticvai-persistence: "none — computed, posts a journal"
+      required: [fiscalPeriodId, obligationsRevalued, netMovement, isDryRun]
+      properties:
+        fiscalPeriodId: { type: string, format: uuid }
+        isDryRun: { type: boolean }
+        obligationsRevalued: { type: integer }
+        netMovement: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        journalEntryId: { type: string, nullable: true }
+        byEntity:
+          type: array
+          items:
+            type: object
+            properties:
+              legalEntityId: { type: string, format: uuid }
+              openBalance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              movement: { $ref: '../shared/common.yaml#/components/schemas/Money' }
 
     SettlementStatus:
       type: string

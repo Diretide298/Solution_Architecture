@@ -1,0 +1,61 @@
+# Coupon code — state model
+# Contract: promotions.CouponStatus
+# Checked by tools/check-states.py.
+
+entity: Coupon code
+contract: promotions
+enum: CouponStatus
+owner: promotions
+initial:
+- issued
+terminal:
+- redeemed
+- expired
+- voided
+transitions:
+- from: issued
+  to: assigned
+  operation: assignCoupon
+  trigger: operation
+  guard: Allocated to a named guest
+- from: issued
+  to: redeemed
+  operation: evaluatePromotions
+  trigger: cascade
+  guard: Used on a paid order. **Single-use enforcement is here** — this transition is the lock
+- from: assigned
+  to: redeemed
+  operation: evaluatePromotions
+  trigger: cascade
+  guard: Used by the assigned guest
+- from: issued
+  to: expired
+  trigger: timer
+  guard: Validity passed unused
+- from: assigned
+  to: expired
+  trigger: timer
+  guard: Validity passed unused
+- from: issued
+  to: voided
+  operation: voidCouponCode
+  trigger: operation
+  guard: Withdrawn — issued in error, or a campaign pulled
+  requiresApproval: true
+- from: assigned
+  to: voided
+  operation: voidCouponCode
+  trigger: operation
+  guard: Withdrawn after assignment
+  requiresApproval: true
+- from: redeemed
+  to: issued
+  operation: createRefund
+  trigger: cascade
+  guard: Order refunded and the code returns to use. **Only where the promotion allows it** — most do
+    not
+  isReversal: true
+  requiresApproval: true
+notes: The redeemed-to-issued reversal is the contentious one. Refunding an order that used a single-use
+  code either returns the code or consumes it, and venues differ. Default is consume; returning it is
+  per-promotion configuration.

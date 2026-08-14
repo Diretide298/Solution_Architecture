@@ -1,0 +1,40 @@
+# inventory.purchaseOrderReceived v1 — published by inventory
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: inventory.purchaseOrderReceived
+version: 1
+publisher: inventory
+description: A purchase order is fully received.
+aggregate: purchaseOrder
+emittedWhen: PurchaseOrderStatus acknowledged or partiallyReceived to received
+payload:
+- field: purchaseOrderId
+  type: uuid
+- field: supplierId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: receiptIds
+  type: array
+  notes: Every goods receipt against it. Several for a split delivery
+- field: orderedValue
+  type: Money
+- field: receivedValue
+  type: Money
+  notes: May differ — price variance is posted separately (CF-38)
+- field: receivedAt
+  type: timestamp
+consumers:
+- context: ledger
+  purpose: Accrue the payable and post any price variance
+  idempotencyKey: purchaseOrderId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: Supplier delivery performance
+  idempotencyKey: purchaseOrderId
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: Emitted on full receipt only. A partial receipt moves stock and does not settle the order, so
+  accruing on it would book a payable for goods still outstanding.

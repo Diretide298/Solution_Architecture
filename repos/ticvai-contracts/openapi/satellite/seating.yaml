@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 4
+  x-ticvai-screen-count: 5
   x-ticvai-tier: satellite
   x-ticvai-module: "19 — Seat Management & Venue Mapping"
   x-ticvai-requirements: 112
@@ -178,6 +178,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getSeatMap
+      x-ticvai-consumed-by:
+        - "P02 GST-049 Interactive Seat Selection"
       x-ticvai-read-routing: replica
       summary: Read a seat map with its structure
       description: >
@@ -563,6 +565,7 @@ paths:
                 items: { $ref: '#/components/schemas/SeatMapTemplate' }
     post:
       operationId: createSeatMapTemplate
+      x-ticvai-config-scope: region
       summary: Save a map as a reusable template
       tags: [seatMap]
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -659,6 +662,7 @@ paths:
       operationId: getSeatAvailability
       x-ticvai-consumed-by:
         - "P01 WEB-007 Seat Map Selection"
+        - "P04 POS-004 Sell — Seat Map"
       x-ticvai-read-routing: primary
       summary: Seat status for a performance
       description: >
@@ -705,6 +709,7 @@ paths:
       operationId: createSeatHold
       x-ticvai-consumed-by:
         - "P01 WEB-007 Seat Map Selection"
+        - "P04 POS-004 Sell — Seat Map"
       summary: Hold specific seats
       description: >
         Short-lived and explicit, unlike a lease. Leases cover interchangeable units; a seat
@@ -788,6 +793,7 @@ paths:
       operationId: extendSeatHold
       x-ticvai-consumed-by:
         - "P01 WEB-007 Seat Map Selection"
+        - "P04 POS-004 Sell — Seat Map"
       summary: Extend a hold
       description: >
         For a guest still completing payment. Bounded by the venue's maximum, so a hold
@@ -969,6 +975,7 @@ paths:
 
     put:
       operationId: setSeatingRules
+      x-ticvai-config-scope: venue
       summary: Set seating rules
       description: >
         Buffer seats, distancing, orphan-seat prevention and accessibility pairing.

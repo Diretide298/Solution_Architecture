@@ -1,0 +1,662 @@
+# P04 — Point of Sale
+#
+# Written against the delivered mockups: Park_POS_dc.html and Park_POS_v1_dc.html.
+# POS-010 is from the 14 August MoM and is not in those designs.
+#
+# Offline-capable, so every screen declares an offline state. Those states are the
+# most important lines in this file: they are where ADR-0013 becomes a behaviour.
+
+platform:
+  code: P04
+  audience: staff
+  formFactor: posTerminal
+  shortName: Staff POS
+  name: Staff POS — Terminal and Tablet
+  surface: staffFacing
+  runtime: reactNativeTablet
+  offlineCapable: true
+  themes:
+  - light
+  - dark
+  directions:
+  - ltr
+  - rtl
+  screenCount: 10
+  app: pos
+  appStatus: scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  - offline-core
+  deployment:
+    target: POS terminal — Windows or Android
+    distribution: device management push
+    bundleUpdate: catalogue bundle applies at shift open; app on a scheduled window
+    hosting: local, offline-first (ADR-0013)
+    storeReview: false
+    deviceOwnership: venue-owned, staffed
+    networkAssumption: venue LAN with expected outages
+    releaseCadence: monthly, never during trading
+  wireframeBoard: wireframes/P04 Staff POS.dc.html
+screens:
+- id: POS-001
+  name: Begin Shift
+  module: Shift
+  purpose: Count the opening float and open the till.
+  capability: C11
+  wave: 1
+  layout:
+    template: wizard
+    regions:
+    - name: statusStrip
+      ref: statusStrip
+      components: []
+    - name: contentBody
+      components:
+      - kind: numberField
+        label: Denomination count
+        notes: Per denomination, from the region settings — the mockup shows AED 200 down to coins.
+          Not a hardcoded list
+      - kind: metricTile
+        bindsTo: Shift.floatTotal
+        notes: Computed, never typed
+      - kind: textField
+        label: Notes
+      - kind: detailPanel
+        notes: Suggested float from the venue default. Advisory, not prefilled — a prefilled count is
+          not a count
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Review & confirm
+  states:
+    loading: Denominations from region settings
+    empty: Not applicable
+    error: Open failed. Counts are kept on screen
+    offline: Opens locally and syncs. A gate that cannot open a till because the network is down is
+      a gate that does not sell
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-001
+  permission: SHIFT_OPEN
+  apis:
+  - operationId: openShift
+    contract: shift
+    purpose: Open with the counted float
+    trigger: onAction
+  - operationId: getCurrentShift
+    contract: shift
+    purpose: Whether a shift is already open here
+    trigger: onLoad
+  notes: 'Design: Park_POS_dc.html. The mockup warns "you will not be able to edit the float amount
+    after the shift has started" — that is correct and deliberate. An editable opening float makes close-out
+    variance meaningless.'
+  implementation:
+    app: pos
+    route: /shift/begin-shift
+    component: apps/pos/src/routes/shift/BeginShiftWizard.tsx
+    status: notStarted
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - POS-002
+- id: POS-002
+  name: Sell — Ticket Catalogue
+  module: Sell
+  purpose: Find a product and add it to the cart.
+  capability: C01
+  wave: 1
+  layout:
+    template: board
+    regions:
+    - name: sideNav
+      ref: sideNav
+      components: []
+    - name: contentBody
+      components:
+      - kind: searchField
+        label: Search events, tickets, customers
+      - kind: saleBoard
+        bindsTo: SaleBoard
+        notes: Category tiles then product cards. Layout is the sale board configured per workstation
+          (ADR-0002), not a fixed grid
+      - kind: selectField
+        label: Sort by
+      - kind: multiSelect
+        label: Filters
+    - name: contextPanel
+      components:
+      - kind: cartPanel
+        bindsTo: PromotionEvaluation
+        notes: Persistent. The mockup shows member discount applied automatically — that is evaluatePromotions,
+          not a manual entry
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Checkout
+      - kind: secondaryButton
+        label: Hold order
+        permission: ORDER_MODIFY
+      - kind: secondaryButton
+        label: Open order
+      - kind: secondaryButton
+        label: Discount
+        permission: ORDER_DISCOUNT
+      - kind: secondaryButton
+        label: Promo code
+      - kind: destructiveButton
+        label: Clear cart
+  states:
+    loading: Tiles from the local bundle. Instant — this screen must not wait on a network
+    empty: No products in this category
+    error: Bundle stale or missing. The terminal refuses to sell rather than selling at an unknown price
+    offline: Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal
+      does not know whether it has a network.
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-002
+  permission: ORDER_CREATE
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: Catalogue
+    trigger: onLoad
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Live cart pricing
+    trigger: onAction
+  - operationId: holdOrder
+    contract: orders
+    purpose: Park the sale
+    trigger: onAction
+  - operationId: applyManualDiscount
+    contract: orders
+    purpose: Cashier discount with a reason
+    trigger: onAction
+  notes: 'Design: Park_POS_dc.html, "Ticket Catalogue / Product Selection". The mockup exposes Hold
+    Order and Discount as first-class buttons — neither existed as an operation until 14 August.'
+  implementation:
+    app: pos
+    route: /sell/sell-ticket-catalogue
+    component: apps/pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-001
+    - POS-006
+    exitTo:
+    - POS-003
+    - POS-004
+    - POS-005
+    - POS-006
+    - POS-010
+- id: POS-003
+  name: Sell — Timed Entry
+  module: Sell
+  purpose: Pick a date, a session and ticket quantities.
+  capability: C81
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: datePicker
+        notes: Seven-day strip, as designed. Region date format
+      - kind: cardList
+        bindsTo: Availability.performances
+        notes: Slots with remaining counts and a demand indicator — the mockup shows High, Medium, Low,
+          Sold Out
+      - kind: cardList
+        bindsTo: ProductVariant[]
+        notes: Adult and child with steppers
+    - name: contextPanel
+      components:
+      - kind: cartPanel
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Add to cart
+  states:
+    loading: Slot skeleton
+    empty: No sessions on this date, with the next available offered
+    error: Availability unavailable. Selection blocked — overselling is worse than waiting
+    offline: '**Availability is never served from the bundle.** A lease is acquired against the server;
+      without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)'
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-003
+  permission: ORDER_CREATE
+  apis:
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Per-session remaining
+    trigger: onLoad
+  - operationId: acquireLease
+    contract: catalogue
+    purpose: Hold capacity for this terminal
+    trigger: onAction
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: Ticket types
+    trigger: onLoad
+  notes: 'Design: Park_POS_dc.html, "Aquarium Entry" timed entry. The demand indicator is a presentation
+    of remaining capacity, not a separate field.'
+  implementation:
+    app: pos
+    route: /sell/sell-timed-entry
+    component: apps/pos/src/routes/sell/SellTimedEntryForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-002
+    exitTo:
+    - POS-002
+    - POS-005
+- id: POS-004
+  name: Sell — Seat Map
+  module: Sell
+  purpose: Choose specific seats for a seated event.
+  capability: C51
+  wave: 2
+  layout:
+    template: canvas
+    regions:
+    - name: contentBody
+      components:
+      - kind: seatMap
+        bindsTo: SeatAvailability
+        notes: Category filter, zoom, legend. Available, selected, sold, accessible — exactly the four
+          states in the design
+      - kind: banner
+        notes: Hold countdown
+    - name: contextPanel
+      components:
+      - kind: cartPanel
+        bindsTo: SeatHold
+        notes: Seat total plus booking fee, itemised as designed
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Add seats to cart
+  states:
+    loading: Map skeleton at the venue aspect ratio
+    empty: No seats in the selected category
+    error: Map unavailable, with best-available offered instead
+    offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
+      seat is unrecoverable'
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-004
+  permission: ORDER_CREATE
+  apis:
+  - operationId: getSeatAvailability
+    contract: seating
+    purpose: Seat status
+    trigger: onLoad
+  - operationId: createSeatHold
+    contract: seating
+    purpose: Hold on selection
+    trigger: onAction
+  - operationId: extendSeatHold
+    contract: seating
+    purpose: Extend during payment
+    trigger: onAction
+  notes: 'Design: Park_POS_dc.html, "Reserved Seating / Seat Map". Booking fee is a separate line —
+    it is a fee, not part of the seat price, and reporting separates them.'
+  implementation:
+    app: pos
+    route: /sell/sell-seat-map
+    component: apps/pos/src/routes/sell/SellSeatMapCanvas.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-002
+    exitTo:
+    - POS-002
+    - POS-005
+- id: POS-005
+  name: Payment
+  module: Payment
+  purpose: Take payment and complete the sale.
+  capability: C04
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: selectField
+        label: Payment method
+        notes: Card, cash, digital wallet, gift card or voucher, online payment — the five in the design
+      - kind: numberField
+        label: Amount received
+      - kind: detailPanel
+        bindsTo: changeDue
+        notes: Computed live. Quick-tender chips for exact, 250, 300
+      - kind: paymentTerminal
+        bindsTo: Payment
+    - name: contextPanel
+      components:
+      - kind: cartPanel
+        notes: Order summary stays visible
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Complete payment
+      - kind: secondaryButton
+        label: Split payment
+      - kind: secondaryButton
+        label: Add tip
+      - kind: secondaryButton
+        label: Print receipt
+      - kind: secondaryButton
+        label: Email receipt
+      - kind: destructiveButton
+        label: Cancel order
+  states:
+    loading: Button disabled while processing. Double submission impossible
+    empty: Not applicable
+    error: Declined, with the reason. Retry reuses the same idempotency key
+    offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
+      never saw is a sale that vanishes at settlement
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-005
+  permission: ORDER_CREATE
+  apis:
+  - operationId: createPayment
+    contract: orders
+    purpose: Capture
+    trigger: onAction
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: Resolve an unknown terminal outcome
+    trigger: onAction
+  - operationId: addTip
+    contract: orders
+    purpose: Record a tip against the payment
+    trigger: onAction
+  - operationId: reprintReceipt
+    contract: retail
+    purpose: Reprint
+    trigger: onAction
+  notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
+    until 14 August. A tip posts to a liability, not to sales.'
+  implementation:
+    app: pos
+    route: /payment/payment
+    component: apps/pos/src/routes/payment/PaymentForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-002
+    - POS-003
+    - POS-004
+    exitTo:
+    - POS-002
+- id: POS-006
+  name: Held Orders
+  module: Sell
+  purpose: Find and resume a parked sale.
+  capability: C01
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        bindsTo: Order[]
+        notes: Label, cashier, age, total. Sorted by age — the oldest is the one about to expire
+      - kind: banner
+        notes: Held orders expiring within the hour
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Resume
+  states:
+    loading: List skeleton
+    empty: Nothing held
+    error: List unavailable. A held order can still be resumed by its number
+    offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
+      till's sale needs the server
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-006
+  permission: ORDER_MODIFY
+  apis:
+  - operationId: listOrders
+    contract: orders
+    purpose: Held orders at this venue
+    trigger: onLoad
+  - operationId: resumeOrder
+    contract: orders
+    purpose: Bring it back, reporting anything that moved
+    trigger: onAction
+  notes: Implied by the Hold Order button in the design and absent from it. A hold with no way to find
+    it again is a lost sale.
+  implementation:
+    app: pos
+    route: /sell/held-orders
+    component: apps/pos/src/routes/sell/HeldOrdersList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-002
+    exitTo:
+    - POS-002
+- id: POS-007
+  name: Close Shift
+  module: Shift
+  purpose: Count the drawer and close the till.
+  capability: C11
+  wave: 1
+  layout:
+    template: wizard
+    regions:
+    - name: contentBody
+      components:
+      - kind: numberField
+        label: Counted by denomination
+        notes: '**Blind count.** The expected figure is withheld until submission — a counter who can
+          see the expected total reconciles to it rather than to the drawer'
+      - kind: banner
+        bindsTo: ShiftCloseResult.variance
+        notes: Revealed only after submission. Above the venue threshold it needs approval
+      - kind: timeline
+        notes: No-sale count, manual discounts, voids — the numbers a supervisor reviews
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Submit count
+  states:
+    loading: Denominations
+    empty: Not applicable
+    error: Close failed. The count is preserved
+    offline: Cannot close. Closing requires the server total, and a locally computed variance is not
+      a variance
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-007
+  permission: SHIFT_CLOSE
+  apis:
+  - operationId: closeShift
+    contract: shift
+    purpose: Submit the blind count
+    trigger: onAction
+  - operationId: acceptShiftVariance
+    contract: shift
+    purpose: Supervisor accepts a variance above threshold
+    trigger: onAction
+  - operationId: recordNoSale
+    contract: shift
+    purpose: Drawer opened without a sale
+    trigger: onAction
+  notes: The blind count is the whole control. Not in the mockup, which shows only Begin Shift.
+  implementation:
+    app: pos
+    route: /shift/close-shift
+    component: apps/pos/src/routes/shift/CloseShiftWizard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-002
+    exitTo: []
+- id: POS-008
+  name: Reports
+  module: Reports
+  purpose: See how the day is going from the terminal.
+  capability: C21
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Gross, tickets, average basket
+      - kind: chart
+        notes: Revenue by hour, revenue mix by category — as designed
+      - kind: dataTable
+        notes: Top selling products with units, revenue, share
+      - kind: detailPanel
+        notes: Sales channels and terminal health
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Export
+  states:
+    loading: Tile skeletons
+    empty: No sales yet today
+    error: Reporting unavailable. Selling is unaffected
+    offline: '**Not available.** Reporting reads the analytical replica (ADR-0016) and a terminal-local
+      figure would disagree with the back office'
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-008
+  permission: REPORT_VIEW
+  apis:
+  - operationId: runReport
+    contract: reporting
+    purpose: Terminal day view
+    trigger: onLoad
+  notes: 'Design: Park_POS_dc.html reports view. Read routing is analytical — never the primary, under
+    any load.'
+  implementation:
+    app: pos
+    route: /reports/reports
+    component: apps/pos/src/routes/reports/ReportsDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-002
+    exitTo:
+    - POS-002
+- id: POS-009
+  name: Staff Roster
+  module: Shift
+  purpose: See who is on duty and on which terminal.
+  capability: C11
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        notes: Staff, role and terminal, shift, sales, status — the columns in the design
+    - name: actionBar
+      components:
+      - kind: secondaryButton
+        label: Export roster
+  states:
+    loading: Table skeleton
+    empty: Nobody on duty
+    error: Roster unavailable
+    offline: Last known roster, with its age shown
+  wireframe:
+    status: approved
+    owner: design — Park_POS_dc.html
+    board: wireframes/P04 Staff POS.dc.html#pos-009
+  permission: SHIFT_CLOSE_OTHER
+  apis:
+  - operationId: listShifts
+    contract: shift
+    purpose: Open shifts at this venue
+    trigger: onLoad
+  implementation:
+    app: pos
+    route: /shift/staff-roster
+    component: apps/pos/src/routes/shift/StaffRosterList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - POS-002
+    exitTo:
+    - POS-002
+- id: POS-010
+  name: Add to Existing Ticket
+  module: Sell
+  purpose: Sell something onto media the guest is already carrying.
+  capability: C01
+  wave: 1
+  permission: ORDER_CREATE
+  apis:
+  - operationId: getMediaEntitlements
+    contract: orders
+    purpose: What the scanned QR already carries
+    trigger: onScan
+  - operationId: appendEntitlementToMedia
+    contract: orders
+    purpose: Attach the new purchase to the same media
+    trigger: onAction
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: scanTarget
+        notes: Scan the guest QR, wristband or card first. The media is the join, not the order
+      - kind: detailPanel
+        bindsTo: MediaEntitlements
+        notes: What they already hold — so a cashier does not sell a locker to someone who has one
+      - kind: banner
+        bindsTo: MediaEntitlements.canAcceptMore
+        notes: Surrendered, expired or blocked media is refused before money is taken, not after
+      - kind: saleBoard
+        notes: Only variants whose template allows canShareMedia
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Add and pay
+  states:
+    loading: Media lookup. Reads the primary — a stale entitlement set is a wrong one
+    empty: Media recognised and carries nothing. Unusual, and worth showing rather than hiding
+    error: Media not recognised at this venue
+    offline: '**Not available.** The entitlement set must be read live; appending to a stale picture
+      double-sells a locker'
+  navigation:
+    entryFrom:
+    - POS-002
+    exitTo:
+    - POS-005
+    - POS-002
+  implementation:
+    app: pos
+    route: /sell/add-to-existing-ticket
+    component: apps/pos/src/routes/sell/AddToExistingTicketDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    board: wireframes/P04 Staff POS.dc.html#pos-010
+  notes: CF-58, from the 14 August MoM. Not in the delivered mockups.

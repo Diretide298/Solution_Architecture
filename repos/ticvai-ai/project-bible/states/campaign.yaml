@@ -1,0 +1,54 @@
+# Campaign — state model
+# Contract: marketing-crm.CampaignStatus
+# Checked by tools/check-states.py.
+
+entity: Campaign
+contract: marketing-crm
+enum: CampaignStatus
+owner: marketing
+initial:
+- draft
+terminal:
+- completed
+- stopped
+- failed
+transitions:
+- from: draft
+  to: scheduled
+  operation: launchCampaign
+  trigger: operation
+  guard: Segment resolved, content approved, consent purpose set
+- from: scheduled
+  to: draft
+  operation: unscheduleCampaign
+  trigger: operation
+  guard: Pulled before sending
+- from: scheduled
+  to: sending
+  trigger: timer
+  guard: Send window reached
+- from: sending
+  to: paused
+  operation: pauseCampaign
+  trigger: operation
+  guard: Halted mid-send. **Recipients already sent to are not unsent**
+- from: paused
+  to: sending
+  operation: launchCampaign
+  trigger: operation
+  guard: Resumed from where it stopped, not from the start
+- from: sending
+  to: completed
+  trigger: job
+  guard: Every recipient attempted
+- from: paused
+  to: stopped
+  operation: stopCampaign
+  trigger: operation
+  guard: Abandoned. Distinct from completed — a stopped campaign reached some of its audience
+- from: sending
+  to: failed
+  trigger: job
+  guard: Provider rejected the send outright
+notes: '`paused` cannot return to `scheduled`. A campaign that has started sending has a partial audience,
+  and restarting it would send twice.'

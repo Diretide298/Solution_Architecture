@@ -1,0 +1,270 @@
+// The exported UI/UX design boards in UIUX_html/.
+//
+// The boards are where the frontend plan came from — frontend/README.md says as
+// much, and the two platforms that were missed were missed because they had no
+// board. They are self-contained HTML, so the viewer serves them and frames
+// them rather than converting anything.
+//
+// A board is attached to a platform two ways, and the difference is shown:
+//
+//   declared — a screen names the board in its `wireframe.owner` or
+//     `wireframe.board`. P04's nine screens do: "design — Park_POS_dc.html".
+//   inferred — nothing names it, so the platform is read off the file name.
+//     Labelled as inferred wherever it appears, and a name that could mean two
+//     platforms is refused rather than guessed at, as the database inference does.
+
+import { readdir, readFile, stat } from 'node:fs/promises';
+import path from 'node:path';
+
+// `designs/` is where the boards live; the earlier delivery called it
+// `UIUX_html/`, so both are looked for and whichever exists is used.
+const BOARD_DIRS = ['designs', 'UIUX_html'];
+
+/** Assets the boards load; they are served, but they are not boards. */
+const NOT_A_BOARD = /^(support|runtime|vendor|bundle)\b/i;
+
+/**
+ * The twelve platforms, from the deployment table in handoff/. The screen files
+ * only cover five of them, so this is the only place the full vocabulary lives —
+ * and a board's platform is usually one of the seven with no screens yet.
+ */
+export async function readPlatformTable(root) {
+  const file = path.join(root, 'handoff', 'platform-deployment.md');
+  const text = await readFile(file, 'utf8').catch(() => null);
+  if (!text) return [];
+
+  // The table has been reshaped once already — it gained Purpose, Audience and
+  // Form factor columns and the platforms were renamed — so this reads by
+  // finding the columns rather than counting them. The code is the first cell,
+  // the app is the one in backticks, and whatever sits between them is the name.
+  const platforms = [];
+  const seen = new Set();
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim().startsWith('|')) continue;
+    const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+    const code = cells[0];
+    if (!/^P\d{2}$/.test(code ?? '') || seen.has(code)) continue;
+
+    const appAt = cells.findIndex((c) => /^`[^`]+`$/.test(c));
+    if (appAt < 1) continue;
+
+    // Between the code and the app sit the name cells and, since the rename,
+    // audience and form factor. Those two are lowercase vocabulary — `guest`,
+    // `posTerminal` — while the name is bolded or capitalised, which is what
+    // separates "Staff POS — Terminal and Tablet" from "staff · posTerminal".
+    const name = cells
+      .slice(1, appAt)
+      .filter((c) => /^\*\*|^[A-Z]/.test(c))
+      .map((c) => c.replace(/\*\*/g, '').trim())
+      .filter(Boolean)
+      .join(' — ');
+
+    seen.add(code);
+    platforms.push({
+      code,
+      name: name || code,
+      app: cells[appAt].replace(/`/g, ''),
+      scaffolded: /yes/i.test(cells[appAt + 1] ?? ''),
+    });
+  }
+  return platforms;
+}
+
+/** Words too common to identify a platform on their own. */
+const STOPWORDS = new Set([
+  'app', 'application', 'portal', 'console', 'web', 'the', 'of', 'and', 'v', 'ui', 'ux',
+  'screen', 'screens', 'board', 'boards', 'design', 'final', 'draft', 'copy', 'new', 'old',
+]);
+
+const tokenise = (s) =>
+  s
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t && !STOPWORDS.has(t));
+
+/**
+ * Which platform a board is for. Returns the match and how it was reached, or
+ * the reason it could not be resolved — never a guess between two candidates.
+ */
+function matchPlatform(name, platforms) {
+  const tokens = new Set(tokenise(name));
+
+  // an explicit code in the file name is as close to declared as this gets
+  const coded = /\bP(\d{2})\b/i.exec(name);
+  if (coded) {
+    const hit = platforms.find((p) => p.code.toLowerCase() === `p${coded[1]}`);
+    if (hit) return { platform: hit, matchedBy: 'code in the file name', inferred: false };
+  }
+
+  // the app slug is the most distinctive thing a board name tends to carry —
+  // "Park POS" has no word in common with "Point of Sale", but it has `pos`
+  const bySlug = platforms.filter((p) => tokenise(p.app).some((t) => tokens.has(t)));
+  if (bySlug.length === 1) {
+    return { platform: bySlug[0], matchedBy: `app slug ${bySlug[0].app}`, inferred: true };
+  }
+  if (bySlug.length > 1) {
+    return { ambiguous: bySlug.map((p) => p.code), matchedBy: 'app slug' };
+  }
+
+  // failing that, a distinctive word from the platform's own name
+  const byName = platforms.filter((p) => tokenise(p.name).some((t) => tokens.has(t)));
+  if (byName.length === 1) {
+    return { platform: byName[0], matchedBy: 'platform name', inferred: true };
+  }
+  if (byName.length > 1) {
+    return { ambiguous: byName.map((p) => p.code), matchedBy: 'platform name' };
+  }
+
+  return {};
+}
+
+async function walk(dir, base = dir, out = []) {
+  const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
+  for (const entry of entries) {
+    const abs = path.join(dir, entry.name);
+    if (entry.isDirectory()) await walk(abs, base, out);
+    else if (entry.isFile()) out.push(path.relative(base, abs).split(path.sep).join('/'));
+  }
+  return out;
+}
+
+/**
+ * "Park_POS_v1_dc.html" → { name: "Park POS", revision: "v1" }. The exporter
+ * writes underscores and a `dc` marker; neither is part of the board's name.
+ */
+function readBoardName(base) {
+  const stem = base.replace(/\.html?$/i, '').replace(/[._-]?dc$/i, '');
+  const parts = stem.split(/[_\s]+/).filter(Boolean);
+  const last = parts[parts.length - 1];
+  const revision = /^v\d+(\.\d+)*$/i.test(last ?? '') ? parts.pop() : null;
+  return { name: parts.join(' ') || stem, revision: revision ? revision.toLowerCase() : null };
+}
+
+/** Any .html file named in free text — `wireframe.owner` is prose with a file in it. */
+const namedFiles = (text) =>
+  String(text ?? '').match(/[\w][\w .%-]*\.html?/gi)?.map((f) => f.trim().toLowerCase()) ?? [];
+
+export async function buildBoards(root, screens = []) {
+  const problems = [];
+
+  let dirName = null;
+  let dir = null;
+  for (const candidate of BOARD_DIRS) {
+    const abs = path.join(root, candidate);
+    const found = await stat(abs).catch(() => null);
+    if (found?.isDirectory()) {
+      dirName = candidate;
+      dir = abs;
+      break;
+    }
+  }
+  if (!dir) {
+    return { present: false, dir: BOARD_DIRS[0], boards: [], platforms: [], problems, stats: { boards: 0 } };
+  }
+  const BOARD_DIR = dirName;
+
+  const platforms = await readPlatformTable(root);
+  const files = await walk(dir);
+  const assets = files.filter((f) => !/\.html?$/i.test(f)).length;
+
+  // A screen that names its board settles the question — P04's nine screens
+  // carry "design — Park_POS_dc.html" in wireframe.owner. Both that and an
+  // explicit wireframe.board are read, keyed on the bare file name.
+  const declared = new Map();
+  for (const screen of screens) {
+    const fields = [screen?.wireframe?.board, screen?.wireframe?.owner];
+    for (const key of fields.flatMap(namedFiles)) {
+      const bare = key.split('/').pop();
+      if (!declared.has(bare)) declared.set(bare, []);
+      if (!declared.get(bare).includes(screen.id)) declared.get(bare).push(screen.id);
+    }
+  }
+
+  const boards = [];
+  for (const rel of files) {
+    if (!/\.html?$/i.test(rel)) continue;
+    const base = path.basename(rel);
+    if (NOT_A_BOARD.test(base)) continue;
+
+    const fileInfo = await stat(path.join(dir, rel));
+    const { name, revision } = readBoardName(base);
+
+    const linkedScreens = declared.get(base.toLowerCase()) ?? declared.get(rel.toLowerCase()) ?? [];
+    const declaredCode = linkedScreens.length
+      ? screens.find((s) => s.id === linkedScreens[0])?.platform
+      : null;
+    const match = declaredCode
+      ? {
+          platform: platforms.find((p) => p.code === declaredCode),
+          matchedBy: `declared on ${linkedScreens.length} screen${linkedScreens.length === 1 ? '' : 's'}`,
+          inferred: false,
+        }
+      : matchPlatform(name, platforms);
+
+    if (match.ambiguous) {
+      problems.push({
+        severity: 'warning',
+        kind: 'board-platform-ambiguous',
+        file: `${BOARD_DIR}/${rel}`,
+        message:
+          `"${name}" matches ${match.ambiguous.join(' and ')} by ${match.matchedBy}, so it is ` +
+          `left unassigned rather than guessed at. Rename it with the platform code, or add ` +
+          `wireframe.board to a screen to say outright.`,
+      });
+    } else if (!match.platform) {
+      problems.push({
+        severity: 'info',
+        kind: 'board-platform-unknown',
+        file: `${BOARD_DIR}/${rel}`,
+        message:
+          `"${name}" does not name a platform, so it is listed but not attached to any screen ` +
+          `or journey. Putting the code in the file name — "P04 ${name}" — is enough.`,
+      });
+    }
+
+    boards.push({
+      id: rel,
+      name,
+      revision: revision ? `v${revision[1]}` : null,
+      file: `${BOARD_DIR}/${rel}`,
+      url: `/designs/${rel.split('/').map(encodeURIComponent).join('/')}`,
+      bytes: fileInfo.size,
+      modified: fileInfo.mtime.toISOString(),
+      dir: BOARD_DIR,
+      platform: match.platform?.code ?? null,
+      platformName: match.platform?.name ?? null,
+      platformApp: match.platform?.app ?? null,
+      matchedBy: match.matchedBy ?? null,
+      inferred: Boolean(match.inferred),
+      screens: linkedScreens,
+    });
+  }
+
+  // newest first, and a revision after the board it is a revision of
+  boards.sort(
+    (a, b) => a.name.localeCompare(b.name) || (a.revision ?? '').localeCompare(b.revision ?? '')
+  );
+
+  // a board for a platform that has screens can be offered on those screens;
+  // one for a platform with none is still worth seeing, and says why
+  const withScreens = new Set(screens.map((s) => s.platform));
+  for (const board of boards) {
+    board.platformHasScreens = board.platform ? withScreens.has(board.platform) : false;
+  }
+
+  return {
+    present: true,
+    dir: BOARD_DIR,
+    boards,
+    platforms,
+    problems,
+    stats: {
+      boards: boards.length,
+      assets,
+      matched: boards.filter((b) => b.platform).length,
+      declared: boards.filter((b) => b.platform && !b.inferred).length,
+      inferred: boards.filter((b) => b.inferred).length,
+      platformsKnown: platforms.length,
+    },
+  };
+}

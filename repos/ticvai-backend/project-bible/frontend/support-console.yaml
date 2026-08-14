@@ -1,9 +1,9 @@
-# support-console — screen and route manifest
-# Derived from screens/*.yaml by tools/link-frontend.py. Do not hand-edit.
-# Routes and component paths are conventional; a route that exists in code but
-# not here, or here but not in code, is caught by tools/check-frontend.py.
+# support-console — staff · web
+# Screen and route manifest. Derived from screens/*.yaml. Do not hand-edit.
 
 app: support-console
+audience: staff
+formFactor: web
 status: not scaffolded
 runtime: reactWeb
 offlineCapable: false
@@ -11,7 +11,7 @@ directions:
 - ltr
 - rtl
 platforms:
-- P12 Support Agent Console
+- P12 Staff Web — Support Console
 packages:
 - design-tokens
 - ui
@@ -34,7 +34,7 @@ screens:
 - id: SUP-002
   name: Agent Dashboard
   route: /general/agent-dashboard
-  component: apps/support-console/src/routes/general/AgentDashboardDashboard.tsx
+  component: apps/support-console/src/routes/general/AgentDashboard.tsx
   wave: 3
   status: notStarted
 - id: SUP-003

@@ -93,6 +93,7 @@ components:
         - ORDER_VIEW_OTHER            # orders raised by other principals
         - ORDER_CREATE
         - ORDER_MODIFY
+        - ORDER_DISCOUNT              # manual discount. Threshold and approver are venue policy
         - ORDER_CANCEL
         - ORDER_VOID
         - ORDER_REFUND                # initiate, subject to threshold

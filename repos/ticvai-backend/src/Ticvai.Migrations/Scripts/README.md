@@ -1,70 +1,21 @@
 # Migrations
 
-**DDL lives here as versioned SQL. Not in the OpenAPI contracts, and not in a schema DSL.**
+**No migrations are written. This is deliberate, as of 14 August.**
 
-## Why SQL rather than YAML
+The schema reference workbook (`handoff/TICVAI_Schema_Reference.xlsx`) is the working artefact
+while the design settles — 232 tables, 1,983 columns, derived from the contracts and regenerated
+whenever they change. Writing DDL against a design that is still moving produces migrations that
+have to be rewritten, and a forward-only migration cannot be rewritten.
 
-The contracts describe the wire. Storage needs things OpenAPI has no way to express, and a
-generic schema DSL expresses badly:
+Six migrations existed and were removed. What they contained beyond the column list —
+row-level security, level-typed foreign keys, partitioning, 53 indexes, 28 constraints and
+seven functions — is written up in **`handoff/storage-design.md`**. That is the 30% of a
+migration that does not derive from the contracts, and it is the part worth keeping.
 
-| Needed | Why a DSL loses it |
-|---|---|
-| `PARTITION BY LIST (venue_id)` | Partitioning strategy is not a field property |
-| `FORCE ROW LEVEL SECURITY` | Policies are predicates, not annotations. `FORCE` is the whole point — without it the owner bypasses every policy |
-| `ltree` + GiST | Extension types with their own operators |
-| Partial indexes | `WHERE is_active` is a query-shape decision |
-| `GENERATED ALWAYS AS` | Derived columns |
-| The `pii` schema split | An architectural boundary, not a naming convention |
+**When migrations resume**, the two documents together are the input: the workbook for tables
+and columns, `storage-design.md` for everything that makes it a database.
 
-Generating SQL from YAML would mean either a DSL that reaches every one of these — at which
-point it is SQL with extra steps — or a DDL nobody can read at the exact moment production
-is broken.
-
-## Where the mapping is recorded
-
-Each API schema in the contracts carries `x-ticvai-persistence`:
-
-```yaml
-JournalEntry:
-  x-ticvai-persistence: "ledger.journal_entry + ledger.journal_line"
-TrialBalance:
-  x-ticvai-persistence: "none — computed"
-```
-
-Documentation of the mapping, not a generator input. It answers "where does this live" without
-pretending the contract defines storage. **19 of the 71 mapped spine schemas have no table at
-all** — they are computed responses, and that is worth stating explicitly rather than leaving
-someone to search for a table that was never meant to exist.
-
-## File layout
-
-One migration per module, applied in order. Module boundaries match the contract tiers.
-
-    V0001__baseline.sql              platform, RLS, partitioning, outbox, pii   [DONE]
-    V0002__identity.sql              principals, roles, grants, sso, mfa
-    V0003__tenancy.sql               workstations, sale boards, devices
-    V0003a__scope-typing.sql         level-typed scope FKs, outlet, tenant projection
-    V0004__catalogue.sql             products, pricing, events, capacity, entitlements
-    V0005__orders.sql                order lines, payments, refunds, reservations
-    V0006__shift.sql                 shifts, cash movements
-    V0007__access.sql                access points, admission profiles, blacklist
-    V0008__ledger.sql                accounts, journals, entries, settlement
-    V0009__cross_cell.sql            guest links, redemption rights, DSAR
-    V0010__seating.sql               seat maps, seats, holds, blocks
-    V0011__fnb.sql                   menus, modifiers, visits, kitchen
-    V0012__inventory.sql             items, movements, counts, procurement
-    V0013__retail.sql                merchandise, returns, wallet, gift cards
-    V0014__promotions.sql            promotions, coupons, vouchers, allocation
-    V0015__marketing.sql             profiles, consent, segments, campaigns, cases
-    V0016__maintenance.sql           assets, work orders, inspections, incidents
-    V0017__queue.sql                 queues, entries, feeds
-    V0018__white_label.sql           tenant config, content, versions
-    V0019__assets.sql                media library, collections, rights
-    V0020__games.sql                 cards, games, plays, prizes
-    V0021__reporting.sql             definitions, executions, schedules
-
-`subscription` has no migration here — it is Control Plane and lives in a separate database
-outside any cell.
+---
 
 ## Rules
 

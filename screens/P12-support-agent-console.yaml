@@ -4,7 +4,10 @@
 
 platform:
   code: P12
-  name: Support Agent Console
+  audience: staff
+  formFactor: web
+  shortName: Staff Web
+  name: Staff Web — Support Console
   surface: staffFacing
   runtime: reactWeb
   offlineCapable: false
@@ -30,6 +33,7 @@ platform:
     deviceOwnership: agent workstation
     networkAssumption: corporate network
     releaseCadence: weekly
+  wireframeBoard: wireframes/P12 Support Console.dc.html
 screens:
 - id: SUP-001
   name: Agent Login
@@ -48,7 +52,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-001
   capability: C35
   apis:
   - operationId: login
@@ -80,7 +85,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-002
   capability: C32
   apis:
   - operationId: listCases
@@ -113,7 +119,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-003
   openQuestions:
   - No contract — agent routing not modelled
   implementation:
@@ -142,7 +149,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-004
   capability: C32
   apis:
   - operationId: listCases
@@ -176,7 +184,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-005
   capability: C32
   apis:
   - operationId: addCaseMessage
@@ -226,7 +235,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-006
   capability: C105
   apis:
   - operationId: listFaqs
@@ -261,7 +271,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-007
   capability: C60
   apis:
   - operationId: listMessageTemplates
@@ -294,7 +305,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-008
   capability: C21
   apis:
   - operationId: runReport

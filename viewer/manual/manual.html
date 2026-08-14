@@ -1,0 +1,2805 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TICVAI Architecture Viewer — Team Manual</title>
+    <style>
+      /* Figure numbers are a counter, not typed in. The figures are captured
+         from the running app so they cannot drift; the numbering should not be
+         the one part of the manual that does. */
+      body { counter-reset: figure; }
+      figure { counter-increment: figure; }
+      .figno::before { content: "Figure " counter(figure); }
+
+      /* ── print setup ─────────────────────────────────────────────── */
+      @page { size: A4; margin: 16mm 14mm 18mm; }
+
+      :root {
+        --ink: #16161d;
+        --dim: #5d5d70;
+        --faint: #8b8b9c;
+        --line: #dcdce4;
+        --line-soft: #ececf1;
+        --accent: #5b3fd6;
+        --accent-soft: #f1eeff;
+        --spine: #2563eb;
+        --satellite: #067a55;
+        --shared: #a16207;
+        --error: #c0392f;
+        --warn: #a16207;
+        --ok: #067a55;
+        --sans: "Segoe UI", -apple-system, Inter, system-ui, sans-serif;
+        --mono: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        font-family: var(--sans);
+        font-size: 10pt;
+        line-height: 1.55;
+        color: var(--ink);
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      p { margin: 0 0 8pt; }
+      strong { font-weight: 600; }
+      code {
+        font-family: var(--mono);
+        font-size: 8.6pt;
+        background: #f4f4f8;
+        border: 1px solid var(--line-soft);
+        border-radius: 3px;
+        padding: 0.5pt 3pt;
+      }
+
+      /* ── cover ───────────────────────────────────────────────────── */
+      .cover {
+        height: 245mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        break-after: page;
+      }
+      .cover-rule { height: 5pt; background: var(--accent); width: 70pt; margin-bottom: 20pt; }
+      .cover h1 { font-size: 30pt; line-height: 1.12; margin: 0 0 6pt; letter-spacing: -0.4pt; }
+      .cover .sub { font-size: 13pt; color: var(--dim); margin: 0 0 26pt; font-weight: 400; }
+      .cover .lede { font-size: 11pt; max-width: 135mm; color: var(--ink); }
+      .cover-meta {
+        margin-top: 30pt;
+        border-top: 1px solid var(--line);
+        padding-top: 12pt;
+        font-size: 9pt;
+        color: var(--dim);
+        display: flex;
+        gap: 24pt;
+        flex-wrap: wrap;
+      }
+      .cover-meta b { display: block; color: var(--ink); font-weight: 600; font-size: 9.5pt; }
+
+      .numbers {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8pt;
+        margin-top: 24pt;
+      }
+      .numbers div {
+        border: 1px solid var(--line);
+        border-radius: 5pt;
+        padding: 8pt 9pt;
+        background: #fbfbfd;
+      }
+      .numbers b { display: block; font-size: 17pt; letter-spacing: -0.3pt; }
+      .numbers span { font-size: 7.6pt; color: var(--dim); text-transform: uppercase; letter-spacing: 0.4pt; }
+
+      /* ── chapters ────────────────────────────────────────────────── */
+      .chapter { break-before: page; }
+      .chapter > h2 {
+        font-size: 18pt;
+        letter-spacing: -0.3pt;
+        margin: 0 0 3pt;
+        padding-bottom: 6pt;
+        border-bottom: 2px solid var(--accent);
+      }
+      .chapter > .chapter-lede {
+        color: var(--dim);
+        font-size: 10.5pt;
+        margin: 0 0 14pt;
+      }
+      h3 {
+        font-size: 12pt;
+        margin: 16pt 0 5pt;
+        break-after: avoid;
+      }
+      h4 {
+        font-size: 10pt;
+        margin: 11pt 0 3pt;
+        break-after: avoid;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.6pt;
+        font-size: 8.4pt;
+      }
+
+      ul, ol { margin: 0 0 9pt; padding-left: 16pt; }
+      li { margin-bottom: 3pt; }
+
+      /* ── figures ─────────────────────────────────────────────────── */
+      figure {
+        margin: 10pt 0 12pt;
+        break-inside: avoid;
+      }
+      figure img {
+        width: 100%;
+        display: block;
+        border: 1px solid var(--line);
+        border-radius: 4pt;
+      }
+      /* the sidebar and links pane are tall and narrow — scaled to the column
+         width they would run a full page each, so bound them by height instead */
+      .fig-pair.tall img {
+        width: auto;
+        max-width: 100%;
+        max-height: 115mm;
+        margin: 0 auto;
+      }
+      figcaption {
+        font-size: 8.3pt;
+        color: var(--dim);
+        margin-top: 4pt;
+        line-height: 1.4;
+      }
+      figcaption b { color: var(--ink); font-weight: 600; }
+
+      .fig-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; break-inside: avoid; }
+      .fig-pair figure { margin: 0; }
+      /* a pair sharing one caption: the caption spans both columns */
+      figure.fig-pair > figcaption { grid-column: 1 / -1; }
+
+      /* callout badges laid over the anatomy figure */
+      .annotated { position: relative; }
+      .annotated .pin {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 15pt;
+        height: 15pt;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-size: 8pt;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 0 2pt rgba(255, 255, 255, 0.85);
+      }
+
+      .keyed {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2pt 16pt;
+        font-size: 9pt;
+        margin: 8pt 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .keyed li { display: flex; gap: 6pt; align-items: baseline; }
+      .keyed .n {
+        flex: none;
+        width: 13pt;
+        height: 13pt;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-size: 7.5pt;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ── tables ──────────────────────────────────────────────────── */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9pt;
+        margin: 8pt 0 12pt;
+        break-inside: avoid;
+      }
+      th {
+        text-align: left;
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.5pt;
+        color: var(--dim);
+        border-bottom: 1.5px solid var(--line);
+        padding: 4pt 6pt 4pt 0;
+        font-weight: 600;
+      }
+      td {
+        padding: 4pt 6pt 4pt 0;
+        border-bottom: 1px solid var(--line-soft);
+        vertical-align: top;
+      }
+      td:first-child { white-space: nowrap; }
+      table.keys td:first-child { width: 70pt; }
+      table.keys kbd {
+        font-family: var(--mono);
+        font-size: 8.4pt;
+        background: #f4f4f8;
+        border: 1px solid var(--line);
+        border-bottom-width: 2px;
+        border-radius: 3px;
+        padding: 1pt 4pt;
+      }
+
+      /* ── callout blocks ──────────────────────────────────────────── */
+      .note, .warn-box {
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        padding: 8pt 10pt;
+        border-radius: 0 4pt 4pt 0;
+        margin: 10pt 0;
+        font-size: 9.2pt;
+        break-inside: avoid;
+      }
+      .warn-box { border-left-color: var(--warn); background: #fdf6e7; }
+      .note p:last-child, .warn-box p:last-child { margin-bottom: 0; }
+      .note .label, .warn-box .label {
+        font-size: 7.6pt;
+        text-transform: uppercase;
+        letter-spacing: 0.7pt;
+        font-weight: 700;
+        color: var(--accent);
+        display: block;
+        margin-bottom: 2pt;
+      }
+      .warn-box .label { color: var(--warn); }
+
+      pre {
+        font-family: var(--mono);
+        font-size: 8.6pt;
+        background: #1c1c24;
+        color: #e4e4ec;
+        padding: 8pt 10pt;
+        border-radius: 4pt;
+        overflow-x: auto;
+        line-height: 1.5;
+        margin: 8pt 0 10pt;
+        break-inside: avoid;
+      }
+      pre .c { color: #8a8aa0; }
+
+      .swatch {
+        display: inline-block;
+        width: 8pt;
+        height: 8pt;
+        border-radius: 2pt;
+        margin-right: 3pt;
+        vertical-align: -0.5pt;
+      }
+
+      /* ── contents ────────────────────────────────────────────────── */
+      .toc { columns: 2; column-gap: 20pt; font-size: 9.5pt; }
+      .toc div { break-inside: avoid; margin-bottom: 3pt; }
+      .toc .n { color: var(--accent); font-weight: 700; margin-right: 5pt; }
+      .toc .d { color: var(--dim); font-size: 8.6pt; display: block; margin-left: 16pt; }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════════ COVER ═══════════════════ -->
+    <div class="cover">
+      <div class="cover-rule"></div>
+      <h1>TICVAI Architecture Viewer</h1>
+      <p class="sub">Team manual — how to read the delivery package</p>
+      <p class="lede">
+        The TICVAI delivery package is 24 API contracts, 347 screen definitions with a wireframe
+        each, 12 user journeys, 39 state models, a 16-event catalogue and a database of 230 tables —
+        spread across a dozen folders and five file formats. The viewer is a local application that
+        reads all of it and draws the links between them, so you can follow a database column back
+        to the screen that displays it and forward to the migration that creates it. This manual
+        explains every layer, every view, every sub-view and every control.
+      </p>
+
+      <div class="numbers">
+        <div><b>24</b><span>Contracts</span></div>
+        <div><b>654</b><span>Operations</span></div>
+        <div><b>347</b><span>Screens</span></div>
+        <div><b>16</b><span>Events</span></div>
+        <div><b>230</b><span>Tables</span></div>
+      </div>
+
+      <div class="cover-meta">
+        <div><b>Audience</b>Engineering, QA, product</div>
+        <div><b>Applies to</b>viewer/ in the architecture repo</div>
+        <div><b>Figures</b>Captured from the running app</div>
+        <div><b>Issued</b>14 August 2026</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ CONTENTS ═══════════════════ -->
+    <section class="chapter">
+      <h2>Contents</h2>
+      <p class="chapter-lede">Twenty minutes end to end. Chapters 1–3 are enough to use it.</p>
+
+      <div class="toc">
+        <div><span class="n">1</span>Running it<span class="d">Install, start, open, stop</span></div>
+        <div><span class="n">2</span>The window<span class="d">Every part of the screen, and the hover tips</span></div>
+        <div><span class="n">3</span>The five layers<span class="d">Frontend · Contracts · Domain · Backend · Decisions</span></div>
+        <div><span class="n">4</span>Contracts layer<span class="d">Graph ×5 scopes, Structure ×2, ER, Reader</span></div>
+        <div><span class="n">5</span>Lineage<span class="d">Which tables an operation touches. Three scopes</span></div>
+        <div><span class="n">6</span>Frontend layer<span class="d">Screen, Journey, Apps, wireframes, design boards</span></div>
+        <div><span class="n">7</span>Waves<span class="d">What ships when, and how the drawings attach</span></div>
+        <div><span class="n">8</span>Domain layer<span class="d">States, Events — the legal moves and the outbox</span></div>
+        <div><span class="n">9</span>Backend layer<span class="d">Data ×2 zooms, Migrations, Routing</span></div>
+        <div><span class="n">10</span>Decisions layer<span class="d">ADRs, permission vectors, artefact gaps, registers</span></div>
+        <div><span class="n">11</span>Tracing across layers<span class="d">The Links pane</span></div>
+        <div><span class="n">12</span>Search<span class="d">Ctrl+K over everything</span></div>
+        <div><span class="n">13</span>The audit<span class="d">What it checks, what it found</span></div>
+        <div><span class="n">14</span>Reading the colours<span class="d">One reference table</span></div>
+        <div><span class="n">15</span>Keyboard shortcuts<span class="d">Full list</span></div>
+        <div><span class="n">16</span>Keeping it current<span class="d">Live reload, editing sources</span></div>
+        <div><span class="n">17</span>Known gaps<span class="d">What is deliberately not shown</span></div>
+        <div><span class="n">18</span>Troubleshooting<span class="d">When something looks wrong</span></div>
+        <div><span class="n">19</span>Glossary<span class="d">Terms used throughout</span></div>
+      </div>
+
+      <h3>Before you start</h3>
+      <p>
+        Two things are worth knowing up front, because they explain most of what the viewer shows.
+      </p>
+      <p>
+        <strong>Everything is read, nothing is generated.</strong> The viewer parses the actual
+        <code>.yaml</code>, <code>.sql</code>, <code>.xlsx</code> and <code>.md</code> files in the
+        repository every time it starts. There is no database, no export step and no cached copy that
+        can drift. If the viewer shows it, it is in a file someone committed.
+      </p>
+      <p>
+        <strong>It distinguishes what is declared from what is guessed.</strong> A relationship
+        somebody wrote down and a relationship the viewer worked out from a naming convention are
+        drawn differently — solid versus dashed — and counted separately. Anywhere the viewer has
+        inferred something, it says so on screen. This matters: 327 of the 347 screen navigation
+        blocks and 289 of the 352 database relationships are inferred, and treating those as
+        settled fact is the main way to misread the package.
+      </p>
+
+      <div class="note">
+        <span class="label">Nothing leaves your machine</span>
+        <p>
+          The viewer is a local server that only reads files beneath the repository root. It makes no
+          outbound network calls and writes nothing to disk.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 1. RUNNING IT ═══════════════════ -->
+    <section class="chapter">
+      <h2>1 · Running it</h2>
+      <p class="chapter-lede">Node 18 or newer. One install, then one command.</p>
+
+      <h3>First time</h3>
+      <pre><span class="c"># from the repository root</span>
+cd viewer
+npm install</pre>
+
+      <h3>Every time</h3>
+      <pre>npm start        <span class="c"># → http://localhost:4173</span></pre>
+      <p>
+        Open <code>http://localhost:4173</code> in Chrome or Edge. Add <code>--open</code> to have it
+        launch the browser for you. Stop the server with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
+      </p>
+
+      <h3>Flags</h3>
+      <table>
+        <tr><th style="width:110pt">Flag</th><th>What it does</th></tr>
+        <tr><td><code>--port 4173</code></td><td>Serve on a different port, if 4173 is taken.</td></tr>
+        <tr><td><code>--open</code></td><td>Launch your default browser once the index is built.</td></tr>
+        <tr>
+          <td><code>--dir contracts</code></td>
+          <td>
+            Index a different contract folder. Use
+            <code>--dir repos/ticvai-contracts/openapi</code> to read the authoritative copy in the
+            contracts repo rather than the delivered snapshot.
+          </td>
+        </tr>
+      </table>
+
+      <h3>What it reads</h3>
+      <table>
+        <tr><th style="width:95pt">Folder</th><th>Contains</th></tr>
+        <tr><td><code>contracts/</code></td><td>The 24 OpenAPI 3.1 contracts — spine, satellite and shared. 654 operations.</td></tr>
+        <tr><td><code>screens/</code></td><td>347 screen definitions across 12 platforms: regions, components, states, the operations each calls.</td></tr>
+        <tr><td><code>flows/</code></td><td>12 user journeys, as ordered steps across screens with their failure branches.</td></tr>
+        <tr><td><code>frontend/</code></td><td>App manifests — which app serves which platform, its routes and waves. 10 apps.</td></tr>
+        <tr><td><code>wireframes/</code></td><td>12 platform boards, each drawing every screen on its platform as an anchored frame — 347 frames — plus a page per flow and a contents page per platform.</td></tr>
+        <tr><td><code>designs/</code></td><td>The exported UI/UX boards, as working HTML. Framed live in the Frontend layer.</td></tr>
+        <tr><td><code>states/</code></td><td>39 state models: which moves between statuses are legal. 225 states, 299 transitions.</td></tr>
+        <tr><td><code>events/</code></td><td>The event catalogue — 16 events, who publishes each and the 43 consumers that read them.</td></tr>
+        <tr><td><code>backend/</code></td><td>The database <em>as it stands</em>: 6 versioned <code>.sql</code> migrations.</td></tr>
+        <tr><td><code>handoff/</code></td><td>The database <em>as it is meant to become</em>: the schema reference workbook, plus the lineage and screen index that join operations to tables.</td></tr>
+        <tr><td><code>docs/</code></td><td>The reasons: 18 ADRs, 31 register and narrative documents, and the permission-vector spec the viewer runs rather than reads.</td></tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">The two backend sources are not the same thing</span>
+        <p>
+          <code>backend/</code> is SQL that exists — 39 tables. <code>handoff/</code> is a spreadsheet
+          derived from the API contracts — 230 tables, 191 of which nobody has written yet. The
+          viewer never merges them. Green means the SQL is real; amber and blue mean planned.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 2. THE WINDOW ═══════════════════ -->
+    <section class="chapter">
+      <h2>2 · The window</h2>
+      <p class="chapter-lede">
+        The same four regions in every view: pick a layer along the top, a subject on the left, read
+        it in the middle, follow it on the right.
+      </p>
+
+      <figure>
+        <div class="annotated">
+          <img src="shots/01-overview.png" alt="The viewer with its four regions" />
+          <span class="pin" style="left: 17.2%; top: 2.4%">1</span>
+          <span class="pin" style="left: 39.5%; top: 2.4%">2</span>
+          <span class="pin" style="left: 64.5%; top: 2.4%">3</span>
+          <span class="pin" style="left: 95.6%; top: 2.4%">4</span>
+          <span class="pin" style="left: 7.8%; top: 6.9%">5</span>
+          <span class="pin" style="left: 7.0%; top: 15.0%">6</span>
+          <span class="pin" style="left: 8.0%; top: 45.0%">7</span>
+          <span class="pin" style="left: 30.0%; top: 26.0%">8</span>
+          <span class="pin" style="left: 91.0%; top: 6.4%">9</span>
+          <span class="pin" style="left: 20.8%; top: 89.0%">10</span>
+        </div>
+        <figcaption>
+          <b class="figno"></b> — The Contracts layer showing the Files graph. Every view shares this frame.
+        </figcaption>
+      </figure>
+
+      <ul class="keyed">
+        <li><span class="n">1</span><span><b>Layer switch.</b> Frontend, Contracts, Domain, Backend, Decisions.</span></li>
+        <li><span class="n">2</span><span><b>Search.</b> Everything, by name. <kbd>Ctrl</kbd>+<kbd>K</kbd>.</span></li>
+        <li><span class="n">3</span><span><b>Views.</b> Changes with the layer. The red badge counts errors.</span></li>
+        <li><span class="n">4</span><span><b>Live dot &amp; theme.</b> Green means it is watching files.</span></li>
+        <li><span class="n">5</span><span><b>Grouping.</b> How the list below is organised.</span></li>
+        <li><span class="n">6</span><span><b>Filter &amp; type chips.</b> Narrow the list.</span></li>
+        <li><span class="n">7</span><span><b>The list.</b> Contracts, screens or tables.</span></li>
+        <li><span class="n">8</span><span><b>Main view.</b> The diagram or sheet itself.</span></li>
+        <li><span class="n">9</span><span><b>Links pane.</b> What connects to the selection.</span></li>
+        <li><span class="n">10</span><span><b>Legend.</b> What the colours mean, per view.</span></li>
+      </ul>
+
+      <h3>Moving around</h3>
+      <p>
+        Every diagram and every sheet pans the same way: <strong>drag anywhere to move it</strong>.
+        Scroll to zoom on the canvas views. A drag of less than a few pixels still counts as a click,
+        so cards and rows open normally — you do not have to be careful about it.
+      </p>
+      <p>
+        Canvas views have a <strong>Fit</strong> or <strong>Recenter</strong> button that frames
+        everything again if you get lost.
+      </p>
+
+      <h3>The sidebar</h3>
+      <div class="fig-pair tall">
+        <figure>
+          <img src="shots/03-sidebar-left.png" alt="The sidebar in the Contracts layer" />
+          <figcaption><b class="figno"></b> — Contracts, grouped by tier. The number is how many operations and schemas each holds.</figcaption>
+        </figure>
+        <figure>
+          <img src="shots/25-sidebar-frontend.png" alt="The sidebar in the Frontend layer" />
+          <figcaption><b class="figno"></b> — The same pane in the Frontend layer: screens grouped by platform, with a note explaining the count.</figcaption>
+        </figure>
+      </div>
+      <p>
+        The grouping buttons at the top change per layer, and the amber note appears wherever a count
+        needs explaining. Press <kbd>m</kbd> to cycle through the groupings without reaching for the
+        mouse.
+      </p>
+
+      <h3>Hover anything you do not recognise</h3>
+      <p>
+        The package is dense with vocabulary that is obvious to whoever wrote it and opaque to
+        everyone else: <code>spine</code>, <code>ambient</code>, <code>saleBoard</code>,
+        <code>retryThenDeadLetter</code>, <code>posTerminal</code>, "declared", "inferred",
+        "reversal". <b>Hover it and it explains itself.</b>
+      </p>
+
+      <figure>
+        <img src="shots/29-hover-tip.png" alt="A component explaining itself on hover" />
+        <figcaption>
+          <b class="figno"></b> — Hovering a component kind. The description, and the states it must
+          handle, come from <code>screens/_components.yaml</code> — the shared library that exists so
+          the vocabulary is reviewed rather than invented per screen.
+        </figcaption>
+      </figure>
+
+      <p>Two sources feed the tips, and the delivery's own words always win over the viewer's:</p>
+      <table>
+        <tr><th style="width:120pt">Source</th><th>Used for</th></tr>
+        <tr>
+          <td><b>The delivery's files</b></td>
+          <td>Component kinds and regions from <code>screens/_components.yaml</code>; schema descriptions and <em>why the schema is separate</em> from the workbook; a consumer's purpose and idempotency key from <code>events/</code>; a guard from <code>states/</code>.</td>
+        </tr>
+        <tr>
+          <td><b>A built-in glossary</b></td>
+          <td>The viewer's own vocabulary and the delivery terms defined in prose rather than in a field — tiers, edge kinds, triggers, failure policies, what "critical" means.</td>
+        </tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">A tip that only restates the name is not an answer</span>
+        <p>
+          <code>handoff/tooltips.json</code> ships 340 hover entries, and its own README states the
+          rule they were written to: <em>"a tip reading 'Derived from fnb.Menu' is the same failure
+          wearing text"</em>. 203 of the 340 break that rule, including 202 of the 230 table tips,
+          which say only <code>Derived from access.AccessPoint.</code> So the file's coverage table
+          claiming 230 of 230 counts keys, not answers — 137 are substantive. The viewer detects a
+          restated tip and falls back to the workbook's own storage reason rather than repeating the
+          name back at you, and the audit reports the count as a warning.
+        </p>
+      </div>
+
+      <p>
+        Everything explainable is hoverable: the five layer buttons, every view tab, every toolbar
+        toggle and graph scope, every component and region on a screen, the four screen states, an
+        API call's trigger, a schema in the Backend sidebar, and every chip in the event catalogue.
+        Where the library names a component but gives no description — 14 of its 46 entries are
+        primitives like <code>textField</code> and <code>toggle</code> — the tip says so rather than
+        showing an empty panel.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 3. LAYERS ═══════════════════ -->
+    <section class="chapter">
+      <h2>3 · The five layers</h2>
+      <p class="chapter-lede">
+        Contracts sit near the middle deliberately — the API is the join between every other layer,
+        and all four others are drawn by resolving against it.
+      </p>
+
+      <figure>
+        <img src="shots/02-topbar.png" alt="The layer switch and view tabs" />
+        <figcaption><b class="figno"></b> — The layer switch (left) decides which set of views (right) is available.</figcaption>
+      </figure>
+
+      <table>
+        <tr><th style="width:70pt">Layer</th><th style="width:120pt">Views</th><th>Answers</th></tr>
+        <tr>
+          <td><b>Frontend</b></td>
+          <td>Screen · Journey · Apps · Waves · Audit</td>
+          <td>What does the user see, in what order, which app builds it, and when did we say it ships?</td>
+        </tr>
+        <tr>
+          <td><b>Contracts</b></td>
+          <td>Graph · Structure · ER · Lineage · Reader · Audit</td>
+          <td>What does the API offer, what shapes does it use, what depends on what, and which tables does each call touch?</td>
+        </tr>
+        <tr>
+          <td><b>Domain</b></td>
+          <td>States · Events · Audit</td>
+          <td>Which moves between statuses are legal, and what crosses the outbox when one happens?</td>
+        </tr>
+        <tr>
+          <td><b>Backend</b></td>
+          <td>Data · Migrations · Routing · Audit</td>
+          <td>What is stored, what actually exists in SQL, and where does each call go?</td>
+        </tr>
+        <tr>
+          <td><b>Decisions</b></td>
+          <td>Decisions · Audit</td>
+          <td>Which decisions were taken, what records them, and which requirements have nothing behind them?</td>
+        </tr>
+      </table>
+
+      <p>
+        Each layer brings its own views, its own sidebar grouping and its own audit — the error badge
+        counts <em>that layer's</em> problems, not the whole package's. Press <kbd>1</kbd> to
+        <kbd>5</kbd> to switch, and hover any layer or view button to be told what it is for.
+      </p>
+
+      <table>
+        <tr><th style="width:80pt">Layer</th><th>Reads</th></tr>
+        <tr><td><b>Frontend</b></td><td><code>screens/</code> · <code>flows/</code> · <code>frontend/</code> · <code>wireframes/</code> · <code>designs/</code> · <code>handoff/screen-index.json</code> for the waves</td></tr>
+        <tr><td><b>Contracts</b></td><td><code>contracts/</code> — 24 OpenAPI 3.1 files · <code>handoff/api-data-lineage.json</code> and the workbook's <b>Data lineage</b> sheet</td></tr>
+        <tr><td><b>Domain</b></td><td><code>states/</code> · <code>events/</code></td></tr>
+        <tr><td><b>Backend</b></td><td><code>backend/</code> SQL · <code>handoff/</code> workbook and <code>relationships.csv</code></td></tr>
+        <tr><td><b>Decisions</b></td><td><code>docs/</code> — 18 ADRs, 31 documents and 7 registers</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">Shortcuts cross layers</span>
+        <p>
+          A view shortcut for another layer takes you there. Press <kbd>d</kbd> for Data while you
+          are in Frontend and the viewer switches to Backend and opens Data. You never have to
+          change layer first.
+        </p>
+      </div>
+
+      <h3>Adding a layer</h3>
+      <p>
+        The Domain layer was added exactly this way when <code>states/</code> and
+        <code>events/</code> arrived, and the Decisions layer the same way when <code>docs/</code>
+        was indexed: one entry in the <code>LAYERS</code> array in <code>public/app.js</code> plus a
+        render function. Nothing else in the application hard-codes the list, so services — expected
+        to arrive as their own layer — will cost the same.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 4. CONTRACTS ═══════════════════ -->
+    <section class="chapter">
+      <h2>4 · Contracts layer</h2>
+      <p class="chapter-lede">
+        24 contracts, 654 operations, 554 schemas and 2,935 resolved <code>$ref</code> links. Six
+        views over the same material, from furthest out to closest in. Four of them are here, each
+        with its own controls; Lineage has the next chapter to itself, and the audit is in
+        chapter 13.
+      </p>
+
+      <h3>Graph — how the contracts depend on each other</h3>
+      <p>
+        A map of the reference graph, with <strong>five scopes</strong> on the toolbar. They are not
+        five styles of the same picture — each answers a different question, and picking the wrong
+        one is why a graph can look like spaghetti. It opens on <b>Spine</b>.
+      </p>
+
+      <h4>Scope 1 · Spine — the architecture, and what actually couples it</h4>
+
+      <div class="warn-box">
+        <span class="label">The picture the obvious view cannot draw</span>
+        <p>
+          The <b>Files</b> scope below draws 24 contracts and 44 <code>$ref</code> links — and
+          <b>every single one of those links points at <code>shared/common</code> or
+          <code>shared/permissions</code></b>. No contract <code>$ref</code>s another. So it produces
+          a two-pointed starburst that is true of everything and distinguishes nothing: the same
+          defect <code>handoff/schema-viewer-notes.md</code> identifies for <code>venue_id</code> and
+          <code>principal_id</code> in the Data view.
+        </p>
+        <p>
+          <b>The contracts are not joined by <code>$ref</code>s. They are joined by events.</b>
+          <code>order.paid</code> is published by <code>orders</code> and consumed by
+          <code>catalogue</code>, <code>finance</code>, <code>inventory</code>,
+          <code>marketing</code> and <code>reporting</code>. Until <code>events/</code> arrived there
+          was nothing to draw that from.
+        </p>
+      </div>
+
+      <figure>
+        <img src="shots/10-graph-spine.png" alt="Spine scope" />
+        <figcaption>
+          <b class="figno"></b> — <code>shared/</code> at the centre because everything rests on it,
+          the eight <b>spine</b> contracts in the inner ring, the fourteen <b>satellites</b> outside.
+          Every arrow is an event, running publisher → consumer. <b>Amber where a consumer is
+          critical.</b> Dot size is the operation count.
+        </figcaption>
+      </figure>
+
+      <p>
+        <b>Position carries meaning here, so the force layout is switched off.</b> Within each ring
+        the order is settled by pulling contracts that exchange events next to each other, which
+        keeps the arrows short; drag one and it stays where you put it. Dots are sized by operation
+        count rather than by degree — in the Files scope a contract's degree is always zero, so
+        every dot there is the same size and the label claiming otherwise was wrong.
+      </p>
+
+      <figure>
+        <img src="shots/10-graph-spine-focused.png" alt="One contract's events isolated" />
+        <figcaption>
+          <b class="figno"></b> — Hover a contract to isolate it. <code>orders</code> publishes to
+          <code>catalogue</code>, <code>finance</code> and <code>inventory</code> critically (amber),
+          and to <code>marketing</code>, <code>reporting</code>, <code>seating</code> and
+          <code>subscription</code> otherwise. This is the coupling that decides what a change to
+          <code>orders</code> actually costs.
+        </figcaption>
+      </figure>
+
+      <p>
+        The <b>Shared $refs</b> toggle adds the 44 links back. It is off by default for the same
+        reason <b>Ambient keys</b> is off in the Data view: an edge true of every contract tells you
+        nothing about any one of them.
+      </p>
+
+      <h4>Scope 2 · Files — the raw <code>$ref</code> graph</h4>
+      <figure>
+        <img src="shots/10-graph-files.png" alt="Files scope" />
+        <figcaption>
+          <b class="figno"></b> — One node per contract, with the <code>$ref</code> links as they
+          really are: 44 of them, all pointing at <code>shared/</code>. Colour is the tier — blue
+          spine, green satellite, amber shared. Honest, and not very useful; the hint says as much.
+        </figcaption>
+      </figure>
+      <p>
+        Worth opening for one question only: <b>how heavily does this contract lean on
+        <code>common</code></b>? A thick edge means a change there lands on it. For anything about
+        how contracts relate to <em>each other</em>, use Spine.
+      </p>
+
+      <h4>Scope 3 · Schemas — what shapes already exist</h4>
+      <figure>
+        <img src="shots/10-graph-schemas.png" alt="Schemas scope" />
+        <figcaption>
+          <b class="figno"></b> — Every schema component in the package and the <code>$ref</code>s between
+          them. Dense clusters are one contract's own entity family; the bridges between clusters are
+          the shapes shared across contracts.
+        </figcaption>
+      </figure>
+      <p>
+        Use this when you are about to define a new type — if something close already exists, it is
+        one of the well-connected nodes here. This is the busiest scope, 537 nodes, so turn
+        <b>Labels</b> off to read the shape, or select something and press <kbd>l</kbd> to narrow to
+        its neighbourhood.
+      </p>
+
+      <h4>Scope 4 · Permissions — who is allowed to do what</h4>
+      <figure>
+        <img src="shots/10-graph-permissions.png" alt="Permissions scope" />
+        <figcaption>
+          <b class="figno"></b> — Contracts mapped to the 111-permission vocabulary. A permission with many
+          edges is a right that unlocks a great deal; one with none is declared but unused, and the
+          audit lists it.
+        </figcaption>
+      </figure>
+      <p>
+        Use this for an access review: pick a permission and see every contract whose operations
+        require it. Pink nodes are permissions, coloured ones are contracts.
+      </p>
+
+      <h4>Scope 5 · Local — just this thing and its surroundings</h4>
+      <figure>
+        <img src="shots/11-graph-local.png" alt="Local scope" />
+        <figcaption>
+          <b class="figno"></b> — The neighbourhood of whatever is selected: <b>two hops</b> from a
+          component, <b>one</b> from a whole contract — a contract is already dozens of nodes before
+          the walk starts. Everything else is left out entirely.
+        </figcaption>
+      </figure>
+      <p>
+        The scope to reach for when the others are too much. Select anything — from the sidebar,
+        from search, from a link in the Reader — and press <kbd>l</kbd>. It is the fastest way to
+        answer "what is this connected to" without reading a whole map.
+      </p>
+
+      <h4>The Graph controls</h4>
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Spine · Files · Schemas · Permissions · Local</b></td><td>The five scopes above.</td></tr>
+        <tr><td><b>Labels</b></td><td>Names on or off. Off is much easier to read at the Schemas scope.</td></tr>
+        <tr><td><b>Recenter</b></td><td>Reframes everything after you have panned away.</td></tr>
+        <tr><td>Scroll</td><td>Zoom.</td></tr>
+        <tr><td>Drag background</td><td>Pan.</td></tr>
+        <tr><td>Drag a node</td><td>Move it and pin it there.</td></tr>
+        <tr><td>Click · double-click</td><td>Select · open it in the Reader.</td></tr>
+      </table>
+
+      <h3>Structure — what is inside one file</h3>
+      <p>
+        A block diagram of a single contract's YAML, in <strong>two layouts</strong>. Scalar leaves
+        are listed as rows inside their parent block, so an operation reads as one card with its
+        <code>operationId</code>, <code>summary</code> and four <code>x-ticvai-*</code> fields rather
+        than eleven separate boxes.
+      </p>
+
+      <div class="fig-pair">
+        <figure>
+          <img src="shots/12-structure-tree.png" alt="Structure, tree layout" />
+          <figcaption><b class="figno"></b> — <b>Tree.</b> Depth runs left to right, siblings stack down each column. Best for seeing how deep something is.</figcaption>
+        </figure>
+        <figure>
+          <img src="shots/13-structure-nested.png" alt="Structure, nested layout" />
+          <figcaption><b class="figno"></b> — <b>Nested.</b> Containment instead of depth — each mapping wraps its children. Best for seeing what belongs to what.</figcaption>
+        </figure>
+      </div>
+
+      <h4>The Structure controls</h4>
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Tree · Nested</b></td><td>The two layouts above.</td></tr>
+        <tr><td><b>Fields</b></td><td>Off gives the bare skeleton — the fastest way to see a file's shape.</td></tr>
+        <tr><td><b>$ref links</b></td><td>Draws a curve from each reference to its target when both are in this file. <b>Dashed</b> means the exact target is folded away and the line lands on the nearest visible block.</td></tr>
+        <tr><td><b>Expand all</b></td><td>Unfolds everything. On a large contract this is enormous — use Fit after.</td></tr>
+        <tr><td><b>Collapse</b></td><td>Back to the top level.</td></tr>
+        <tr><td><b>Fit</b></td><td>Frames the whole diagram. The default zoom is floored to keep text readable; Fit overrides that.</td></tr>
+        <tr><td>Click a block</td><td>Folds one level.</td></tr>
+        <tr><td>Double-click a block</td><td>Folds the whole branch.</td></tr>
+      </table>
+
+      <h3>ER — the entities of one contract</h3>
+      <figure>
+        <img src="shots/14-er.png" alt="ER diagram for the fnb contract" />
+        <figcaption>
+          <b class="figno"></b> — The <code>fnb</code> contract's schemas as entity boxes, <b>laid out as a
+          hierarchy</b>: an entity sits below the entities it references. Every field shows its type,
+          <code>•</code> marks required, and <code>$ref</code> fields are in the entity colour.
+          Purple boxes are enums; amber ones are pulled in from another contract.
+        </figcaption>
+      </figure>
+
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Contract picker</b></td><td>Which contract's entities to draw.</td></tr>
+        <tr><td><b>Fields</b></td><td>Field rows on or off. Off leaves entity names and their relationships.</td></tr>
+        <tr><td><b>Fit</b></td><td>Reframes everything.</td></tr>
+        <tr><td>Click a field</td><td>Follows its <code>$ref</code> to what it points at.</td></tr>
+        <tr><td>Drag a box</td><td>Moves it and leaves it there.</td></tr>
+        <tr><td>Hover or select</td><td>Everything unrelated dims; the connected lines thicken and glow.</td></tr>
+      </table>
+
+      <p>
+        This view is for <em>API entities</em>. Screens have regions and components rather than
+        entities, so they are not here, and the database's own tables live in the Backend layer's
+        Data view.
+      </p>
+
+      <h3>Reader — the YAML itself</h3>
+      <figure>
+        <img src="shots/15-reader.png" alt="Reader view" />
+        <figcaption>
+          <b class="figno"></b> — <code>createOrder</code> in the Reader. Every <code>$ref</code> is a
+          link that resolves across files, and every permission string jumps to its definition.
+          Unresolved references are underlined in red. <b>Show whole file</b> expands from the
+          selected block to the full document.
+        </figcaption>
+      </figure>
+      <p>
+        The Reader is where a chain of links ends: search for a name, land here, and follow its
+        <code>$ref</code>s into other contracts without opening a file by hand. The header above the
+        YAML carries the operation's four <code>x-ticvai-*</code> extensions — permission, scope,
+        offline capability and conflict policy — which is the quickest way to check them.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 5. LINEAGE ═══════════════════ -->
+    <section class="chapter">
+      <h2>5 · Lineage</h2>
+      <p class="chapter-lede">
+        Which tables an operation actually touches. 654 operations, 165 tables, 22 services.
+        Contracts layer, <b>Lineage</b> tab.
+      </p>
+
+      <h3>Why this view exists</h3>
+      <p>
+        Until the lineage arrived, the Contracts layer and the Backend layer were two unconnected
+        universes. A contract operation knew its permission and its scope. A table knew its columns
+        and its foreign keys. <b>Nothing knew that <code>validateAccess</code> writes
+        <code>access.scan_event</code>.</b>
+      </p>
+      <p>
+        That link is not derivable from the contracts. <code>x-ticvai-persistence</code> marks which
+        schemas become tables; it does not mark which operations touch them. So the viewer was right
+        not to guess it, and wrong only in having nothing to show. The join had to arrive as data,
+        and it did — from four places, read by <code>lib/lineage.mjs</code>.
+      </p>
+
+      <table>
+        <tr><th style="width:150pt">Source</th><th>Carries</th></tr>
+        <tr>
+          <td><code>handoff/api-data-lineage.json</code></td>
+          <td>654 operations against the tables each reads and writes, its service, its read routing, its scope level, its permission and whether it works offline.</td>
+        </tr>
+        <tr>
+          <td>The workbook's <b>Data lineage</b> sheet</td>
+          <td>The same join, stated again — and not the same data. It carries a routing the JSON export lost, and a stored procedure column the JSON has no field for.</td>
+        </tr>
+        <tr>
+          <td>The workbook's <b>Where used</b> sheet</td>
+          <td>The reverse index: all 230 tables against the operations and screens that reach each. Its own subtitle is the reason to read it — what breaks if this table changes.</td>
+        </tr>
+        <tr>
+          <td><code>handoff/screen-index.json</code></td>
+          <td>347 screens against their board anchor, operations, services, tables, stored procedures and wave.</td>
+        </tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">Two sources, and one of them is lossy</span>
+        <p>
+          The JSON and the sheet <b>agree wherever both speak — 0 disagreements across all 654
+          rows</b>. But the export dropped the routing value on <b>399 operations that the sheet
+          decides</b>, leaving an empty string where the sheet says <code>write</code>. A viewer
+          reading the JSON alone therefore reports 399 operations as having no routing decided when
+          the workbook has decided every one of them. So the sheet is merged in, it wins on the
+          fields the export lost, and a row filled from it carries a mark saying where the value came
+          from. Any disagreement between the two would be reported rather than resolved silently;
+          there are none.
+        </p>
+      </div>
+
+      <h3>The chain</h3>
+      <p>
+        <code>wireframes/LINKAGE.md</code> draws the whole thing in one line, and it is worth keeping
+        in view because every hop is a different file:
+      </p>
+
+      <pre>board anchor  ──►  screen definition  ──►  operations  ──►  service
+                                          │
+                                          ▼
+                                    tables · stored procedure</pre>
+
+      <p>
+        Worked through, from the delivery's own example:
+        <code>P07 Staff Scanner.dc.html#scn-004</code> is <code>SCN-004 Admitted</code>, which calls
+        <code>validateAccess</code>, which lives in <code>AccessService</code>, writes
+        <code>access.scan_event</code>, reads six tables including
+        <code>access.admission_profile</code> and <code>access.blacklist</code>, and is one of the
+        stored procedures — <code>access.sp_validate_and_record</code>. Five files answer that
+        sentence. This view is the middle three of them.
+      </p>
+      <p>
+        The screen end of the chain is thinner than the operation end, and the index says so rather
+        than padding it: <b>155 of the 347 screens declare an operation, and 108 reach a table.</b>
+        The rest are screens with a purpose and no declared operation — real screens, not yet
+        specified, returned as empty arrays rather than guesses. Chapter 7 lays that out by wave.
+      </p>
+
+      <h3>The three scopes</h3>
+      <p>
+        The same material three ways, on the toolbar. It opens on <b>Operations</b>. A filter box
+        narrows all three at once, and it matches operation names, paths, services and table names —
+        so typing a table name in the Operations scope gives you everything that touches it.
+      </p>
+
+      <h4>Scope 1 · Operations — grouped by contract</h4>
+      <figure>
+        <img src="shots/hc-lineage.png" alt="The Lineage view, operations grouped by contract" />
+        <figcaption>
+          <b class="figno"></b> — The Lineage view, operations grouped by contract; dimmed rows are
+          the 318 that resolve to no table. Each row carries its method, path, routing, scope,
+          service and the tables it touches — <b>writes first, then reads</b>. Click the name to open
+          the operation in the Reader; click a table chip to open it in the Backend layer's Data
+          view.
+        </figcaption>
+      </figure>
+      <p>
+        Each group header says <code>n of m resolved</code> for that contract, which is the fastest
+        way to see whose lineage is thin. A table chip for a table the schema workbook does not list
+        is drawn as unknown and refuses to navigate — it tells you why instead.
+      </p>
+
+      <h4>Scope 2 · Tables — the other direction</h4>
+      <p>
+        Each table with every operation that touches it, drawn as a bar: red for the operations that
+        write it, green for the ones that read it, sorted busiest first. <b>The busiest tables are
+        the ones a schema change costs most to make</b>, and that is not visible anywhere else in the
+        viewer. <code>orders.sales_order</code> is the busiest: 13 operations touch it, 12 reading
+        and 7 writing, across two services.
+      </p>
+
+      <div class="note">
+        <span class="label">The prose and the sheet disagree here, and the sheet is checkable</span>
+        <p>
+          <code>handoff/services-and-procedures.md</code> says <em>"<code>orders.sales_order</code>
+          is read by 23 operations across four services"</em>. The resolved lineage gives 13
+          operations across two. The prose was written before the sheet was; the view counts rows
+          rather than repeating the sentence, and the argument the sentence was making — that a table
+          this contested is the case for the outbox rather than direct writes — survives the smaller
+          number.
+        </p>
+      </div>
+
+      <p>
+        Above the bars sits the scope of the claim, taken from the <b>Where used</b> sheet rather
+        than from the lineage: of the <b>230 tables in the schema reference, 191 are reached by an
+        operation and 51 by a screen. The other 39 are reached by nothing at all</b> — written by a
+        job, a migration or a trigger, or by nothing yet. Those 39 are listed by name underneath, so
+        the absence is a list rather than a subtraction.
+      </p>
+
+      <h4>Scope 3 · Services — 22 of them</h4>
+      <figure>
+        <img src="shots/hc-lineage-services.png" alt="The Lineage view by service" />
+        <figcaption>
+          <b class="figno"></b> — By service. One card per service with its operation count and the
+          tables it writes; the tables more than one service writes are marked on the card and listed
+          again at the bottom.
+        </figcaption>
+      </figure>
+      <p>
+        The services mirror the contract boundaries exactly, and
+        <code>handoff/services-and-procedures.md</code> gives the reason: <em>"The contract is already
+        the service boundary; inventing a different one would create two maps of the same
+        territory."</em> The rule that makes it a boundary rather than a namespace is the next line:
+        <em>"A service owns its tables and no others."</em>
+      </p>
+      <p>
+        So the view computes the exception rather than leaving it to the eye. <b>A table two services
+        both write is a boundary drawn in the wrong place</b> — whichever service does not own it is
+        reaching across one. There are two: <code>ledger.journal_entry</code>, written by
+        <code>LedgerService</code>, <code>OrderService</code> and <code>ShiftService</code>, and
+        <code>inventory.movement</code>, written by <code>InventoryService</code> and
+        <code>MaintenanceService</code>. Not defects on their own, but both are questions worth
+        asking before the code exists.
+      </p>
+
+      <div class="note">
+        <span class="label">Ten stored procedures, eight of them on the sheet</span>
+        <p>
+          The delivery argues for services over procedures at length — RLS with <code>FORCE</code>
+          exists so that nothing bypasses it, and a definer-role procedure does — and lands on ten.
+          The <b>Data lineage</b> sheet names <b>8</b> against an operation; its own footnote and
+          <code>services-and-procedures.md</code> both say <em>"the ten stored procedures"</em>. The
+          other two are argued for in prose and marked against nothing, so the viewer shows eight and
+          reports the difference rather than picking a number. Six of the eight are named by a screen
+          in <code>screen-index.json</code>, and it is those six it can place on a screen.
+        </p>
+      </div>
+
+      <h3>318 resolve to no table, and that is mostly correct</h3>
+      <p>
+        <b>336 of the 654 operations resolve</b> — 299 derived from persistence markers, 37
+        projections mapped by hand. The other <b>318 carry <code>"source": "unresolved"</code></b>.
+        All four numbers are chips across the top of the view, next to each other, always.
+      </p>
+
+      <div class="warn-box">
+        <span class="label">The 318 are not a defect list</span>
+        <p>
+          Most of them return a computed projection — <code>OrderSummary</code>,
+          <code>TicketStatus</code>, <code>MediaEntitlements</code> — assembled across tables rather
+          than persisted, and <b>a projection has no persistence marker because there is nothing to
+          mark</b>. The rest are commands with no response body, health checks and the sync
+          endpoints. <code>services-and-procedures.md</code> states this is the correct outcome, not
+          a backlog. Read the number as the shape of an API that returns more views than it stores,
+          not as 318 rows of work.
+        </p>
+      </div>
+
+      <p>
+        They are drawn rather than dropped for the same reason <code>inferred</code> relationships
+        are drawn dashed everywhere else: a view that quietly showed 336 operations would read as
+        <em>"these are all the operations there are"</em>, which is the more misleading number. So
+        each is dimmed, with a <code>no table</code> chip where the table list would be, and the
+        <b>No table</b> toggle removes them. It is on by default, and switching it off visibly
+        removes rows — a count that changes when you hide something is a count you can trust.
+      </p>
+
+      <p>
+        The same file states where the resolved half is weakest, and the view inherits the weakness:
+        <em>"an operation that reads a table only to check a permission or resolve a scope does not
+        show it. The lineage is what an operation <b>is about</b>, not every row it touches."</em>
+        Row security means every scoped read also touches <code>platform.scope_node</code>, and only
+        six of the 654 rows say so.
+      </p>
+
+      <h3>What the view checks</h3>
+      <p>
+        The lineage and the contracts are two independent statements about the same 654 operations,
+        so where they disagree one of them is stale. The reader compares three fields on every row —
+        permission, scope and offline capability — against the contract the viewer has already
+        indexed, and reports any difference as <code>lineage-contradicts-contract</code>. The
+        contract is the source of truth, so a finding means the lineage needs regenerating.
+        <b>There are currently none.</b>
+      </p>
+
+      <table>
+        <tr><th style="width:185pt">Check</th><th>Catches</th></tr>
+        <tr><td><code>lineage-contradicts-contract</code></td><td>A row whose permission, scope or offline flag disagrees with the contract. None at present.</td></tr>
+        <tr><td><code>lineage-unknown-table</code></td><td>A table the lineage names and the schema workbook does not list. Five at present.</td></tr>
+        <tr><td><code>lineage-unknown-operation</code></td><td>A lineage row for an operation no contract declares — the file was generated against a different set of contracts.</td></tr>
+        <tr><td><code>lineage-json-incomplete</code></td><td>Fields the JSON export dropped that the workbook sheet carries. 399 routing values at present.</td></tr>
+        <tr><td><code>stored-procedure-count</code></td><td>The sheet naming a different number of stored procedures from the prose that describes it. 8 against ten.</td></tr>
+        <tr><td><code>table-reached-by-nothing</code></td><td>A table in the schema reference no operation reads or writes. 39 at present.</td></tr>
+        <tr><td><code>screen-index-unknown-screen</code></td><td>An index entry for a screen no platform file defines.</td></tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">Five tables the workbook does not list</span>
+        <p>
+          <code>orders.b</code>, <code>marketing.consent</code>,
+          <code>reporting.report_execution</code>, <code>queue.queue_entry</code> and
+          <code>whitelabel.homepage_section</code>. Four of them look like tables that exist in
+          somebody's head and not yet in the workbook. <code>orders.b</code> does not look like a
+          table name at all — it reads as a truncation artefact in the source file, though that is an
+          observation rather than something the viewer can establish. Either way the viewer names all
+          five rather than dropping the chips, and the chips refuse to navigate.
+        </p>
+      </div>
+
+      <h3>Routing and scope</h3>
+      <p>
+        Every row carries where its read is routed and which level of the hierarchy it is authorised
+        at. All 654 now carry a routing, but only because two files were read rather than one:
+      </p>
+
+      <table>
+        <tr><th style="width:105pt">Routing</th><th style="width:50pt">Operations</th><th style="width:80pt">Stated by</th><th>Means</th></tr>
+        <tr><td><b>write</b></td><td>399</td><td>The sheet</td><td>A write. It goes to the primary by definition. Every one of these is blank in the JSON.</td></tr>
+        <tr><td><b>replica</b></td><td>192</td><td>The JSON</td><td>A read that may be served from a replica.</td></tr>
+        <tr><td><b>primary</b></td><td>35</td><td>The JSON</td><td>Must hit the primary — either it writes, or it reads something it just wrote.</td></tr>
+        <tr><td><b>analytical</b></td><td>28</td><td>The JSON</td><td>Served from the analytical store. Never on a transaction path.</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">Absent is not the same as undecided</span>
+        <p>
+          The 399 blanks were never a decision nobody had taken; they were a decision the export
+          lost. The distinction matters because <em>"nobody has decided"</em> and <em>"routed to the
+          primary"</em> are different claims and only one of them is safe to build on — so the reader
+          fills them from the sheet and marks the chip, rather than either defaulting them to
+          <code>replica</code> or leaving 399 operations looking undecided. Hover a marked chip and
+          it says where the value came from.
+        </p>
+      </div>
+
+      <p>
+        Scope is stated for all 654: <b>venue 410, tenant 153, workstation 45, region 44, brand 2</b>.
+        A grant at a level inherits downward and never bubbles up, so the venue-scoped majority is the
+        shape of the platform rather than an accident of the file. 109 operations are marked
+        offline-capable. Of the 336 that resolve, all 336 read at least one table and 256 of them
+        also write.
+      </p>
+
+      <h4>The Lineage controls</h4>
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Operations · Tables · Services</b></td><td>The three scopes above.</td></tr>
+        <tr><td><b>No table</b></td><td>The 318 rows that resolve to no table, on or off. <b>On by default</b>, and switching it off visibly removes rows.</td></tr>
+        <tr><td><b>Filter</b></td><td>Matches operation ids, paths, services and table names, in whichever scope is open.</td></tr>
+        <tr><td>Click an operation</td><td>Opens it in the Contracts Reader.</td></tr>
+        <tr><td>Click a table</td><td>Switches to the Backend layer and selects it in the Data view.</td></tr>
+        <tr><td>Click a group header</td><td>Folds that contract away. Groups open automatically when a filter is active.</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">The join is traced in both directions</span>
+        <p>
+          This view reads the chain from the contract end. The same join is read from the other two
+          ends as well: a screen page carries a <b>reaches</b> section — services, tables written,
+          tables read, stored procedures — and selecting a table in the Backend layer fills the Links
+          pane with the operations that touch it and the screens that reach it. Chapters 6 and 11.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 6. FRONTEND ═══════════════════ -->
+    <section class="chapter">
+      <h2>6 · Frontend layer</h2>
+      <p class="chapter-lede">
+        347 screens across 12 platforms, each reaching a wireframe; 12 journeys, 10 apps, and the
+        design boards the plan was drawn from. What the user sees, in what order, and who builds it.
+        The layer's fifth view, Waves, has the chapter after this one.
+      </p>
+
+      <h3>Screen — the schematic a wireframe implements</h3>
+      <figure>
+        <img src="shots/20-screen.png" alt="Screen view" />
+        <figcaption>
+          <b class="figno"></b> — A screen page. Regions as blocks with their components inside, the four
+          states as their own panel, every operation the screen calls, and — below the fold —
+          navigation, the platform's deployment block, the wireframe, the design board and the
+          implementation path.
+        </figcaption>
+      </figure>
+
+      <p>A screen page answers, in this order:</p>
+      <table>
+        <tr><th style="width:105pt">Section</th><th>Tells you</th></tr>
+        <tr>
+          <td><b>Chips</b></td>
+          <td>Platform, module, layout template, wave, capability, the permission that gates the whole screen, and the wireframe status — <code>notStarted</code> through <code>approved</code>.</td>
+        </tr>
+        <tr>
+          <td><b>Layout</b></td>
+          <td>Each region as a block, with its components inside. A component shows what it binds to (<code>Shift.floatTotal</code>), the permission that hides it, and any note.</td>
+        </tr>
+        <tr>
+          <td><b>States</b></td>
+          <td>Loading, empty, error and — where the platform is offline-capable — offline. <b>A required state nobody declared is drawn as the finding it is</b>, not quietly left out.</td>
+        </tr>
+        <tr>
+          <td><b>Operations</b></td>
+          <td>Every call, with its trigger (<code>onLoad</code>, <code>onAction</code>…), method and contract. Click through to the contract.</td>
+        </tr>
+        <tr>
+          <td><b>Reaches</b></td>
+          <td>Where those calls end up: the services behind them, the tables written, the tables only read, and any stored procedure. The frontend end of the lineage in chapter 5. A screen naming no operation gets the honest version — it reaches nothing, and 192 of the 347 are in that position.</td>
+        </tr>
+        <tr>
+          <td><b>Navigation</b></td>
+          <td>Entry points in and destinations out, clickable. The heading says <b>declared</b> or <b>inferred</b>.</td>
+        </tr>
+        <tr>
+          <td><b>Deployment</b></td>
+          <td>How the whole platform ships — runs on, ships by, hosting, update model, cadence, network assumption, device ownership, store review.</td>
+        </tr>
+        <tr>
+          <td><b>Wireframe</b></td>
+          <td>This screen's own drawing, framed live. All 347 screens have one: the viewer lifts that screen's frame out of its platform board, matched by anchor — see below.</td>
+        </tr>
+        <tr>
+          <td><b>Design board</b></td>
+          <td>The exported UI/UX artboard the whole platform was drawn from, framed live. Only appears when there is one — one platform has them.</td>
+        </tr>
+        <tr>
+          <td><b>Implementation</b></td>
+          <td>App, route and component path — the file a developer opens.</td>
+        </tr>
+      </table>
+
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Screen picker</b></td><td>Every screen, grouped by <b>Screens</b> and <b>Design boards</b>.</td></tr>
+        <tr><td><b>Notes</b></td><td>The explanatory notes under each component, on or off.</td></tr>
+        <tr><td>Drag</td><td>Pans the sheet.</td></tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">Navigation says which kind it is</span>
+        <p>
+          327 of the 347 navigation blocks are marked <code>inferred</code> — derived from module and
+          flow order rather than drawn by anyone. Those render as dashed pills under a heading that
+          says so. A sitemap that looks authoritative while being mostly guessed is worse than no
+          sitemap, so check the heading before relying on a route.
+        </p>
+      </div>
+
+      <h3>Journey — one job, traced across screens</h3>
+      <figure>
+        <img src="shots/21-journey.png" alt="Journey F01" />
+        <figcaption>
+          <b class="figno"></b> — F01, a guest buying a ticket online. Steps run left to right; each
+          carries its screen, the operations it calls and its outcome. The trigger and the offline
+          position are stated at the top.
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img src="shots/22-journey-panned.png" alt="Journey F01 after panning" />
+        <figcaption>
+          <b class="figno"></b> — The same journey dragged left. <b>The branches that can derail a step
+          hang underneath it</b>, coloured by severity from recoverable through to data loss, with
+          exit states at the end. The title and chips stay pinned while the track moves.
+        </figcaption>
+      </figure>
+
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Journey picker</b></td><td>Which of the twelve flows to trace.</td></tr>
+        <tr><td><b>Branches</b></td><td>The failure branches under each step, on or off. Off gives the happy path alone.</td></tr>
+        <tr><td><b>Operations</b></td><td>The API calls inside each step card, on or off.</td></tr>
+        <tr><td>Drag</td><td>Pans the track, which is wider than any window.</td></tr>
+        <tr><td>Click a step</td><td>Opens that screen.</td></tr>
+      </table>
+
+      <p>
+        Nothing in this view is inferred: every step, branch, screen link and route is declared, and
+        the loader reports any that points at something which does not exist.
+      </p>
+      <p>
+        Below the track the journey is <b>drawn</b>: each step's screen lifted out of its platform
+        board as its own frame, in step order, so the flow can be read as pictures rather than as
+        names. The flow page in <code>wireframes/</code> is the fallback, used only where no screen
+        on the journey resolves to a board frame.
+      </p>
+
+      <h3>Apps — what actually gets built</h3>
+      <figure>
+        <img src="shots/23-apps.png" alt="Apps view" />
+        <figcaption>
+          <b class="figno"></b> — The manifests in <code>frontend/</code>: which platforms each app serves,
+          which contracts it consumes, and its screens split by wave. Scaffolded apps are
+          green-topped, the rest amber. 10 apps, 6 scaffolded.
+        </figcaption>
+      </figure>
+      <p>
+        Each card carries the app's runtime, the platforms it serves, whether it is offline-capable,
+        a wave bar showing the delivery shape, the contracts it consumes (clickable) and a
+        collapsible list of its routes (also clickable). The design boards are listed underneath.
+      </p>
+
+      <h3>Wireframes — a board per platform, a page per journey</h3>
+      <p>
+        <code>wireframes/</code> holds twelve platform boards, each drawing every screen on its
+        platform as one anchored frame, alongside a page per flow and a contents page per platform.
+        They are framed live rather than screenshotted, so they scroll and respond exactly as they
+        do standalone.
+      </p>
+
+      <p>
+        <b>Nothing here is inferred.</b> A wireframe is either named for exactly the thing it draws
+        — <code>flow-f01.html</code> is flow F01, <code>p04.html</code> is platform P04 — or it is a
+        platform board carrying one frame per screen, and the anchor is the screen id, so
+        <code>P04 Staff POS.dc.html#pos-002</code> is screen POS-002. Neither join is guessed: the
+        first is the file name, the second is declared by the screen itself in
+        <code>wireframe.board</code>. The two sides line up exactly: <b>347 screens, 360
+        wireframes — 347 frames across 12 boards, 5 flow pages and 8 platform pages — and every
+        screen resolves.</b> A screen with no frame, and a frame no screen claims, are both reported
+        as findings.
+      </p>
+
+      <div class="note">
+        <span class="label">One frame, lifted out of the board</span>
+        <p>
+          A board is a single file holding every screen on its platform — 713KB at the largest.
+          Framing the whole board and scrolling it to an anchor would show the right screen with
+          dozens of others around it, so the viewer lifts that one
+          <code>&lt;div id="web-002"&gt;</code> out and serves it as a document of its own at
+          <code>/frame?board=…&amp;anchor=…</code>. The frames carry all their styling inline, so
+          nothing is lost by moving one. All 347 extract with balanced markup, and the largest board
+          drops from 713KB to about 10KB per frame.
+        </p>
+      </div>
+
+      <figure>
+        <img src="shots/28-screen-wireframe.png" alt="A screen's wireframe" />
+        <figcaption>
+          <b class="figno"></b> — POS-002's frame on its screen page, lifted out of the P04 board.
+          The chip reads <b>from the platform board</b>: hover it for the board and anchor it came
+          from. <b>Open the board ↗</b> opens the whole board in its own tab.
+        </figcaption>
+      </figure>
+
+      <div class="note">
+        <span class="label">These are structure, not design</span>
+        <p>
+          A frame shows <b>what is on a screen and where</b>, not what it will look like. The field
+          names, enums, states and deny reasons on it are read off the package —
+          <code>contracts/</code>, <code>states/</code> and <code>screens/</code> — so a frame is
+          checkable against the definition rather than invented. Where a screen had no definition at
+          all — 136 had none — the frame is derived from the contract operations that reach no
+          screen, and the board header says so. The design boards below are the other thing: what it
+          should look like.
+        </p>
+      </div>
+
+      <figure>
+        <img src="shots/28b-journey-wireframe.png" alt="A journey's wireframe" />
+        <figcaption>
+          <b class="figno"></b> — A journey's flow page: the whole flow, screen by screen, on one
+          document. Five of the twelve flows have one; the other seven are listed as notes in the
+          Frontend audit. This is now the fallback — where the steps resolve to board frames, the
+          page draws those instead.
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img src="shots/23b-apps-wireframes.png" alt="The platform wireframes on the Apps page" />
+        <figcaption>
+          <b class="figno"></b> — The Apps page carries a wireframe per platform: every screen on
+          that platform, listed on one page. Twelve platforms have screens; eight have one of these,
+          and all twelve have a board. The boards themselves are framed underneath, whole rather than
+          a frame at a time — all 12 of them, 347 screens drawn.
+        </figcaption>
+      </figure>
+
+      <h4>Wireframes and design boards are different claims</h4>
+      <table>
+        <tr><th style="width:80pt"></th><th style="width:150pt">Wireframe</th><th>Design board</th></tr>
+        <tr><td><b>Folder</b></td><td><code>wireframes/</code></td><td><code>designs/</code></td></tr>
+        <tr><td><b>Covers</b></td><td>One platform as a board of anchored frames, or one flow or platform as a page</td><td>One platform, as a single exported artboard</td></tr>
+        <tr><td><b>Attached by</b></td><td>An anchor inside a platform board, or file name = id. Nothing is guessed.</td><td>A screen naming it, or failing that the file name — and the viewer says which</td></tr>
+        <tr><td><b>Says</b></td><td>What is on the screen, from the definition</td><td>What it should look like, from the designer</td></tr>
+        <tr><td><b>Coverage</b></td><td>347 of 347 screens, as frames on 12 platform boards</td><td>2 boards, 1 platform</td></tr>
+      </table>
+
+      <h3>Design boards — the UI/UX exports</h3>
+      <p>
+        <code>designs/</code> holds the exported design boards as working HTML. The viewer serves
+        them and frames them live, so they scroll and respond exactly as they do standalone —
+        these are not screenshots.
+      </p>
+
+      <figure>
+        <img src="shots/26-board-page.png" alt="A design board as a page" />
+        <figcaption>
+          <b class="figno"></b> — The Park POS board open as a page of its own, reached from
+          <b>DESIGN BOARDS</b> at the bottom of the sidebar. The chips say which platform it belongs
+          to and how many screens were drawn from it; the pills underneath open those screens.
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img src="shots/27-screen-board.png" alt="A screen showing its design board" />
+        <figcaption>
+          <b class="figno"></b> — The same board on a screen page. Every P04 screen carries
+          <code>wireframe.owner: design — Park_POS_dc.html</code>, so the viewer knows the board
+          belongs there. <b>Open full size ↗</b> opens it in its own tab.
+        </figcaption>
+      </figure>
+
+      <h4>Where a board appears</h4>
+      <table>
+        <tr><th style="width:105pt">Place</th><th>Which boards</th></tr>
+        <tr><td><b>A screen</b></td><td>The board that screen names, or failing that any board for its platform.</td></tr>
+        <tr><td><b>A journey</b></td><td>Boards for the platforms that journey runs on.</td></tr>
+        <tr><td><b>Apps</b></td><td>All of them, with a link to open each as a page.</td></tr>
+        <tr><td><b>Sidebar</b></td><td>All of them, under DESIGN BOARDS — which is how a platform with a board but no screen files stays reachable.</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">Declared or inferred, again</span>
+        <p>
+          A board's platform is <b>declared</b> when a screen names the board in its
+          <code>wireframe.owner</code> or <code>wireframe.board</code> — P04's nine screens do.
+          Otherwise it is <b>inferred</b> from the file name (the app slug <code>pos</code> → P04),
+          drawn with a dashed chip and a note saying so. A name that could mean two platforms is
+          refused rather than guessed at. An earlier revision — <code>Park_POS_v1_dc.html</code> — is
+          not shown beside the board it supersedes; it is reachable from that board's page.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 7. WAVES ═══════════════════ -->
+    <section class="chapter">
+      <h2>7 · Waves, and how the drawings attach</h2>
+      <p class="chapter-lede">
+        Two subjects in the Frontend layer. The first the viewer did not show at all; the second it
+        showed wrongly, and this chapter settles it.
+      </p>
+
+      <h3>Waves — what ships when</h3>
+      <p>
+        Every screen carries a wave, and <b>a wave is a commitment</b>. It is the sequencing somebody
+        agreed to, written on the screen itself rather than in a plan sitting beside it. Nothing else
+        in the viewer represented that dimension. The Screen page carried the wave as a chip and no
+        view counted them, so the one question a delivery plan exists to answer — what did we say we
+        would ship first, and can it be built — had no page.
+      </p>
+
+      <p>
+        <b>347 screens across 3 waves.</b> Wave 1 is 133 screens, wave 2 is 153, wave 3 is 61. Each
+        wave is then broken down by platform, one card per platform, largest first, every screen in
+        it as a cell. The wave and the operations both come from
+        <code>handoff/screen-index.json</code>; the tables come from the lineage behind it.
+      </p>
+
+      <figure>
+        <img src="shots/hc-waves.png" alt="The waves view" />
+        <figcaption>
+          <b class="figno"></b> — 347 screens across three waves and twelve platforms; dashed cells
+          name no operation. The label above each grid reads <code>wave 2 — 153 screens, n
+          buildable</code>. Click any cell to open that screen.
+        </figcaption>
+      </figure>
+
+      <h4>The number this view exists for</h4>
+      <p>
+        <b>192 of the 347 screens name no operation.</b> 155 name one. Only <b>108 reach an actual
+        table</b>. A screen that names no operation is a screen somebody can draw and nobody can
+        build: there is nothing to call, so there is nothing to implement against. Those cells are
+        marked — dashed and red — and the point of laying them out by wave and platform is that they
+        are <em>not</em> evenly spread.
+      </p>
+
+      <div class="warn-box">
+        <span class="label">From handoff/screen-contract-linkage.md</span>
+        <p>
+          The gap used to mean <b>missing screens</b>. All 347 screens now exist, so it no longer
+          does — it means screens that name no operation, <em>"and every one of those is a screen
+          somebody can draw and nobody can build."</em>
+        </p>
+      </div>
+
+      <p>
+        The index does not guess. A screen with no declared operation returns an empty list rather
+        than a plausible one, and the cell's tooltip says so: a real screen, not yet specified. That
+        is the distinction the view is protecting — an unspecified screen and a screen with no
+        purpose look identical in a count and are not the same problem.
+      </p>
+
+      <h4>Reading a cell</h4>
+      <table>
+        <tr><th style="width:120pt">Cell</th><th>Means</th></tr>
+        <tr>
+          <td><b>Accent</b> — <span class="swatch" style="background:var(--accent)"></span> solid</td>
+          <td><b>Reaches a table.</b> The screen names an operation, and that operation resolves through the lineage to something the database actually holds. 108 screens.</td>
+        </tr>
+        <tr>
+          <td><b>Dim</b> — plain</td>
+          <td><b>Names an operation</b> that reaches no table. Buildable against the contract; usually a projection, so there is nothing to persist rather than something missing.</td>
+        </tr>
+        <tr>
+          <td><b>Red</b>, dashed</td>
+          <td><b>Names none.</b> 192 of them. Hover for the route and the wave; there is nothing else to say about it.</td>
+        </tr>
+      </table>
+
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Mark unbuildable</b></td><td>The dashed red marking on screens that name no operation, on or off.</td></tr>
+        <tr><td><b>Offline only</b></td><td>Restricts every count and grid to offline-capable screens. The counts in the hint line move with it.</td></tr>
+        <tr><td>Click a cell</td><td>Opens that screen in the Frontend layer.</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">When the file is not there</span>
+        <p>
+          The whole view rests on one file. Without <code>handoff/screen-index.json</code> the page
+          says so — <em>"no wave is stated for any screen"</em> — rather than drawing an empty grid
+          that reads as nothing left to ship.
+        </p>
+      </div>
+
+      <h3>How the drawings attach</h3>
+      <p>
+        The previous chapter states the rule the viewer now follows; this is the history behind it,
+        because the earlier account was wrong in a way worth recording.
+      </p>
+      <p>
+        There used to be two kinds of drawn artefact for a screen. <code>wireframes/screens/</code>
+        held 180 standalone renders, one file per screen, generated from the screen definition and
+        matched by file name. The platform boards held the same screens again, one anchored frame
+        each, drawn with real field names and states. <b>Both existed, and only one of them was the
+        drawn article.</b>
+      </p>
+      <p>
+        <code>wireframes/screens/</code> has since been deleted from the delivery, so the 180
+        standalone renders are gone. <b>Every screen is now drawn exactly once: as a frame on one of
+        the 12 platform boards.</b> There is no file-name lookup left for a screen, and nothing to
+        choose between.
+      </p>
+
+      <table>
+        <tr><th style="width:80pt"></th><th style="width:150pt">Screen</th><th>Flow or platform page</th></tr>
+        <tr><td><b>File</b></td><td><code>wireframes/P07 Staff Scanner.dc.html</code></td><td><code>wireframes/flow-f01.html</code>, <code>wireframes/p04.html</code></td></tr>
+        <tr><td><b>Draws</b></td><td>Every screen on one platform, each behind an anchor</td><td>One flow, or one platform's screens as a contents page</td></tr>
+        <tr><td><b>Attached by</b></td><td>The anchor — <code>…#scn-004</code> is SCN-004, declared in <code>wireframe.board</code></td><td>File name = flow or platform id</td></tr>
+        <tr><td><b>How many</b></td><td>12 boards, 347 frames</td><td>5 flow pages, 8 platform pages</td></tr>
+      </table>
+
+      <p>
+        One board can hold 73 screens, so for a screen the file name settles nothing. The join is the
+        anchor, and that link is <b>declared, not guessed</b>: every screen carries
+        <code>wireframe.board</code> and every platform carries <code>platform.wireframeBoard</code>.
+        This stays inside the same rule as the rest of the package — the design boards in
+        <code>designs/</code> infer and say so; nothing here does.
+      </p>
+
+      <p>
+        With the boards read, the two sides line up: <b>347 of 347 screens resolve to a board frame,
+        across 12 boards holding 347 frames, and every frame is claimed by exactly one screen.</b>
+        Both directions, none missing, none left over. Rather than frame a 713KB board and scroll it
+        to an anchor, the viewer lifts the one frame out and serves it as a document of its own at
+        <code>/frame?board=…&amp;anchor=…</code> — which is what the screen page, the Journey view
+        and the Apps page all draw.
+      </p>
+
+      <div class="warn-box">
+        <span class="label">This was a viewer defect, and it is fixed</span>
+        <p>
+          Before this, the matcher looked only at file names. It found the 180 standalone files,
+          could not see inside a board, and reported <b>167 <code>wireframe-missing</code> and 13
+          <code>wireframe-unmatched</code></b> — 180 findings. Every one of them was an artefact of
+          the matcher, not of the package: the screens were drawn and the boards were on disk the
+          whole time. Fixing the join turned <b>180 false problems into 7 real ones</b>.
+        </p>
+      </div>
+
+      <div class="note">
+        <span class="label">The check that matters</span>
+        <p>
+          From <code>wireframes/LINKAGE.md</code>: <em>"a link to <code>#scn-004</code> in a board
+          with no such anchor is a click that silently does nothing"</em> — which is worse than no
+          link at all, because a dead link still reads as coverage. Both directions are checked: a
+          screen pointing at an anchor no board has, and a board frame no screen claims.
+        </p>
+      </div>
+
+      <p>
+        The 7 findings that remain are real, and they are all the same one. Flows <b>F06 to F12 have
+        no flow page</b>: 5 of the 12 flows have one, which makes the other seven a gap rather than a
+        policy. That is the whole of what the layer now reports about the drawings.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 8. DOMAIN ═══════════════════ -->
+    <section class="chapter">
+      <h2>8 · Domain layer</h2>
+      <p class="chapter-lede">
+        Two artefacts that check each other. <code>states/</code> says which moves between statuses
+        are legal; <code>events/</code> says what crosses the outbox when one happens. Between them
+        they answer a question the contracts cannot.
+      </p>
+
+      <div class="note">
+        <span class="label">Why this layer exists</span>
+        <p>
+          The contracts declare <b>38 status enums</b> — <code>OrderStatus</code>,
+          <code>SeatStatus</code>, <code>ShiftStatus</code> and so on. Every one of them says what
+          states exist. <b>Not one of them says which moves between those states are allowed.</b> So
+          nothing catches an order going from <code>held</code> to <code>refunded</code> without
+          ever having been paid: the enum permits it, the business does not, and until
+          <code>states/</code> arrived no artefact said so.
+        </p>
+      </div>
+
+      <p>
+        All thirty-eight enums now have a model — thirty-nine machines in all, one of them anchored
+        to a schema that is not an enum — covering <b>225 states</b> and <b>299 transitions</b>.
+        Nothing is left unmodelled. What remains to act on is that one model, checked against
+        nothing.
+      </p>
+
+      <h3>8.1 · States — the legal moves</h3>
+      <p>
+        One machine per entity, laid out left to right by longest path from an initial state. Unlike
+        every other diagram in the viewer, <b>direction is the whole point here</b>:
+        <code>paid → refunded</code> and <code>refunded → paid</code> are not the same claim, and one
+        of them is a defect. So every transition carries an arrowhead, and the layout makes
+        "forward" a direction on screen rather than something to work out.
+      </p>
+
+      <figure>
+        <img src="shots/50-states-order.png" alt="The order state machine" />
+        <figcaption>
+          <b class="figno"></b> — The Order machine. Nine states, fourteen transitions, five of them
+          reversals. <code>pending</code> on the left carries the entry stub that marks an initial
+          state; the terminal states are stacked on the right with a second rule down their right
+          edge. Amber arcs are reversals — value moving backwards.
+        </figcaption>
+      </figure>
+
+      <h4>Reading a machine</h4>
+      <table>
+        <tr><th style="width:115pt">What you see</th><th>What it means</th></tr>
+        <tr>
+          <td><b>Entry stub</b> — a short arrow into the left edge</td>
+          <td>An <b>initial</b> state. A record may be created here. Usually one; occasionally several, where a record can be created already advanced.</td>
+        </tr>
+        <tr>
+          <td><b>Double rule</b> down the right edge</td>
+          <td>A <b>terminal</b> state. Nothing leaves. The check that every state can reach one is what catches a state that traps records.</td>
+        </tr>
+        <tr>
+          <td><code>offline</code> under the name</td>
+          <td>A terminal can enter this state with <b>no network</b>. Everything else needs the server. On a POS this is the difference between a sale that completes and one that cannot.</td>
+        </tr>
+        <tr>
+          <td><b>Solid blue arrow</b></td>
+          <td>An operation in a contract causes this move. Its <code>operationId</code> is the label.</td>
+        </tr>
+        <tr>
+          <td><b>Dashed green arrow</b></td>
+          <td>A <b>timer or a background job</b> causes it. Dashed because no operation in any contract produces it — there is nothing to call and nobody watching.</td>
+        </tr>
+        <tr>
+          <td><b>Amber arc</b>, bowing out of the row</td>
+          <td>A <b>reversal</b>: a transition that undoes an earlier one. Marked because reversals are where money and entitlements move backwards, and they carry different approval requirements.</td>
+        </tr>
+        <tr>
+          <td><code>✓</code> before a label</td>
+          <td>The transition <b>requires approval</b> — a person with the right grant must authorise it.</td>
+        </tr>
+        <tr>
+          <td>A state outlined in <b>red</b></td>
+          <td>Unreachable from any initial state, unable to reach a terminal one, or not in the contract enum at all. Each is a finding, and each appears in the audit.</td>
+        </tr>
+      </table>
+
+      <div class="note">
+        <span class="label">Why reversals bow out of the row</span>
+        <p>
+          Reversals are excluded from the depth calculation that decides which column a state sits
+          in. A refund reaching back from <code>completed</code> would otherwise drag the whole tail
+          of the machine leftwards and the diagram would read as a tangle. They are still drawn —
+          they just do not decide where anything sits.
+        </p>
+      </div>
+
+      <h4>The guard — hover a transition</h4>
+      <p>
+        A transition's <b>guard</b> is the condition that must hold for the move to be allowed, and
+        it is the real reason the file is written down: stated here, it is not only in whoever wrote
+        the handler. Hover any transition to read it. Only the one under the pointer shows its
+        guard — selecting a state can make five transitions active at once, and five guards would
+        land on top of each other.
+      </p>
+
+      <figure>
+        <img src="shots/53-states-guard.png" alt="A guard shown on the hovered transition" />
+        <figcaption>
+          <b class="figno"></b> — The guard on the transition under the pointer. Turn
+          <b>Guards</b> off in the toolbar to suppress them.
+        </figcaption>
+      </figure>
+
+      <h4>Selecting a state</h4>
+      <figure class="fig-pair">
+        <img src="shots/51-states-selected.png" alt="A state selected" />
+        <img src="shots/52-states-links.png" alt="The right pane for a selected state" />
+        <figcaption>
+          <b class="figno"></b> — Click a state and everything not touching it dims. The right pane
+          then lists <b>every way it is left and every way it is reached</b>: the operation, the
+          guard, whether it is a reversal, whether it needs approval, and what it publishes. The
+          operation name opens it in the Contracts layer; the pink event chip opens it in the
+          catalogue.
+        </figcaption>
+      </figure>
+
+      <p>
+        With nothing selected the pane describes the model as a whole — its owner, its initial and
+        terminal states, which states are reachable offline, and the author's note. Order's note is
+        the clearest statement of what this folder is for:
+      </p>
+
+      <div class="warn-box">
+        <span class="label">From states/order.yaml</span>
+        <p>
+          <b>held → refunded is not a transition.</b> A parked sale was never paid, so there is
+          nothing to return. The enum permits it and the business does not, which is the defect this
+          file exists to catch.
+        </p>
+      </div>
+
+      <figure>
+        <img src="shots/54-states-seat.png" alt="The seat state machine" />
+        <figcaption>
+          <b class="figno"></b> — A different shape. The Seat machine has one state per column, so
+          transitions that skip a column arch over the boxes between rather than running through
+          them. Boxes drag; the layout is deterministic, so it is a sensible place to start from
+          rather than something to fight.
+        </figcaption>
+      </figure>
+
+      <h4>The sidebar — and the list that matters</h4>
+      <figure>
+        <img src="shots/57-sidebar-domain.png" alt="The domain sidebar" />
+        <figcaption>
+          <b class="figno"></b> — Three groups. <b>State models</b> shows
+          <code>states/transitions</code> for each. <b>Events</b> shows the consumer count.
+          <b>Enums with no model</b> is the third, and it is now empty: all thirty-eight status
+          enums have a model. An amber name in the first two groups is a model with no enum behind
+          it, or an event nothing emits.
+        </figcaption>
+      </figure>
+
+      <p>
+        Switch the grouping to <b>Contexts</b> for the other reading: the sixteen bounded contexts
+        and what they owe each other, counted as <code>n↑</code> published and <code>n↓</code>
+        consumed. Reporting consumes nine events and publishes none; marketing seven. That asymmetry
+        is the shape of the platform.
+      </p>
+
+      <h3>8.2 · Events — what crosses the outbox</h3>
+      <p>
+        <code>platform.outbox</code> has always existed and has always been correct: publication is
+        atomic with the state change, so a crash cannot leave an event unpublished for a change that
+        happened. What never existed was <b>a description of what it carries</b> — who publishes,
+        who consumes, what the payload is, and what a consumer does with a duplicate. Without that,
+        an event is a contract between two services that neither one wrote down.
+      </p>
+
+      <figure>
+        <img src="shots/55-events-catalogue.png" alt="The event catalogue" />
+        <figcaption>
+          <b class="figno"></b> — The catalogue, read as a ledger of who tells whom. Each row is one
+          event: publisher on the left, the transition that emits it in the middle, every consumer on
+          the right. <b>Amber chips are critical consumers</b> — the business breaks if they never
+          run. An event no state model emits carries an amber note saying so.
+        </figcaption>
+      </figure>
+
+      <p>
+        Sixteen events, forty-three consumers, twenty-one of them critical.
+        <code>order.paid</code> is the most consumed event in the platform: five consumers, three
+        critical. A dead-lettered <code>order.paid</code> means a guest paid and holds nothing, so it
+        pages rather than logs.
+      </p>
+
+      <figure>
+        <img src="shots/56-events-detail.png" alt="One event in full" />
+        <figcaption>
+          <b class="figno"></b> — One event in full. <b>Emitted when</b> links back to the exact
+          transition in the state machine. The payload is tabulated with required and optional
+          marked. The consumer table gives each context's purpose, its <b>idempotency key</b> and
+          what it does on failure.
+        </figcaption>
+      </figure>
+
+      <h4>The two rules the catalogue enforces</h4>
+      <table>
+        <tr><th style="width:150pt">Rule</th><th>Why</th></tr>
+        <tr>
+          <td><b>Every event has at least one consumer</b></td>
+          <td>An event nobody consumes is a write nobody reads — either the consumer was never built, or the event should not be published.</td>
+        </tr>
+        <tr>
+          <td><b>Every consumer states its idempotency key</b></td>
+          <td>Delivery is at-least-once. A consumer that cannot say what makes a delivery a duplicate will process one twice, and the second time will be a Saturday.</td>
+        </tr>
+      </table>
+
+      <p>
+        <code>onFailure</code> takes one of four values, and hovering it in the table explains each:
+        <code>retry</code>, <code>retryThenDeadLetter</code> (the usual choice for anything
+        critical), <code>deadLetterImmediately</code> and <code>ignore</code>.
+      </p>
+
+      <div class="note">
+        <span class="label">Commands are deliberately absent</span>
+        <p>
+          This catalogue is facts that have already happened — <code>order.paid</code>, not
+          <code>payOrder</code>. A published event a consumer can refuse is a distributed
+          transaction wearing a disguise. Ordering is guaranteed per aggregate, never globally: two
+          orders may be processed in any order, two events about the <em>same</em> order may not.
+        </p>
+      </div>
+
+      <h3>8.3 · What the layer checks</h3>
+      <p>
+        Every check runs against the contracts the viewer has already indexed, so nothing can be
+        checked against the wrong copy. The Audit tab lists whatever fails.
+      </p>
+      <table>
+        <tr><th style="width:195pt">Check</th><th>Catches</th></tr>
+        <tr><td>Every modelled state is in the contract enum</td><td>A model that has drifted from the API</td></tr>
+        <tr><td>Every enum value is modelled</td><td>A state nobody has thought about</td></tr>
+        <tr><td>Every state is reachable from an initial one</td><td>A state records can never get to</td></tr>
+        <tr><td>Every state can reach a terminal one</td><td>A state that traps records</td></tr>
+        <tr><td>Every operation named by a transition exists</td><td>A move caused by a call that was renamed or removed</td></tr>
+        <tr><td>Every event a transition emits is catalogued</td><td>A consumer waiting for a message that never arrives</td></tr>
+        <tr><td>Every catalogued event has a publishing transition</td><td>A fact the catalogue claims that nothing produces</td></tr>
+        <tr><td>Every event has a consumer, and every consumer an idempotency key</td><td>The two rules above</td></tr>
+        <tr><td>Offline-reachable states are states the entity has</td><td>A typo in the one list a POS depends on</td></tr>
+      </table>
+
+      <figure>
+        <img src="shots/58-audit-domain.png" alt="The domain audit" />
+        <figcaption>
+          <b class="figno"></b> — The domain audit. Click a finding to open the model or the event it
+          is about.
+        </figcaption>
+      </figure>
+
+      <div class="warn-box">
+        <span class="label">Two findings, as issued</span>
+        <p>
+          <b><code>states/entitlement.yaml</code> is anchored to something that is not an enum.</b>
+          It declares <code>contract: access, enum: TicketStatus</code> — and
+          <code>access.TicketStatus</code> is an <em>object</em> describing a validated ticket
+          (<code>ticketId</code>, <code>isValid</code>, <code>entriesUsed</code>) with no enum values
+          at all. None of <code>issued</code>, <code>partiallyConsumed</code>,
+          <code>fullyConsumed</code>, <code>expired</code>, <code>cancelled</code> or
+          <code>surrendered</code> appears anywhere in any contract. The one model covering the
+          entity that both <code>access.validated</code> and <code>entitlement.issued</code> are
+          about is therefore checked against nothing — the single thing the folder exists to prevent.
+        </p>
+        <p>
+          <b><code>entitlement.issued</code> is catalogued and no transition emits it.</b> Fifteen of
+          the sixteen events name a transition in <code>states/</code> that publishes them. Either
+          the transition is not written down, or it is published from somewhere the models do not
+          cover.
+        </p>
+      </div>
+
+      <div class="note">
+        <span class="label">The command-line checker disagrees, and it is wrong</span>
+        <p>
+          <code>tools/check-states.py</code> runs the same checks from a terminal and reports errors
+          that are not real. Line 36 looks for the contracts as a <em>sibling</em> of the project
+          root:
+        </p>
+        <pre>CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"</pre>
+        <p>
+          Neither that path nor its fallback exists in this repository, so it loads zero enums and
+          zero operations and every lookup fails identically. Repointed at <code>contracts/</code> it
+          passes. <code>tools/check-frontend.py</code> has the same bug. The viewer resolves against
+          the contracts it has already indexed, so it cannot go looking in the wrong place.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 9. BACKEND ═══════════════════ -->
+    <section class="chapter">
+      <h2>9 · Backend layer</h2>
+      <p class="chapter-lede">
+        Two sources with different standing, kept apart on purpose: 39 tables that exist in SQL, and
+        230 that the contracts imply.
+      </p>
+
+      <h3>Data — the ER diagram, at two zoom levels</h3>
+      <p>
+        Boxes are placed in a <strong>hierarchy, not a cloud</strong>: a table sits below the tables
+        it references, so the things the rest of the schema hangs off end up along the top. The
+        arrangement is deterministic — the same data always draws the same picture — and any box can
+        then be dragged anywhere and will stay there. Re-picking the scope restores the tidy layout.
+      </p>
+
+      <h4>Zoom 1 · Whole database — 21 boxes instead of 230</h4>
+      <figure>
+        <img src="shots/30-data-all.png" alt="Whole database schema map" />
+        <figcaption>
+          <b class="figno"></b> — One box per schema, each listing which other schemas its keys reach into
+          and how many columns do the reaching. Every table at once is a hairball with no room for
+          labels, so this is the map you start from. Click a schema to drill in.
+        </figcaption>
+      </figure>
+
+      <h4>Zoom 2 · One schema — its tables as entities</h4>
+      <figure>
+        <img src="shots/31-data-schema.png" alt="One schema drilled into" />
+        <figcaption>
+          <b class="figno"></b> — One schema's tables, every column with its type and <code>•</code>
+          marking required. <b>Green means a migration creates it and it is really there; blue means
+          it is derived from the contracts and still only planned</b>; amber is a table pulled in
+          from another schema because something here points at it.
+        </figcaption>
+      </figure>
+
+      <table>
+        <tr><th style="width:120pt">Control</th><th>Does</th></tr>
+        <tr><td><b>Scope picker</b></td><td><i>whole database</i>, or any one of the 21 schemas.</td></tr>
+        <tr><td><b>Columns</b></td><td>Column rows on or off. Off fits far more tables on screen.</td></tr>
+        <tr><td><b>Inferred keys</b></td><td>The dashed relationships, on or off. <b>Off leaves only what is genuinely declared</b> — the quickest honesty check on this view.</td></tr>
+        <tr><td><b>Fit</b></td><td>Reframes everything, clear of the legend.</td></tr>
+        <tr><td>Click a table</td><td>Selects it; the right pane fills with what the DDL says.</td></tr>
+        <tr><td>Click a column</td><td>Follows its key to the table it points at.</td></tr>
+        <tr><td>Drag a box</td><td>Moves it and leaves it there.</td></tr>
+        <tr><td>Hover or select</td><td>Unrelated tables dim; the connected lines thicken and glow.</td></tr>
+      </table>
+
+      <h4>Relationships come in three kinds, strongest first</h4>
+      <table>
+        <tr><th style="width:105pt">Kind</th><th style="width:44pt">Drawn</th><th>Meaning</th></tr>
+        <tr>
+          <td><b>REFERENCES clause</b></td>
+          <td>Solid</td>
+          <td>The database saying what is true. 52 of these, 12 of them composite <code>(id, level)</code> keys.</td>
+        </tr>
+        <tr>
+          <td><b>Declared in a contract</b></td>
+          <td>Solid</td>
+          <td>A column whose source property is a <code>$ref</code>. 11 of these.</td>
+        </tr>
+        <tr>
+          <td><b>Inferred from a name</b></td>
+          <td>Dashed</td>
+          <td>
+            An <code>_id</code> column resolved by trying successively shorter suffixes, so
+            <code>added_by_principal_id</code> finds <code>identity.principal</code>. 289 of these.
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        Inference is conservative: a table in the column's own schema wins over one elsewhere, a name
+        owned by two schemas is refused rather than guessed at, and inference is dropped entirely for
+        any table the DDL already covers.
+      </p>
+
+      <div class="note">
+        <span class="label">The DDL teaches the inference</span>
+        <p>
+          <code>venue_id</code> appears on 50 tables and there is no <code>venue</code> table — a
+          venue is a <em>level</em> of <code>platform.scope_node</code>, which only the migrations
+          know. Where a migration resolves a column name, that answer is reused for the same name
+          elsewhere and labelled <code>per DDL</code>.
+        </p>
+      </div>
+
+      <h3>Migrations — what backend/ actually contains</h3>
+      <figure>
+        <img src="shots/32-migrations.png" alt="Migrations view" />
+        <figcaption>
+          <b class="figno"></b> — Each <code>.sql</code> file in apply order with the tables it creates,
+          its policies and row-security coverage, above totals for the whole set. Click any table
+          name to open it in the Data view.
+        </figcaption>
+      </figure>
+
+      <p>
+        The totals are the honest summary of the database today: <b>6 migrations, 39 tables, 52
+        foreign keys</b>, 12 composite keys, 2 partitioned tables, 16 of 16 tables with row security
+        <em>forced</em>, 16 policies, 4 generated columns and 8 enum types. The 21 storage-only
+        tables are listed with the reason each has no contract schema, so the gap reads as a decision
+        rather than an omission. The prose from <code>MIGRATIONS.md</code> is shown alongside.
+      </p>
+
+      <h3>Routing — where each call goes</h3>
+      <figure>
+        <img src="shots/33-routing.png" alt="Routing view" />
+        <figcaption>
+          <b class="figno"></b> — ADR-0016 made visible: 654 routed operations across 22 contracts, split
+          into primary-write, primary-read, replica and analytical. 256 writes, 336 reads.
+        </figcaption>
+      </figure>
+      <p>
+        Each contract is a row with a bar showing the split. Use it to see which contracts are
+        write-heavy — those are the ones a read replica will not relieve — and which are candidates
+        for analytical routing.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 10. DECISIONS ═══════════════════ -->
+    <section class="chapter">
+      <h2>10 · Decisions layer</h2>
+      <p class="chapter-lede">
+        A fifth layer over <code>docs/</code>: 18 ADRs, 31 register documents holding 1,107 rows,
+        and one spec that is not read but run.
+      </p>
+
+      <h3>Why a layer for prose</h3>
+      <p>
+        Every other layer reads a machine-readable artefact — contracts, YAML, a workbook, CSV — and
+        can be checked mechanically. <code>docs/</code> is prose, and <b>prose is where the reasons
+        live</b>. The four layers before this one say what the platform is. None of them says why it
+        is that and not something else.
+      </p>
+      <p>
+        Prose is not renderable as a graph and should not be forced into one, so this layer does
+        three specific things rather than trying to be a documentation browser: it
+        <b>indexes the ADRs</b> so a reference to ADR-0013 anywhere in the viewer resolves to a title
+        and a decision rather than a file name; it <b>pulls the tables out of the registers</b>, so
+        what the delivery counted sits beside what the viewer computes; and it
+        <b>executes the permission spec</b>.
+      </p>
+      <p>
+        One view, four scopes on the toolbar — <b>Decisions</b>, <b>Permissions</b>, <b>Gaps</b>,
+        <b>Registers</b> — and its own Audit, as every layer has.
+      </p>
+
+      <h3>Decisions — the ADRs</h3>
+      <p>
+        18 ADRs, all 18 Accepted, 3 of them amended after acceptance. Each card carries the
+        decision itself — the text under <code>## Decision</code>, not the context around it — its
+        date, what it closes, what it withdraws or supersedes, and what it constrains. Click the
+        title to open the file.
+      </p>
+
+      <figure>
+        <img src="shots/hc-decisions.png" alt="The ADR index" />
+        <figcaption>
+          <b class="figno"></b> — The 18 ADRs, with ADR-0001 marked as accepted and partly
+          superseded.
+        </figcaption>
+      </figure>
+
+      <div class="warn-box">
+        <span class="label">The case that misleads</span>
+        <p>
+          <b>ADR-0001 is Accepted <em>and</em> its split rule is superseded by ADR-0014.</b> Its
+          status line is one line making three statements — "Accepted — split rule superseded by
+          ADR-0014; isolation claim amended 14 August 2026" — and in a list of statuses it reads as
+          current. The part that matters is not current: cells are no longer split by jurisdiction,
+          they are split by Tenant × Region, and jurisdiction is now a placement constraint on
+          regions. Everything else in the ADR still stands.
+        </p>
+        <p>
+          So the viewer takes the first word as the verdict and the rest as the qualifier, and marks
+          the badge <b>partly superseded</b> where the qualifier mentions supersession. It is the
+          qualifier that is worth reading.
+        </p>
+      </div>
+
+      <p>
+        An ADR carrying an <code>## Amendment</code> section is marked <b>amended</b> for the same
+        reason: the accepted date is then not the date of what the ADR now says. Three do —
+        ADR-0001, ADR-0013 and ADR-0014. A status the viewer does not recognise, or no status at
+        all, is a finding rather than a blank badge, because whether a decision is binding cannot
+        otherwise be told from the file.
+      </p>
+
+      <h3>Permission vectors — the spec, executed</h3>
+      <p>
+        <code>docs/architecture/specs/permission-vectors.json</code> opens with one line:
+        <b>NORMATIVE. A failing vector is a build failure.</b> It is the largest security surface in
+        the platform written down as data. Each vector is a set of grants, a query, and the verdict
+        the platform must reach.
+      </p>
+      <p>
+        <b>A viewer that listed them would be a worse version of the file.</b> One that evaluates
+        them checks that the rule as written actually produces the answers the spec claims — which
+        is the one thing reading it cannot tell you. So the viewer resolves every vector.
+      </p>
+
+      <figure>
+        <img src="shots/hc-vectors.png" alt="The permission vectors resolved" />
+        <figcaption>
+          <b class="figno"></b> — The authorisation spec executed — every vector resolved against
+          the rule, not listed.
+        </figcaption>
+      </figure>
+
+      <h4>The rule, as the viewer implements it</h4>
+      <p>
+        Scopes are a seven-level tree — Tenant → Brand → Region → Venue → Department →
+        Sub-Department → Workstation — written as a path,
+        <code>t_ref.b_alpha.r_north.v_alpha1</code>. A grant applies when its permission matches
+        exactly or the grant is <code>*</code>, and its scope is the query scope or an ancestor of
+        it. Then:
+      </p>
+      <pre>any applicable DENY   <span class="c">→</span> DENY
+otherwise any ALLOW   <span class="c">→</span> PERMIT
+otherwise             <span class="c">→</span> DENY</pre>
+
+      <p>
+        The middle clause is the one people get wrong. <b>Deny does not merely win at equal
+        depth.</b> V10 grants ALLOW at the venue and DENY at the brand above it, asks at the venue,
+        and the answer is DENY — so there is no "most specific wins" tie-break anywhere in this.
+        The spec's own reasoning is that under most-specific-wins a tenant administrator's blanket
+        deny can be silently overridden by a venue allow somebody added months earlier; under
+        deny-overrides, a deny is a guarantee. And nothing bubbles upward: a grant at a workstation
+        says nothing about the venue that contains it (V04).
+      </p>
+
+      <table>
+        <tr><th style="width:44pt">Vector</th><th style="width:150pt">Grants</th><th style="width:110pt">Asks</th><th>Verdict, and why</th></tr>
+        <tr>
+          <td><b>V01</b></td>
+          <td>none</td>
+          <td><code>ORDER_CREATE</code> @ venue</td>
+          <td><b>DENY</b> — default deny. Absence is never permission.</td>
+        </tr>
+        <tr>
+          <td><b>V03</b></td>
+          <td>ALLOW @ tenant</td>
+          <td><code>ORDER_CREATE</code> @ workstation</td>
+          <td><b>PERMIT</b> — inheritance runs six levels down.</td>
+        </tr>
+        <tr>
+          <td><b>V04</b></td>
+          <td>ALLOW @ workstation</td>
+          <td><code>ORDER_CREATE</code> @ venue</td>
+          <td><b>DENY</b> — nothing bubbles up.</td>
+        </tr>
+        <tr>
+          <td><b>V10</b></td>
+          <td>ALLOW @ venue · DENY @ brand</td>
+          <td><code>ORDER_CREATE</code> @ venue</td>
+          <td><b>DENY</b> — the specific allow does not override the broader deny.</td>
+        </tr>
+        <tr>
+          <td><b>V12</b></td>
+          <td>ALLOW @ tenant · DENY <code>*</code> @ region</td>
+          <td><code>ORDER_CREATE</code> @ venue</td>
+          <td><b>DENY</b> — the wildcard applies to denies.</td>
+        </tr>
+      </table>
+
+      <p>
+        <b>22 of 22 pass.</b> The spec's table states 28 vectors; the machine-runnable file carries
+        22. The six left out depend on inputs the grant model does not carry — which cell the scope
+        is in, which role the session selected, the session's workstation, an inactive node in the
+        path, an expired grant. Two of those, the inactive node and the expiry, are recorded in the
+        spec as gaps in the platform's own resolver. A vector that failed here would be an error in
+        this layer's audit, in the file's own words.
+      </p>
+
+      <div class="warn-box">
+        <span class="label">Writing the resolver found a bug — in the viewer, not the spec</span>
+        <p>
+          The first run reported <b>V12 as PERMIT</b> where the spec requires DENY. The spec was
+          right. The viewer had a small helper that strips markdown emphasis off a table cell, and
+          it was being applied to grant data on the way into the resolver — so
+          <code>*</code>, which is a real value in a grant, was being deleted. The wildcard deny
+          became a grant for a permission named nothing, stopped applying, and the tenant-level
+          allow won.
+        </p>
+        <p>
+          The fix was to stop treating data as prose: the resolver reads grant fields as written,
+          and the stripping helper is marked for prose only. It is worth stating plainly because it
+          is the evidence that the harness does real work — a view that listed the vectors would
+          have shown a wildcard deny and been silently wrong about it.
+        </p>
+      </div>
+
+      <h3>Gaps — the artefact audit</h3>
+      <p>
+        <code>handoff/artefact-audit.md</code> classifies <b>3,297 requirements</b> by the kind of
+        artefact each one needs, derived from the requirement text rather than from a checklist
+        somewhere else. It is <b>the only register in the viewer that measures absence</b>.
+        Everywhere else counts what is there.
+      </p>
+      <p>
+        15 artefact classes, <b>12 open</b>, <b>1,612 requirements behind them</b>, and 8 classes
+        with nothing at all behind them: Report (347 requirements), Configuration (273), Audit
+        (206), Notification (193), Integration (171), Validation rule (94), Retention/archive (89)
+        and Performance/SLA (30). The Report line is the clearest: <b>52 reports are named by title
+        and nothing lists them.</b> There is a report definition engine —
+        <code>createReport</code>, <code>runReport</code>, <code>scheduleReport</code> — which is
+        the right shape; what cannot be shown is that any particular named report is covered,
+        because nothing maps title to definition.
+      </p>
+
+      <figure>
+        <img src="shots/hc-gaps.png" alt="The artefact audit as a bar chart" />
+        <figcaption>
+          <b class="figno"></b> — The artefact audit, the one register that counts what is absent.
+        </figcaption>
+      </figure>
+
+      <p>
+        Each class is a bar, and <b>bar length is the requirement count</b> — red where there is
+        nothing behind the class, amber where cover is partial, green where it is covered. Hover a
+        name for the audit's verdict and what the package currently holds against it. Eight classes
+        with nothing behind them is the layer's one standing warning, and it is counted by the
+        delivery's own audit rather than by the viewer.
+      </p>
+
+      <h3>Registers</h3>
+      <p>
+        31 documents holding <b>1,107 rows</b> of reference data, in five groups: registers (7),
+        the handoff narratives (9), architecture (6), in-flight (5) and guides (4). Each card shows
+        the document's lead paragraph, its file and its row count; clicking one opens the source in
+        the Reader.
+      </p>
+      <p>
+        The tables are the register and the prose around them is the reason for it, so the viewer
+        reads both and counts the rows. Prose has no node in the graph, which is why a document
+        opens as source rather than as a diagram.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 11. LINKS PANE ═══════════════════ -->
+    <section class="chapter">
+      <h2>11 · Tracing across layers</h2>
+      <p class="chapter-lede">
+        The right-hand pane answers one question about whatever is selected: what links to this?
+      </p>
+
+      <div class="fig-pair tall">
+        <figure>
+          <img src="shots/16-links-pane.png" alt="Links pane for an operation" />
+          <figcaption>
+            <b class="figno"></b> — An <b>operation</b>: which screens call it, which flows traverse it,
+            what references it and what it references.
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="shots/34-table-links.png" alt="Links pane for a table" />
+          <figcaption>
+            <b class="figno"></b> — A <b>table</b>: the operations and screens that reach it, what the
+            migration says about it, its real foreign keys, the contract schema it derives from, and
+            any <code>_id</code> column pointing at no table at all.
+          </figcaption>
+        </figure>
+      </div>
+
+      <table>
+        <tr><th style="width:80pt">Selected</th><th>The pane shows</th></tr>
+        <tr><td><b>Operation</b></td><td>Screens that call it · flows that traverse it · what it <code>$ref</code>s · what references it.</td></tr>
+        <tr><td><b>Schema</b></td><td>What references it, and which table it is persisted as — or, for 168 of them, why it deliberately has none.</td></tr>
+        <tr><td><b>Screen</b></td><td>Flows that step through it · screens that reach it.</td></tr>
+        <tr><td><b>Table</b></td><td>The operations that touch it, each marked <b>writes</b> or <b>reads</b> · the screens that reach it · migration, primary key, partitioning, row security · foreign keys with their <code>ON DELETE</code> · the contract schema it derives from · inferred keys · keys with no table.</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">The join runs the other way too</span>
+        <p>
+          The first two sections of a table's pane come from the <b>Where used</b> sheet of the
+          schema reference, whose own subtitle is the reason to lead with them: <em>what breaks if
+          this table changes</em>. A foreign key says what a table is joined to; this says who would
+          notice if it moved. Where nothing reaches a table the pane says so rather than showing an
+          empty list — 39 of the 230 tables are reached by no operation at all, and only 51 are
+          reached by a drawn screen. Chapter 5 reads the same join from the contract end.
+        </p>
+      </div>
+
+      <p>
+        Every entry is a link, which is what makes the package traceable end to end. The table pane
+        above is <code>orders.sales_order</code>: it says the table is created by
+        <code>V0001__baseline.sql</code>, keyed on <code>(id, venue_id)</code>, partitioned
+        <code>LIST venue_id</code>, with row security enabled <em>and forced</em>; that its one
+        declared foreign key is a composite reference into <code>platform.scope_node</code>; and that
+        it derives from the <code>orders.Order</code> schema in the contracts — from which you can
+        click straight through to the screens that display it.
+      </p>
+
+      <div class="note">
+        <span class="label">Keys with no table</span>
+        <p>
+          The last section lists <code>_id</code> columns that resolve to nothing. Some are real gaps;
+          some, like <code>venue_id</code>, are scope levels rather than tables. Five or more uses of
+          the same unresolved name is raised in the Backend audit.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 12. SEARCH ═══════════════════ -->
+    <section class="chapter">
+      <h2>12 · Search</h2>
+      <p class="chapter-lede">One box over operations, schemas, permissions and paths.</p>
+
+      <figure>
+        <img src="shots/18-palette.png" alt="The search palette" />
+        <figcaption>
+          <b class="figno"></b> — <kbd>Ctrl</kbd>+<kbd>K</kbd> from anywhere. Type a fragment; arrows move,
+          <kbd>Enter</kbd> opens the result in the Reader, <kbd>Esc</kbd> closes.
+        </figcaption>
+      </figure>
+
+      <p>
+        Search matches operation ids, schema names, permission strings and URL paths, so
+        <code>reserv</code> finds the reservation operations, their request and response schemas and
+        the paths that serve them in one list. It is the fastest way in when you know a name but not
+        which contract owns it.
+      </p>
+
+      <h3>Deep links</h3>
+      <p>
+        Node ids are stable and live in the URL, so any operation or schema can be linked directly in
+        a ticket or a chat message:
+      </p>
+      <pre>http://localhost:4173/#op:contracts/spine/orders.yaml%23listOrders</pre>
+      <p>
+        Opening that URL selects the node and restores the view. Browser back and forward work as
+        expected.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 13. AUDIT ═══════════════════ -->
+    <section class="chapter">
+      <h2>13 · The audit</h2>
+      <p class="chapter-lede">
+        Each layer checks its own material, and the badge on the Audit tab counts that layer's
+        errors.
+      </p>
+
+      <figure>
+        <img src="shots/17-audit-contracts.png" alt="Contract audit" />
+        <figcaption>
+          <b class="figno"></b> — The contract audit. Filter by severity along the top; every finding
+          names the file and line, so it is actionable as it stands.
+        </figcaption>
+      </figure>
+
+      <h4>What each layer checks</h4>
+      <table>
+        <tr><th style="width:65pt">Layer</th><th>Checks</th></tr>
+        <tr>
+          <td><b>Contracts</b></td>
+          <td>
+            Duplicate path keys · <code>$ref</code>s that do not resolve · operations missing any of
+            the four required <code>x-ticvai-*</code> extensions · permissions used but absent from
+            the enum · permissions declared but unused · components nothing references · taxonomy
+            gaps · platform-code collisions · a lineage row that disagrees with its contract, names a
+            table the workbook does not list, or was generated against operations that no longer
+            exist.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Frontend</b></td>
+          <td>
+            Screens calling an operation no contract declares · component kinds and region references
+            outside the vocabulary · the four-states rule, with <code>offline</code> required only
+            where the platform is offline-capable · navigation pointing at a screen that does not
+            exist · flow steps calling an operation their own screen never declares · route
+            collisions within an app · an offline-capable app with no offline package.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Domain</b></td>
+          <td>
+            A modelled state that is not in the contract enum, and an enum value nothing models · a
+            state unreachable from any initial one · a state that can reach no terminal one · a
+            transition caused by an operation no contract declares · a transition publishing an event
+            the catalogue does not have · an event no transition emits · an event with no consumer ·
+            a consumer with no idempotency key · an offline-reachable state the entity does not have.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Backend</b></td>
+          <td>
+            A table marked written with no migration behind it · a foreign key pointing at a table no
+            migration creates · a table created twice · columns the DDL has that the workbook does
+            not list · a table deriving from a schema no contract declares · any <code>_id</code>
+            column name used five or more times with no table behind it · a second, older copy of the
+            workbook · a sheet whose header row cannot be recognised.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Decisions</b></td>
+          <td>
+            Every ADR states a status the register recognises, and its amendments are recorded ·
+            every permission vector in the authorisation spec is run rather than listed · every
+            artefact class the delivery's own audit names has a document behind it.
+          </td>
+        </tr>
+      </table>
+
+      <h3>What it currently reports</h3>
+      <p>
+        <b>Two errors across five layers.</b> The Frontend layer has no errors and no warnings — an
+        earlier drop had several errors and all of them are fixed — and the duplicate
+        <code>/reservations</code> block that made <code>createReservation</code> unreachable is
+        gone too. It is not silent, though: seven of the twelve flows have no wireframe, and each is
+        listed as a note.
+      </p>
+
+      <h4>1 · Platform code P09 is used with two different names</h4>
+      <p>
+        "P09 Platform Admin Console" and "P09 Platform Admin". One code meaning two things is the
+        same failure mode <code>permissions.yaml</code> warns about for permission strings, and it
+        splits that platform into two sidebar entries. The only error the Contracts layer reports.
+      </p>
+
+      <h4>2 · A state model anchored to something that is not an enum</h4>
+      <p>
+        <code>states/entitlement.yaml</code> declares <code>enum: TicketStatus</code>, and
+        <code>access.TicketStatus</code> is an object, not an enum. Its six states are checked
+        against nothing. Chapter 8 sets this out in full, along with the reason
+        <code>tools/check-states.py</code> cannot see it.
+      </p>
+
+      <h4>Warnings worth knowing about</h4>
+      <table>
+        <tr><th style="width:70pt">Layer</th><th>Warning</th></tr>
+        <tr>
+          <td><b>Domain</b></td>
+          <td><code>entitlement.issued</code> is catalogued and no state model emits it.</td>
+        </tr>
+        <tr>
+          <td><b>Backend</b></td>
+          <td>
+            Three, and the same shape as each other: an <code>_id</code> column name used repeatedly
+            with no table behind it. These are what the inference could not resolve, and they are
+            listed rather than guessed at.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Lineage</b></td>
+          <td>The lineage names five tables the schema workbook does not list.</td>
+        </tr>
+        <tr>
+          <td><b>Tooltips</b></td>
+          <td>
+            203 of 340 tips say only where the row came from rather than why the thing exists,
+            including 202 of the 230 table tips.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Decisions</b></td>
+          <td>
+            Eight artefact classes have nothing behind them — Report, Configuration, Audit and
+            others — counted by the delivery's own audit rather than by the viewer.
+          </td>
+        </tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">Two that the viewer itself was caught by</span>
+        <p>
+          The 14 August workbook renamed a column on the Modules sheet from <code>Columns</code> to
+          <code>Cols</code>. The reader required every identifying header to match exactly, so the
+          header row was never found and the sheet read as empty: <b>230 tables and zero schemas</b>.
+          Identifying headers now accept a list of names the workbook has used for the same thing,
+          and a sheet that still cannot be read is an error in this audit rather than a silently
+          empty view.
+        </p>
+        <p>
+          The same sheet caught it a second way. It ends with its own footnotes — <em>"Reading this
+          sheet"</em>, then several sentences explaining what the Out and In columns mean, each one
+          a single cell in the first column. The reader took every non-empty row as a record, so
+          eight paragraphs of prose became eight schema modules and showed up in the schema picker.
+          The rule that separates them is that a data row fills every column that identifies the
+          sheet and a footnote fills one. <b>The schema count is 21, not 29</b>, and the eight
+          skipped rows are recorded as a note rather than dropped in silence.
+        </p>
+      </div>
+
+      <div class="fig-pair">
+        <figure>
+          <img src="shots/24-audit-frontend.png" alt="Frontend audit" />
+          <figcaption><b class="figno"></b> — The Frontend audit: no errors and no warnings, and seven notes for flows with no wireframe.</figcaption>
+        </figure>
+        <figure>
+          <img src="shots/36-audit-backend.png" alt="Backend audit" />
+          <figcaption><b class="figno"></b> — The Backend audit, which is mostly a list of what has not been written yet.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 14. COLOURS ═══════════════════ -->
+    <section class="chapter">
+      <h2>14 · Reading the colours</h2>
+      <p class="chapter-lede">The palette is consistent across every view. One page, all of it.</p>
+
+      <h4>Contract tiers</h4>
+      <table>
+        <tr><th style="width:90pt">Colour</th><th>Means</th></tr>
+        <tr><td><span class="swatch" style="background:#2563eb"></span> Blue</td><td><b>Spine</b> — the core contracts the platform is built on.</td></tr>
+        <tr><td><span class="swatch" style="background:#067a55"></span> Green</td><td><b>Satellite</b> — a bounded capability that plugs into the spine.</td></tr>
+        <tr><td><span class="swatch" style="background:#d69e2e"></span> Amber</td><td><b>Shared</b> — <code>common</code> and <code>permissions</code>, referenced by everything.</td></tr>
+      </table>
+
+      <h4>Database tables</h4>
+      <table>
+        <tr><th style="width:90pt">Colour</th><th>Means</th></tr>
+        <tr><td><span class="swatch" style="background:#067a55"></span> Green</td><td><b>A migration creates it.</b> The table exists. 39 of 230.</td></tr>
+        <tr><td><span class="swatch" style="background:#2563eb"></span> Blue</td><td><b>Derived from the contracts.</b> Planned, not written.</td></tr>
+        <tr><td><span class="swatch" style="background:#d69e2e"></span> Amber</td><td><b>Borrowed.</b> Pulled in from another schema because something here points at it.</td></tr>
+      </table>
+
+      <h4>Lines</h4>
+      <table>
+        <tr><th style="width:90pt">Style</th><th>Means</th></tr>
+        <tr><td>Solid</td><td><b>Declared</b> — a <code>REFERENCES</code> clause in the DDL, or a <code>$ref</code> in a contract. Someone wrote it down.</td></tr>
+        <tr><td>Dashed</td><td><b>Inferred</b> — worked out from a column or screen naming convention. Treat as a hypothesis.</td></tr>
+      </table>
+
+      <h4>Severity</h4>
+      <table>
+        <tr><th style="width:90pt">Colour</th><th>Means</th></tr>
+        <tr><td><span class="swatch" style="background:#c0392f"></span> Red</td><td><b>Error</b> — the package is wrong here and something will break.</td></tr>
+        <tr><td><span class="swatch" style="background:#a16207"></span> Amber</td><td><b>Warning</b> — probably wrong, or a rule bent.</td></tr>
+        <tr><td><span class="swatch" style="background:#2563eb"></span> Blue</td><td><b>Note</b> — worth knowing, not a defect. Unused permissions land here.</td></tr>
+      </table>
+
+      <h4>HTTP methods</h4>
+      <p>
+        Operation badges follow the usual convention: <span class="swatch" style="background:#2563eb"></span>
+        GET blue, <span class="swatch" style="background:#067a55"></span> POST green,
+        <span class="swatch" style="background:#d69e2e"></span> PUT amber,
+        <span class="swatch" style="background:#c0392f"></span> DELETE red,
+        <span class="swatch" style="background:#7c3aed"></span> PATCH purple.
+      </p>
+
+      <h3>Light theme</h3>
+      <figure>
+        <img src="shots/40-light-theme.png" alt="The viewer in light theme" />
+        <figcaption>
+          <b class="figno"></b> — The <b>◐</b> button top-right switches themes; the choice is remembered.
+          Same colour meanings throughout, and better for projecting or printing.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ═══════════════════ 15. SHORTCUTS ═══════════════════ -->
+    <section class="chapter">
+      <h2>15 · Keyboard shortcuts</h2>
+      <p class="chapter-lede">
+        View shortcuts work from any layer — the viewer switches layer to follow you.
+      </p>
+
+      <table class="keys">
+        <tr><th>Key</th><th>Does</th></tr>
+        <tr><td><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd></td><td>Open search. <kbd>↑</kbd><kbd>↓</kbd> to move, <kbd>Enter</kbd> to open, <kbd>Esc</kbd> to close.</td></tr>
+        <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd></td><td>Frontend · Contracts · Domain · Backend · Decisions.</td></tr>
+        <tr><td><kbd>m</kbd></td><td>Cycle how the left pane is grouped.</td></tr>
+      </table>
+
+      <table class="keys">
+        <tr><th>Key</th><th>View</th></tr>
+        <tr><td><kbd>w</kbd></td><td>Screen <span style="color:var(--dim)">(frontend)</span></td></tr>
+        <tr><td><kbd>j</kbd></td><td>Journey <span style="color:var(--dim)">(frontend)</span></td></tr>
+        <tr><td><kbd>p</kbd></td><td>Apps <span style="color:var(--dim)">(frontend)</span></td></tr>
+        <tr><td><kbd>g</kbd></td><td>Graph <span style="color:var(--dim)">(contracts)</span></td></tr>
+        <tr><td><kbd>s</kbd></td><td>Structure <span style="color:var(--dim)">(contracts)</span></td></tr>
+        <tr><td><kbd>e</kbd></td><td>ER <span style="color:var(--dim)">(contracts)</span></td></tr>
+        <tr><td><kbd>r</kbd></td><td>Reader <span style="color:var(--dim)">(contracts)</span></td></tr>
+        <tr><td><kbd>d</kbd></td><td>Data <span style="color:var(--dim)">(backend)</span></td></tr>
+        <tr><td><kbd>v</kbd></td><td>Migrations <span style="color:var(--dim)">(backend)</span></td></tr>
+        <tr><td><kbd>o</kbd></td><td>Routing <span style="color:var(--dim)">(backend)</span></td></tr>
+        <tr><td><kbd>a</kbd></td><td>Audit <span style="color:var(--dim)">(the current layer's)</span></td></tr>
+        <tr><td><kbd>l</kbd></td><td>Local graph of the current selection.</td></tr>
+      </table>
+
+      <h3>Mouse</h3>
+      <table class="keys">
+        <tr><th>Action</th><th>Does</th></tr>
+        <tr><td>Drag</td><td>Pan — on every canvas and every sheet.</td></tr>
+        <tr><td>Scroll</td><td>Zoom on canvas views; scroll on sheets.</td></tr>
+        <tr><td>Click</td><td>Select. On Structure, fold one level.</td></tr>
+        <tr><td>Double-click</td><td>Open a graph node. On Structure, fold the whole branch.</td></tr>
+        <tr><td>Drag a box</td><td>Pin it in place, on ER and Data.</td></tr>
+      </table>
+    </section>
+
+    <!-- ═══════════════════ 16. KEEPING CURRENT ═══════════════════ -->
+    <section class="chapter">
+      <h2>16 · Keeping it current</h2>
+      <p class="chapter-lede">Edit a source file, save, and the open page updates itself.</p>
+
+      <p>
+        The server watches <code>contracts/</code>, <code>flows/</code>, <code>screens/</code>,
+        <code>frontend/</code> and <code>backend/</code> and re-indexes on save — including the
+        <code>.xlsx</code>, so editing the schema reference in Excel updates the Data view. No
+        refresh, no restart. The green dot beside the theme button means the watch is live.
+      </p>
+
+      <h3>Where to change what</h3>
+      <table>
+        <tr><th style="width:130pt">To change…</th><th>Edit</th></tr>
+        <tr><td>An endpoint or schema</td><td><code>contracts/**/*.yaml</code></td></tr>
+        <tr><td>What a screen contains</td><td><code>screens/*.yaml</code></td></tr>
+        <tr><td>A journey's steps or branches</td><td><code>flows/*.yaml</code></td></tr>
+        <tr><td>An app's routes or waves</td><td><code>frontend/*.yaml</code></td></tr>
+        <tr><td>The database as planned</td><td><code>handoff/TICVAI_Schema_Reference.xlsx</code></td></tr>
+        <tr><td>The database as built</td><td>A new <code>backend/V####__*.sql</code></td></tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">The workbook is delivered to more than one folder</span>
+        <p>
+          Copies drift. The viewer finds every copy and reads the newest, and reports a stale one
+          rather than silently preferring it — <code>backend/</code> held a build behind
+          <code>handoff/</code> for a while, and whichever folder you happened to open decided which
+          numbers you believed. Edit the copy in <code>handoff/</code>.
+        </p>
+      </div>
+
+      <h3>Regenerating this manual</h3>
+      <p>
+        The figures in this document are photographs of the running application, not mock-ups. With
+        the viewer running:
+      </p>
+      <pre>cd viewer
+node manual/capture.mjs   <span class="c"># re-shoots every figure</span>
+node manual/build.mjs     <span class="c"># re-renders the PDF</span></pre>
+      <p>
+        <code>capture.mjs</code> drives a real browser through every view; if a view fails to render
+        or the console reports an error, the capture exits non-zero rather than producing a manual
+        with a blank figure in it. Adding a view to the viewer means adding one entry to the
+        <code>SHOTS</code> sequence and one section here.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 17. GAPS ═══════════════════ -->
+    <section class="chapter">
+      <h2>17 · Known gaps</h2>
+      <p class="chapter-lede">
+        On disk but not shown, and why. None of these are bugs; each is a decision.
+      </p>
+
+      <table>
+        <tr><th style="width:130pt">Not shown</th><th>Why</th></tr>
+        <tr>
+          <td><b>Whole-platform sitemap</b></td>
+          <td>
+            Entry and exit points are shown per screen and are clickable, but there is no
+            navigation graph across a platform. Worth building only once more of the 327 inferred
+            navigation blocks are confirmed — a guessed sitemap drawn authoritatively is worse than
+            none.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Platforms with no screen files</b></td>
+          <td>
+            None left. P03, P06, P07 and P13 were the last four; they landed and took the count to
+            12 platforms and 347 screens. The sidebar note counts platforms from the deployment
+            table rather than asserting a list, so it stays right as more arrive.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Row-security policies</b></td>
+          <td>
+            The viewer says a table is <code>FORCED</code>, not what the 16 policies actually permit.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Board-to-region mapping</b></td>
+          <td>
+            A design board is attached to a screen, not to the part of the board that screen is.
+            Reading one exported design board as nine screens is still a manual job. The wireframe
+            platform boards do not have this problem — each screen has its own anchor on the board,
+            so the viewer frames exactly the right part.
+          </td>
+        </tr>
+        <tr>
+          <td><b>An events graph of its own</b></td>
+          <td>
+            The Domain layer lists contexts; the <em>drawing</em> of them is the Contracts layer's
+            Spine scope, because they are the same 24 nodes. There is no view where events rather
+            than contracts are the nodes.
+          </td>
+        </tr>
+      </table>
+
+      <h3>Two tool results to distrust</h3>
+      <p>
+        <code>tools/check-frontend.py</code> looks for the frontend repository as a <em>sibling</em>
+        of the project root, but it is checked out at <code>repos/ticvai-frontend</code>. It
+        therefore reports screens across apps that do not exist. They do exist;
+        <code>frontend/platform-deployment.md</code> is correct.
+      </p>
+      <p>
+        <code>tools/check-states.py</code> has the same bug in the same family — line 36 points at a
+        contracts directory that is not there, so it loads zero enums and every lookup fails. Both
+        pass once repointed. Fix the path before acting on either one's output; chapter 8 has the
+        detail.
+      </p>
+    </section>
+
+    <!-- ═══════════════════ 18. TROUBLESHOOTING ═══════════════════ -->
+    <section class="chapter">
+      <h2>18 · Troubleshooting</h2>
+
+      <table>
+        <tr><th style="width:150pt">Symptom</th><th>Cause and fix</th></tr>
+        <tr>
+          <td><b>Page will not load</b></td>
+          <td>
+            The server is not running, or something else holds port 4173. Start it with
+            <code>npm start --port 4180</code> and open that port instead.
+          </td>
+        </tr>
+        <tr>
+          <td><b>The green dot is grey</b></td>
+          <td>
+            The live connection dropped — usually the server was stopped or restarted. Reload the
+            page.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Edits do not appear</b></td>
+          <td>
+            Check the file is under a watched folder and has a watched extension
+            (<code>.yaml</code>, <code>.yml</code>, <code>.xlsx</code>, <code>.md</code>). Excel's
+            lock files and temporary copies are deliberately ignored, so the workbook only reindexes
+            once you actually save it.
+          </td>
+        </tr>
+        <tr>
+          <td><b>A diagram is a hairball</b></td>
+          <td>
+            Press <b>Fit</b> or <b>Recenter</b>. On Data, drill into one schema rather than viewing
+            all 230 tables. On Graph, use <b>Local</b> with something selected.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Numbers disagree with a spreadsheet</b></td>
+          <td>
+            You are probably reading a stale copy of the workbook. The viewer reads the newest copy
+            and reports the older one in the Backend audit.
+          </td>
+        </tr>
+        <tr>
+          <td><b>A table shows no relationships</b></td>
+          <td>
+            Check <b>Inferred keys</b> is on. If it is, the table's <code>_id</code> columns resolve
+            to nothing — see "keys with no table" in the Links pane.
+          </td>
+        </tr>
+        <tr>
+          <td><b>A screen shows no navigation</b></td>
+          <td>
+            All 347 screens have navigation, but 327 blocks are inferred and drawn as dashed pills
+            under their own heading. Look below the operations list.
+          </td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- ═══════════════════ 19. GLOSSARY ═══════════════════ -->
+    <section class="chapter">
+      <h2>19 · Glossary</h2>
+
+      <table>
+        <tr><th style="width:110pt">Term</th><th>Means</th></tr>
+        <tr><td><b>Spine</b></td><td>A core contract the platform is built on — identity, orders, catalogue, tenancy and so on. 8 of them.</td></tr>
+        <tr><td><b>Satellite</b></td><td>A bounded capability that plugs into the spine — F&amp;B, games, assets. 14 of them.</td></tr>
+        <tr><td><b>Shared</b></td><td><code>common.yaml</code> and <code>permissions.yaml</code>, referenced by nearly everything.</td></tr>
+        <tr><td><b>Module</b></td><td>A functional grouping declared as <code>x-ticvai-module</code>, used to organise both contracts and screens.</td></tr>
+        <tr><td><b>Platform</b></td><td>A coded surface — P01 Guest Web Storefront, P10 Partner Portal, and so on. Declared per contract, so a contract appears under every platform it names.</td></tr>
+        <tr><td><b>Wave</b></td><td>Delivery phase. Screens and apps carry the wave they ship in.</td></tr>
+        <tr><td><b>Flow / journey</b></td><td>One job a person came to do, traced across screens, with the branches that can derail it.</td></tr>
+        <tr><td><b>Branch</b></td><td>A way a journey step can go wrong, with a severity from recoverable through to data loss.</td></tr>
+        <tr><td><b>The four states</b></td><td>Loading, empty, error and — where the platform is offline-capable — offline. Every screen must declare all that apply.</td></tr>
+        <tr><td><b>Declared</b></td><td>Written down by a person in a source file. Drawn solid.</td></tr>
+        <tr><td><b>Inferred</b></td><td>Worked out by the viewer from a naming convention. Drawn dashed, counted separately, switchable off.</td></tr>
+        <tr><td><b>DDL</b></td><td>The SQL in <code>backend/</code> that creates tables. The strongest evidence available.</td></tr>
+        <tr><td><b>Storage-only table</b></td><td>A table with no contract schema behind it, by design — outbox, schema version, partition defaults. 21 of them.</td></tr>
+        <tr><td><b>Composite key</b></td><td>A foreign key over more than one column, here usually <code>(id, level)</code> — needed because a scope node is identified by both.</td></tr>
+        <tr><td><b>Row security FORCED</b></td><td>Row-level security that applies even to the table's owner, not merely enabled.</td></tr>
+        <tr><td><b>Not persisted</b></td><td>A contract schema deliberately backed by no table — a request body, a response envelope, an enum. 168 of them.</td></tr>
+        <tr><td><b>Ambient key</b></td><td>A key to one of the four hub tables — venue, principal, subject, tenant. True of nearly every table and therefore saying nothing about any one of them. 163 of the 352 relationships. Hidden by default.</td></tr>
+        <tr><td><b>Child edge</b></td><td>This row belongs to that row and has no meaning without it. Drawn heaviest of the three edge kinds.</td></tr>
+        <tr><td><b>State model</b></td><td>The legal transitions for one status enum: which moves are allowed, what causes each, and what must be true first. In <code>states/</code>.</td></tr>
+        <tr><td><b>Initial / terminal</b></td><td>A state a record may be created in / a state nothing leaves. Every state must be reachable from an initial one and able to reach a terminal one.</td></tr>
+        <tr><td><b>Guard</b></td><td>The condition that must hold for a transition to be allowed. Written down so it is not only in whoever wrote the handler.</td></tr>
+        <tr><td><b>Reversal</b></td><td>A transition that undoes an earlier one. Marked because reversals are where money and entitlements move backwards, and they carry different approval requirements. 40 of the 299.</td></tr>
+        <tr><td><b>Offline-reachable</b></td><td>A state a terminal can enter with no network. Everything else needs the server.</td></tr>
+        <tr><td><b>Domain event</b></td><td>A fact that has already happened, published through <code>platform.outbox</code> — <code>order.paid</code>, never <code>payOrder</code>. In <code>events/</code>.</td></tr>
+        <tr><td><b>Aggregate</b></td><td>What an event is about. Ordering is guaranteed within one instance of it and never globally.</td></tr>
+        <tr><td><b>Idempotency key</b></td><td>What makes a redelivery a duplicate. Required of every consumer, because delivery is at-least-once.</td></tr>
+        <tr><td><b>Critical consumer</b></td><td>One the business breaks without. A dead-lettered critical event is a page, not a dashboard. 21 of the 43.</td></tr>
+        <tr><td><b>Context</b></td><td>A bounded context — which is also what a contract is. The 16 that publish or consume events are where the real coupling between contracts lives.</td></tr>
+        <tr><td><b>Wireframe</b></td><td>A rendered drawing of one screen, flow or platform, generated from the screen definition. Structure only — what is on the screen and where, not what it will look like. In <code>wireframes/</code>.</td></tr>
+        <tr><td><b>Design board</b></td><td>An exported UI/UX artboard covering a whole platform, drawn by a designer. In <code>designs/</code>.</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">Where this manual comes from</span>
+        <p>
+          Written against the viewer in <code>viewer/</code>; every figure was captured from it
+          running against the delivery package on 14 August 2026 — none is a mock-up, and the figure
+          numbers are counted rather than typed. If a screenshot disagrees with what you see, the
+          package has moved on: re-run <code>node manual/capture.mjs</code> and
+          <code>node manual/build.mjs</code>.
+        </p>
+      </div>
+    </section>
+  </body>
+</html>

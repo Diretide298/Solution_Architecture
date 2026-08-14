@@ -1,0 +1,36 @@
+# ledger.periodClosed v1 — published by ledger
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: ledger.periodClosed
+version: 1
+publisher: ledger
+description: A fiscal period is closed. Figures for it will not move again without a reopen.
+aggregate: fiscalPeriod
+emittedWhen: PeriodStatus closing to closed
+payload:
+- field: fiscalPeriodId
+  type: uuid
+- field: legalEntityId
+  type: uuid
+- field: periodStart
+  type: date
+- field: periodEnd
+  type: date
+- field: closedByPrincipalId
+  type: uuid
+- field: closedAt
+  type: timestamp
+consumers:
+- context: reporting
+  purpose: Freeze the period in the read model and mark reports for it as final
+  idempotencyKey: fiscalPeriodId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: subscription
+  purpose: Trigger tenant billing for the period
+  idempotencyKey: fiscalPeriodId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: Retained with the period. This is an audit record, not an operational message
+notes: '**Billing consumes this rather than a timer.** Invoicing on a calendar date while the period
+  is still closing bills against figures that are still moving.'

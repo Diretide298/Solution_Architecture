@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Virtual Queue
   version: 0.1.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 12
   x-ticvai-tier: satellite
   x-ticvai-module: "5 — F&B & Guest Management (Virtual Queue)"
   x-ticvai-requirements: 46
@@ -107,6 +107,9 @@ paths:
   /queues:
     get:
       operationId: listQueues
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-004 Manual Wait Time Entry"
       x-ticvai-read-routing: replica
       summary: List queues
       description: >
@@ -143,6 +146,8 @@ paths:
 
     post:
       operationId: createQueue
+      x-ticvai-consumed-by:
+        - "P08 BO-002 Queue Configuration"
       summary: Create a queue
       description: >
         Bound to an attraction and, where one exists, to an asset — so a ride taken out of
@@ -193,6 +198,8 @@ paths:
 
     patch:
       operationId: updateQueue
+      x-ticvai-consumed-by:
+        - "P08 BO-002 Queue Configuration"
       summary: Amend queue configuration
       tags: [queue]
       x-ticvai-permission: QUEUE_MANAGE
@@ -268,6 +275,8 @@ paths:
   /queue-entries:
     post:
       operationId: joinQueue
+      x-ticvai-consumed-by:
+        - "P02 GST-023 Virtual Queue / Join Queue"
       summary: Join a virtual queue
       description: >
         Guest-facing. Returns a position, a party number and a return window.
@@ -451,6 +460,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: callNextParties
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Call the next parties forward
       description: >
         Advances the queue by a cycle. Notifies each called party through their app and, where
@@ -498,6 +509,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listQueueEntries
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       x-ticvai-read-routing: primary
       summary: List entries in a queue
       description: Operator view. Position order, with no-shows and expiries visible.
@@ -530,6 +543,8 @@ paths:
   /queues/wait-times:
     get:
       operationId: getWaitTimes
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       x-ticvai-read-routing: replica
       summary: Wait times across a venue
       description: >
@@ -572,6 +587,8 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setWaitTime
+      x-ticvai-consumed-by:
+        - "P08 BO-004 Manual Wait Time Entry"
       summary: Manually set a wait time
       description: >
         Operator override, and the fallback where no sensor feed exists. A manual figure is
@@ -606,6 +623,8 @@ paths:
   /queue-feeds:
     get:
       operationId: listQueueFeeds
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
       x-ticvai-read-routing: replica
       summary: List configured sensor feeds
       description: >
@@ -627,6 +646,9 @@ paths:
 
     put:
       operationId: configureQueueFeed
+      x-ticvai-config-scope: venue
+      x-ticvai-consumed-by:
+        - "P08 BO-003 Queue Integration Setup"
       summary: Configure a sensor feed
       description: >
         Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor
@@ -711,6 +733,39 @@ paths:
                   discardedOutOfOrder: { type: integer }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
 
+  /queue-feeds/{feedId}/test:
+    parameters:
+      - name: feedId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: testQueueFeed
+      x-ticvai-consumed-by:
+        - "P08 BO-003 Queue Integration Setup"
+      summary: Test a feed before trusting it
+      description: >
+        Attempts one exchange with the configured source and reports what came back — reachable,
+        authenticated, and whether the payload parsed into a reading the platform understands.
+
+        Configuring an integration without a test is configuring it blind. The failure this
+        catches is the common one: credentials accepted, endpoint reachable, and the payload in
+        a shape nobody mapped — which looks like silence rather than an error.
+
+        Readings from a test are discarded. A test must not move a wait time on a live board.
+      tags: [feed]
+      x-ticvai-permission: QUEUE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Test complete. Check `succeeded` — a reachable source that returns nonsense is a failure
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedTestResult' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
   /queue-feeds/{feedId}/health:
     parameters:
       - name: feedId
@@ -719,6 +774,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getQueueFeedHealth
+      x-ticvai-consumed-by:
+        - "P08 BO-003 Queue Integration Setup"
       x-ticvai-read-routing: replica
       summary: Feed health
       description: >
@@ -1077,6 +1134,38 @@ components:
         value: { type: number, minimum: 0 }
         confidence: { type: number, minimum: 0, maximum: 1 }
         observedAt: { type: string, format: date-time }
+
+    FeedTestResult:
+      type: object
+      x-ticvai-persistence: "none — computed, discarded"
+      required: [succeeded, checks, testedAt]
+      properties:
+        succeeded: { type: boolean }
+        checks:
+          type: array
+          items:
+            type: object
+            required: [check, passed]
+            properties:
+              check:
+                type: string
+                enum: [reachable, authenticated, payloadParsed, readingMapped, withinInterval]
+              passed: { type: boolean }
+              detail: { type: string }
+              latencyMs: { type: integer, nullable: true }
+        sampleReading:
+          allOf:
+            - $ref: '#/components/schemas/QueueReading'
+          description: >
+            What the source actually returned, mapped. Shown so a configurer can see whether
+            "people count 4" means four people or four groups before it drives a board.
+        rawSample:
+          type: string
+          nullable: true
+          description: >
+            Truncated raw payload. The only way to diagnose a source that is reachable and
+            returning a shape nobody mapped.
+        testedAt: { type: string, format: date-time }
 
     QueueFeedHealth:
       x-ticvai-persistence: "none — computed"

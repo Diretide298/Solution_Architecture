@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Till
   version: 1.0.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 6
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -99,6 +99,8 @@ paths:
   /shifts:
     get:
       operationId: listShifts
+      x-ticvai-consumed-by:
+        - "P04 POS-009 Staff Roster"
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
       summary: List shifts
       tags: [shift]
@@ -138,6 +140,8 @@ paths:
 
     post:
       operationId: openShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
       summary: Open a shift
       description: >
         Fails if another shift is already open on this workstation. Where the venue is
@@ -176,6 +180,8 @@ paths:
   /shifts/current:
     get:
       operationId: getCurrentShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
       tags: [shift]
@@ -218,6 +224,100 @@ paths:
               schema: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /shifts/{shiftId}/approve-open:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: approveShiftOpen
+      summary: Approve a shift opening outside tolerance
+      description: >
+        A float that does not match the venue's expected amount holds the shift in
+        `pendingApproval` until a supervisor accepts it. Without this the cashier cannot trade,
+        and with it the variance at close has a known starting point.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_APPROVE_OPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 300 }
+      responses:
+        '200':
+          description: Approved and open
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '409':
+          description: Shift is not awaiting approval
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/reopen:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: reopenShift
+      summary: Reopen a shift closed in error
+      description: >
+        A cashier who closed the wrong till, or a count submitted before the drawer was
+        finished.
+
+        **A reversal, and treated as one.** Requires an approver who is not the person who
+        closed it, and the original close is retained — reopening does not erase the first
+        count, because the difference between the two counts is the thing worth looking at.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_REOPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, approverPrincipalId]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                approverPrincipalId:
+                  type: string
+                  format: uuid
+                  description: May not be the principal who closed it.
+      responses:
+        '200':
+          description: Reopened
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403':
+          description: Approver is the closing principal
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Shift is not closed, or the fiscal period has closed over it
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /shifts/{shiftId}/suspend:
     parameters:
@@ -303,6 +403,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: closeShift
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
       summary: Blind close-out
       description: >
         The operator submits a counted denomination breakdown. The expected figure is not
@@ -346,6 +448,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: acceptShiftVariance
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
       summary: Accept an over/short beyond the threshold
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
@@ -374,6 +478,57 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /shifts/{shiftId}/no-sale:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: recordNoSale
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+      summary: Open the drawer without a sale
+      description: >
+        Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
+
+        **Recorded because it is the classic cover for theft.** A drawer that opens forty times
+        in a shift with four sales is a conversation, and it is only a conversation if someone
+        can see the count. A reason is required for the same reason it is required on a manual
+        discount — attributable, not forbidden.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_SUSPEND
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, reason, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                reason:
+                  type: string
+                  enum: [changeForGuest, correctFloat, retrieveDroppedCash, tillCheck, other]
+                note: { type: string, maxLength: 300 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoSaleEvent' }
+        '409':
+          description: Shift is not open
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /shifts/{shiftId}/cash-movements:
     parameters:
@@ -622,6 +777,24 @@ components:
           description: Safe drop reference or bag number.
         reason: { type: string, maxLength: 500 }
         recordedAt: { type: string, format: date-time }
+
+    NoSaleEvent:
+      type: object
+      x-ticvai-persistence: "orders.no_sale_event"
+      required: [id, shiftId, reason, principalId, recordedAt]
+      properties:
+        id: { type: string }
+        shiftId: { type: string }
+        workstationId: { type: string, format: uuid }
+        reason: { type: string }
+        note: { type: string, nullable: true }
+        principalId: { type: string, format: uuid }
+        recordedAt: { type: string, format: date-time }
+        countThisShift:
+          type: integer
+          description: >
+            Running count. Returned so the terminal can show it — a cashier who can see they
+            are on their ninth no-sale behaves differently from one who cannot.
 
     CashMovement:
       x-ticvai-persistence: "orders.cash_movement"

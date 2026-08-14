@@ -140,3 +140,81 @@ Under this decision it also exercises **three cells**, which makes it a better f
 it was: cross-cell paths are now default-path tests rather than a special case bolted on.
 
 No client deployment topology is implied by it, and none should be inferred.
+
+---
+
+## Amendment — 14 August 2026
+
+**A third cell kind exists: the shared cell.**
+
+The 14 August kick-off confirmed two hosting models, and this ADR described only one.
+
+**Dedicated tenant** — own infrastructure, own domain, one tenant per cell. This ADR as
+written.
+
+**Shared** — many small tenants in one TICVAI-operated database, isolated logically by scope.
+Sold as the cheaper package; a tenant wanting isolation pays for a dedicated cell. Confirmed by
+Dinesh as *"logically isolated, the data will still stay in the same database"* and by Allam as
+isolation *"based on that venue site id."*
+
+### What does not change
+
+The cell is still the shard boundary. Region is still the residency boundary — a shared cell is
+shared **within** a region, never across one. The scope tree and RLS already support several
+tenant roots in one database; that part needed no work.
+
+### What does change
+
+**"A cell holds exactly one tenant" is no longer true**, and one thing had been built on it.
+`platform.tenant` was written as a single-row projection with **no RLS**, on that stated
+ground. On a shared cell that is a cross-tenant leak between two paying customers. Corrected in
+V0003a on the day the amendment was written, because adding it later would mean a migration
+against live data protecting something already exposed.
+
+**Migration fan-out is per cell, not per tenant.** A shared cell holds many tenants on one
+schema version, so a tenant cannot defer an upgrade there — deferral is a dedicated-cell
+privilege. The upgrade scheduler needs to say so rather than accepting a deferral it cannot
+honour.
+
+**Sizing is driven by traffic and concurrent users, not by tenant count.** Forty quiet tenants
+may load a cell less than three busy ones, and Qossai's two-week event with 30,000 attendees a
+day is small commercially and large here. `getCellCapacity` reports per dimension —
+concurrent users, transactions, scans, connections, storage, replication lag — because a cell
+short of connections and long on storage needs a different response from one short of both.
+
+**Scaling out means launching another identical cluster**, not growing one indefinitely. A
+single primary has a ceiling, and it arrives during an event rather than at a planning meeting.
+`launchCellCluster` replicates an existing cell's shape, tier and **schema version** — copied
+from a model cell rather than specified, because a cluster at a different version is not
+capacity, it is a second thing to maintain.
+
+**A tenant can move between cells, and that is a product.** A client who starts on shared
+infrastructure and later wants isolation is **migrated to their own cell**. The shared start is
+not a decision they are stuck with, and saying so is what makes the cheaper package sellable.
+The same operation rebalances a hot shared cell onto a newly launched cluster.
+
+`planTenantMigration` and `executeTenantMigration`. Three constraints:
+
+- **Region cannot change.** Moving a tenant across a residency boundary is not a migration, it
+  is an export, and it is refused.
+- **A tenant mid-trade cannot move.** Open shifts block it — a cutover during a shift loses
+  the drawer.
+- **The source is retained, not dropped.** A cutover that goes wrong needs somewhere to return
+  to, and a tenant's whole history is not something to delete on the day it moved.
+
+Cross-cell links are re-pointed rather than copied. An entitlement redeemable in another region
+holds a link that, copied, leaves two cells claiming the same guest.
+
+### The isolation question this raises
+
+Logical isolation puts two customers' data one missing `WHERE` clause apart. That is exactly
+what RLS with `FORCE` exists for, and it is why the migration checker fails any table carrying
+`scope_path` or `venue_id` without a policy.
+
+It is also why the shared cell should not be treated as the same product as a dedicated one:
+a dedicated cell survives an application bug that a shared cell does not. Worth stating to a
+client who asks what they are paying extra for.
+
+> **Cell kinds are now stated in [ADR-0017](0017-deployment-models.md).** The split rule —
+> Cell = Tenant × Region — still stands and is this ADR's contribution. What a cell *contains*
+> moved to ADR-0017 after being amended twice here.

@@ -1,0 +1,642 @@
+# P07 — Staff Scanner — Access Control
+#
+# Derived from the wireframe board on 14 August. **Purposes and navigation are real;
+# components, states and operations are not yet written.** Every screen carries
+# wireframe.status drafted so the gap is visible rather than implied.
+
+platform:
+  code: P07
+  audience: staff
+  formFactor: handheld
+  shortName: Staff Scanner
+  name: Staff Scanner — Access Control
+  surface: staffFacing
+  runtime: reactNative
+  app: scanner
+  appStatus: scaffolded
+  offlineCapable: true
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  - offline-core
+  deployment:
+    target: rugged handheld — Android
+    distribution: MDM
+    bundleUpdate: at shift start
+    hosting: local, offline-first (ADR-0013)
+    storeReview: false
+    deviceOwnership: venue-owned, issued per shift
+    networkAssumption: must function with none
+    releaseCadence: monthly, never on an event day
+  screenCount: 16
+  wireframeBoard: wireframes/P07 Staff Scanner.dc.html
+screens:
+- id: SCN-001
+  name: Sign in
+  module: Access
+  purpose: PIN or badge. Session carries the workstation.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Session check against the local store, then the server if reachable
+    empty: Not applicable
+    error: Sign-in failed. The reason is shown — wrong PIN reads differently from no network
+    offline: '**Signs in against the cached principal list from the last bundle.** A steward locked
+      out at 08:00 because the venue wifi is down is a gate that does not open'
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-001
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/sign-in
+    component: apps/scanner/src/routes/access/SignInDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: login
+    contract: identity
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getCurrentShift
+    contract: shift
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-002
+  name: Access point & direction
+  module: Access
+  purpose: Confirm what this device is doing before it does it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Access points from the bundle
+    empty: No access points configured for this venue — a configuration error, shown as one
+    error: Cannot load. The last selection is offered
+    offline: Fully offline. The access point list is in the bundle
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-002
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/access-point-direction
+    component: apps/scanner/src/routes/access/AccessPointDirectionDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listAccessPoints
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: setTurnstileMode
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-003
+  name: Ready to scan
+  module: Access
+  purpose: The screen the device sits on all day.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Instant. This screen must never wait
+    empty: Not applicable
+    error: Camera or scanner hardware failed — distinct from a bad scan, and it needs a different response
+    offline: '**The normal state.** The strip shows bundle age and pending journal count, and a steward
+      who can see both knows what to trust'
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-003
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/ready-to-scan
+    component: apps/scanner/src/routes/access/ReadyToScanDetail.tsx
+    status: notStarted
+- id: SCN-004
+  name: Admitted
+  module: Access
+  purpose: Readable at arm's length, gone in 1.5s.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: None. The decision is already made when this renders
+    empty: Not applicable
+    error: Not applicable — an admit is not an error state
+    offline: Identical offline. The entitlement is consumed in the local journal and the guest goes
+      through
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-004
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/admitted
+    component: apps/scanner/src/routes/access/AdmittedDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: validateAccess
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-005
+  name: Denied
+  module: Access
+  purpose: A reason and a next action, never a boolean.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: None
+    empty: Not applicable
+    error: '**The deny reason is the screen.** A steward facing a guest needs to say what happened,
+      not just no'
+    offline: 'Identical offline, with one difference: a denial the bundle cannot explain shows `unknown
+      to this device` rather than inventing a reason'
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-005
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/denied
+    component: apps/scanner/src/routes/access/DeniedDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: validateAccess
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-006
+  name: Override
+  module: Access
+  purpose: The operation most likely to be examined after an incident.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Permission check, which may need the server
+    empty: Not applicable
+    error: Override refused — the steward does not hold the permission
+    offline: '**Available offline and recorded locally.** An override that cannot happen without a network
+      is an override that never happens at a gate'
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-006
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/override
+    component: apps/scanner/src/routes/access/OverrideDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: overrideAccess
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-007
+  name: Group admission
+  module: Access
+  purpose: Partial admission is the normal case, not the error.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Party resolution from the bundle
+    empty: Party of one — falls through to a normal scan
+    error: Group could not be resolved
+    offline: Fully offline. Admits what is valid and states the shortfall
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-007
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/group-admission
+    component: apps/scanner/src/routes/access/GroupAdmissionDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-008
+  name: Manual entry
+  module: Access
+  purpose: Damaged media, dead phone battery, printed slip.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Reference lookup, local first
+    empty: No match for that reference
+    error: Not found. Offers SCN-009 by name instead
+    offline: Searches the bundle only. A reference issued after the last sync will not be found, and
+      the screen says so rather than denying
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-008
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/manual-entry
+    component: apps/scanner/src/routes/access/ManualEntryDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: lookupTicket
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-009
+  name: Ticket lookup
+  module: Access
+  purpose: Reads. Does not admit, does not decrement.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Name search across the bundle
+    empty: No match
+    error: Search unavailable
+    offline: Bundle only, and the bundle age is shown beside the results
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-009
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/ticket-lookup
+    component: apps/scanner/src/routes/access/TicketLookupDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: lookupTicket
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-010
+  name: Blacklisted
+  module: Access
+  purpose: Denies outright regardless of entitlement.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: None
+    empty: Not applicable
+    error: Not applicable
+    offline: Blacklist ships in the bundle. **A blacklist that only works online is not a blacklist**
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-010
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/blacklisted
+    component: apps/scanner/src/routes/access/BlacklistedDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listBlacklist
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-011
+  name: Delegated right
+  module: Access
+  purpose: A ticket issued in another cell, redeemed here.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Right resolution, which may cross cells
+    empty: No delegated right on this media
+    error: Cross-cell lookup failed
+    offline: '**Not available offline.** A delegated right issued in another region cannot be verified
+      from a local bundle, and admitting on trust is how a pass gets used twice in two countries'
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-011
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/delegated-right
+    component: apps/scanner/src/routes/access/DelegatedRightDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getRedemptionRight
+    contract: cross-cell
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-012
+  name: Offline scanning
+  module: Access
+  purpose: Same loop, different truth. Amber says so.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Not applicable — this screen is the offline state
+    empty: Not applicable
+    error: Bundle missing or expired. The device refuses to scan rather than admitting blind
+    offline: This is the screen. Bundle age, scans journalled, last sync attempt
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-012
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/offline-scanning
+    component: apps/scanner/src/routes/access/OfflineScanningDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: validateAccess
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-013
+  name: Offline journal
+  module: Access
+  purpose: What the device decided, before anyone confirmed it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Journal loads locally
+    empty: Nothing journalled
+    error: Journal unreadable — the most serious failure on the device
+    offline: The journal is the offline record. It is why an offline admit is recoverable
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-013
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/offline-journal
+    component: apps/scanner/src/routes/access/OfflineJournalDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listScans
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-014
+  name: Sync & reconciliation
+  module: Access
+  purpose: The screen nobody designs and everybody needs.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Sync in progress, with a count
+    empty: Nothing to sync
+    error: Sync failed. **The journal is kept** — a failed sync must never discard what it was carrying
+    offline: Not applicable. This screen exists to end the offline period
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-014
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/sync-reconciliation
+    component: apps/scanner/src/routes/access/SyncReconciliationDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: syncScans
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: listSyncRejections
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-015
+  name: Offline package
+  module: Access
+  purpose: Rule changes land here, not instantly.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Downloading. Size and progress shown
+    empty: Not applicable
+    error: Download failed. The previous bundle stays in place
+    offline: Cannot refresh. The existing bundle continues to be used and its age is shown
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-015
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/offline-package
+    component: apps/scanner/src/routes/access/OfflinePackageDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: SCN-016
+  name: Gate mode
+  module: Access
+  purpose: Podium operation. Changes what the gate does.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Current mode from the device
+    empty: Not applicable
+    error: Turnstile unreachable — the mode is a request, not a confirmed hardware state
+    offline: '**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding
+      (CF-33)'
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P07 Staff Scanner.dc.html#scn-016
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: scanner
+    route: /access/gate-mode
+    component: apps/scanner/src/routes/access/GateModeDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: setTurnstileMode
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad

@@ -1,0 +1,2149 @@
+# P02 — Guest Mobile App
+# Generated from handoff/page-inventory.md, then corrected against the client
+# hierarchy v2.1 and the contracts. Offline-capable: every screen declares an
+# offline state.
+
+platform:
+  code: P02
+  audience: guest
+  formFactor: mobileApp
+  shortName: Guest App
+  name: Guest App — Mobile
+  surface: guestFacing
+  runtime: reactNative
+  offlineCapable: true
+  themes:
+  - light
+  - dark
+  directions:
+  - ltr
+  - rtl
+  screenCount: 62
+  app: guest
+  appStatus: scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  - offline-core
+  deployment:
+    target: iOS / Android native
+    distribution: App Store + Play, tenant developer account
+    bundleUpdate: over-the-air for JS; store release for native
+    hosting: n/a — installed
+    storeReview: true
+    deviceOwnership: guest device
+    networkAssumption: mobile data, intermittent
+    releaseCadence: fortnightly, gated by review
+  wireframeBoard: wireframes/P02 Guest App.dc.html
+screens:
+- id: GST-001
+  name: Home – Default
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-001
+  capability: C02
+  openQuestions:
+  - Inventory cites `GET /catalogue, local` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/home-default
+    component: apps/guest/src/routes/general/HomeDefaultDashboard.tsx
+    status: notStarted
+  navigation:
+    isEntryPoint: true
+    inferred: true
+- id: GST-002
+  name: Explore Categories
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-002
+  capability: C02
+  openQuestions:
+  - Inventory cites `GET /catalogue` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/explore-categories
+    component: apps/guest/src/routes/general/ExploreCategoriesList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-003
+  name: Attractions List
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-003
+  capability: C02
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/attractions-list
+    component: apps/guest/src/routes/general/AttractionsList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-004
+  name: Attraction Details
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-004
+  capability: C02
+  apis:
+  - operationId: getProduct
+    contract: catalogue
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/attraction-details
+    component: apps/guest/src/routes/general/AttractionDetailsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-005
+  name: What's On
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-005
+  capability: C84
+  apis:
+  - operationId: listEvents
+    contract: catalogue
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/whats-on
+    component: apps/guest/src/routes/general/WhatsOnList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-006
+  name: Event / Exhibition Details
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-006
+  capability: C84
+  apis:
+  - operationId: getEvent
+    contract: catalogue
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/event-exhibition-details
+    component: apps/guest/src/routes/general/EventExhibitionDetailsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-007
+  name: Select Date & Time
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-007
+  capability: C02
+  openQuestions:
+  - Inventory cites `GET /performances, POST /leases` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/select-date-and-time
+    component: apps/guest/src/routes/general/SelectDateAndTimeDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-008
+  name: Tickets & Add-ons
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-008
+  capability: C02
+  openQuestions:
+  - Inventory cites `local` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/tickets-and-add-ons
+    component: apps/guest/src/routes/general/TicketsAndAddOnsList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-009
+  name: Review & Payment
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-009
+  capability: C47
+  apis:
+  - operationId: createOrder
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/review-and-payment
+    component: apps/guest/src/routes/general/ReviewAndPaymentForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-010
+  name: Booking Confirmation
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-010
+  capability: C02
+  apis:
+  - operationId: getOrder
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/booking-confirmation
+    component: apps/guest/src/routes/general/BookingConfirmationDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-011
+  name: Wallet Overview
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-011
+  capability: C37
+  openQuestions:
+  - Inventory cites `GET /wallet` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/wallet-overview
+    component: apps/guest/src/routes/general/WalletOverviewDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-012
+  name: My Tickets
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-012
+  capability: C02
+  openQuestions:
+  - Inventory cites `GET /tickets` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/my-tickets
+    component: apps/guest/src/routes/general/MyTicketsList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-013
+  name: Ticket Details
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-013
+  capability: C02
+  openQuestions:
+  - Inventory cites `GET /tickets/{id}` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/ticket-details
+    component: apps/guest/src/routes/general/TicketDetailsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-014
+  name: Ticket Transfer
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-014
+  capability: C02
+  openQuestions:
+  - Inventory cites `POST /tickets/{id}/transfer` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/ticket-transfer
+    component: apps/guest/src/routes/general/TicketTransferDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-015
+  name: Memberships
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-015
+  capability: C03
+  openQuestions:
+  - Inventory cites `GET /memberships` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/memberships
+    component: apps/guest/src/routes/general/MembershipsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-016
+  name: My Reservations
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-016
+  capability: C02
+  apis:
+  - operationId: listReservations
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/my-reservations
+    component: apps/guest/src/routes/general/MyReservationsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-017
+  name: Reservation Details
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-017
+  capability: C02
+  apis:
+  - operationId: getReservation
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/reservation-details
+    component: apps/guest/src/routes/general/ReservationDetailsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-018
+  name: Add to Calendar / Reminders
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-018
+  capability: C02
+  openQuestions:
+  - Inventory cites `local` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/add-to-calendar-reminders
+    component: apps/guest/src/routes/general/AddToCalendarRemindersDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-019
+  name: Order History (Wallet)
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-019
+  capability: C21
+  apis:
+  - operationId: listOrders
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/order-history-wallet
+    component: apps/guest/src/routes/general/OrderHistoryWalletDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-020
+  name: Saved Items / Wishlist
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-020
+  capability: C58
+  openQuestions:
+  - Inventory cites `GET /wishlist` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/saved-items-wishlist
+    component: apps/guest/src/routes/general/SavedItemsWishlistList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-021
+  name: Interactive Map
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: canvas
+    regions:
+    - name: contentBody
+      components:
+      - kind: scanTarget
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-021
+  capability: C39
+  openQuestions:
+  - Inventory cites `GET /venue-map` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/interactive-map
+    component: apps/guest/src/routes/general/InteractiveMapCanvas.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-022
+  name: Attraction Wait Times
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-022
+  capability: C82
+  openQuestions:
+  - Inventory cites `GET /queue/wait-times` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/attraction-wait-times
+    component: apps/guest/src/routes/general/AttractionWaitTimesDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-023
+  name: Virtual Queue / Join Queue
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-023
+  capability: C82
+  apis:
+  - operationId: joinQueue
+    contract: queue
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/virtual-queue-join-queue
+    component: apps/guest/src/routes/general/VirtualQueueJoinQueueDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-024
+  name: F&B – Browse & Order
+  module: TODO
+  purpose: Order food to where the guest is sitting, or for collection.
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-024
+  capability: C05
+  apis:
+  - operationId: listDiningOutlets
+    contract: fnb
+    purpose: Outlets open now, with ordering method
+    trigger: onLoad
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: The menu in force at this moment
+    trigger: onLoad
+  - operationId: claimLocationSession
+    contract: fnb
+    purpose: Scan the table, cabana or sunbed code
+    trigger: onLoad
+  - operationId: createGuestFnbOrder
+    contract: fnb
+    purpose: Place the order
+    trigger: onLoad
+  notes: The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
+    or a seat uses the same claimLocationSession as a table (4.6.26).
+  implementation:
+    app: guest
+    route: /general/fandb-browse-and-order
+    component: apps/guest/src/routes/general/FandbBrowseAndOrderList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-025
+  name: F&B – Order Tracking
+  module: TODO
+  purpose: Track an order to the point it reaches the guest.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-025
+  capability: C05
+  apis:
+  - operationId: getGuestOrderStatus
+    contract: fnb
+    purpose: Ordered → accepted → in preparation → ready → served, collected or delivered
+    trigger: onLoad
+  - operationId: getGuestBill
+    contract: fnb
+    purpose: Everything ordered at this location this sitting
+    trigger: onLoad
+  notes: Nine states from 4.6.35. Collected and delivered are distinct from served — a counter handover,
+    a runner delivery and a server putting a plate down are three different events.
+  implementation:
+    app: guest
+    route: /general/fandb-order-tracking
+    component: apps/guest/src/routes/general/FandbOrderTrackingDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-026
+  name: Retail / Merchandise
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-026
+  capability: C08
+  openQuestions:
+  - Inventory cites `GET /products?kind=retail` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/retail-merchandise
+    component: apps/guest/src/routes/general/RetailMerchandiseDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-027
+  name: Parking – Reserve & Pay
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-027
+  capability: C23
+  openQuestions:
+  - Inventory cites `POST /parking-reservations` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/parking-reserve-and-pay
+    component: apps/guest/src/routes/general/ParkingReserveAndPayDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-028
+  name: Parking – Reservation Confirmed
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-028
+  capability: C23
+  openQuestions:
+  - Inventory cites `GET /parking-reservations/{id}` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/parking-reservation-confirmed
+    component: apps/guest/src/routes/general/ParkingReservationConfirmedDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-029
+  name: Venue Info & Services
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-029
+  capability: C17
+  openQuestions:
+  - Inventory cites `GET /venue-info` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/venue-info-and-services
+    component: apps/guest/src/routes/general/VenueInfoAndServicesDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-030
+  name: In-Venue Notifications
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-030
+  capability: C61
+  openQuestions:
+  - Inventory cites `GET /notifications` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/in-venue-notifications
+    component: apps/guest/src/routes/general/InVenueNotificationsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+  apis:
+  - operationId: claimLocationSession
+    contract: fnb
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: GST-031
+  name: AI Concierge – Home
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-031
+  capability: AI-02
+  openQuestions:
+  - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/ai-concierge-home
+    component: apps/guest/src/routes/general/AiConciergeHomeDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+  apis:
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: GST-032
+  name: AI Concierge – Chat
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-032
+  capability: AI-02
+  openQuestions:
+  - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/ai-concierge-chat
+    component: apps/guest/src/routes/general/AiConciergeChatDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+  apis:
+  - operationId: createGuestFnbOrder
+    contract: fnb
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: GST-033
+  name: AI Concierge – Contextual Help
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-033
+  capability: AI-02
+  openQuestions:
+  - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/ai-concierge-contextual-help
+    component: apps/guest/src/routes/general/AiConciergeContextualHelpDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+  apis:
+  - operationId: createPayment
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: GST-034
+  name: Lost & Found
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-034
+  capability: C18
+  openQuestions:
+  - Inventory cites `POST /lost-found/reports` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/lost-and-found
+    component: apps/guest/src/routes/general/LostAndFoundDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+  apis:
+  - operationId: getGuestOrderStatus
+    contract: fnb
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: GST-035
+  name: Feedback & Ratings
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-035
+  capability: C62
+  apis:
+  - operationId: submitReview
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/feedback-and-ratings
+    component: apps/guest/src/routes/general/FeedbackAndRatingsList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-036
+  name: Loyalty & Rewards
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-036
+  capability: C64
+  openQuestions:
+  - Inventory cites `GET /loyalty` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/loyalty-and-rewards
+    component: apps/guest/src/routes/general/LoyaltyAndRewardsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-037
+  name: Offers & Promotions
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-037
+  capability: C86
+  openQuestions:
+  - Inventory cites `GET /offers` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/offers-and-promotions
+    component: apps/guest/src/routes/general/OffersAndPromotionsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-038
+  name: Digital Companion Mode
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-038
+  capability: C105
+  apis:
+  - operationId: getFeatureToggles
+    contract: white-label
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/digital-companion-mode
+    component: apps/guest/src/routes/general/DigitalCompanionModeDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-039
+  name: Profile
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: cardList
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-039
+  capability: C58
+  openQuestions:
+  - Inventory cites `GET /guests/me` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/profile
+    component: apps/guest/src/routes/general/ProfileDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-040
+  name: Help & Support
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-040
+  capability: C17
+  openQuestions:
+  - Inventory cites `GET /support` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/help-and-support
+    component: apps/guest/src/routes/general/HelpAndSupportDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-041
+  name: Checkout Entry
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-041
+  capability: C56
+  openQuestions:
+  - Inventory cites `—` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/checkout-entry
+    component: apps/guest/src/routes/general/CheckoutEntryForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-042
+  name: Simple Registration & OTP
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-042
+  capability: C56
+  apis:
+  - operationId: requestGuestOtp
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/simple-registration-and-otp
+    component: apps/guest/src/routes/general/SimpleRegistrationAndOtpDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-043
+  name: Arabic / RTL Experience
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-043
+  capability: C57
+  openQuestions:
+  - Inventory cites `—` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/arabic-rtl-experience
+    component: apps/guest/src/routes/general/ArabicRtlExperienceDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-044
+  name: Multi-Currency & Pricing
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-044
+  capability: C107
+  openQuestions:
+  - Inventory cites `GET /currencies` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/multi-currency-and-pricing
+    component: apps/guest/src/routes/general/MultiCurrencyAndPricingDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-045
+  name: Ticket Delivery & Sharing
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-045
+  capability: C02
+  openQuestions:
+  - Inventory cites `POST /tickets/{id}/share` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/ticket-delivery-and-sharing
+    component: apps/guest/src/routes/general/TicketDeliveryAndSharingDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-046
+  name: Branded Queue / Waiting Room
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-046
+  capability: C98
+  openQuestions:
+  - Inventory cites `GET /waiting-room` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/branded-queue-waiting-room
+    component: apps/guest/src/routes/general/BrandedQueueWaitingRoomDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-047
+  name: Maintenance Page
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-047
+  capability: C57
+  apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/maintenance-page
+    component: apps/guest/src/routes/general/MaintenancePageDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-048
+  name: Upsell / Cross-Sell
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-048
+  capability: C88
+  openQuestions:
+  - Inventory cites `GET /recommendations` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/upsell-cross-sell
+    component: apps/guest/src/routes/general/UpsellCrossSellDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-049
+  name: Interactive Seat Selection
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: canvas
+    regions:
+    - name: contentBody
+      components:
+      - kind: scanTarget
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-049
+  capability: C53
+  apis:
+  - operationId: getSeatMap
+    contract: seating
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/interactive-seat-selection
+    component: apps/guest/src/routes/general/InteractiveSeatSelectionCanvas.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-050
+  name: Resource Booking – Cabana
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-050
+  capability: C78
+  openQuestions:
+  - Inventory cites `POST /resource-bookings` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/resource-booking-cabana
+    component: apps/guest/src/routes/general/ResourceBookingCabanaDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-051
+  name: Plan Your Adventure – Start
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-051
+  capability: AI-35
+  openQuestions:
+  - Inventory cites `POST /ai/itinerary` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/plan-your-adventure-start
+    component: apps/guest/src/routes/general/PlanYourAdventureStartDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-052
+  name: Suggested Itineraries
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-052
+  capability: AI-35
+  openQuestions:
+  - Inventory cites `GET /itineraries/suggested` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/suggested-itineraries
+    component: apps/guest/src/routes/general/SuggestedItinerariesDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-053
+  name: Build Your Own Itinerary
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-053
+  capability: C02
+  openQuestions:
+  - Inventory cites `POST /itineraries` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/build-your-own-itinerary
+    component: apps/guest/src/routes/general/BuildYourOwnItineraryDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-054
+  name: AI Optimized Itinerary
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-054
+  capability: AI-35
+  openQuestions:
+  - Inventory cites `POST /ai/itinerary/optimise` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/ai-optimized-itinerary
+    component: apps/guest/src/routes/general/AiOptimizedItineraryDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-055
+  name: Dynamic QR Ticket
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: canvas
+    regions:
+    - name: contentBody
+      components:
+      - kind: scanTarget
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-055
+  capability: C09
+  openQuestions:
+  - Inventory cites `GET /tickets/{id}/dynamic-qr` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/dynamic-qr-ticket
+    component: apps/guest/src/routes/general/DynamicQrTicketCanvas.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-056
+  name: Bundle Package
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-056
+  capability: C87
+  apis:
+  - operationId: getBundle
+    contract: promotions
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/bundle-package
+    component: apps/guest/src/routes/general/BundlePackageDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-057
+  name: Accessibility Information
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-057
+  capability: C17
+  openQuestions:
+  - Inventory cites `GET /accessibility` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/accessibility-information
+    component: apps/guest/src/routes/general/AccessibilityInformationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-058
+  name: Resource Availability (Cabana)
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-058
+  capability: C78
+  openQuestions:
+  - Inventory cites `GET /resources/availability` — no matching operation. Written before the contracts
+    existed.
+  implementation:
+    app: guest
+    route: /general/resource-availability-cabana
+    component: apps/guest/src/routes/general/ResourceAvailabilityCabanaDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-059
+  name: Plan My Day – In Progress
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-059
+  capability: C02
+  openQuestions:
+  - Inventory cites `GET /itineraries/{id}` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest
+    route: /general/plan-my-day-in-progress
+    component: apps/guest/src/routes/general/PlanMyDayInProgressDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-060
+  name: Maintenance / Upgrade Page
+  module: TODO
+  purpose: TODO — one sentence, what the guest came here to do
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — the guest app caches tickets; most other reads need a network
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-060
+  capability: C57
+  apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest
+    route: /general/maintenance-upgrade-page
+    component: apps/guest/src/routes/general/MaintenanceUpgradePageDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-061
+  name: Menu Item Detail
+  module: In-Venue Experience
+  purpose: Decide on a dish, choose modifiers, check allergens.
+  capability: C05
+  wave: 2
+  apis:
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: Item, modifiers and allergens
+    trigger: onLoad
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        bindsTo: GuestMenu.sections[].items[]
+      - kind: selectField
+        label: Modifiers
+        notes: Constraints come from the group — minimum, maximum, required
+      - kind: banner
+        notes: Allergens. Always present; not a field a tenant may omit (4.8.9)
+  states:
+    loading: Item skeleton
+    empty: Not applicable
+    error: Item unavailable, with a route back to the menu
+    offline: Cached menu shown with a staleness warning. Ordering is refused — availability changes
+      by the minute
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-061
+  notes: P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August.
+  implementation:
+    app: guest
+    route: /in-venue-experience/menu-item-detail
+    component: apps/guest/src/routes/in-venue-experience/MenuItemDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+- id: GST-062
+  name: Shop & Drop Collection
+  module: In-Venue Experience
+  purpose: Collect shopping left earlier, using the ticket rather than a receipt.
+  capability: C21
+  wave: 3
+  apis:
+  - operationId: lookupShopAndDrop
+    contract: retail
+    purpose: Find goods awaiting collection
+    trigger: onLoad
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: ShopAndDrop
+      - kind: banner
+        notes: Collect-by time. Usually venue close
+  states:
+    loading: List skeleton
+    empty: Nothing awaiting collection
+    error: Lookup unavailable — the collection point can still find it by receipt
+    offline: Cannot look up. Shows the drop reference held locally so a guest can quote it
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-062
+  notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
+  implementation:
+    app: guest
+    route: /in-venue-experience/shop-and-drop-collection
+    component: apps/guest/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true

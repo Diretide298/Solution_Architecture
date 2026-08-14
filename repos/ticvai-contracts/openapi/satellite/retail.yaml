@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 2
+  x-ticvai-screen-count: 4
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -393,6 +393,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: reprintReceipt
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       summary: Reprint or resend a receipt
       tags: [sale]
       x-ticvai-permission: ORDER_REPRINT
@@ -556,6 +558,7 @@ paths:
 
     put:
       operationId: setReturnPolicy
+      x-ticvai-config-scope: venue
       summary: Set the retail return policy
       tags: [return]
       x-ticvai-permission: REGION_CONFIGURE
@@ -864,6 +867,157 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/OutletStockLine' }
+
+  /shop-and-drop:
+    post:
+      operationId: createShopAndDrop
+      summary: Buy now, collect on the way out
+      description: >
+        4.4.7 — a guest buys in store and leaves the goods behind rather than carrying them
+        round a venue all day. The purchase is **linked to their entitlement**, which is what
+        makes collection possible without a receipt: the ticket they are already carrying is
+        the claim.
+
+        The goods leave stock at purchase, not at collection. They are sold; they are merely
+        somewhere else.
+
+        Not a reservation. `reserveMerchandise` holds unsold stock for someone who has not
+        paid; this is paid goods awaiting handover, and conflating the two produces a stock
+        figure nobody can explain.
+      tags: [floor]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, saleId, collectionPointId, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                saleId: { type: string }
+                entitlementId:
+                  type: string
+                  nullable: true
+                  description: >
+                    The guest's ticket. Scanned at collection instead of a receipt — the
+                    thing they cannot leave without is the thing that claims their shopping.
+                collectionPointId: { type: string, format: uuid }
+                lineIds:
+                  type: array
+                  description: Omit to drop the whole sale.
+                  items: { type: string }
+                collectBy:
+                  type: string
+                  format: date-time
+                  description: >
+                    Usually venue close. Uncollected goods after it become an exception, not
+                    a permanent shelf occupant.
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Dropped
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShopAndDrop' }
+        '409':
+          description: >
+            Sale already dropped, an item is non-droppable — chilled, fragile, oversized — or
+            the collection point is closed before `collectBy`.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shop-and-drop/lookup:
+    get:
+      operationId: lookupShopAndDrop
+      x-ticvai-consumed-by:
+        - "P02 GST-062 Shop & Drop Collection"
+      summary: Find a guest's dropped goods
+      description: >
+        Scanned at the collection point. Accepts the entitlement, the drop reference, or the
+        original receipt — a guest arrives with whichever they still have.
+      tags: [floor]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - name: entitlementId
+          in: query
+          schema: { type: string }
+        - name: dropReference
+          in: query
+          schema: { type: string }
+        - name: receiptNumber
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Awaiting collection
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ShopAndDrop' }
+        '400':
+          description: No identifier supplied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shop-and-drop/{dropId}/collect:
+    parameters:
+      - name: dropId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: collectShopAndDrop
+      summary: Hand the goods over
+      description: >
+        Records who handed over and against what. Partial collection is permitted — a guest
+        may take some and leave the rest for a later trip on the same ticket.
+      tags: [floor]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recordedAt]
+              properties:
+                lineIds:
+                  type: array
+                  items: { type: string }
+                verifiedBy:
+                  type: string
+                  enum: [entitlementScan, receipt, dropReference, staffOverride]
+                note: { type: string, maxLength: 500 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Collected
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShopAndDrop' }
+        '409':
+          description: Already collected, or past the collection deadline
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /outlets/{outletId}/reserve:
     parameters:
@@ -1353,6 +1507,44 @@ components:
         available: { type: number }
         isBelowReorderPoint: { type: boolean }
         lastSoldAt: { type: string, format: date-time, nullable: true }
+
+    ShopAndDrop:
+      type: object
+      x-ticvai-persistence: "retail.shop_and_drop + retail.shop_and_drop_line"
+      required: [id, dropReference, saleId, collectionPointId, status, collectBy]
+      properties:
+        id: { type: string }
+        dropReference:
+          type: string
+          description: Short and readable. Printed on the slip a guest may or may not keep.
+        saleId: { type: string }
+        entitlementId:
+          type: string
+          nullable: true
+          description: >
+            The ticket that claims these goods. The point of 4.4.7 — a guest does not have to
+            keep a receipt safe for eight hours in a water park.
+        subjectId: { type: string, format: uuid, nullable: true }
+        collectionPointId: { type: string, format: uuid }
+        collectionPointName: { type: string }
+        status:
+          type: string
+          enum: [awaitingCollection, partiallyCollected, collected, uncollected, disposed]
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              lineId: { type: string }
+              merchandiseId: { type: string, format: uuid }
+              name: { type: string }
+              quantity: { type: integer }
+              collectedQuantity: { type: integer }
+        droppedAt: { type: string, format: date-time }
+        collectBy: { type: string, format: date-time }
+        collectedAt: { type: string, format: date-time, nullable: true }
+        collectedByPrincipalId: { type: string, format: uuid, nullable: true }
+        verifiedBy: { type: string, nullable: true }
 
     MerchandiseReservation:
       x-ticvai-persistence: "retail.reservation + retail.reservation_line"

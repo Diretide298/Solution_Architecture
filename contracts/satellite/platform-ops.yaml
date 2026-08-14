@@ -171,6 +171,78 @@ paths:
               schema: { $ref: '#/components/schemas/ReleaseDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
+  /releases/{releaseId}/reject:
+    parameters:
+      - name: releaseId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rejectRelease
+      summary: Reject a release back a stage
+      description: >
+        Staging promotion is where a bad release is stopped, and stopping it needs to be as easy as promoting it.
+      tags: [release]
+      x-ticvai-permission: PLATFORM_RELEASE_PROMOTE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /releases/{releaseId}/withdraw:
+    parameters:
+      - name: releaseId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: withdrawRelease
+      summary: Withdraw a release
+      description: >
+        Distinct from a rollback. The rollout state handles the mechanics of reversing a deployment; this records the decision that the artefact should never ship again.
+      tags: [release]
+      x-ticvai-permission: PLATFORM_RELEASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /releases/{releaseId}/promote:
     parameters:
       - name: releaseId
@@ -323,6 +395,42 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/RolloutDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /rollouts/{rolloutId}/start:
+    parameters:
+      - name: rolloutId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: startRollout
+      summary: Start or continue a rollout
+      description: >
+        Begins at the canary and continues from it once held. **The canary should be a dedicated cell or the smallest shared one** — a canary that is itself a busy shared cell risks many tenants (ADR-0001).
+      tags: [rollout]
+      x-ticvai-permission: PLATFORM_RELEASE_PROMOTE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stage]
+              properties:
+                stage: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /rollouts/{rolloutId}/pause:
     parameters:
@@ -1060,8 +1168,12 @@ components:
         hasUnexplainedSkew:
           type: boolean
           description: >
-            Skew during a rollout is expected. Skew outside one is a defect, and separating
-            the two is the entire value of this report.
+            Skew during a rollout is expected. Skew outside one is a defect, and separating the
+            two is the entire value of this report.
+
+            **An on-premise cell is a third case: legitimately behind, indefinitely**, because
+            the client has not scheduled the window and TICVAI cannot push. It is not counted
+            here and must not appear as a defect (ADR-0017).
         cells:
           type: array
           items:
@@ -1076,7 +1188,13 @@ components:
               reason:
                 type: string
                 nullable: true
-                enum: [midRollout, rolloutPaused, rolloutFailed, tenantDeferred, unexplained]
+                enum:
+                  - midRollout
+                  - rolloutPaused
+                  - rolloutFailed
+                  - tenantDeferred
+                  - onPremiseNotScheduled
+                  - unexplained
 
     Environment:
       type: object

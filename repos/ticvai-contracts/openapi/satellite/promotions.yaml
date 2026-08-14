@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 3
+  x-ticvai-screen-count: 4
   x-ticvai-tier: satellite
   x-ticvai-module: "4 — Bundles and Promotions"
   x-ticvai-requirements: 229
@@ -231,6 +231,105 @@ paths:
               schema: { $ref: '#/components/schemas/Promotion' }
         '409':
           description: Conditions or discount amended on a live promotion
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}/pause:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: pausePromotion
+      summary: Pause a live promotion
+      description: >
+        **Carts already priced keep their price.** A guest mid-checkout is not repriced — the discount they were shown is the one they pay.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}/end:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: endPromotion
+      summary: End a promotion early
+      description: >
+        Distinct from expiry. `expired` means it ran its course; `ended` means somebody decided, and the register should be able to answer which after a bad month.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}/unschedule:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: unschedulePromotion
+      summary: Pull a scheduled promotion before it starts
+      description: >
+        Returns it to draft. Nothing has priced against it yet, so nothing needs honouring.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -477,6 +576,42 @@ paths:
               schema: { $ref: '#/components/schemas/CouponCode' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
+  /coupon-codes/{code}/assign:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: assignCoupon
+      summary: Assign a coupon to a named guest
+      description: >
+        Allocates an issued code to a subject. Only that guest may redeem it, which is the difference between a campaign code and a service-recovery one.
+      tags: [coupon]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subjectId]
+              properties:
+                subjectId: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /coupon-codes/{code}/void:
     parameters:
       - name: code
@@ -684,6 +819,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getBundle
+      x-ticvai-consumed-by:
+        - "P02 GST-056 Bundle Package"
       x-ticvai-read-routing: replica
       summary: Read a bundle with components and allocation
       tags: [bundle]
@@ -844,6 +981,7 @@ paths:
 
     post:
       operationId: createUpsellRule
+      x-ticvai-config-scope: region
       summary: Create an upsell rule
       description: >
         Rules apply across every channel by default — POS, kiosk, web, app, call centre, B2B
@@ -851,7 +989,7 @@ paths:
         experience inconsistency, so channel restriction is opt-in rather than the default.
       tags: [upsell]
       x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: region
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -940,6 +1078,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-010 Shopping Cart"
+        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P10 PTR-010 Cart & Quote"
       summary: Evaluate promotions against a cart
       description: >

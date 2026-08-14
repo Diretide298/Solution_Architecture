@@ -1,74 +1,58 @@
-# Screen ↔ contract linkage
+# Screen and contract linkage
 
-**64 of 581 operations are consumed by a specified screen.**
+**143 of 642 operations reach a defined screen.** 499 do not.
 
-The link is written once — screens declare which operations they call — and derived both
-ways by `tools/link-screens-contracts.py`. Contracts carry `x-ticvai-consumed-by` per
-operation; screens carry `contract` per API entry. They cannot disagree, because only one
-side is hand-written.
+Derived both directions by `tools/link-screens-contracts.py`: `x-ticvai-consumed-by` on each
+operation, and validated operation ids on each screen.
 
-## Why the number is low
+## What the gap means now
 
-Only 5 of 9 platforms have screen definitions, and within those most screens are still
-structural. The 203 screens on platforms with UI/UX boards have no definitions yet at all.
-
-**An uncovered operation is not automatically wrong.** It is one of three things:
+It used to mean missing screens. **All 347 screens now exist**, so it no longer does — it means
+screens that name no operation. 203 of 347 declare none, and every one of those is a screen
+somebody can draw and nobody can build.
 
 | | |
 |---|---|
-| A screen that exists but is not yet specified | Most of them |
-| A back-office or Control Plane surface with no screen definition | Finance, reporting, platform-ops |
-| An endpoint nothing will ever call | The one worth finding |
+| Operations reaching a screen | 143 |
+| Operations reaching none | 499 |
+| Screens declaring an operation | 144 of 347 |
 
-The third is why this report exists. An endpoint no screen consumes, on a platform whose
-screens *are* specified, is a candidate for deletion — and cheaper to delete now than to
-build, test and maintain first.
+## Operations no screen calls
 
-## Coverage by contract
+Not all are defects. Sync endpoints, webhooks and service-to-service calls legitimately have
+no screen. The ones worth checking are the rest.
 
-| Contract | Ops | Linked | Coverage |
-|---|---|---|---|
-| `marketing-crm` | 43 | 14 | 33% |
-| `subscription` | 28 | 10 | 36% |
-| `orders` | 31 | 9 | 29% |
-| `catalogue` | 45 | 8 | 18% |
-| `identity` | 38 | 7 | 18% |
-| `white-label` | 41 | 5 | 12% |
-| `seating` | 29 | 4 | 14% |
-| `promotions` | 27 | 3 | 11% |
-| `retail` | 23 | 2 | 9% |
-| `reporting` | 23 | 1 | 4% |
-| `finance` | 37 | 1 | 3% |
-| `assets` | 10 | 0 | 0% |
-| `fnb` | 30 | 0 | 0% |
-| `games` | 13 | 0 | 0% |
-| `inventory` | 34 | 0 | 0% |
-| `maintenance` | 28 | 0 | 0% |
-| `platform-ops` | 21 | 0 | 0% |
-| `queue` | 20 | 0 | 0% |
-| `access` | 19 | 0 | 0% |
-| `cross-cell` | 16 | 0 | 0% |
-| `shift` | 10 | 0 | 0% |
-| `tenancy` | 15 | 0 | 0% |
+```
+abandonPeriodClose, acceptFnbOrder, acknowledgePurchaseOrder, addBlacklistEntry, addLicenceAddOn, addSuppression
+adjustGameCard, adjustLoyaltyPoints, adjustWallet, amendFnbOrder, analysePromotionConflicts, approveJournalEntry
+approveRefund, approveRequisition, approveShiftOpen, askReportingQuestion, assignCoupon, authoriseWalletSpend
+beginPeriodClose, blockGiftCard, calculateTax, cancelDecommission, cancelFnbOrder, cancelPerformance
+cancelPurchaseOrder, cancelReportExecution, cancelReservation, cancelStockCount, cancelWorkOrder, capturePayment
+captureWalletAuthorisation, claimTableSession, claimTicketTransfer, clearTable, cloneSeatMap, closeFiscalPeriod
+closePurchaseOrderShort, closeTableVisit, collectShopAndDrop, commitImportJob, compareQuotations, completeSsoAuthorization
+completeUpload, configureWorkstation, consumeRedemptionRight, convertReservation, copyPriceList, createAccessPoint
+createAccount, createAdmissionProfile, createAsset, createBanner, createBulkRefund, createBundle
+createCampaign, createCashMovement, createCollection, createContentPage, createCostCenter, createCouponCampaign
+createDashboard, createDsarRequest, createEntitlementTemplate, createEnvelope, createEvent, createFnbOrder
+createGame, createGoodsReceipt, createGuestLink, createInspectionTemplate, createInventoryItem, createJournalEntry
+createLegalEntity, createLoyaltyProgramme, createMaintenancePlan, createMenu, createMerchandise, createMessageTemplate
+createMfaChallenge, createModifierGroup, createOutlet, createPerformances, createPlan, createPlanVersion
+createPreview, createPriceList, createPrincipal, createPrize, createProduct, createPromoBlock
+createPromotion, createPurchaseOrder, createRecognitionSchedule, createRefund, createRefundRequest, createRelease
+createReport, createReportSchedule, createRequisition, createReservation, createRetailExchange, createRetailReturn
+createRetailSale, createSaleBoard, createScopeNode, createSeatBlock, createSeatCategory, createSeatMap
+createSeatMapTemplate, createSegment, createShopAndDrop, createStockLocation, createStockMovement, createStockTransfer
+createSupplier, createTaxCode, createTaxExemption, createTenant, createUpload, createUpsellRule
+createVoucherBatch, createWorkOrder, decommissionCell, deleteBanner, deleteContentPage, deleteGrant
+deleteGuestAccount, deleteMediaAsset, deleteReport, deleteReportSchedule, deleteUpsellRule, diffConfigVersion
+endPromotion, enrolMfaMethod, exchangeOrderLines, executeTenantMigration, exportReportResult, extendReservation
+forceLogout, forceReleaseLease, generateCouponCodes, generateInvoice, getAccessPoint, getAccount
+getAppIcons, getAsset, getAssetHistory, getBill, getBrandIdentity, getCampaign
+getCampaignPerformance, getCell, getCellCapacity, getConsentHistory, getCountVariance, getCurrentSession
+getDashboard, getDeferredRevenue, getDsarRequest, getDueMaintenance, getExpiringRights, getFinancialReport
+getFnbOrder, getFonts, getForeignTenderReport, getGameCard, getGuestConsents, getGuestLink
+getGuestSession, getHomepageLayout, getImportJob, getInventoryItem, getJournalEntry, getLatestBundle
+getMediaAsset, getMenu, getMessageStatus, getMigrationRun, getModuleEnablement, getNavigation
+```
 
-## Fully uncovered contracts
-
-No operation in these is consumed by any specified screen. In every case the reason is a
-missing screen definition rather than a missing purpose.
-
-- **`access`** (19 ops) — P07 Access Handheld — no screen definitions yet
-- **`assets`** (10 ops) — P13 White-Label CMS — no screen definitions yet
-- **`cross-cell`** (16 ops) — Cell-to-cell. No screen consumes these, by design
-- **`fnb`** (30 ops) — P04 POS and P06 Staff Ops — no screen definitions yet
-- **`games`** (13 ops) — P04 POS and game readers — no screen definitions yet
-- **`inventory`** (34 ops) — P06 Staff Ops — no screen definitions yet
-- **`maintenance`** (28 ops) — P06 Staff Ops — no screen definitions yet
-- **`platform-ops`** (21 ops) — P09 — screens exist but the contract postdates them; re-run the linker after mapping
-- **`queue`** (20 ops) — P02 Guest App and signage — no screen definitions yet
-- **`shift`** (10 ops) — P04 POS — no screen definitions yet
-- **`tenancy`** (15 ops) — P08 Back Office — no screen definitions yet
-
-## Operations with no consuming screen
-
-517 operations. Grouped by contract; full list in the workbook.
-
+…and 319 more.

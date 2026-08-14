@@ -1,425 +1,375 @@
-# Page Inventory
+# Page inventory
 
-> **Purpose:** Every screen, its capability, and the APIs it calls  
-> **Owner:** Chinmay + design  
-> **Status:** **v3 — five platforms added from the screen hierarchy**
+**347 screens. Every one defined.**
 
-Part of the build handoff. See [api-list](api-list.md) and [schema](schema.md).
+Superseded the earlier inventory, which counted 316 and itemised 203 — the difference was
+73 back office screens carried as a number with no list behind them (CF-53), and two
+platforms never counted at all (CF-53, and the kiosk and scanner).
 
-## What changed in v3 — CF-47 closed
-
-v2 was rebuilt from the client UI/UX boards, which cover the **apps**. Five platforms have
-no board and were therefore absent entirely: the B2C web storefront, the Platform Admin
-Console, the Partner Portal, the Accreditation Portal and the Support Console.
-
-They are in the client's own screen hierarchy (`TAIS_Phase1_Platform_and_Screen_Hierarchy`),
-which is where these come from.
-
-| Platform | v2 | v3 | Delta |
+| | Platform | App | Screens |
 |---|---|---|---|
-| White Label Builder | 20 | 20 | — |
-| Guest App | 60 | 60 | — |
-| Employee App | 50 | 50 | — |
-| POS · Scanner · Back office | 73 | 73 | — |
-| **P01 Guest Web Storefront** | — | **29** | **New** |
-| **P09 Platform Admin Console** | — | **36** | **New** |
-| **P10 Partner & Reseller Portal** | — | **21** | **New** |
-| **P11 Accreditation Portal** | — | **8** | **New** |
-| **P12 Support Agent Console** | — | **8** | **New** |
-| **Total** | **203** | **305** | **+102** |
+| P01 | Guest Web — Storefront | `web-b2c` | 29 |
+| P02 | Guest App — Mobile | `guest` | 62 |
+| P04 | Staff POS — Terminal and Tablet | `pos` | 10 |
+| P05 | Guest Kiosk — Self-Service | `guest` | 14 |
+| P06 | Staff App — Operations | `employee` | 50 |
+| P07 | Staff Scanner — Access Control | `scanner` | 16 |
+| P08 | Staff Web — Venue Back Office | `backoffice` | 73 |
+| P09 | Admin Web — Platform Console | `platform-admin` | 36 |
+| P10 | Partner Web — Reseller Portal | `partner-portal` | 21 |
+| P11 | Public Web — Accreditation | `accreditation` | 8 |
+| P12 | Staff Web — Support Console | `support-console` | 8 |
+| P13 | Staff Web — White-Label CMS | `backoffice` | 20 |
+| | | | **347** |
 
-**Frontend estimates increase again.** v1 → v2 was +105%; v2 → v3 is a further +50%.
+## Every screen
 
-Two of the five are not a surprise in scope, only in inventory — the storefront and the
-partner portal were always in the proposal. The Platform Admin Console at 36 screens is the
-one worth pausing on: it is the largest single platform after the back office, it is entirely
-Control Plane, and none of it was in any estimate before today.
-
-## What changed in v2
-
-Rebuilt against `TICVAI_White_Label_Guest_App_UI_Reference` (8 boards) and
-`TICVAI_Employee_App_UI_Reference` (5 boards). **v1 undercounted by ~130 screens.**
-
-| App | v1 | v2 | Delta |
+| ID | Name | Platform | Wave |
 |---|---|---|---|
-| White Label Builder | — | **20** | **New context** |
-| Guest App | 14 | **60** | +46 |
-| Employee App | 12 | **50** | +38 |
-| POS · Scanner · Back office | 73 | 73 | — |
-| **Total** | **99** | **203** | |
-
-
-## White Label Builder
-
-React web — back office. **NEW CONTEXT**
-
-| ID | Screen | Capability | APIs | Wave | Notes |
-|---|---|---|---|---|---|
-| WLB-001 | Tenant Dashboard (Overview) | C57 | `GET /tenant-config` | 1 | App status, active modules 18/24, active pages 42/58, recent changes |
-| WLB-002 | Brand Identity – Logo & Icons | C57 | `PUT /tenant-config/brand` | 1 | Logo, favicon. PNG/SVG, max 2MB |
-| WLB-003 | Splash Screen | C57 | `PUT /tenant-config/splash` | 1 | Multiple images, duration, fallback colour, loading indicator |
-| WLB-004 | App Icon | C57 | `PUT /tenant-config/icons` | 1 | **Build-time.** iOS 1024, SpotLight 512, Android 512/432 |
-| WLB-005 | Color Theme | C57 | `PUT /tenant-config/theme` | 1 | Primary, secondary, accent, background, text + live preview |
-| WLB-006 | Font Management | C57 | `PUT /tenant-config/fonts` | 1 | **Arabic + Latin pairs.** Tajawal/Roboto. Custom font upload |
-| WLB-007 | Header Configuration | C57 | `PUT /tenant-config/header` | 1 | Three layout variants, logo/menu/notification toggles |
-| WLB-008 | Footer / Bottom Navigation | C57 | `PUT /tenant-config/navigation` | 1 | Nav type, ordered menu items, visibility per item |
-| WLB-009 | Navigation Menu Configuration | C57 | `PUT /tenant-config/navigation` | 1 | Main menu vs More menu |
-| WLB-010 | Live Preview – Mobile App | C57 | `GET /tenant-config/preview` | 1 | iOS/Android, light/dark, **EN/AR** |
-| WLB-011 | Homepage Layout Builder | C105 | `PUT /tenant-config/homepage` | 1 | **Drag-and-drop sections.** Hero, quick actions, tickets, what's on, attractions, membership, dining, promotions, map, custom |
-| WLB-012 | Banner Management | C105 | `GET/POST /tenant-config/banners` | 1 | Scheduled/active/expired states, date windows |
-| WLB-013 | Promotional Block Management | C105 | `GET/POST /tenant-config/promo-blocks` | 1 | Active/scheduled/inactive |
-| WLB-014 | Custom Content Pages | C105 | `GET/POST /tenant-config/pages` | 1 | Published/draft, slug per page |
-| WLB-015 | FAQ Management | C105 | `GET/POST /tenant-config/faqs` | 2 | Categorised, surfaces in guest Help |
-| WLB-016 | Policy & Terms Management | C105 | `GET/PUT /tenant-config/policies` | 1 | **Per-language versions** — EN/AR/FR. Rich text editor |
-| WLB-017 | Module & Page Enablement | C75 | `PUT /tenant-config/modules` | 1 | **This is the licensing model surfaced.** Disabled modules hidden from guest app |
-| WLB-018 | Tenant-Specific Features | C75 | `PUT /tenant-config/features` | 1 | Digital Companion, AI Concierge, Lost & Found, Push, Social, Multi-language, Apple Wallet, Google Pay, Cash on Delivery |
-| WLB-019 | Preview & Publish | C106 | `POST /tenant-config/publish` | 1 | **Draft → Review → Preview → Publish workflow** |
-| WLB-020 | Version History | C106 | `GET /tenant-config/versions` | 1 | **Restore Previous Version.** v2.3.1 etc, published-by, status |
-
-## Guest App
-
-React Native — white-label per tenant
-
-| ID | Screen | Capability | APIs | Wave | Notes |
-|---|---|---|---|---|---|
-| GST-001 | Home – Default | C02 | `GET /catalogue, local` | 1 | Hero, quick actions, What's On |
-| GST-002 | Explore Categories | C02 | `GET /catalogue` | 1 | Attractions, exhibitions, events, dining, shop, experiences |
-| GST-003 | Attractions List | C02 | `GET /products` | 1 | Filter: indoor/outdoor/family/heritage. Duration shown |
-| GST-004 | Attraction Details | C02 | `GET /products/{id}` | 1 | Rating, duration, best time, suitability, location |
-| GST-005 | What's On | C84 | `GET /events` | 1 | Exhibitions, events, workshops |
-| GST-006 | Event / Exhibition Details | C84 | `GET /events/{id}` | 1 | Hours, duration, language, age |
-| GST-007 | Select Date & Time | C02, C103 | `GET /performances, POST /leases` | 1 | Calendar + time slots. **Lease acquired here** |
-| GST-008 | Tickets & Add-ons | C02, C88 | `local` | 1 | Adult/child/senior tiers, add-ons |
-| GST-009 | Review & Payment | C47 | `POST /orders` | 1 | Order summary, **VAT line**, payment method |
-| GST-010 | Booking Confirmation | C02 | `GET /orders/{id}` | 1 | QR, booking ID, Add to Wallet |
-| GST-011 | Wallet Overview | C37 | `GET /wallet` | 2 | Balance, add money, payment methods, transactions |
-| GST-012 | My Tickets | C02 | `GET /tickets` | 1 | Upcoming/used/cancelled tabs, QR per booking |
-| GST-013 | Ticket Details | C02 | `GET /tickets/{id}` | 1 | QR, transfer, Add to Apple Wallet |
-| GST-014 | Ticket Transfer | C02 | `POST /tickets/{id}/transfer` | 2 | **Per-ticket selection**, transfer by email/phone, message |
-| GST-015 | Memberships | C03 | `GET /memberships` | 2 | Tier card, benefits grid, members, renew, history |
-| GST-016 | My Reservations | C02 | `GET /reservations` | 2 | Confirmed/pending states |
-| GST-017 | Reservation Details | C02 | `GET /reservations/{id}` | 2 | Meeting point, reschedule, cancel |
-| GST-018 | Add to Calendar / Reminders | C02 | `local` | 3 | Apple/Google/Outlook, reminder offsets |
-| GST-019 | Order History (Wallet) | C21 | `GET /orders` | 2 | Payments, refunds, top-ups. **Download statement** |
-| GST-020 | Saved Items / Wishlist | C58 | `GET /wishlist` | 3 |  |
-| GST-021 | Interactive Map | C39 | `GET /venue-map` | 2 | Layers: attractions, dining, shops, restrooms, first aid, services, parking. **Weather chip** |
-| GST-022 | Attraction Wait Times | C82 | `GET /queue/wait-times` | 3 | **Third-party feed (ADR-0012).** Height req shown |
-| GST-023 | Virtual Queue / Join Queue | C82 | `POST /queue-entries` | 3 | Queue number, parties ahead, leave queue |
-| GST-024 | F&B – Browse & Order | C05 | `GET /menu` | 2 | Restaurants, cafés, snacks, beverages |
-| GST-025 | F&B – Order Tracking | C05, C07 | `GET /fnb-orders/{id}` | 2 | **Received→Preparing→Ready→Completed.** Pickup location, order QR |
-| GST-026 | Retail / Merchandise | C08 | `GET /products?kind=retail` | 2 | Categories, best sellers, cart badge |
-| GST-027 | Parking – Reserve & Pay | C23 | `POST /parking-reservations` | 3 | Date, time, vehicle type, zone |
-| GST-028 | Parking – Reservation Confirmed | C23 | `GET /parking-reservations/{id}` | 3 | QR, plate, Add to Wallet, directions |
-| GST-029 | Venue Info & Services | C17 | `GET /venue-info` | 2 | Restrooms, first aid, prayer room, lost & found, accessibility, wifi, ATM |
-| GST-030 | In-Venue Notifications | C61 | `GET /notifications` | 2 | Alerts, offers, updates. Show starting, queue ready, weather |
-| GST-031 | AI Concierge – Home | AI-02 | `POST /ai/concierge` | 2 | Popular questions |
-| GST-032 | AI Concierge – Chat | AI-02 | `POST /ai/concierge` | 2 | Structured cards + quick actions |
-| GST-033 | AI Concierge – Contextual Help | AI-02 | `POST /ai/concierge` | 2 | **Live wait time inside the chat** — grounded, not generated |
-| GST-034 | Lost & Found | C18 | `POST /lost-found/reports` | 2 | Report vs Found tabs, **photo upload to 5**, category, last seen |
-| GST-035 | Feedback & Ratings | C62 | `POST /reviews` | 3 | Star rating, aspect chips, opt-in |
-| GST-036 | Loyalty & Rewards | C64 | `GET /loyalty` | 3 | Tier, points to next, benefits, transactions |
-| GST-037 | Offers & Promotions | C86 | `GET /offers` | 2 | Special/member-exclusive/family tags, validity |
-| GST-038 | Digital Companion Mode | C105 | `GET /tenant-config/features` | 3 | **Before / During / After visit journey.** Tenant-toggleable |
-| GST-039 | Profile | C58 | `GET /guests/me` | 1 | Personal info, **family members**, payment methods, preferences, privacy |
-| GST-040 | Help & Support | C17 | `GET /support` | 2 | Live chat, call, email, help centre, report a problem |
-| GST-041 | Checkout Entry | C56 | `—` | 1 | **Continue as Guest** / Sign in / **UAE PASS** |
-| GST-042 | Simple Registration & OTP | C56 | `POST /auth/guest/otp` | 1 | **OTP via WhatsApp or SMS** |
-| GST-043 | Arabic / RTL Experience | C57 | `—` | 1 | **Full RTL mirror.** Not a translation layer |
-| GST-044 | Multi-Currency & Pricing | C107 | `GET /currencies` | 2 | **Display currency ≠ settlement currency.** 'Payment processed in AED' |
-| GST-045 | Ticket Delivery & Sharing | C02 | `POST /tickets/{id}/share` | 2 | WhatsApp, SMS, email, Add to Wallet |
-| GST-046 | Branded Queue / Waiting Room | C98 | `GET /waiting-room` | 1 | **Virtual Waiting Room.** Queue ID, position, estimated wait |
-| GST-047 | Maintenance Page | C57 | `GET /tenant-config/status` | 1 | Branded, expected-back time, social links |
-| GST-048 | Upsell / Cross-Sell | C88, AI-36 | `GET /recommendations` | 2 | Membership upgrade + add-ons inline at checkout |
-| GST-049 | Interactive Seat Selection | C53 | `GET /seat-maps/{id}` | 2 | **Available/selected/sold/wheelchair legend.** VIP vs regular blocks |
-| GST-050 | Resource Booking – Cabana | C78 | `POST /resource-bookings` | 3 | Capacity, features, date/time, price |
-| GST-051 | Plan Your Adventure – Start | AI-35 | `POST /ai/itinerary` | 3 | 4-step wizard: date, group type, interests |
-| GST-052 | Suggested Itineraries | AI-35 | `GET /itineraries/suggested` | 3 | Family/thrill/culture/relaxed personas |
-| GST-053 | Build Your Own Itinerary | C02 | `POST /itineraries` | 3 | Timeline, total time + **walking time** |
-| GST-054 | AI Optimized Itinerary | AI-35 | `POST /ai/itinerary/optimise` | 3 | **Min wait / shortest walk / best experience.** Route drawn on map |
-| GST-055 | Dynamic QR Ticket | C09 | `GET /tickets/{id}/dynamic-qr` | 1 | **Auto-refresh, countdown to expiry.** Anti-screenshot |
-| GST-056 | Bundle Package | C87 | `GET /bundles/{id}` | 2 | Savings badge, itemised inclusions |
-| GST-057 | Accessibility Information | C17 | `GET /accessibility` | 2 | Per attraction: wheelchair, min height, service animals, elevator |
-| GST-058 | Resource Availability (Cabana) | C78 | `GET /resources/availability` | 3 | **Remaining count per unit** |
-| GST-059 | Plan My Day – In Progress | C02 | `GET /itineraries/{id}` | 3 | Confirmed vs upcoming per stop |
-| GST-060 | Maintenance / Upgrade Page | C57 | `GET /tenant-config/status` | 1 | Duplicate of board 7 screen 7 — consolidate |
-
-## Employee App
-
-React Native — offline-partial
-
-| ID | Screen | Capability | APIs | Wave | Notes |
-|---|---|---|---|---|---|
-| EMP-001 | Login / SSO / Biometric | C56, C35 | `POST /auth/login` | 1 | **Biometric + SSO.** C35 was REF-tagged — now confirmed |
-| EMP-002 | Role & Venue Selection | C56 | `POST /auth/select-role` | 1 | **Confirms ADR-0003.** Venue selection alongside role |
-| EMP-003 | Role-Based Home Dashboard | C56 | `GET /auth/session` | 1 | Filtered by effectivePermissions |
-| EMP-004 | More / Role-Based Modules | C56 | `GET /auth/session` | 1 |  |
-| EMP-005 | Notification Center | C61 | `GET /notifications` | 2 |  |
-| EMP-006 | Notification Detail / Action | C61 | `GET /notifications/{id}` | 2 |  |
-| EMP-007 | Universal Search | AI-01 | `POST /ai/search` | 2 | **AI-powered.** Cross-module |
-| EMP-008 | Create Request Hub | C15 | `POST /requests` | 2 | Single entry to all request types |
-| EMP-009 | Employee Profile / Digital ID | C56 | `GET /principals/me` | 1 | **Digital employee ID — scannable** |
-| EMP-010 | Settings / Preferences / Security | C36 | `GET/PUT /principals/me/settings` | 2 |  |
-| EMP-011 | My Tasks & Work Orders | C11 | `GET /work-orders` | 2 |  |
-| EMP-012 | Task Detail | C11 | `GET /work-orders/{id}` | 2 |  |
-| EMP-013 | Work Order Detail | C11 | `GET /work-orders/{id}` | 2 |  |
-| EMP-014 | Start / Pause / Complete Work Order | C11 | `PATCH /work-orders/{id}` | 2 | **Timer** |
-| EMP-015 | Asset Scan | C13 | `GET /assets/{code}` | 3 |  |
-| EMP-016 | Asset Detail | C13 | `GET /assets/{id}` | 3 |  |
-| EMP-017 | Asset History / Documents / SOP | C94 | `GET /assets/{id}/history` | 3 | **SOP attached to asset** |
-| EMP-018 | Safety Inspection / Checklist | C12 | `POST /inspections` | 2 | Opening/closing checklists |
-| EMP-019 | Report Incident / Hazard | C12 | `POST /incidents` | 2 | Photo-first |
-| EMP-020 | Incident Detail / Resolution | C12 | `GET /incidents/{id}` | 2 |  |
-| EMP-021 | Inventory Scan / Lookup | C13 | `GET /inventory/{code}` | 3 |  |
-| EMP-022 | Inventory Item Detail | C13 | `GET /inventory/{id}` | 3 |  |
-| EMP-023 | Stock Count | C13 | `POST /stock-counts` | 3 |  |
-| EMP-024 | Goods Receipt | C14 | `POST /goods-receipts` | 3 |  |
-| EMP-025 | Stock Issue / Return | C13 | `POST /stock-movements` | 3 |  |
-| EMP-026 | Inventory Transfer | C13 | `POST /stock-transfers` | 3 |  |
-| EMP-027 | Low Stock / Auto-Requisition | C14, AI-43 | `GET /requisitions/suggested` | 3 | **Par-level auto-draft** |
-| EMP-028 | Purchase Request | C14 | `POST /purchase-requests` | 3 |  |
-| EMP-029 | Purchase Request / PO Progress | C14 | `GET /purchase-orders/{id}` | 3 |  |
-| EMP-030 | Approval Center / Workflow | C15 | `GET /approvals` | 1 |  |
-| EMP-031 | My Roster / Weekly Timetable | C16 | `GET /rosters` | 2 |  |
-| EMP-032 | Shift Detail / Zone Assignment | C16 | `GET /shifts-roster/{id}` | 2 | **Zone assignment** |
-| EMP-033 | Shift Swap / Open Shift / Overtime | C16 | `POST /shift-swaps` | 3 | **Not modelled** — swap marketplace |
-| EMP-034 | Leave Request | C16 | `POST /leave-requests` | 3 |  |
-| EMP-035 | Break Management | C16, C01 | `POST /breaks` | 2 | **Ties to shift suspend** — 12 Aug §1 |
-| EMP-036 | Team / Supervisor View | C16 | `GET /teams` | 2 | On time / pending / absent |
-| EMP-037 | Operations Communication / Announcements | C61 | `GET /announcements` | 2 |  |
-| EMP-038 | Guest Services / Employee Assistance | C17 | `GET /guest-services` | 2 |  |
-| EMP-039 | Attraction Status / Capacity Counter | C39 | `GET /venue-status` | 2 | **Live capacity counter** |
-| EMP-040 | Lost & Found | C18 | `GET/POST /lost-found` | 2 |  |
-| EMP-041 | Universal Scanner | C09, C10 | `POST /access/validate` | 1 | **7 scan types:** ticket, membership, **accreditation**, asset, inventory, employee ID, NFC |
-| EMP-042 | Ticket Validation – Valid | C09 | `POST /access/validate` | 1 | Mark as Entered, Scan Next |
-| EMP-043 | Ticket Validation – Invalid | C09 | `POST /access/validate` | 1 | Reason, first-scan detail, **Escalate to Supervisor** |
-| EMP-044 | Membership / Accreditation Validation | C03, C30 | `POST /access/validate` | 2 | **Accreditation on the scanner** — CF-21 not deferrable |
-| EMP-045 | Venue Map / Operational Map | C39 | `GET /venue-map` | 2 | Attraction status, wait time, height req, incidents, zones |
-| EMP-046 | TICVAI AI Assistant (Home) | AI-06 | `POST /ai/assistant` | 2 | **Primary nav tab** |
-| EMP-047 | AI – Contextual Assistance | AI-06 | `POST /ai/assistant` | 2 | **Cites source: 'F&B SOP Manual v2.1 – Section 4.3'.** Grounded |
-| EMP-048 | Training / Knowledge Base | C108 | `GET /training` | 3 | **NEW.** SOPs, manuals, videos, progress, due dates |
-| EMP-049 | Employee Recognition / Kudos | C109 | `POST /kudos` | 3 | **NEW.** Categories, message, recipient |
-| EMP-050 | Offline & Synchronization Center | C24 | `GET /sync/status` | 1 | **Pending by category, auto-sync toggle, Sync Now** |
-
----
-
-## New capabilities this surfaced
-
-| ID | Capability | Why |
-|---|---|---|
-| **C105** | **Tenant content management** — homepage layout builder, banners, promo blocks, custom pages, FAQs, policies per language | 6 builder screens. C57 covered branding only |
-| **C106** | **Tenant config publishing** — draft → review → preview → publish, version history with restore | 2 screens. Same problem shape as catalogue bundles; should reuse that machinery |
-| **C107** | **Multi-currency display** — display currency separate from settlement currency | Guest board 7 screen 4. Not the same as ADR-0008 money scale |
-| **C108** | **Training & knowledge base** — SOPs, manuals, videos, progress, due dates | Employee 48. **No requirement, no MoM** |
-| **C109** | **Employee recognition** — kudos, categories, recipients | Employee 49. **No requirement, no MoM** |
-
-C108 and C109 are tagged `DESIGN` — they appear in a rank-3 design reference only, so they
-are not scope until they appear in the matrix or a MoM.
-
-## Screens with no prior capability
-
-| Screen | Note |
-|---|---|
-| Shift Swap / Open Shift / Overtime | A swap marketplace. C16 covers rostering, not trading shifts |
-| Digital Companion Mode | Before/during/after visit journey. Tenant-toggleable feature |
-| Dynamic QR Ticket | Auto-refresh with visible countdown. C09 has the mechanism; the guest-facing screen was not inventoried |
-| Employee Digital ID | Scannable staff credential. Adjacent to accreditation |
-
-## Confirmations
-
-- **C35 staff authentication modes** was `REF`-tagged and unvalidated. Employee screen 1 shows biometric and SSO login — **promote to scope**
-- **C39 venue map** was a candidate. Appears in both guest (screen 21) and employee (screen 45) — **confirmed**
-- **Accreditation validation is on the employee scanner** (screen 44), so that domain is not safely deferrable to Wave 4
-- **Module enablement toggles** are the licensing model made visible — confirms C75
-- **AI is a primary nav tab in the employee app**, so the shell depends on AI-06 existing
-
-## Cross-cutting requirements the boards make explicit
-
-| Requirement | Evidence |
-|---|---|
-| **RTL is first-class** | Full Arabic mirror screen, Arabic/Latin font pairing, EN/العربية preview toggle. **Must be in `design-tokens` from Sprint 1** |
-| **Dark theme** | Employee app is dark by default; builder is light. Both themes needed |
-| **WCAG 2.2 Level AA** | Stated on guest board 7 |
-| **PCI DSS** | Stated on guest board 7 |
-| Dynamic QR | Stated as anti-screenshot with visible expiry |
-
----
-
-# Platforms added in v3
-
-These have no UI/UX board. Screen names come from the client's screen hierarchy; capability
-and API mapping is ours. Where a screen has no contract behind it yet, the API column says so
-rather than inventing an endpoint.
-
-## P01 — Guest Web Storefront (B2C)
-
-React web, public. Shares the guest app's contracts almost entirely — same catalogue, same
-orders, same guest auth. **The screens differ; the API surface does not.**
-
-| ID | Screen | Capability | APIs | Wave |
-|---|---|---|---|---|
-| WEB-001 | Home / Landing | C79 | `GET /tenant-config`, `GET /products` | 1 |
-| WEB-002 | Event & Attraction Listing | C79 | `GET /products`, `GET /events` | 1 |
-| WEB-003 | Search Results | C79 | `GET /products?search` | 1 |
-| WEB-004 | Event / Attraction Detail | C79 | `GET /products/{id}`, `GET /performances` | 1 |
-| WEB-005 | Ticket Type Selection | C80 | `GET /products/{id}/variants` | 1 |
-| WEB-006 | Date & Session Selection | C81 | `GET /performances/{id}/availability` | 1 |
-| WEB-007 | Seat Map Selection | C51 | `GET /performances/{id}/seat-availability` | 2 |
-| WEB-008 | Add-ons & Upsell | C86 | `POST /upsell-suggestions` | 2 |
-| WEB-009 | Wishlist | C79 | **No contract** — guest-scoped list, not yet specified | 3 |
-| WEB-010 | Shopping Cart | C02 | `POST /promotions/evaluate` | 1 |
-| WEB-011 | Guest Details & Attendee Forms | C03 | `POST /orders` | 1 |
-| WEB-012 | Checkout — Payment | C04 | `POST /payments` | 1 |
-| WEB-013 | Order Confirmation | C03 | `GET /orders/{id}` | 1 |
-| WEB-014 | Payment Link Landing | C04 | `POST /payments` | 2 |
-| WEB-015 | Virtual Waiting Room | — | **Q2, not Q1.** Infrastructure, not this contract (ADR-0012) | 2 |
-| WEB-016 | Login / Register | C36 | `POST /auth/guest/register`, `/otp`, `/social` | 1 |
-| WEB-017 | My Account Dashboard | C36 | `GET /guests/{id}` | 1 |
-| WEB-018 | My Tickets | C09 | `GET /orders`, `GET /entitlements` | 1 |
-| WEB-019 | Order History | C34 | `GET /orders`, `GET /orders/{id}/statement` | 1 |
-| WEB-020 | Profile & Preferences | C36 | `PATCH /guests/{id}`, `POST /guests/{id}/consents` | 1 |
-| WEB-021 | Wallet & Gift Cards | C21 | `GET /wallets/{id}`, `GET /gift-cards/{code}` | 2 |
-| WEB-022 | Membership Plans | C31 | `GET /products?kind=membership` | 2 |
-| WEB-023 | Membership Management | C31 | `GET /entitlements`, `POST /orders/{id}/modify` | 2 |
-| WEB-024 | Loyalty & Rewards | C93 | `GET /guests/{id}/loyalty` | 3 |
-| WEB-025 | Help Centre / FAQ | C105 | `GET /tenant-config/faqs` | 1 |
-| WEB-026 | Survey & Feedback | C33 | `POST /reviews` | 3 |
-| WEB-027 | Newsletter Subscription | C59 | `POST /guests/{id}/consents` | 2 |
-| WEB-028 | Contact & Venue Information | C105 | `GET /tenant-config/pages` | 1 |
-| WEB-029 | Error / Sold Out / Maintenance | C57 | `GET /tenant-config/status` | 1 |
-
-**Wishlist has no contract.** It is a guest-scoped list of product references — small, but it
-does not exist in `catalogue` or `marketing-crm` today. Either add it or drop the screen.
-
-## P09 — Platform Admin Console
-
-**Control Plane.** Runs outside any cell. Largest platform after the back office and entirely
-absent from every prior estimate.
-
-| ID | Screen | Capability | APIs | Wave |
-|---|---|---|---|---|
-| ADM-001 | Platform Login / MFA | C35 | `POST /auth/login`, `/auth/mfa/verify` | 1 |
-| ADM-002 | Platform Dashboard | C95 | `GET /tenants` | 1 |
-| ADM-003 | Cross-Tenant Health Dashboard | C95 | `GET /cells/{id}/health` | 2 |
-| ADM-004 | Platform Audit Log | C97 | **No contract** — Control Plane audit not specified | 2 |
-| ADM-005 | Tenant Directory | C95 | `GET /tenants` | 1 |
-| ADM-006 | Tenant Hierarchy Explorer | C20 | `GET /scope-tree` | 1 |
-| ADM-007 | Module & Feature Entitlement | C75 | `GET /tenants/{id}/licences` | 1 |
-| ADM-008 | Subscription & Plan Management | C74 | `GET /plans`, `PUT /tenants/{id}/subscription` | 1 |
-| ADM-009 | Tenant Billing & Invoicing | C74 | `GET /tenants/{id}/invoices` | 2 |
-| ADM-010 | Usage Metering | C74 | `GET /tenants/{id}/usage` | 2 |
-| ADM-011 | Licence & Seat Management | C75 | `GET /tenants/{id}/entitlement-usage` | 2 |
-| ADM-012 | Tenant Isolation & Resource Pool | C96 | `POST /tenants/{id}/cells` | 1 |
-| ADM-013 | Tenant Performance Monitor | C96 | `GET /cells/{id}/health` | 2 |
-| ADM-014 | Auto-Scaling Configuration | C96 | **No contract** — infrastructure, Terraform not API | 3 |
-| ADM-015 | API Rate Limit & Quota Management | — | **Blocked** — Developer & API workshop | 3 |
-| ADM-016 | White-Label Branding Management | C57 | `GET /tenant-config` | 2 |
-| ADM-017 | Domain & Certificate Management | C96 | **No contract** — not specified | 2 |
-| ADM-018 | Localisation & Language Pack | C57 | `PUT /tenant-config/languages` | 2 |
-| ADM-019 | Global Configuration & Defaults | C95 | **No contract** — platform defaults not specified | 2 |
-| ADM-020 | Platform User Directory | C56 | `GET /principals` | 1 |
-| ADM-021 | Platform Role Management | C56 | `GET /roles`, `POST /roles` | 1 |
-| ADM-022 | Release & Version Management | C96 | **No contract** — new scope, 30 Jul | 2 |
-| ADM-023 | Staging Promotion & Approval | C96 | **No contract** — new scope, 30 Jul | 2 |
-| ADM-024 | Release Notification Composer | C96 | **No contract** — new scope, 30 Jul | 3 |
-| ADM-025 | Tenant Upgrade Scheduler | C96 | **No contract** — new scope, 30 Jul | 2 |
-| ADM-026 | End-of-Support Notice Management | C96 | **No contract** — new scope, 30 Jul | 3 |
-| ADM-027 | Database Migration Console | C96 | **No contract** — **the unowned orchestrator** | 1 |
-| ADM-028 | Environment Registry | C96 | **No contract** — not specified | 2 |
-| ADM-029 | Deployment Monitor | C96 | `GET /cells/{id}/jobs` | 2 |
-| ADM-030 | Infrastructure Sizing & Scaling Policy | C96 | **No contract** — Terraform | 3 |
-| ADM-031 | Security & Compliance Dashboard | C97 | **No contract** — not specified | 3 |
-| ADM-032 | WAF & Security Policy View | C96 | **No contract** — infrastructure | 3 |
-| ADM-033 | Backup & DR Status | C96 | `GET /cells/{id}/health` | 2 |
-| ADM-034 | Archival Job Monitor | C96 | **No contract** — retention not specified | 3 |
-| ADM-035 | Support & Escalation Console | — | **No contract** — overlaps P12 | 3 |
-| ADM-036 | Platform Notification Broadcast | C96 | **No contract** — not specified | 3 |
-
-**19 of 36 have no contract behind them.** Most are the release-management and infrastructure
-scope raised on 30 July and never specified. `ADM-027 Database Migration Console` is the user
-interface for the orchestrator that has been unowned since the same date.
-
-## P10 — Partner & Reseller Portal (B2B)
-
-Settled 05 August. Credit, allocation and commission are contracted; the portal itself was
-never screened.
-
-| ID | Screen | Capability | APIs | Wave |
-|---|---|---|---|---|
-| PTR-001 | Partner Login / MFA | C35 | `POST /auth/login`, `/auth/mfa/verify` | 2 |
-| PTR-002 | Partner Dashboard | C34 | `GET /orders`, `GET /b2b-accounts/{id}/credit` | 2 |
-| PTR-003 | Profile & Company Details | C56 | `GET /principals/{id}` | 2 |
-| PTR-004 | Notifications | C59 | `POST /messages` | 3 |
-| PTR-005 | Inventory & Allocation View | C103 | `GET /envelopes/{id}/channel-allocations` | 2 |
-| PTR-006 | Product Catalog (B2B Pricing) | C85 | `GET /products`, `GET /price-lists/{id}` | 2 |
-| PTR-007 | Availability Search | C81 | `GET /performances/{id}/availability` | 2 |
-| PTR-008 | Booking Creation | C02 | `POST /orders` | 2 |
-| PTR-009 | Group / Bulk Booking | C54 | `POST /seat-blocks/{id}/allocate` | 3 |
-| PTR-010 | Cart & Quote | C02 | `POST /promotions/evaluate` | 3 |
-| PTR-011 | Quote Management | — | **No contract** — quotes are procurement-side only | 3 |
-| PTR-012 | Checkout / Credit Purchase | C04 | `POST /payments` | 2 |
-| PTR-013 | Credit Limit & Balance | C34 | `GET /b2b-accounts/{id}/credit` | 2 |
-| PTR-014 | Settlement & Payment History | C50 | `GET /settlements` | 3 |
-| PTR-015 | Order History | C34 | `GET /orders`, `GET /orders/{id}/statement` | 2 |
-| PTR-016 | Voucher / Ticket Download | C09 | `POST /orders/{id}/reprints` | 2 |
-| PTR-017 | Commission Statement | — | **No contract** — commission not modelled | 3 |
-| PTR-018 | Reports & Sales Performance | C21 | `POST /reports/{id}/run` | 3 |
-| PTR-019 | API Credentials & Integration | — | **Blocked** — Developer & API workshop | 3 |
-| PTR-020 | Sub-Agent Management | C56 | `POST /grants` | 3 |
-| PTR-021 | Support & Contact | C32 | `POST /cases` | 3 |
-
-**Two genuine gaps:** B2B quotes (distinct from supplier quotations, which are procurement)
-and commission. Neither is modelled anywhere.
-
-## P11 — Accreditation Portal
-
-**Blocked on the Accreditation workshop.** Screens listed so the platform is not forgotten in
-estimates; no capability or API mapping until the domain is discussed.
-
-| ID | Screen | Wave |
-|---|---|---|
-| ACC-001 | Landing / Programme Overview | 3 |
-| ACC-002 | Registration Form | 3 |
-| ACC-003 | Application Review & Submit | 3 |
-| ACC-004 | Application Status Tracking | 3 |
-| ACC-005 | Accreditation Badge | 3 |
-| ACC-006 | Reviewer Queue | 3 |
-| ACC-007 | Reviewer Application Detail | 3 |
-| ACC-008 | Credential Register | 3 |
-
-**Accreditation validation still appears on the employee scanner in Wave 1** (employee screen
-44). The portal is Wave 3; the validation path is not, and that split is the reason this
-workshop is the urgent one of the four.
-
-## P12 — Support Agent Console
-
-| ID | Screen | Capability | APIs | Wave |
-|---|---|---|---|---|
-| SUP-001 | Agent Login | C35 | `POST /auth/login` | 3 |
-| SUP-002 | Agent Dashboard | C32 | `GET /cases` | 3 |
-| SUP-003 | Availability & Routing Settings | — | **No contract** — agent routing not modelled | 3 |
-| SUP-004 | Conversation Queue | C32 | `GET /cases` | 3 |
-| SUP-005 | Live Chat Workspace | C32 | `POST /cases/{id}/messages` | 3 |
-| SUP-006 | Knowledge Base Search | C105 | `GET /tenant-config/faqs` | 3 |
-| SUP-007 | Canned Response Management | C60 | `GET /message-templates` | 3 |
-| SUP-008 | Agent Performance & SLA View | C21 | `POST /reports/{id}/run` | 3 |
-
-Cases, SLA and templates are all contracted. **Agent routing and presence are not** — that is
-contact-centre functionality, and whether it is built or integrated is an open question.
-
----
-
-# Gaps this exercise surfaced
-
-**28 screens across the five platforms have no contract behind them.** They divide cleanly:
-
-| Cause | Screens | Note |
-|---|---|---|
-| **Release & infrastructure management** | 13 | New scope from 30 Jul, never specified. All P09 |
-| **Blocked on a workshop** | 3 | Developer & API, Accreditation |
-| **Genuinely unmodelled** | 6 | Wishlist, B2B quotes, commission, agent routing, platform audit, retention |
-| **Not an API** | 6 | Terraform, WAF, certificates — infrastructure, not endpoints |
-
-The six unmodelled ones are small and worth adding. The thirteen release-management screens
-are not small, and they are the honest answer to why the Platform Admin Console was missed:
-**that scope arrived in a workshop and never reached a requirement, a contract or an
-estimate.**
+| `WEB-001` | Home / Landing | P01 | 1 |
+| `WEB-002` | Event & Attraction Listing | P01 | 1 |
+| `WEB-003` | Search Results | P01 | 1 |
+| `WEB-004` | Event / Attraction Detail | P01 | 1 |
+| `WEB-005` | Ticket Type Selection | P01 | 1 |
+| `WEB-006` | Date & Session Selection | P01 | 1 |
+| `WEB-007` | Seat Map Selection | P01 | 2 |
+| `WEB-008` | Add-ons & Upsell | P01 | 2 |
+| `WEB-009` | Wishlist | P01 | 3 |
+| `WEB-010` | Shopping Cart | P01 | 1 |
+| `WEB-011` | Guest Details & Attendee Forms | P01 | 1 |
+| `WEB-012` | Checkout — Payment | P01 | 1 |
+| `WEB-013` | Order Confirmation | P01 | 1 |
+| `WEB-014` | Payment Link Landing | P01 | 2 |
+| `WEB-015` | Virtual Waiting Room | P01 | 2 |
+| `WEB-016` | Login / Register | P01 | 1 |
+| `WEB-017` | My Account Dashboard | P01 | 1 |
+| `WEB-018` | My Tickets | P01 | 1 |
+| `WEB-019` | Order History | P01 | 1 |
+| `WEB-020` | Profile & Preferences | P01 | 1 |
+| `WEB-021` | Wallet & Gift Cards | P01 | 2 |
+| `WEB-022` | Membership Plans | P01 | 2 |
+| `WEB-023` | Membership Management | P01 | 2 |
+| `WEB-024` | Loyalty & Rewards | P01 | 3 |
+| `WEB-025` | Help Centre / FAQ | P01 | 1 |
+| `WEB-026` | Survey & Feedback | P01 | 3 |
+| `WEB-027` | Newsletter Subscription | P01 | 2 |
+| `WEB-028` | Contact & Venue Information | P01 | 1 |
+| `WEB-029` | Error / Sold Out / Maintenance | P01 | 1 |
+| `GST-001` | Home – Default | P02 | 1 |
+| `GST-002` | Explore Categories | P02 | 1 |
+| `GST-003` | Attractions List | P02 | 1 |
+| `GST-004` | Attraction Details | P02 | 1 |
+| `GST-005` | What's On | P02 | 1 |
+| `GST-006` | Event / Exhibition Details | P02 | 1 |
+| `GST-007` | Select Date & Time | P02 | 1 |
+| `GST-008` | Tickets & Add-ons | P02 | 1 |
+| `GST-009` | Review & Payment | P02 | 1 |
+| `GST-010` | Booking Confirmation | P02 | 1 |
+| `GST-011` | Wallet Overview | P02 | 2 |
+| `GST-012` | My Tickets | P02 | 1 |
+| `GST-013` | Ticket Details | P02 | 1 |
+| `GST-014` | Ticket Transfer | P02 | 2 |
+| `GST-015` | Memberships | P02 | 2 |
+| `GST-016` | My Reservations | P02 | 2 |
+| `GST-017` | Reservation Details | P02 | 2 |
+| `GST-018` | Add to Calendar / Reminders | P02 | 3 |
+| `GST-019` | Order History (Wallet) | P02 | 2 |
+| `GST-020` | Saved Items / Wishlist | P02 | 3 |
+| `GST-021` | Interactive Map | P02 | 2 |
+| `GST-022` | Attraction Wait Times | P02 | 3 |
+| `GST-023` | Virtual Queue / Join Queue | P02 | 3 |
+| `GST-024` | F&B – Browse & Order | P02 | 2 |
+| `GST-025` | F&B – Order Tracking | P02 | 2 |
+| `GST-026` | Retail / Merchandise | P02 | 2 |
+| `GST-027` | Parking – Reserve & Pay | P02 | 3 |
+| `GST-028` | Parking – Reservation Confirmed | P02 | 3 |
+| `GST-029` | Venue Info & Services | P02 | 2 |
+| `GST-030` | In-Venue Notifications | P02 | 2 |
+| `GST-031` | AI Concierge – Home | P02 | 2 |
+| `GST-032` | AI Concierge – Chat | P02 | 2 |
+| `GST-033` | AI Concierge – Contextual Help | P02 | 2 |
+| `GST-034` | Lost & Found | P02 | 2 |
+| `GST-035` | Feedback & Ratings | P02 | 3 |
+| `GST-036` | Loyalty & Rewards | P02 | 3 |
+| `GST-037` | Offers & Promotions | P02 | 2 |
+| `GST-038` | Digital Companion Mode | P02 | 3 |
+| `GST-039` | Profile | P02 | 1 |
+| `GST-040` | Help & Support | P02 | 2 |
+| `GST-041` | Checkout Entry | P02 | 1 |
+| `GST-042` | Simple Registration & OTP | P02 | 1 |
+| `GST-043` | Arabic / RTL Experience | P02 | 1 |
+| `GST-044` | Multi-Currency & Pricing | P02 | 2 |
+| `GST-045` | Ticket Delivery & Sharing | P02 | 2 |
+| `GST-046` | Branded Queue / Waiting Room | P02 | 1 |
+| `GST-047` | Maintenance Page | P02 | 1 |
+| `GST-048` | Upsell / Cross-Sell | P02 | 2 |
+| `GST-049` | Interactive Seat Selection | P02 | 2 |
+| `GST-050` | Resource Booking – Cabana | P02 | 3 |
+| `GST-051` | Plan Your Adventure – Start | P02 | 3 |
+| `GST-052` | Suggested Itineraries | P02 | 3 |
+| `GST-053` | Build Your Own Itinerary | P02 | 3 |
+| `GST-054` | AI Optimized Itinerary | P02 | 3 |
+| `GST-055` | Dynamic QR Ticket | P02 | 1 |
+| `GST-056` | Bundle Package | P02 | 2 |
+| `GST-057` | Accessibility Information | P02 | 2 |
+| `GST-058` | Resource Availability (Cabana) | P02 | 3 |
+| `GST-059` | Plan My Day – In Progress | P02 | 3 |
+| `GST-060` | Maintenance / Upgrade Page | P02 | 1 |
+| `GST-061` | Menu Item Detail | P02 | 2 |
+| `GST-062` | Shop & Drop Collection | P02 | 3 |
+| `POS-001` | Begin Shift | P04 | 1 |
+| `POS-002` | Sell — Ticket Catalogue | P04 | 1 |
+| `POS-003` | Sell — Timed Entry | P04 | 1 |
+| `POS-004` | Sell — Seat Map | P04 | 2 |
+| `POS-005` | Payment | P04 | 1 |
+| `POS-006` | Held Orders | P04 | 1 |
+| `POS-007` | Close Shift | P04 | 1 |
+| `POS-008` | Reports | P04 | 2 |
+| `POS-009` | Staff Roster | P04 | 2 |
+| `POS-010` | Add to Existing Ticket | P04 | 1 |
+| `KSK-001` | Attract Loop | P05 | 2 |
+| `KSK-002` | Language Select | P05 | 2 |
+| `KSK-003` | What are you buying | P05 | 2 |
+| `KSK-004` | Choose tickets | P05 | 2 |
+| `KSK-005` | Choose a session | P05 | 2 |
+| `KSK-006` | Review | P05 | 2 |
+| `KSK-007` | Payment | P05 | 2 |
+| `KSK-009` | Ticket issued | P05 | 2 |
+| `KSK-011` | Collect a booking | P05 | 2 |
+| `KSK-012` | Booking found | P05 | 2 |
+| `KSK-008` | Payment unresolved | P05 | 2 |
+| `KSK-010` | Print failure | P05 | 2 |
+| `KSK-013` | Call staff | P05 | 2 |
+| `KSK-014` | Out of service | P05 | 2 |
+| `EMP-001` | Sign in | P06 | 1 |
+| `EMP-002` | Select venue & role | P06 | 1 |
+| `EMP-003` | Home — on duty | P06 | 1 |
+| `EMP-048` | Opening checklist | P06 | 1 |
+| `EMP-009` | End shift | P06 | 1 |
+| `EMP-010` | Scan — ready | P06 | 1 |
+| `EMP-011` | Scan — admitted | P06 | 1 |
+| `EMP-012` | Scan — denied | P06 | 1 |
+| `EMP-013` | Override | P06 | 1 |
+| `EMP-014` | Ticket lookup | P06 | 1 |
+| `EMP-015` | Group scan | P06 | 2 |
+| `EMP-016` | Offline scanning | P06 | 1 |
+| `EMP-017` | Sync & reconciliation | P06 | 1 |
+| `EMP-018` | Offline package | P06 | 1 |
+| `EMP-004` | Task list | P06 | 1 |
+| `EMP-005` | Task detail | P06 | 1 |
+| `EMP-006` | Raise a task | P06 | 1 |
+| `EMP-007` | Handover notes | P06 | 2 |
+| `EMP-008` | Shift summary | P06 | 2 |
+| `EMP-019` | AI assistant — home | P06 | 2 |
+| `EMP-020` | AI assistant — answer | P06 | 2 |
+| `EMP-031` | Queue monitor | P06 | 2 |
+| `EMP-032` | Manual wait entry | P06 | 2 |
+| `EMP-033` | Capacity view | P06 | 2 |
+| `EMP-034` | Walk-up sale | P06 | 2 |
+| `EMP-035` | Payment on device | P06 | 2 |
+| `EMP-036` | Issue media | P06 | 2 |
+| `EMP-037` | Notifications | P06 | 1 |
+| `EMP-039` | Announcements | P06 | 2 |
+| `EMP-047` | Emergency mode | P06 | 1 |
+| `EMP-050` | Post-incident restore | P06 | 2 |
+| `EMP-021` | Roster | P06 | 1 |
+| `EMP-022` | My rota | P06 | 1 |
+| `EMP-023` | Swap request | P06 | 2 |
+| `EMP-024` | Clock in / out | P06 | 1 |
+| `EMP-025` | Break management | P06 | 2 |
+| `EMP-026` | Incident report | P06 | 1 |
+| `EMP-027` | Incident detail | P06 | 2 |
+| `EMP-028` | Lost & found | P06 | 2 |
+| `EMP-029` | Guest assistance | P06 | 2 |
+| `EMP-030` | Venue map | P06 | 2 |
+| `EMP-038` | Broadcast to team | P06 | 2 |
+| `EMP-040` | Knowledge base | P06 | 2 |
+| `EMP-041` | Training | P06 | 3 |
+| `EMP-042` | Profile | P06 | 1 |
+| `EMP-043` | Device settings | P06 | 1 |
+| `EMP-044` | Accessibility | P06 | 2 |
+| `EMP-045` | Arabic / RTL | P06 | 1 |
+| `EMP-046` | Sign out | P06 | 1 |
+| `EMP-049` | Hand over the journal | P06 | 1 |
+| `SCN-001` | Sign in | P07 | 1 |
+| `SCN-002` | Access point & direction | P07 | 1 |
+| `SCN-003` | Ready to scan | P07 | 1 |
+| `SCN-004` | Admitted | P07 | 1 |
+| `SCN-005` | Denied | P07 | 1 |
+| `SCN-006` | Override | P07 | 1 |
+| `SCN-007` | Group admission | P07 | 1 |
+| `SCN-008` | Manual entry | P07 | 1 |
+| `SCN-009` | Ticket lookup | P07 | 1 |
+| `SCN-010` | Blacklisted | P07 | 1 |
+| `SCN-011` | Delegated right | P07 | 1 |
+| `SCN-012` | Offline scanning | P07 | 1 |
+| `SCN-013` | Offline journal | P07 | 1 |
+| `SCN-014` | Sync & reconciliation | P07 | 1 |
+| `SCN-015` | Offline package | P07 | 1 |
+| `SCN-016` | Gate mode | P07 | 1 |
+| `BO-001` | Queue Directory | P08 | 1 |
+| `BO-002` | Queue Configuration | P08 | 1 |
+| `BO-003` | Queue Integration Setup | P08 | 1 |
+| `BO-004` | Manual Wait Time Entry | P08 | 1 |
+| `BO-005` | Queue Monitor | P08 | 2 |
+| `BO-006` | Parking Configuration | P08 | 2 |
+| `BO-007` | Product Directory | P08 | 1 |
+| `BO-008` | Product Detail & Variants | P08 | 1 |
+| `BO-009` | Pricing Rules | P08 | 1 |
+| `BO-010` | Promotions & Coupons | P08 | 2 |
+| `BO-011` | Packages & Bundles | P08 | 2 |
+| `BO-012` | Membership Products | P08 | 2 |
+| `BO-013` | Channel & Distribution | P08 | 2 |
+| `BO-014` | Catalogue Publishing | P08 | 1 |
+| `BO-015` | Session Calendar | P08 | 1 |
+| `BO-016` | Session Template | P08 | 1 |
+| `BO-017` | Capacity Management | P08 | 1 |
+| `BO-018` | Allocation & Holds | P08 | 2 |
+| `BO-019` | Closures & Blackouts | P08 | 2 |
+| `BO-020` | Timed Entry Rules | P08 | 2 |
+| `BO-021` | Order Search | P08 | 1 |
+| `BO-022` | Order Detail | P08 | 1 |
+| `BO-023` | Refunds & Exchanges | P08 | 1 |
+| `BO-024` | Payment Exceptions | P08 | 1 |
+| `BO-025` | Chargebacks & Disputes | P08 | 2 |
+| `BO-026` | Group Bookings | P08 | 2 |
+| `BO-027` | Reissue & Media Replacement | P08 | 2 |
+| `BO-028` | Refund Approval Queue | P08 | 1 |
+| `BO-029` | Report Builder | P08 | 2 |
+| `BO-030` | Access Point Directory | P08 | 1 |
+| `BO-031` | Access Point Configuration | P08 | 1 |
+| `BO-032` | Admission Profiles | P08 | 1 |
+| `BO-033` | Blacklist Management | P08 | 1 |
+| `BO-034` | Scan Activity | P08 | 1 |
+| `BO-035` | Override Audit | P08 | 1 |
+| `BO-036` | Device Registry | P08 | 2 |
+| `BO-037` | Offline Package Status | P08 | 1 |
+| `BO-038` | Reconciliation Queue | P08 | 1 |
+| `BO-039` | Shift Directory | P08 | 1 |
+| `BO-040` | Variance Approval | P08 | 1 |
+| `BO-041` | Cash Movements | P08 | 2 |
+| `BO-042` | Banking & Safe | P08 | 2 |
+| `BO-043` | Daily Reconciliation | P08 | 1 |
+| `BO-044` | F&B Outlets | P08 | 2 |
+| `BO-045` | Menu Management | P08 | 2 |
+| `BO-046` | Kitchen Display | P08 | 2 |
+| `BO-047` | F&B Order Management | P08 | 2 |
+| `BO-048` | Retail Products | P08 | 2 |
+| `BO-049` | Stock Levels | P08 | 2 |
+| `BO-050` | Stock Count | P08 | 2 |
+| `BO-051` | Purchase Orders | P08 | 2 |
+| `BO-052` | Goods Receipt | P08 | 3 |
+| `BO-053` | Staff Directory | P08 | 1 |
+| `BO-054` | Role Assignment | P08 | 1 |
+| `BO-055` | Rota & Scheduling | P08 | 2 |
+| `BO-056` | Time & Attendance | P08 | 2 |
+| `BO-057` | Training & Certification | P08 | 3 |
+| `BO-058` | Reporting Home | P08 | 1 |
+| `BO-059` | Sales Reports | P08 | 1 |
+| `BO-060` | Attendance & Footfall | P08 | 2 |
+| `BO-061` | Scheduled Reports | P08 | 3 |
+| `BO-062` | Venue Profile | P08 | 1 |
+| `BO-063` | Opening Hours & Calendar | P08 | 1 |
+| `BO-064` | Zones & Areas | P08 | 1 |
+| `BO-065` | Venue Configuration | P08 | 1 |
+| `BO-066` | Notification Settings | P08 | 2 |
+| `BO-067` | Integrations | P08 | 2 |
+| `BO-068` | Audit Log | P08 | 2 |
+| `BO-069` | Asset Register | P08 | 2 |
+| `BO-070` | Work Orders | P08 | 2 |
+| `BO-071` | Planned Maintenance | P08 | 3 |
+| `BO-072` | Incident Log | P08 | 2 |
+| `BO-073` | Lost & Found Register | P08 | 2 |
+| `ADM-001` | Platform Login / MFA | P09 | 1 |
+| `ADM-002` | Platform Dashboard | P09 | 1 |
+| `ADM-003` | Cross-Tenant Health Dashboard | P09 | 2 |
+| `ADM-004` | Platform Audit Log | P09 | 2 |
+| `ADM-005` | Tenant Directory | P09 | 1 |
+| `ADM-006` | Tenant Hierarchy Explorer | P09 | 1 |
+| `ADM-007` | Module & Feature Entitlement | P09 | 1 |
+| `ADM-008` | Subscription & Plan Management | P09 | 1 |
+| `ADM-009` | Tenant Billing & Invoicing | P09 | 2 |
+| `ADM-010` | Usage Metering | P09 | 2 |
+| `ADM-011` | Licence & Seat Management | P09 | 2 |
+| `ADM-012` | Tenant Isolation & Resource Pool | P09 | 1 |
+| `ADM-013` | Tenant Performance Monitor | P09 | 2 |
+| `ADM-014` | Auto-Scaling Configuration | P09 | 3 |
+| `ADM-015` | API Rate Limit & Quota Management | P09 | 3 |
+| `ADM-016` | White-Label Branding Management | P09 | 2 |
+| `ADM-017` | Domain & Certificate Management | P09 | 2 |
+| `ADM-018` | Localisation & Language Pack | P09 | 2 |
+| `ADM-019` | Global Configuration & Defaults | P09 | 2 |
+| `ADM-020` | Platform User Directory | P09 | 1 |
+| `ADM-021` | Platform Role Management | P09 | 1 |
+| `ADM-022` | Release & Version Management | P09 | 2 |
+| `ADM-023` | Staging Promotion & Approval | P09 | 2 |
+| `ADM-024` | Release Notification Composer | P09 | 3 |
+| `ADM-025` | Tenant Upgrade Scheduler | P09 | 2 |
+| `ADM-026` | End-of-Support Notice Management | P09 | 3 |
+| `ADM-027` | Database Migration Console | P09 | 1 |
+| `ADM-028` | Environment Registry | P09 | 2 |
+| `ADM-029` | Deployment Monitor | P09 | 2 |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | P09 | 3 |
+| `ADM-031` | Security & Compliance Dashboard | P09 | 3 |
+| `ADM-032` | WAF & Security Policy View | P09 | 3 |
+| `ADM-033` | Backup & DR Status | P09 | 2 |
+| `ADM-034` | Archival Job Monitor | P09 | 3 |
+| `ADM-035` | Support & Escalation Console | P09 | 3 |
+| `ADM-036` | Platform Notification Broadcast | P09 | 3 |
+| `PTR-001` | Partner Login / MFA | P10 | 2 |
+| `PTR-002` | Partner Dashboard | P10 | 2 |
+| `PTR-003` | Profile & Company Details | P10 | 2 |
+| `PTR-004` | Notifications | P10 | 3 |
+| `PTR-005` | Inventory & Allocation View | P10 | 2 |
+| `PTR-006` | Product Catalog (B2B Pricing) | P10 | 2 |
+| `PTR-007` | Availability Search | P10 | 2 |
+| `PTR-008` | Booking Creation | P10 | 2 |
+| `PTR-009` | Group / Bulk Booking | P10 | 3 |
+| `PTR-010` | Cart & Quote | P10 | 3 |
+| `PTR-011` | Quote Management | P10 | 3 |
+| `PTR-012` | Checkout / Credit Purchase | P10 | 2 |
+| `PTR-013` | Credit Limit & Balance | P10 | 2 |
+| `PTR-014` | Settlement & Payment History | P10 | 3 |
+| `PTR-015` | Order History | P10 | 2 |
+| `PTR-016` | Voucher / Ticket Download | P10 | 2 |
+| `PTR-017` | Commission Statement | P10 | 3 |
+| `PTR-018` | Reports & Sales Performance | P10 | 3 |
+| `PTR-019` | API Credentials & Integration | P10 | 3 |
+| `PTR-020` | Sub-Agent Management | P10 | 3 |
+| `PTR-021` | Support & Contact | P10 | 3 |
+| `ACC-001` | Landing / Programme Overview | P11 | 3 |
+| `ACC-002` | Registration Form | P11 | 3 |
+| `ACC-003` | Application Review & Submit | P11 | 3 |
+| `ACC-004` | Application Status Tracking | P11 | 3 |
+| `ACC-005` | Accreditation Badge | P11 | 3 |
+| `ACC-006` | Reviewer Queue | P11 | 3 |
+| `ACC-007` | Reviewer Application Detail | P11 | 3 |
+| `ACC-008` | Credential Register | P11 | 3 |
+| `SUP-001` | Agent Login | P12 | 3 |
+| `SUP-002` | Agent Dashboard | P12 | 3 |
+| `SUP-003` | Availability & Routing Settings | P12 | 3 |
+| `SUP-004` | Conversation Queue | P12 | 3 |
+| `SUP-005` | Live Chat Workspace | P12 | 3 |
+| `SUP-006` | Knowledge Base Search | P12 | 3 |
+| `SUP-007` | Canned Response Management | P12 | 3 |
+| `SUP-008` | Agent Performance & SLA View | P12 | 3 |
+| `CMS-001` | Tenant Workspace | P13 | 2 |
+| `CMS-002` | Brand Kit | P13 | 2 |
+| `CMS-003` | Typography | P13 | 2 |
+| `CMS-004` | Logo & Assets | P13 | 2 |
+| `CMS-005` | Theme Editor | P13 | 2 |
+| `CMS-006` | Component Preview | P13 | 2 |
+| `CMS-007` | Page Builder | P13 | 2 |
+| `CMS-008` | Content Blocks | P13 | 2 |
+| `CMS-009` | Navigation & Menus | P13 | 2 |
+| `CMS-010` | Media Library | P13 | 2 |
+| `CMS-013` | SEO & Metadata | P13 | 2 |
+| `CMS-011` | Translations | P13 | 2 |
+| `CMS-012` | RTL Preview | P13 | 2 |
+| `CMS-014` | Publishing Workflow | P13 | 2 |
+| `CMS-015` | Version History | P13 | 2 |
+| `CMS-016` | Site Settings | P13 | 2 |
+| `CMS-017` | Domain & Certificate | P13 | 2 |
+| `CMS-018` | Consent & Legal | P13 | 2 |
+| `CMS-019` | User Access | P13 | 2 |
+| `CMS-020` | Change Log | P13 | 2 |

@@ -1060,8 +1060,12 @@ components:
         hasUnexplainedSkew:
           type: boolean
           description: >
-            Skew during a rollout is expected. Skew outside one is a defect, and separating
-            the two is the entire value of this report.
+            Skew during a rollout is expected. Skew outside one is a defect, and separating the
+            two is the entire value of this report.
+
+            **An on-premise cell is a third case: legitimately behind, indefinitely**, because
+            the client has not scheduled the window and TICVAI cannot push. It is not counted
+            here and must not appear as a defect (ADR-0017).
         cells:
           type: array
           items:
@@ -1076,7 +1080,13 @@ components:
               reason:
                 type: string
                 nullable: true
-                enum: [midRollout, rolloutPaused, rolloutFailed, tenantDeferred, unexplained]
+                enum:
+                  - midRollout
+                  - rolloutPaused
+                  - rolloutFailed
+                  - tenantDeferred
+                  - onPremiseNotScheduled
+                  - unexplained
 
     Environment:
       type: object

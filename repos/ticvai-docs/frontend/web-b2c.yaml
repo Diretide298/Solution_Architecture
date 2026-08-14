@@ -1,9 +1,9 @@
-# web-b2c — screen and route manifest
-# Derived from screens/*.yaml by tools/link-frontend.py. Do not hand-edit.
-# Routes and component paths are conventional; a route that exists in code but
-# not here, or here but not in code, is caught by tools/check-frontend.py.
+# web-b2c — guest · web
+# Screen and route manifest. Derived from screens/*.yaml. Do not hand-edit.
 
 app: web-b2c
+audience: guest
+formFactor: web
 status: scaffolded
 runtime: reactWeb
 offlineCapable: false
@@ -11,7 +11,7 @@ directions:
 - ltr
 - rtl
 platforms:
-- P01 Guest Web Storefront
+- P01 Guest Web — Storefront
 packages:
 - design-tokens
 - ui
@@ -52,7 +52,7 @@ screens:
 - id: WEB-004
   name: Event / Attraction Detail
   route: /discovery-and-browse/event-attraction-detail
-  component: apps/web-b2c/src/routes/discovery-and-browse/EventAttractionDetailDetail.tsx
+  component: apps/web-b2c/src/routes/discovery-and-browse/EventAttractionDetail.tsx
   wave: 1
   status: notStarted
 - id: WEB-005
@@ -100,7 +100,7 @@ screens:
 - id: WEB-017
   name: My Account Dashboard
   route: /account-and-self-service/my-account-dashboard
-  component: apps/web-b2c/src/routes/account-and-self-service/MyAccountDashboardDashboard.tsx
+  component: apps/web-b2c/src/routes/account-and-self-service/MyAccountDashboard.tsx
   wave: 1
   status: notStarted
 - id: WEB-018

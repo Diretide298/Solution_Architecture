@@ -1,0 +1,50 @@
+# access.validated v1 — published by access
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: access.validated
+version: 1
+publisher: access
+description: An entitlement was presented and admitted.
+aggregate: entitlement
+emittedWhen: Entitlement issued to partiallyConsumed or fullyConsumed
+payload:
+- field: scanId
+  type: string
+  notes: ULID. The idempotency key for every consumer
+- field: entitlementId
+  type: string
+- field: venueId
+  type: uuid
+- field: accessPointId
+  type: uuid
+- field: direction
+  type: string
+  notes: in or out
+- field: wasOffline
+  type: boolean
+  notes: True where the terminal validated against a bundle and synced later
+- field: recordedAt
+  type: timestamp
+  notes: When it happened at the gate
+- field: syncedAt
+  type: timestamp
+  notes: When the server heard. Differs from recordedAt on an offline scan
+consumers:
+- context: reporting
+  purpose: Occupancy and attendance
+  idempotencyKey: scanId
+  onFailure: retry
+  isCritical: false
+- context: marketing
+  purpose: Attendance behaviour
+  idempotencyKey: scanId
+  onFailure: retry
+  isCritical: false
+- context: queue
+  purpose: Release a held virtual queue slot on entry
+  idempotencyKey: scanId
+  onFailure: retry
+  isCritical: false
+retention: 7 days. At scan volume the outbox becomes the largest table in the cell otherwise
+notes: '**High volume — the highest in the platform.** No critical consumer, deliberately: admission
+  already happened at the gate, and nothing downstream can undo it. Everything here is derived.'

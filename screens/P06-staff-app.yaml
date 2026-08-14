@@ -1,0 +1,1689 @@
+# P06 — Staff App — Operations
+#
+# Derived from the wireframe board on 14 August. **Purposes and navigation are real;
+# components, states and operations are not yet written.** Every screen carries
+# wireframe.status drafted so the gap is visible rather than implied.
+
+platform:
+  code: P06
+  audience: staff
+  formFactor: mobileApp
+  shortName: Staff App
+  name: Staff App — Operations
+  surface: staffFacing
+  runtime: reactNative
+  app: employee
+  appStatus: scaffolded
+  offlineCapable: true
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  - offline-core
+  deployment:
+    target: iOS / Android native
+    distribution: MDM, not a public store
+    bundleUpdate: on launch
+    hosting: in-cell
+    storeReview: false
+    deviceOwnership: venue-owned or BYOD
+    networkAssumption: venue wifi, dead zones expected
+    releaseCadence: fortnightly
+  screenCount: 50
+  wireframeBoard: wireframes/P06 Staff App.dc.html
+screens:
+- id: EMP-001
+  name: Sign in
+  module: Operations
+  purpose: Get an employee onto a shared device fast.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Biometric prompt, or SSO redirect
+    empty: Not applicable
+    error: Sign-in failed, with the reason
+    offline: Signs in against the cached principal list. A technician in a basement still needs their
+      tasks
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-001
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/sign-in
+    component: apps/employee/src/routes/operations/SignInDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: login
+    contract: identity
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: EMP-002
+  name: Select venue & role
+  module: Operations
+  purpose: Confirm which hat this person is wearing today.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Roles and venues for this principal
+    empty: Only one role — skipped entirely
+    error: Could not load roles. The last selection is offered
+    offline: Cached from the last session
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-002
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/select-venue-role
+    component: apps/employee/src/routes/operations/SelectVenueRoleDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listRoles
+    contract: identity
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: selectRole
+    contract: identity
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: EMP-003
+  name: Home — on duty
+  module: Operations
+  purpose: The screen the device sits on between tasks.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Tiles skeleton. Shift state renders first
+    empty: Nothing on today
+    error: Partial — each tile fails independently, so one dead service does not blank the screen
+    offline: Last synced view, with its age. The pending count is always current because it is local
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-003
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/home-on-duty
+    component: apps/employee/src/routes/operations/HomeOnDutyDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getCurrentShift
+    contract: shift
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: listIncidents
+    contract: maintenance
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: EMP-048
+  name: Opening checklist
+  module: Operations
+  purpose: Confirm a gate is fit to open before the first guest reaches it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-048
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/opening-checklist
+    component: apps/employee/src/routes/operations/OpeningChecklistDetail.tsx
+    status: notStarted
+- id: EMP-009
+  name: End shift
+  module: Operations
+  purpose: Close out cleanly, including anything unsynced.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Closing
+    empty: Not applicable
+    error: Close failed. The shift stays open rather than half-closed
+    offline: '**Cannot close.** Closing needs the server total, and a locally computed variance is not
+      a variance'
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-009
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/end-shift
+    component: apps/employee/src/routes/operations/EndShiftDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: closeShift
+    contract: shift
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: EMP-010
+  name: Scan — ready
+  module: Operations
+  purpose: The raised centre action, and the thing this app is for.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-010
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/scan-ready
+    component: apps/employee/src/routes/operations/ScanReadyDetail.tsx
+    status: notStarted
+- id: EMP-011
+  name: Scan — admitted
+  module: Operations
+  purpose: Confirm entry, then get out of the way.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-011
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/scan-admitted
+    component: apps/employee/src/routes/operations/ScanAdmittedDetail.tsx
+    status: notStarted
+- id: EMP-012
+  name: Scan — denied
+  module: Operations
+  purpose: Give the reason and the next action.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-012
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/scan-denied
+    component: apps/employee/src/routes/operations/ScanDeniedDetail.tsx
+    status: notStarted
+- id: EMP-013
+  name: Override
+  module: Operations
+  purpose: Admit against a failed validation, on the record.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-013
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/override
+    component: apps/employee/src/routes/operations/OverrideDetail.tsx
+    status: notStarted
+- id: EMP-014
+  name: Ticket lookup
+  module: Operations
+  purpose: Answer a question without admitting anybody.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-014
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/ticket-lookup
+    component: apps/employee/src/routes/operations/TicketLookupDetail.tsx
+    status: notStarted
+- id: EMP-015
+  name: Group scan
+  module: Operations
+  purpose: Admit a party on one credential.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-015
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/group-scan
+    component: apps/employee/src/routes/operations/GroupScanDetail.tsx
+    status: notStarted
+- id: EMP-016
+  name: Offline scanning
+  module: Operations
+  purpose: Keep working when the network does not.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-016
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/offline-scanning
+    component: apps/employee/src/routes/operations/OfflineScanningDetail.tsx
+    status: notStarted
+- id: EMP-017
+  name: Sync & reconciliation
+  module: Operations
+  purpose: Learn that the server disagreed with you.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-017
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/sync-reconciliation
+    component: apps/employee/src/routes/operations/SyncReconciliationDetail.tsx
+    status: notStarted
+- id: EMP-018
+  name: Offline package
+  module: Operations
+  purpose: Know which rules this device is enforcing.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-018
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/offline-package
+    component: apps/employee/src/routes/operations/OfflinePackageDetail.tsx
+    status: notStarted
+- id: EMP-004
+  name: Task list
+  module: Operations
+  purpose: See what is assigned, and what is overdue.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: List skeleton
+    empty: No tasks assigned — offers available work rather than nothing
+    error: Task service unavailable
+    offline: Local queue. Tasks completed offline sync on return
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-004
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/task-list
+    component: apps/employee/src/routes/operations/TaskListDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listWorkOrders
+    contract: maintenance
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: EMP-005
+  name: Task detail
+  module: Operations
+  purpose: Do the task and record that it was done.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Detail skeleton
+    empty: Not applicable
+    error: Task not found — it may have been reassigned
+    offline: Editable offline. Findings and photos queue
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-005
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/task-detail
+    component: apps/employee/src/routes/operations/TaskDetailDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: completeWorkOrder
+    contract: maintenance
+    purpose: Complete a work order raised as a task
+    trigger: onAction
+- id: EMP-006
+  name: Raise a task
+  module: Operations
+  purpose: Report something without finding a manager.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Form
+    empty: Not applicable
+    error: Could not raise. The draft is kept
+    offline: Queues locally. A task raised in a plant room must not need signal
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-006
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/raise-a-task
+    component: apps/employee/src/routes/operations/RaiseATaskDetail.tsx
+    status: notStarted
+- id: EMP-007
+  name: Handover notes
+  module: Operations
+  purpose: Tell the next shift what they are walking into.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Notes load
+    empty: No notes from the previous shift
+    error: Could not load
+    offline: Editable offline and synced at end of shift
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-007
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/handover-notes
+    component: apps/employee/src/routes/operations/HandoverNotesDetail.tsx
+    status: notStarted
+- id: EMP-008
+  name: Shift summary
+  module: Operations
+  purpose: See what this person actually did today.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-008
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/shift-summary
+    component: apps/employee/src/routes/operations/ShiftSummaryDetail.tsx
+    status: notStarted
+- id: EMP-019
+  name: AI assistant — home
+  module: Operations
+  purpose: The tab that is already in the shell.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-019
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/ai-assistant-home
+    component: apps/employee/src/routes/operations/AiAssistantHomeDetail.tsx
+    status: notStarted
+- id: EMP-020
+  name: AI assistant — answer
+  module: Operations
+  purpose: Answer with the operation behind it visible.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-020
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/ai-assistant-answer
+    component: apps/employee/src/routes/operations/AiAssistantAnswerDetail.tsx
+    status: notStarted
+- id: EMP-031
+  name: Queue monitor
+  module: Operations
+  purpose: See the queue from the floor.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-031
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/queue-monitor
+    component: apps/employee/src/routes/operations/QueueMonitorDetail.tsx
+    status: notStarted
+- id: EMP-032
+  name: Manual wait entry
+  module: Operations
+  purpose: Take over when the wait feed dies.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-032
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/manual-wait-entry
+    component: apps/employee/src/routes/operations/ManualWaitEntryDetail.tsx
+    status: notStarted
+- id: EMP-033
+  name: Capacity view
+  module: Operations
+  purpose: Know whether the next session can take a walk-up.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-033
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/capacity-view
+    component: apps/employee/src/routes/operations/CapacityViewDetail.tsx
+    status: notStarted
+- id: EMP-034
+  name: Walk-up sale
+  module: Operations
+  purpose: Sell at the gate without a till.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-034
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/walk-up-sale
+    component: apps/employee/src/routes/operations/WalkUpSaleDetail.tsx
+    status: notStarted
+- id: EMP-035
+  name: Payment on device
+  module: Operations
+  purpose: Take a card payment on the handheld.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-035
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/payment-on-device
+    component: apps/employee/src/routes/operations/PaymentOnDeviceDetail.tsx
+    status: notStarted
+- id: EMP-036
+  name: Issue media
+  module: Operations
+  purpose: Give the guest something the gate can read.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-036
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/issue-media
+    component: apps/employee/src/routes/operations/IssueMediaDetail.tsx
+    status: notStarted
+- id: EMP-037
+  name: Notifications
+  module: Operations
+  purpose: Tell the right person the right thing.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-037
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/notifications
+    component: apps/employee/src/routes/operations/NotificationsDetail.tsx
+    status: notStarted
+- id: EMP-039
+  name: Announcements
+  module: Operations
+  purpose: Read what the venue told everybody.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-039
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/announcements
+    component: apps/employee/src/routes/operations/AnnouncementsDetail.tsx
+    status: notStarted
+- id: EMP-047
+  name: Emergency mode
+  module: Operations
+  purpose: Evacuate, and stop pretending to be a ticketing app.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Instant. This screen preempts everything
+    empty: Not applicable
+    error: Renders from local data only — it must work when nothing else does
+    offline: Fully offline by design
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-047
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/emergency-mode
+    component: apps/employee/src/routes/operations/EmergencyModeDetail.tsx
+    status: notStarted
+- id: EMP-050
+  name: Post-incident restore
+  module: Operations
+  purpose: Put the venue back to how it was.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-050
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/post-incident-restore
+    component: apps/employee/src/routes/operations/PostIncidentRestoreDetail.tsx
+    status: notStarted
+- id: EMP-021
+  name: Roster
+  module: Operations
+  purpose: See who is on, and where.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-021
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/roster
+    component: apps/employee/src/routes/operations/RosterDetail.tsx
+    status: notStarted
+- id: EMP-022
+  name: My rota
+  module: Operations
+  purpose: Know when to turn up next.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-022
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/my-rota
+    component: apps/employee/src/routes/operations/MyRotaDetail.tsx
+    status: notStarted
+- id: EMP-023
+  name: Swap request
+  module: Operations
+  purpose: Ask somebody to take a shift.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-023
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/swap-request
+    component: apps/employee/src/routes/operations/SwapRequestDetail.tsx
+    status: notStarted
+- id: EMP-024
+  name: Clock in / out
+  module: Operations
+  purpose: Record attendance from the device already in hand.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-024
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/clock-in-out
+    component: apps/employee/src/routes/operations/ClockInOutDetail.tsx
+    status: notStarted
+- id: EMP-025
+  name: Break management
+  module: Operations
+  purpose: Take a break without leaving a gate unstaffed.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-025
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/break-management
+    component: apps/employee/src/routes/operations/BreakManagementDetail.tsx
+    status: notStarted
+- id: EMP-026
+  name: Incident report
+  module: Operations
+  purpose: Record what happened while it is fresh.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Form
+    empty: Not applicable
+    error: Could not submit. **The report is kept and retried** — a safety report lost to a network
+      error is the worst outcome on this app
+    offline: Queues locally with the highest sync priority
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-026
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/incident-report
+    component: apps/employee/src/routes/operations/IncidentReportDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: reportIncident
+    contract: maintenance
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: EMP-027
+  name: Incident detail
+  module: Operations
+  purpose: Follow up on something already reported.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-027
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/incident-detail
+    component: apps/employee/src/routes/operations/IncidentDetailDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getIncident
+    contract: maintenance
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: updateIncident
+    contract: maintenance
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: EMP-028
+  name: Lost & found
+  module: Operations
+  purpose: Log something handed in.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-028
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/lost-found
+    component: apps/employee/src/routes/operations/LostFoundDetail.tsx
+    status: notStarted
+- id: EMP-029
+  name: Guest assistance
+  module: Operations
+  purpose: Help a guest without leaving the floor.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-029
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/guest-assistance
+    component: apps/employee/src/routes/operations/GuestAssistanceDetail.tsx
+    status: notStarted
+- id: EMP-030
+  name: Venue map
+  module: Operations
+  purpose: Find a gate, an exit or a colleague.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-030
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/venue-map
+    component: apps/employee/src/routes/operations/VenueMapDetail.tsx
+    status: notStarted
+- id: EMP-038
+  name: Broadcast to team
+  module: Operations
+  purpose: Reach everybody on shift at once.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-038
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/broadcast-to-team
+    component: apps/employee/src/routes/operations/BroadcastToTeamDetail.tsx
+    status: notStarted
+- id: EMP-040
+  name: Knowledge base
+  module: Operations
+  purpose: Look up the rule rather than guess it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-040
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/knowledge-base
+    component: apps/employee/src/routes/operations/KnowledgeBaseDetail.tsx
+    status: notStarted
+- id: EMP-041
+  name: Training
+  module: Operations
+  purpose: Do the module that unlocks the role.
+  capability: C00
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-041
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/training
+    component: apps/employee/src/routes/operations/TrainingDetail.tsx
+    status: notStarted
+- id: EMP-042
+  name: Profile
+  module: Operations
+  purpose: Change what this person controls about themselves.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-042
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/profile
+    component: apps/employee/src/routes/operations/ProfileDetail.tsx
+    status: notStarted
+- id: EMP-043
+  name: Device settings
+  module: Operations
+  purpose: Set how this handheld behaves.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-043
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/device-settings
+    component: apps/employee/src/routes/operations/DeviceSettingsDetail.tsx
+    status: notStarted
+- id: EMP-044
+  name: Accessibility
+  module: Operations
+  purpose: Make the app usable in the conditions it is used in.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-044
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/accessibility
+    component: apps/employee/src/routes/operations/AccessibilityDetail.tsx
+    status: notStarted
+- id: EMP-045
+  name: Arabic / RTL
+  module: Operations
+  purpose: Render the staff app right to left.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-045
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/arabic-rtl
+    component: apps/employee/src/routes/operations/ArabicRtlDetail.tsx
+    status: notStarted
+- id: EMP-046
+  name: Sign out
+  module: Operations
+  purpose: Leave the shared device safe for the next person.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-046
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/sign-out
+    component: apps/employee/src/routes/operations/SignOutDetail.tsx
+    status: notStarted
+- id: EMP-049
+  name: Hand over the journal
+  module: Operations
+  purpose: Move an unsynced journal off a device that is going flat.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+    offline: TODO — this surface must work with no network (ADR-0013)
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P06 Staff App.dc.html#emp-049
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: employee
+    route: /operations/hand-over-the-journal
+    component: apps/employee/src/routes/operations/HandOverTheJournalDetail.tsx
+    status: notStarted

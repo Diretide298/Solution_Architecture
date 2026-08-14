@@ -537,6 +537,7 @@ paths:
                         items: { $ref: '#/components/schemas/AdmissionProfile' }
     post:
       operationId: createAdmissionProfile
+      x-ticvai-config-scope: venue
       summary: Create an admission profile
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -565,6 +566,7 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: updateAdmissionProfile
+      x-ticvai-config-scope: venue
       summary: Update an admission profile
       description: >
         Changes take effect at terminals after the next offline package refresh, not

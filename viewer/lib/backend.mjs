@@ -12,6 +12,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { readWorkbook } from './xlsx.mjs';
 import { buildMigrations } from './migrations.mjs';
+import { buildRelationships } from './relationships.mjs';
 
 // The workbook is delivered to more than one folder and the copies drift —
 // backend/ held a build two versions behind handoff/ for a while. Rather than
@@ -48,36 +49,67 @@ async function findWorkbook(root) {
  * present and left empty if not. A rebuild should cost a column, not a sheet.
  */
 function table(rows, required, optional = []) {
-  const wanted = required.map((h) => h.toLowerCase());
-  let headerRow = -1;
+  // A header may be given as `'Columns'` or as `['Columns', 'Cols']` — the
+  // first name is what the record is keyed by, the rest are names the workbook
+  // has used for the same thing. The 14 August rebuild renamed `Columns` to
+  // `Cols` on the Modules sheet, and because every required header had to match
+  // exactly the header row was never found and the sheet read as empty: 230
+  // tables and zero schemas. A rename should cost nothing.
+  const names = (h) => (Array.isArray(h) ? h : [h]);
+  const key = (h) => names(h)[0];
+  const matches = (h, cells) => names(h).some((n) => cells.includes(n.toLowerCase()));
 
+  let headerRow = -1;
   for (let i = 0; i < rows.length; i++) {
     const cells = rows[i].map((c) => String(c ?? '').trim().toLowerCase());
-    if (wanted.every((w) => cells.includes(w))) { headerRow = i; break; }
+    if (required.every((h) => matches(h, cells))) { headerRow = i; break; }
   }
   if (headerRow < 0) return { rows: [], missing: true, columns: [] };
 
   const cols = rows[headerRow].map((c) => String(c ?? '').trim().toLowerCase());
-  const at = (row, name) => {
-    const index = cols.indexOf(name.toLowerCase());
-    return index < 0 ? '' : String(row[index] ?? '').trim();
+  const at = (row, header) => {
+    for (const name of names(header)) {
+      const index = cols.indexOf(name.toLowerCase());
+      if (index >= 0) return String(row[index] ?? '').trim();
+    }
+    return '';
   };
 
   const headers = [...required, ...optional];
   const out = [];
+  let prose = 0;
   for (let i = headerRow + 1; i < rows.length; i++) {
     const row = rows[i];
     if (!row.some((c) => String(c ?? '').trim())) continue;
     const record = {};
-    for (const header of headers) record[header] = at(row, header);
+    for (const header of headers) record[key(header)] = at(row, header);
+
+    // These sheets carry their own footnotes *below* the data — the Modules
+    // sheet ends with "Reading this sheet", then nine sentences explaining what
+    // Out and In mean. Every one of them is a single cell in the first column,
+    // so taking every non-empty row as a record turned eight paragraphs of prose
+    // into eight schema modules, and put them in the schema picker.
+    //
+    // The rule that separates them: a data row fills every column that
+    // identifies the sheet. A footnote fills one.
+    if (!required.every((h) => at(row, h))) { prose += 1; continue; }
+
     out.push(record);
   }
   return {
+    prose,
     rows: out,
     missing: false,
     columns: rows[headerRow].map((c) => String(c ?? '').trim()).filter(Boolean),
   };
 }
+
+/** A comma-separated cell, with the workbook's own "nothing here" marker dropped. */
+const splitTables = (cell) =>
+  String(cell ?? '')
+    .split(/[,;]/)
+    .map((s) => s.trim())
+    .filter((s) => s && s !== '—' && s !== '-');
 
 /** Just enough to render an ADR heading and lede as plain text. */
 const stripMarkdown = (text) =>
@@ -409,10 +441,14 @@ export async function buildBackend(root, contractSchemas = []) {
   const sheet = (name) => sheets.get(name) ?? [];
   const note = preamble(sheet('Read me'), 8);
 
-  const moduleRows = table(sheet('Modules'), ['Module', 'Tables', 'Columns'],
-    ['Migration', 'Status', 'Written']).rows;
-  const tableRows = table(sheet('Tables'), ['Module', 'Table', 'Columns'],
-    ['Child of', 'Derived from', 'Migration', 'Written']).rows;
+  // `What it is` and `Why it is separate` arrived in the 14 August rebuild and
+  // are the best short description of a schema anywhere in the delivery — so
+  // they are read and shown on hover rather than left in the spreadsheet.
+  const moduleRows = table(sheet('Modules'), ['Module', 'Tables', ['Columns', 'Cols']],
+    ['Migration', 'Status', 'Written', 'What it is', 'Why it is separate', 'Contract', 'Ops',
+      'Tier', 'Out', 'In', 'Cross']).rows;
+  const tableRows = table(sheet('Tables'), ['Module', 'Table', ['Columns', 'Cols']],
+    ['Child of', 'Derived from', 'Migration', 'Written', 'New', 'PII']).rows;
   const columnRows = table(sheet('Columns'), ['Table', 'Column', 'Type'],
     ['Required', 'Source', 'Description']).rows;
   const scalingRows = table(sheet('Scaling'), ['Contract', 'Writes'],
@@ -421,9 +457,32 @@ export async function buildBackend(root, contractSchemas = []) {
   const noTableRows = table(sheet('No table'), ['Contract', 'Schema'],
     ['Why there is no table']).rows;
 
+  // Two sheets the viewer had never opened, both of which state the API-to-table
+  // join the contracts cannot:
+  //
+  //   Data lineage   every operation against the tables it reads and writes. The
+  //                  same join as handoff/api-data-lineage.json, and NOT the same
+  //                  data — the JSON drops the routing value on 399 rows where
+  //                  the sheet says `write`, and the sheet carries a stored
+  //                  procedure column the JSON has no field for. Two independent
+  //                  statements of one thing, so they can be checked against
+  //                  each other rather than one being trusted.
+  //
+  //   Where used     the reverse index — which operations and which screens
+  //                  reach each table. Its own subtitle is the reason to have
+  //                  it: "what breaks if this table changes".
+  const dataLineageRows = table(sheet('Data lineage'), ['Operation', 'Contract', 'Verb'],
+    ['Service', 'Reads', 'Writes', 'Routing', 'Scope', 'Offline', 'Stored procedure', 'Source']).rows;
+  // only `Table` identifies a row here: 39 of the 230 tables are reached by no
+  // operation and no screen, and a blank rest of the row is what that looks
+  // like. Requiring the counts would drop exactly the rows worth knowing about.
+  const whereUsedRows = table(sheet('Where used'), ['Table'],
+    ['Operations', 'Screens', 'Which operations', 'Which screens']).rows
+    .filter((r) => /^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$/i.test(r.Table ?? ''));
+
   for (const [name, result] of [
-    ['Modules', table(sheet('Modules'), ['Module', 'Tables', 'Columns'])],
-    ['Tables', table(sheet('Tables'), ['Module', 'Table', 'Columns'])],
+    ['Modules', table(sheet('Modules'), ['Module', 'Tables', ['Columns', 'Cols']])],
+    ['Tables', table(sheet('Tables'), ['Module', 'Table', ['Columns', 'Cols']])],
     ['Columns', table(sheet('Columns'), ['Table', 'Column', 'Type'])],
   ]) {
     if (result.missing) {
@@ -432,6 +491,19 @@ export async function buildBackend(root, contractSchemas = []) {
         kind: 'backend-sheet-unreadable',
         file: workbookName,
         message: `The ${name} sheet has no recognisable header row — the workbook layout has changed`,
+      });
+    }
+    // Skipped rather than read as data. Reported because a sheet that suddenly
+    // has forty of these has changed shape, and silence is how that gets missed.
+    if (result.prose) {
+      problems.push({
+        severity: 'info',
+        kind: 'backend-sheet-footnotes',
+        file: workbookName,
+        message:
+          `${result.prose} row${result.prose > 1 ? 's' : ''} below the ${name} data fill only the first ` +
+          `column — the sheet's own footnotes. Skipped, because read as records they become ` +
+          `${result.prose} schemas that do not exist.`,
       });
     }
   }
@@ -444,6 +516,14 @@ export async function buildBackend(root, contractSchemas = []) {
       columns: number(r.Columns),
       migration: r.Migration || null,
       status: r.Status || null,
+      what: r['What it is'] || null,
+      why: r['Why it is separate'] || null,
+      contract: r.Contract || null,
+      operations: number(r.Ops),
+      tier: r.Tier || null,
+      out: number(r.Out),
+      in: number(r.In),
+      cross: number(r.Cross),
       // "Derivable. Not written" also contains the word written, so the
       // negative has to be excluded before the positive is tested
       written: /\bwritten\b/i.test(r.Status ?? '') && !/\bnot\s+written\b/i.test(r.Status ?? ''),
@@ -563,6 +643,11 @@ export async function buildBackend(root, contractSchemas = []) {
   // a table happens to be called venue — there is none, and never will be
   addForeignKeys(tables, columns, problems, workbookName, migrations);
   applyMigrations(tables, columns, migrations, problems);
+
+  // handoff/relationships.csv states the relationships outright, and says what
+  // kind each one is. Where it exists it beats reading column names.
+  const relationships = await buildRelationships(root);
+  problems.push(...(relationships.problems ?? []));
   problems.push(...migrations.problems);
 
   // "why is there no table for this schema" — keyed by contract schema name,
@@ -590,7 +675,30 @@ export async function buildBackend(root, contractSchemas = []) {
     adrs,
     docs,
     migrations,
+    relationships,
     notPersisted,
+    // handed to lineage.mjs, which owns the API-to-table join and needs both
+    // statements of it — the workbook's and the JSON's — to compare them
+    dataLineage: dataLineageRows.map((r) => ({
+      operation: r.Operation,
+      contract: r.Contract,
+      verb: r.Verb,
+      service: r.Service || null,
+      reads: splitTables(r.Reads),
+      writes: splitTables(r.Writes),
+      routing: r.Routing || null,
+      scope: r.Scope || null,
+      offline: /^(yes|true)$/i.test(r.Offline ?? ''),
+      procedure: r['Stored procedure'] && r['Stored procedure'] !== '—' ? r['Stored procedure'] : null,
+      source: r.Source || null,
+    })),
+    whereUsed: whereUsedRows.map((r) => ({
+      table: r.Table,
+      operationCount: number(r.Operations),
+      screenCount: number(r.Screens),
+      operations: splitTables(r['Which operations']),
+      screens: splitTables(r['Which screens']),
+    })),
     problems,
     stats: {
       modules: modules.length,

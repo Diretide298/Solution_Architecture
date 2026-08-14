@@ -1,0 +1,54 @@
+# Promotion — state model
+# Contract: promotions.PromotionStatus
+# Checked by tools/check-states.py.
+
+entity: Promotion
+contract: promotions
+enum: PromotionStatus
+owner: promotions
+initial:
+- draft
+terminal:
+- expired
+- ended
+transitions:
+- from: draft
+  to: scheduled
+  operation: publishPromotion
+  trigger: operation
+  guard: Conditions and discount validated, no unresolved stacking conflict
+- from: scheduled
+  to: draft
+  operation: unschedulePromotion
+  trigger: operation
+  guard: Pulled before starting
+- from: scheduled
+  to: live
+  trigger: timer
+  guard: Start reached
+- from: live
+  to: paused
+  operation: pausePromotion
+  trigger: operation
+  guard: Halted. **Carts already priced keep their price** — a guest mid-checkout is not repriced
+- from: paused
+  to: live
+  operation: publishPromotion
+  trigger: operation
+  guard: Resumed within the window
+- from: live
+  to: expired
+  trigger: timer
+  guard: End reached
+- from: paused
+  to: ended
+  operation: endPromotion
+  trigger: operation
+  guard: Ended early. Distinct from expired — somebody decided
+- from: live
+  to: ended
+  operation: endPromotion
+  trigger: operation
+  guard: Ended early while running
+notes: '`expired` and `ended` are separated so the register can answer whether a promotion ran its course
+  or was pulled, which is the question asked after a bad month.'

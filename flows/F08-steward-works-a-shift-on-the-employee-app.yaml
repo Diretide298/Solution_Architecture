@@ -1,0 +1,126 @@
+# F08 — Steward works a shift on the employee app
+#
+# The app a venue actually runs on. Fifty screens, and the flow below is the spine
+# through them — everything else is entered from EMP-003 and returns to it.
+#
+# Validated by tools/check-flows.py.
+
+id: F08
+name: Steward works a shift on the employee app
+actor: supervisor
+capability: C11
+wave: 2
+frequency: daily
+criticality: operational
+platforms:
+- P06 Staff App
+offlineBehaviour: Offline-capable but not offline-mandatory. A technician losing signal in a plant room
+  is an inconvenience; a gate losing signal is a queue. Tasks and notes queue locally and sync.
+trigger:
+  description: A member of venue staff arrives for a shift and works through it on their phone.
+  entryScreen: EMP-001
+  entryPoints:
+  - Start of shift
+  - Called in
+  - Returning from a break
+steps:
+- step: 1
+  screen: EMP-001
+  action: Signs in
+  operations:
+  - login
+  outcome: Biometric or SSO
+- step: 2
+  screen: EMP-002
+  action: Selects venue and role
+  operations:
+  - listRoles
+  - selectRole
+  outcome: A person may hold several roles; the shift needs one
+- step: 3
+  screen: EMP-048
+  action: Works the opening checklist
+  operations: []
+  outcome: What must be true before the venue opens
+- step: 4
+  screen: EMP-003
+  action: Sees the home screen on duty
+  operations:
+  - getCurrentShift
+  - listIncidents
+  outcome: Today, at a glance
+- step: 5
+  screen: EMP-004
+  action: Works the task list
+  operations: []
+  outcome: Assigned and available work
+- step: 6
+  screen: EMP-005
+  action: Completes a task
+  operations:
+  - completeWorkOrder
+  outcome: With findings, not just a tick
+- step: 7
+  screen: EMP-007
+  action: Writes handover notes
+  operations: []
+  outcome: What the next shift needs to know
+- step: 8
+  screen: EMP-009
+  action: Ends the shift
+  operations:
+  - closeShift
+  outcome: Tasks reassigned, notes handed over
+branches:
+- at: 6
+  condition: Task is a safety incident
+  behaviour: EMP-026 and EMP-027. A different severity, a different escalation, and it must reach a
+    supervisor rather than sit in a list.
+  severity: requiresStaff
+  resolvedBy: Supervisor
+- at: 6
+  condition: Task needs a part that is not in stock
+  behaviour: Blocks on awaitingParts rather than paused. **The distinction matters** — one is a person,
+    the other is supply, and only one is chased by ordering something.
+  severity: recoverable
+  resolvedBy: Storekeeper
+- at: 4
+  condition: Signal lost in a plant room or basement
+  behaviour: Queues locally. The status strip shows pending count, and EMP-017 reconciles on return.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 8
+  condition: Shift ends with tasks open
+  behaviour: Reassigned or carried, never silently closed. An open task at handover is the thing handover
+    exists for.
+  severity: recoverable
+  resolvedBy: Supervisor
+- at: 8
+  condition: Steward forgets to end the shift
+  behaviour: Auto-closed after the venue limit, and recorded as autoClosed rather than closed — nobody
+    counted it.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 3
+  condition: A gate needs covering mid-shift
+  behaviour: EMP-010 through EMP-015 — the app scans too. Lower throughput than a handheld, and enough
+    for a relief.
+  severity: recoverable
+  resolvedBy: Steward
+- at: 2
+  condition: Emergency declared
+  behaviour: EMP-047 emergency mode overrides the home screen entirely. This is the one screen that
+    outranks everything.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+exitStates:
+- state: completed
+  description: Shift closed, notes handed over
+- state: deferred
+  description: Shift auto-closed, tasks carried
+- state: escalated
+  description: Incident raised and referred
+openQuestions:
+- '**A task has no contract.** `listTasks`, `updateTask` and `createHandoverNote` do not exist in 642
+  operations, and the employee app is fifty screens built around them. Steps 4 to 7 below name no operation
+  for that reason. Raised as CF-71.'

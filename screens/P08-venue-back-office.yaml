@@ -1,0 +1,2477 @@
+# P08 — Venue Back Office
+#
+# STARTED, NOT COMPLETE. The page inventory counts 73 back office screens and
+# itemises none of them — a figure carried from v1 with no list behind it.
+# These six are the queue integration surface the client decided on 14 August,
+# plus a parking placeholder pending that day's MoM.
+
+platform:
+  code: P08
+  audience: staff
+  formFactor: web
+  shortName: Staff Web
+  name: Staff Web — Venue Back Office
+  surface: staffFacing
+  runtime: reactWeb
+  offlineCapable: false
+  themes:
+  - light
+  - dark
+  directions:
+  - ltr
+  - rtl
+  screenCount: 73
+  app: backoffice
+  appStatus: scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: browser, desktop
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: venue-owned workstation
+    networkAssumption: venue LAN
+    releaseCadence: weekly
+  wireframeBoard: wireframes/P08 Staff Web Back Office.dc.html
+screens:
+- id: BO-001
+  name: Queue Directory
+  module: Queue Management
+  purpose: See every queue in the venue and whether its data is arriving.
+  capability: C05
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        bindsTo: Queue[]
+        notes: Current wait, source, feed health, status
+      - kind: banner
+        notes: Queues whose feed has gone quiet. The first thing a duty manager checks
+  states:
+    loading: Table skeleton
+    empty: No queues configured, with the action to create one
+    error: Queue service unavailable. Manual wait times can still be set — the fallback must not depend
+      on the thing that failed
+  wireframe:
+    status: drafted
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-001
+  permission: QUEUE_VIEW
+  apis:
+  - operationId: listQueues
+    contract: queue
+    purpose: Every queue with its current wait
+    trigger: onLoad
+  - operationId: listQueueFeeds
+    contract: queue
+    purpose: Feed health per queue
+    trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: From the flow it appears in
+    trigger: onLoad
+  notes: A queue on the manual adaptor shows "manual" rather than "no feed". It is configured and working;
+    treating it as unconfigured makes the health view lie.
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-directory
+    component: apps/backoffice/src/routes/queue-management/QueueDirectoryList.tsx
+    status: notStarted
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - BO-002
+    - BO-003
+    - BO-004
+    - BO-005
+    inferred: true
+- id: BO-002
+  name: Queue Configuration
+  module: Queue Management
+  purpose: Create a queue and set how it behaves.
+  capability: C05
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+        label: Name
+      - kind: selectField
+        label: Attraction or resource
+      - kind: numberField
+        label: Capacity per call
+      - kind: toggle
+        label: Guests may join from the app
+      - kind: numberField
+        label: Redemption window (minutes)
+        notes: How long after being called before the entry expires
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Save
+  states:
+    loading: Form skeleton
+    empty: Not applicable
+    error: Save failed, with the field named. Values are never silently dropped
+  wireframe:
+    status: drafted
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-002
+  permission: QUEUE_MANAGE
+  apis:
+  - operationId: createQueue
+    contract: queue
+    purpose: Create
+    trigger: onAction
+  - operationId: updateQueue
+    contract: queue
+    purpose: Amend
+    trigger: onAction
+  - operationId: cancelPerformance
+    contract: catalogue
+    purpose: From the flow it appears in
+    trigger: onLoad
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-configuration
+    component: apps/backoffice/src/routes/queue-management/QueueConfigurationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-003
+  name: Queue Integration Setup
+  module: Queue Management
+  purpose: Connect a queue to an on-site system, or leave it on manual entry.
+  capability: C05
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: selectField
+        label: Source
+        notes: Manual, sensor API, webhook, MQTT, vendor poll, turnstile count, CV camera. Manual is
+          the default and a valid end state
+      - kind: textField
+        label: Endpoint or topic
+        notes: Hidden when the source is manual
+      - kind: textField
+        label: Credential reference
+        notes: A key vault reference, never the secret. A secret typed into a form ends up in a screenshot
+      - kind: numberField
+        label: Expected interval (seconds)
+        notes: Drives the went-quiet alarm. Too tight and a duty manager learns to ignore it
+      - kind: secondaryButton
+        label: Test connection
+        notes: Runs testQueueFeed. Configuring an integration without a test is configuring it blind
+      - kind: detailPanel
+        bindsTo: FeedTestResult
+        notes: Five checks, plus the mapped sample reading and the raw payload. A source that is reachable
+          and returns a shape nobody mapped looks like silence, not an error
+      - kind: toggle
+        label: Enabled
+        notes: Disabled by default. A feed goes live only after a passing test
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Save
+  states:
+    loading: Form skeleton
+    empty: Not applicable
+    error: Save failed. The test result stays on screen — losing it forces the configurer to run the
+      test again
+  wireframe:
+    status: drafted
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-003
+  permission: QUEUE_MANAGE
+  apis:
+  - operationId: configureQueueFeed
+    contract: queue
+    purpose: Set the source
+    trigger: onAction
+  - operationId: testQueueFeed
+    contract: queue
+    purpose: One exchange with the configured source
+    trigger: onAction
+  - operationId: getQueueFeedHealth
+    contract: queue
+    purpose: Current feed state
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getRefundPolicy
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+  notes: ADR-0012, adaptor-first. A named vendor is a driver behind a stable inbound shape, so adding
+    one is configuration plus a driver rather than a core change. Vendor selection is CF-33a and deliberately
+    late.
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-integration-setup
+    component: apps/backoffice/src/routes/queue-management/QueueIntegrationSetupForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-004
+  name: Manual Wait Time Entry
+  module: Queue Management
+  purpose: Set a wait time by hand, whether or not a feed exists.
+  capability: C05
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: Queue[]
+        notes: One row per queue with a stepper and the current value
+      - kind: banner
+        notes: Where a feed is live, a manual entry overrides it for a stated period and then reverts.
+          A permanent silent override is how a broken sensor goes unnoticed for a season
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Publish
+  states:
+    loading: Rows skeleton. Current values render immediately
+    empty: No queues configured
+    error: Publish failed. The entered value is kept on screen
+  wireframe:
+    status: drafted
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-004
+  permission: QUEUE_MANAGE
+  apis:
+  - operationId: setWaitTime
+    contract: queue
+    purpose: Set or override the wait
+    trigger: onAction
+  - operationId: listQueues
+    contract: queue
+    purpose: Current values
+    trigger: onLoad
+  - operationId: createBulkRefund
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+  notes: The screen the client asked for on 14 August. Available regardless of integration state — a
+    venue with no sensors runs entirely from here, and a venue whose sensor failed falls back to it.
+  implementation:
+    app: backoffice
+    route: /queue-management/manual-wait-time-entry
+    component: apps/backoffice/src/routes/queue-management/ManualWaitTimeEntryForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-005
+  name: Queue Monitor
+  module: Queue Management
+  purpose: Watch queues during operation and call parties forward.
+  capability: C05
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Waiting, called, expired, average wait
+      - kind: dataTable
+        bindsTo: QueueEntry[]
+      - kind: chart
+        notes: Wait over the day. Stale where the feed has gone quiet
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Call next
+  states:
+    loading: Tiles skeleton
+    empty: Nobody waiting
+    error: Live data unavailable. Last known values shown with their age
+  wireframe:
+    status: drafted
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-005
+  permission: QUEUE_VIEW
+  apis:
+  - operationId: listQueueEntries
+    contract: queue
+    purpose: Who is waiting
+    trigger: onInterval
+  - operationId: callNextParties
+    contract: queue
+    purpose: Call forward
+    trigger: onAction
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Current waits
+    trigger: onInterval
+  - operationId: listCampaigns
+    contract: marketing-crm
+    purpose: From the flow it appears in
+    trigger: onLoad
+  implementation:
+    app: backoffice
+    route: /queue-management/queue-monitor
+    component: apps/backoffice/src/routes/queue-management/QueueMonitorDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-006
+  name: Parking Configuration
+  module: Parking
+  purpose: TODO — pending the 14 August MoM.
+  capability: C39
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: TODO
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: drafted
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-006
+  notes: Placeholder. Parking was discussed on 14 August and the MoM has not yet been received.
+  openQuestions:
+  - 'Awaiting the 14 August MoM. Scope unknown: whether parking is barrier integration, space counting,
+    pre-booking, or all three. `parking` is already a module key in the White Label Builder with nothing
+    behind it — the same gap as diningAndFnb and push.'
+  implementation:
+    app: backoffice
+    route: /parking/parking-configuration
+    component: apps/backoffice/src/routes/parking/ParkingConfigurationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - BO-001
+    inferred: true
+- id: BO-007
+  name: Product Directory
+  module: Venue Operations
+  purpose: Find anything sellable at this venue.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/product-directory
+    component: apps/backoffice/src/routes/venue-operations/ProductDirectoryDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-007
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-008
+  name: Product Detail & Variants
+  module: Venue Operations
+  purpose: Define what is sold and the ticket types under it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/product-detail-variants
+    component: apps/backoffice/src/routes/venue-operations/ProductDetailVariantsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-008
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+  apis:
+  - operationId: listInterEntityObligations
+    contract: finance
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: BO-009
+  name: Pricing Rules
+  module: Venue Operations
+  purpose: Set what something costs, and when that changes.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/pricing-rules
+    component: apps/backoffice/src/routes/venue-operations/PricingRulesDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-009
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-010
+  name: Promotions & Coupons
+  module: Venue Operations
+  purpose: Issue a code and control what it does.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/promotions-coupons
+    component: apps/backoffice/src/routes/venue-operations/PromotionsCouponsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-010
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-011
+  name: Packages & Bundles
+  module: Venue Operations
+  purpose: Sell several products as one line.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/packages-bundles
+    component: apps/backoffice/src/routes/venue-operations/PackagesBundlesDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-011
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-012
+  name: Membership Products
+  module: Venue Operations
+  purpose: Define what a membership includes.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/membership-products
+    component: apps/backoffice/src/routes/venue-operations/MembershipProductsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-012
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-013
+  name: Channel & Distribution
+  module: Venue Operations
+  purpose: Decide where each product can be sold.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/channel-distribution
+    component: apps/backoffice/src/routes/venue-operations/ChannelDistributionDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-013
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-014
+  name: Catalogue Publishing
+  module: Venue Operations
+  purpose: Push catalogue changes live, or schedule them.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/catalogue-publishing
+    component: apps/backoffice/src/routes/venue-operations/CataloguePublishingDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-014
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-015
+  name: Session Calendar
+  module: Venue Operations
+  purpose: See what is scheduled and how full it is.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/session-calendar
+    component: apps/backoffice/src/routes/venue-operations/SessionCalendarDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-015
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-016
+  name: Session Template
+  module: Venue Operations
+  purpose: Define the pattern the calendar is generated from.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/session-template
+    component: apps/backoffice/src/routes/venue-operations/SessionTemplateDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-016
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-017
+  name: Capacity Management
+  module: Venue Operations
+  purpose: Change how many people a session can take.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/capacity-management
+    component: apps/backoffice/src/routes/venue-operations/CapacityManagementDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-017
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-018
+  name: Allocation & Holds
+  module: Venue Operations
+  purpose: See who is holding capacity, and release it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/allocation-holds
+    component: apps/backoffice/src/routes/venue-operations/AllocationHoldsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-018
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-019
+  name: Closures & Blackouts
+  module: Venue Operations
+  purpose: Stop selling something, for a reason.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/closures-blackouts
+    component: apps/backoffice/src/routes/venue-operations/ClosuresBlackoutsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-019
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-020
+  name: Timed Entry Rules
+  module: Venue Operations
+  purpose: Control how early and how late a ticket admits.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/timed-entry-rules
+    component: apps/backoffice/src/routes/venue-operations/TimedEntryRulesDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-020
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+  apis:
+  - operationId: acceptFnbOrder
+    contract: fnb
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: setKitchenTicketStatus
+    contract: fnb
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: BO-021
+  name: Order Search
+  module: Venue Operations
+  purpose: Find any order taken at this venue.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/order-search
+    component: apps/backoffice/src/routes/venue-operations/OrderSearchDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-021
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+  apis:
+  - operationId: recordOrderHandover
+    contract: fnb
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: BO-022
+  name: Order Detail
+  module: Venue Operations
+  purpose: See everything about one order in one place.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/order-detail
+    component: apps/backoffice/src/routes/venue-operations/OrderDetailDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-022
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-023
+  name: Refunds & Exchanges
+  module: Venue Operations
+  purpose: Give money back, or move the booking.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/refunds-exchanges
+    component: apps/backoffice/src/routes/venue-operations/RefundsExchangesDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-023
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-024
+  name: Payment Exceptions
+  module: Venue Operations
+  purpose: Resolve payments that never resolved themselves.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/payment-exceptions
+    component: apps/backoffice/src/routes/venue-operations/PaymentExceptionsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-024
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-025
+  name: Chargebacks & Disputes
+  module: Venue Operations
+  purpose: Answer the acquirer with the evidence attached.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/chargebacks-disputes
+    component: apps/backoffice/src/routes/venue-operations/ChargebacksDisputesDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-025
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-026
+  name: Group Bookings
+  module: Venue Operations
+  purpose: Handle a booking that arrives as a school, not a guest.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/group-bookings
+    component: apps/backoffice/src/routes/venue-operations/GroupBookingsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-026
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-027
+  name: Reissue & Media Replacement
+  module: Venue Operations
+  purpose: Replace media a guest has lost or damaged.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/reissue-media-replacement
+    component: apps/backoffice/src/routes/venue-operations/ReissueMediaReplacementDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-027
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-028
+  name: Refund Approval Queue
+  module: Venue Operations
+  purpose: Approve the refunds a cashier is not allowed to make alone.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/refund-approval-queue
+    component: apps/backoffice/src/routes/venue-operations/RefundApprovalQueueDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-028
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-029
+  name: Report Builder
+  module: Venue Operations
+  purpose: Build the report nobody wrote down, without asking for a release.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/report-builder
+    component: apps/backoffice/src/routes/venue-operations/ReportBuilderDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-029
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-030
+  name: Access Point Directory
+  module: Venue Operations
+  purpose: See every gate and what it is doing.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/access-point-directory
+    component: apps/backoffice/src/routes/venue-operations/AccessPointDirectoryDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-030
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+  apis:
+  - operationId: verifyWorkOrder
+    contract: maintenance
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: BO-031
+  name: Access Point Configuration
+  module: Venue Operations
+  purpose: Define what a gate is and where it is.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/access-point-configuration
+    component: apps/backoffice/src/routes/venue-operations/AccessPointConfigurationDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-031
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+  apis:
+  - operationId: updateAsset
+    contract: maintenance
+    purpose: From the flow it appears in
+    trigger: onLoad
+- id: BO-032
+  name: Admission Profiles
+  module: Venue Operations
+  purpose: Set the rules a gate enforces, including offline.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/admission-profiles
+    component: apps/backoffice/src/routes/venue-operations/AdmissionProfilesDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-032
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-033
+  name: Blacklist Management
+  module: Venue Operations
+  purpose: Bar a media code outright.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/blacklist-management
+    component: apps/backoffice/src/routes/venue-operations/BlacklistManagementDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-033
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-034
+  name: Scan Activity
+  module: Venue Operations
+  purpose: See what the gates have been doing.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/scan-activity
+    component: apps/backoffice/src/routes/venue-operations/ScanActivityDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-034
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-035
+  name: Override Audit
+  module: Venue Operations
+  purpose: Review every admission that broke a rule.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/override-audit
+    component: apps/backoffice/src/routes/venue-operations/OverrideAuditDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-035
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-036
+  name: Device Registry
+  module: Venue Operations
+  purpose: Know which handheld is where, and whether it has synced.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/device-registry
+    component: apps/backoffice/src/routes/venue-operations/DeviceRegistryDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-036
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-037
+  name: Offline Package Status
+  module: Venue Operations
+  purpose: Know what each device is enforcing right now.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/offline-package-status
+    component: apps/backoffice/src/routes/venue-operations/OfflinePackageStatusDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-037
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-038
+  name: Reconciliation Queue
+  module: Venue Operations
+  purpose: Handle scans the server disagreed with.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/reconciliation-queue
+    component: apps/backoffice/src/routes/venue-operations/ReconciliationQueueDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-038
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-039
+  name: Shift Directory
+  module: Venue Operations
+  purpose: See every till, open or closed.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/shift-directory
+    component: apps/backoffice/src/routes/venue-operations/ShiftDirectoryDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-039
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-040
+  name: Variance Approval
+  module: Venue Operations
+  purpose: Accept or refuse a till that did not balance.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/variance-approval
+    component: apps/backoffice/src/routes/venue-operations/VarianceApprovalDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-040
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-041
+  name: Cash Movements
+  module: Venue Operations
+  purpose: Track money in and out of a drawer that is not a sale.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/cash-movements
+    component: apps/backoffice/src/routes/venue-operations/CashMovementsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-041
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-042
+  name: Banking & Safe
+  module: Venue Operations
+  purpose: Move the day’s cash out of the tills.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/banking-safe
+    component: apps/backoffice/src/routes/venue-operations/BankingSafeDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-042
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-043
+  name: Daily Reconciliation
+  module: Venue Operations
+  purpose: Prove the day balances before anyone goes home.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/daily-reconciliation
+    component: apps/backoffice/src/routes/venue-operations/DailyReconciliationDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-043
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-044
+  name: F&B Outlets
+  module: Venue Operations
+  purpose: See every outlet and whether it is trading.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/f-b-outlets
+    component: apps/backoffice/src/routes/venue-operations/FBOutletsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-044
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-045
+  name: Menu Management
+  module: Venue Operations
+  purpose: Change what is on sale and what is in it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/menu-management
+    component: apps/backoffice/src/routes/venue-operations/MenuManagementDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-045
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-046
+  name: Kitchen Display
+  module: Venue Operations
+  purpose: Show the kitchen what to make, in order.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/kitchen-display
+    component: apps/backoffice/src/routes/venue-operations/KitchenDisplayDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-046
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-047
+  name: F&B Order Management
+  module: Venue Operations
+  purpose: Fix an order that has gone wrong.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/f-b-order-management
+    component: apps/backoffice/src/routes/venue-operations/FBOrderManagementDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-047
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-048
+  name: Retail Products
+  module: Venue Operations
+  purpose: Manage what the shop sells.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/retail-products
+    component: apps/backoffice/src/routes/venue-operations/RetailProductsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-048
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-049
+  name: Stock Levels
+  module: Venue Operations
+  purpose: Know what is on the shelf and what is on order.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/stock-levels
+    component: apps/backoffice/src/routes/venue-operations/StockLevelsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-049
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-050
+  name: Stock Count
+  module: Venue Operations
+  purpose: Count the shelf and account for the difference.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/stock-count
+    component: apps/backoffice/src/routes/venue-operations/StockCountDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-050
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-051
+  name: Purchase Orders
+  module: Venue Operations
+  purpose: Order more of what is running out.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/purchase-orders
+    component: apps/backoffice/src/routes/venue-operations/PurchaseOrdersDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-051
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-052
+  name: Goods Receipt
+  module: Venue Operations
+  purpose: Book in what actually arrived.
+  capability: C00
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/goods-receipt
+    component: apps/backoffice/src/routes/venue-operations/GoodsReceiptDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-052
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-053
+  name: Staff Directory
+  module: Venue Operations
+  purpose: Find anyone who works at this venue.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/staff-directory
+    component: apps/backoffice/src/routes/venue-operations/StaffDirectoryDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-053
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-054
+  name: Role Assignment
+  module: Venue Operations
+  purpose: Give somebody the permissions their job needs.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/role-assignment
+    component: apps/backoffice/src/routes/venue-operations/RoleAssignmentDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-054
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-055
+  name: Rota & Scheduling
+  module: Venue Operations
+  purpose: Decide who is on which gate, when.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/rota-scheduling
+    component: apps/backoffice/src/routes/venue-operations/RotaSchedulingDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-055
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-056
+  name: Time & Attendance
+  module: Venue Operations
+  purpose: Record who actually turned up.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/time-attendance
+    component: apps/backoffice/src/routes/venue-operations/TimeAttendanceDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-056
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-057
+  name: Training & Certification
+  module: Venue Operations
+  purpose: Know who is allowed to do what.
+  capability: C00
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/training-certification
+    component: apps/backoffice/src/routes/venue-operations/TrainingCertificationDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-057
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-058
+  name: Reporting Home
+  module: Venue Operations
+  purpose: Find the report rather than build it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/reporting-home
+    component: apps/backoffice/src/routes/venue-operations/ReportingHomeDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-058
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-059
+  name: Sales Reports
+  module: Venue Operations
+  purpose: See what sold, through which channel.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/sales-reports
+    component: apps/backoffice/src/routes/venue-operations/SalesReportsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-059
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-060
+  name: Attendance & Footfall
+  module: Venue Operations
+  purpose: See how many people actually came in.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/attendance-footfall
+    component: apps/backoffice/src/routes/venue-operations/AttendanceFootfallDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-060
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-061
+  name: Scheduled Reports
+  module: Venue Operations
+  purpose: Send a report to somebody without them asking.
+  capability: C00
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/scheduled-reports
+    component: apps/backoffice/src/routes/venue-operations/ScheduledReportsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-061
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-062
+  name: Venue Profile
+  module: Venue Operations
+  purpose: The facts every other surface reads.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/venue-profile
+    component: apps/backoffice/src/routes/venue-operations/VenueProfileDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-062
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-063
+  name: Opening Hours & Calendar
+  module: Venue Operations
+  purpose: Say when the venue is open, including the exceptions.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/opening-hours-calendar
+    component: apps/backoffice/src/routes/venue-operations/OpeningHoursCalendarDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-063
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-064
+  name: Zones & Areas
+  module: Venue Operations
+  purpose: Divide the venue into the things gates control.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/zones-areas
+    component: apps/backoffice/src/routes/venue-operations/ZonesAreasDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-064
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-065
+  name: Venue Configuration
+  module: Venue Operations
+  purpose: Set the venue-level values everything inherits from.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/venue-configuration
+    component: apps/backoffice/src/routes/venue-operations/VenueConfigurationDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-065
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-066
+  name: Notification Settings
+  module: Venue Operations
+  purpose: Decide what this venue tells people, and how.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/notification-settings
+    component: apps/backoffice/src/routes/venue-operations/NotificationSettingsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-066
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-067
+  name: Integrations
+  module: Venue Operations
+  purpose: Connect the venue to the systems around it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/integrations
+    component: apps/backoffice/src/routes/venue-operations/IntegrationsDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-067
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-068
+  name: Audit Log
+  module: Venue Operations
+  purpose: See who changed what at this venue.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/audit-log
+    component: apps/backoffice/src/routes/venue-operations/AuditLogDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-068
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-069
+  name: Asset Register
+  module: Venue Operations
+  purpose: Know what equipment exists and where.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/asset-register
+    component: apps/backoffice/src/routes/venue-operations/AssetRegisterDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-069
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-070
+  name: Work Orders
+  module: Venue Operations
+  purpose: Get something fixed, and know it was.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/work-orders
+    component: apps/backoffice/src/routes/venue-operations/WorkOrdersDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-070
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-071
+  name: Planned Maintenance
+  module: Venue Operations
+  purpose: Schedule the work that stops the emergencies.
+  capability: C00
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/planned-maintenance
+    component: apps/backoffice/src/routes/venue-operations/PlannedMaintenanceDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-071
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-072
+  name: Incident Log
+  module: Venue Operations
+  purpose: Record what happened, while it is fresh.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/incident-log
+    component: apps/backoffice/src/routes/venue-operations/IncidentLogDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-072
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.
+- id: BO-073
+  name: Lost & Found Register
+  module: Venue Operations
+  purpose: Match what was lost to what was handed in.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: backoffice
+    route: /venue-operations/lost-found-register
+    component: apps/backoffice/src/routes/venue-operations/LostFoundRegisterDetail.tsx
+    status: notStarted
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-073
+  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    at all.

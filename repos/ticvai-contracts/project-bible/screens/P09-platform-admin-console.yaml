@@ -4,7 +4,10 @@
 
 platform:
   code: P09
-  name: Platform Admin Console
+  audience: platformAdmin
+  formFactor: web
+  shortName: Admin Web
+  name: Admin Web — Platform Console
   surface: platformAdmin
   runtime: reactWeb
   offlineCapable: false

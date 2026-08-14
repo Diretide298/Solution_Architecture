@@ -4,7 +4,10 @@
 
 platform:
   code: P09
-  name: Platform Admin Console
+  audience: platformAdmin
+  formFactor: web
+  shortName: Admin Web
+  name: Admin Web — Platform Console
   surface: platformAdmin
   runtime: reactWeb
   offlineCapable: false
@@ -30,6 +33,7 @@ platform:
     deviceOwnership: platform staff device
     networkAssumption: corporate network, IP-restricted
     releaseCadence: weekly
+  wireframeBoard: wireframes/P09 Admin Web.dc.html
 screens:
 - id: ADM-001
   name: Platform Login / MFA
@@ -48,7 +52,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-001
   capability: C35
   apis:
   - operationId: login
@@ -81,7 +86,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-002
   capability: C95
   apis:
   - operationId: listTenants
@@ -120,7 +126,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-003
   capability: C95
   apis:
   - operationId: getCellHealth
@@ -153,7 +160,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-004
   capability: C97
   openQuestions:
   - No contract — Control Plane audit not specified
@@ -183,7 +191,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-005
   capability: C95
   apis:
   - operationId: listTenants
@@ -216,7 +225,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-006
   capability: C20
   implementation:
     app: platform-admin
@@ -243,7 +253,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-007
   capability: C75
   apis:
   - operationId: getTenantLicences
@@ -276,7 +287,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-008
   capability: C74
   apis:
   - operationId: listPlans
@@ -312,7 +324,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-009
   capability: C74
   apis:
   - operationId: listSubscriptionInvoices
@@ -344,7 +357,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-010
   capability: C74
   apis:
   - operationId: getUsageMetering
@@ -377,7 +391,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-011
   capability: C75
   apis:
   - operationId: getEntitlementUsage
@@ -409,7 +424,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-012
   capability: C96
   apis:
   - operationId: provisionCell
@@ -442,7 +458,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-013
   capability: C96
   apis:
   - operationId: getCellHealth
@@ -475,7 +492,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-014
   capability: C96
   openQuestions:
   - No contract — infrastructure, Terraform not API
@@ -505,7 +523,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-015
   openQuestions:
   - Blocked — Developer & API workshop
   implementation:
@@ -534,7 +553,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-016
   capability: C57
   apis:
   - operationId: getTenantConfig
@@ -567,7 +587,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-017
   capability: C96
   openQuestions:
   - No contract — not specified
@@ -596,7 +617,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-018
   capability: C57
   apis:
   - operationId: setLanguages
@@ -629,7 +651,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-019
   capability: C95
   openQuestions:
   - No contract — platform defaults not specified
@@ -659,7 +682,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-020
   capability: C56
   apis:
   - operationId: listPrincipals
@@ -692,7 +716,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-021
   capability: C56
   apis:
   - operationId: listRoles
@@ -729,7 +754,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-022
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -775,7 +801,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-023
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -818,7 +845,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-024
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -853,7 +881,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-025
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -892,7 +921,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-026
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -926,7 +956,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-027
   capability: C96
   openQuestions:
   - No contract — the unowned orchestrator
@@ -976,7 +1007,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-028
   capability: C96
   openQuestions:
   - No contract — not specified
@@ -1015,7 +1047,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-029
   capability: C96
   apis:
   - operationId: listCellJobs
@@ -1065,7 +1098,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-030
   capability: C96
   openQuestions:
   - No contract — Terraform
@@ -1095,7 +1129,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-031
   capability: C97
   openQuestions:
   - No contract — not specified
@@ -1125,7 +1160,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-032
   capability: C96
   openQuestions:
   - No contract — infrastructure
@@ -1155,7 +1191,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-033
   capability: C96
   apis:
   - operationId: getCellHealth
@@ -1188,7 +1225,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-034
   capability: C96
   openQuestions:
   - No contract — retention not specified
@@ -1217,7 +1255,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-035
   openQuestions:
   - No contract — overlaps P12
   implementation:
@@ -1246,7 +1285,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-036
   capability: C96
   openQuestions:
   - No contract — not specified

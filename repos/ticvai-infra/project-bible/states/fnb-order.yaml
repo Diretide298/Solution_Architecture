@@ -1,0 +1,89 @@
+# F&B order — state model
+# Contract: fnb.FnbOrderStatus
+# Checked by tools/check-states.py against the contract enum and the event catalogue.
+
+entity: F&B order
+contract: fnb
+enum: FnbOrderStatus
+owner: fnb
+initial:
+- ordered
+terminal:
+- served
+- collected
+- delivered
+- cancelled
+- refunded
+offlineReachable:
+- ordered
+- accepted
+- inPreparation
+- ready
+transitions:
+- from: ordered
+  to: accepted
+  operation: acceptFnbOrder
+  trigger: operation
+  guard: The outlet took it. May be automatic, or a human decision — past last orders, out of an ingredient,
+    too far behind
+- from: ordered
+  to: cancelled
+  operation: cancelFnbOrder
+  trigger: operation
+  guard: Refused before acceptance. Better immediately than after ten minutes in a queue
+- from: accepted
+  to: inPreparation
+  operation: setKitchenTicketStatus
+  trigger: operation
+  guard: Kitchen started
+- from: inPreparation
+  to: ready
+  operation: setKitchenTicketStatus
+  trigger: operation
+  guard: Ready to hand over
+  emits:
+  - fnb.orderReady
+- from: ready
+  to: served
+  operation: recordOrderHandover
+  trigger: operation
+  guard: A server put it on a table
+- from: ready
+  to: collected
+  operation: recordOrderHandover
+  trigger: operation
+  guard: The guest took it from a counter
+- from: ready
+  to: delivered
+  operation: recordOrderHandover
+  trigger: operation
+  guard: A runner took it to a seat, cabana or named location
+- from: accepted
+  to: cancelled
+  operation: cancelFnbOrder
+  trigger: operation
+  guard: Cancelled after acceptance. Waste is recorded separately
+  requiresApproval: true
+- from: served
+  to: refunded
+  operation: createRefund
+  trigger: operation
+  guard: Service recovery
+  isReversal: true
+  requiresApproval: true
+- from: collected
+  to: refunded
+  operation: createRefund
+  trigger: operation
+  guard: Service recovery
+  isReversal: true
+  requiresApproval: true
+- from: delivered
+  to: refunded
+  operation: createRefund
+  trigger: operation
+  guard: Service recovery
+  isReversal: true
+  requiresApproval: true
+notes: Three distinct closing states, from 4.6.35. A server putting a plate down, a counter handover
+  and a runner delivery are different events, and the dispute is always about which one happened.

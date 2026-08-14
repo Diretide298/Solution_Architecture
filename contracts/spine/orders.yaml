@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 9
+  x-ticvai-screen-count: 20
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales"
   x-ticvai-requirements: 343
@@ -118,7 +118,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History (Wallet)"
+        - "P04 POS-006 Held Orders"
+        - "P08 BO-003 Queue Integration Setup"
         - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
       x-ticvai-read-routing: replica
       summary: List orders
@@ -168,6 +172,8 @@ paths:
       operationId: createOrder
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
+        - "P02 GST-009 Review & Payment"
+        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
       summary: Create an order
       description: >
@@ -221,6 +227,9 @@ paths:
       operationId: getOrder
       x-ticvai-consumed-by:
         - "P01 WEB-013 Order Confirmation"
+        - "P02 GST-010 Booking Confirmation"
+        - "P05 KSK-009 Ticket issued"
+        - "P05 KSK-012 Booking found"
       x-ticvai-read-routing: primary
       summary: Read an order
       tags: [order]
@@ -235,6 +244,146 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Order' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /orders/{orderId}/hold:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: holdOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+      summary: Park a sale and free the till
+      description: >
+        The guest has gone to fetch a wallet, or wants to add something after checking with
+        someone. The cashier parks the sale and serves the next person.
+
+        **Not a reservation.** Nothing is held against inventory — a parked sale that reserved
+        capacity would let a queue of parked sales exhaust a session. Prices are re-evaluated
+        on resume, and a price that moved is surfaced rather than silently applied.
+
+        Held orders expire. A till that accumulates parked sales across a shift cannot be
+        closed, and the cashier who parked them has gone home.
+      tags: [order]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriterWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recordedAt]
+              properties:
+                label:
+                  type: string
+                  maxLength: 60
+                  description: >
+                    How the cashier will find it again — a name, a description, a party size.
+                    A list of unlabelled parked sales is unusable at a busy counter.
+                holdUntil: { type: string, format: date-time }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Held
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '409':
+          description: Order is already paid, voided, or contains a seat hold about to expire
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/resume:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: resumeOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-006 Held Orders"
+      summary: Bring a parked sale back to a till
+      description: >
+        Any till, not only the one that parked it — the cashier who took it may be on a break.
+
+        Prices are re-evaluated. Where a price, a promotion or an availability has moved since
+        the hold, the response says so and the cashier decides. Silently charging the old price
+        loses money; silently charging the new one loses the guest.
+      tags: [order]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Resumed, with any change since the hold reported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderResumeResult' }
+        '409':
+          description: Held order expired, or already resumed at another till
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/discounts:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: applyManualDiscount
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+      summary: Apply a discount a cashier chose
+      description: >
+        Distinct from a promotion, which is a rule the platform evaluates. This is a person
+        deciding — service recovery, a damaged item, a manager's judgement.
+
+        **Always requires a reason, and above the venue threshold an approver who is not the
+        requester.** Manual discount is the most common internal fraud in retail, and the
+        control is that every one is attributable and reviewable rather than that they are
+        forbidden.
+
+        Posts to a discount account, never as a price change. A line sold at a reduced price
+        and a line discounted are different facts, and margin reporting needs both.
+      tags: [order]
+      x-ticvai-permission: ORDER_DISCOUNT
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ManualDiscountRequest' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '403':
+          description: >
+            Above the cashier's limit and no approver supplied, or the approver is the
+            requester.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /orders/{orderId}/voids:
     parameters:
@@ -389,6 +538,8 @@ paths:
   /refunds/bulk:
     post:
       operationId: createBulkRefund
+      x-ticvai-consumed-by:
+        - "P08 BO-004 Manual Wait Time Entry"
       summary: Refund every order against an event, performance or date
       description: >
         Cancellation handling. Always requires approval regardless of individual thresholds —
@@ -497,6 +648,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getRefundPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-003 Queue Integration Setup"
       x-ticvai-read-routing: replica
       summary: Read a venue's refund policy
       description: >
@@ -516,6 +669,7 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: setRefundPolicy
+      x-ticvai-config-scope: venue
       summary: Set a venue's refund policy
       tags: [policy]
       x-ticvai-permission: REGION_CONFIGURE
@@ -543,6 +697,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-014 Payment Link Landing"
+        - "P02 GST-033 AI Concierge – Contextual Help"
+        - "P04 POS-005 Payment"
+        - "P05 KSK-007 Payment"
         - "P10 PTR-012 Checkout / Credit Purchase"
       summary: Take a payment against an order
       description: >
@@ -589,6 +746,8 @@ paths:
       operationId: inquirePaymentStatus
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
+        - "P04 POS-005 Payment"
+        - "P05 KSK-008 Payment unresolved"
       summary: Ask the provider what actually happened
       description: >
         The recovery path (12 Aug §12). A terminal charged the card and the response never
@@ -611,6 +770,65 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '503':
           description: Provider unreachable. Retry; do not assume an outcome.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /payments/{paymentId}/tip:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: addTip
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+      summary: Record a tip against a payment
+      description: >
+        A separate operation rather than a line on the order, because a tip is not revenue —
+        it is money held for staff and posts to a liability, not to sales. Treating it as a
+        line inflates takings and understates what is owed.
+
+        Where the terminal captured the tip, this records what it reported. Where the guest
+        wrote it on a slip, a cashier enters it, and that path needs the same attribution as
+        a manual discount.
+      tags: [payment]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, source, recordedAt]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                source:
+                  type: string
+                  enum: [terminalPrompt, cashierEntered, guestApp, serviceCharge]
+                  description: >
+                    `serviceCharge` is not a tip and is separated deliberately — it is revenue
+                    in most jurisdictions, and pooling it with tips is how a payroll dispute
+                    starts.
+                allocateToPrincipalId:
+                  type: string
+                  format: uuid
+                  description: Where the venue allocates rather than pools.
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+        '409':
+          description: Payment not settled, or a tip is already recorded against it
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -648,37 +866,6 @@ paths:
               schema: { $ref: '#/components/schemas/Payment' }
 
   # ---------------------------------------------------------------- reservations
-  /reservations:
-    post:
-      operationId: createReservation
-      summary: Hold without payment
-      description: >
-        A reservation is not an order. It holds capacity, expires, creates no entitlement
-        and posts nothing to the ledger.
-      tags: [reservation]
-      x-ticvai-permission: ORDER_CREATE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/CreateReservationRequest' }
-      responses:
-        '201':
-          description: Held
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Reservation' }
-        '409':
-          description: Capacity unavailable
-          content:
-            application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
   /reservations/{reservationId}/convert:
     parameters:
       - name: reservationId
@@ -747,6 +934,8 @@ paths:
   /sync/rejections:
     get:
       operationId: listSyncRejections
+      x-ticvai-consumed-by:
+        - "P07 SCN-014 Sync & reconciliation"
       x-ticvai-read-routing: replica
       summary: Entries the server refused
       description: >
@@ -815,6 +1004,88 @@ paths:
         '409':
           description: >
             A targeted line's entitlement has been redeemed, or the order is voided.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /media/{mediaCode}/entitlements:
+    parameters:
+      - name: mediaCode
+        in: path
+        required: true
+        schema: { type: string }
+        description: The QR, wristband or card the guest is already carrying.
+    get:
+      operationId: getMediaEntitlements
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+      summary: What is already on this media
+      description: >
+        Scanned at a counter before adding something. Shows what the guest holds so a cashier
+        does not sell a locker to someone who already has one.
+      tags: [order]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: What the media carries
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaEntitlements' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    post:
+      operationId: appendEntitlementToMedia
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+      summary: Add something to a ticket the guest already holds
+      description: >
+        A guest arrives, buys admission, and an hour later wants a locker. They scan the QR
+        they are already carrying and the locker attaches to it. **No second QR.**
+
+        Named as important on 14 August: *"I don't need to give another QR code for the locker.
+        I will use the same QR code and I can go and scan it in the locker."*
+
+        This creates a **new order** that issues entitlements onto **existing media**. The
+        original order is untouched — it was paid, receipted and possibly reported on, and
+        editing it to add a later purchase would make yesterday's revenue move.
+
+        The media is the join, not the order. That is why this operation is keyed on
+        `mediaCode` rather than on an order id: the guest has the wristband in their hand and
+        may not know which order issued it.
+      tags: [order]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AppendEntitlementRequest' }
+      responses:
+        '201':
+          description: >
+            Appended. Returns the new order and the media's full entitlement set, so the
+            cashier can tell the guest what their QR now does.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AppendEntitlementResult' }
+        '409':
+          description: >
+            Media expired, blocked, already surrendered at exit, or the entitlement cannot
+            share media — a single-entry ticket surrendered at the gate is not a claim token
+            for anything bought afterwards.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/AppendRefusedProblem' }
+        '404':
+          description: Media not recognised at this venue
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -919,6 +1190,7 @@ paths:
       operationId: reprintOrder
       x-ticvai-consumed-by:
         - "P01 WEB-013 Order Confirmation"
+        - "P05 KSK-010 Print failure"
         - "P10 PTR-016 Voucher / Ticket Download"
       summary: Reprint or resend tickets
       description: >
@@ -1096,6 +1368,8 @@ paths:
   /reservations:
     get:
       operationId: listReservations
+      x-ticvai-consumed-by:
+        - "P02 GST-016 My Reservations"
       x-ticvai-read-routing: replica
       summary: List reservations
       tags: [reservation]
@@ -1126,6 +1400,35 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/Reservation' }
 
+    post:
+      operationId: createReservation
+      summary: Hold without payment
+      description: >
+        A reservation is not an order. It holds capacity, expires, creates no entitlement
+        and posts nothing to the ledger.
+      tags: [reservation]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateReservationRequest' }
+      responses:
+        '201':
+          description: Held
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '409':
+          description: Capacity unavailable
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
   /reservations/{reservationId}:
     parameters:
       - name: reservationId
@@ -1134,6 +1437,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getReservation
+      x-ticvai-consumed-by:
+        - "P02 GST-017 Reservation Details"
       x-ticvai-read-routing: primary
       summary: Read a reservation
       tags: [reservation]
@@ -1206,6 +1511,7 @@ paths:
     get:
       operationId: getB2bCredit
       x-ticvai-consumed-by:
+        - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-read-routing: replica
@@ -1464,9 +1770,168 @@ components:
               reason: { type: string }
               expiresAt: { type: string, format: date-time, nullable: true }
 
+    MediaEntitlements:
+      type: object
+      x-ticvai-persistence: "none — projection over entitlement and scan history"
+      required: [mediaCode, isValid, entitlements]
+      properties:
+        mediaCode: { type: string }
+        mediaKind:
+          type: string
+          enum: [qr, wristband, card, nfc, mobilePass]
+        subjectId: { type: string, format: uuid, nullable: true }
+        isValid: { type: boolean }
+        invalidReason: { type: string, nullable: true }
+        canAcceptMore:
+          type: boolean
+          description: >
+            False where the media has been surrendered, expired or blocked. A cashier should
+            know before taking money, not after.
+        entitlements:
+          type: array
+          items:
+            type: object
+            properties:
+              entitlementId: { type: string }
+              name: { type: string }
+              kind:
+                type: string
+                enum: [admission, locker, fnb, retail, parking, rental, experience, membership]
+              orderId: { type: string }
+              addedAt: { type: string, format: date-time }
+              isRedeemed: { type: boolean }
+              redeemedAt: { type: string, format: date-time, nullable: true }
+              validTo: { type: string, format: date-time, nullable: true }
+
+    AppendEntitlementRequest:
+      type: object
+      x-ticvai-persistence: "none — request only"
+      required: [id, lines, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [variantId, quantity]
+            properties:
+              variantId: { type: string, format: uuid }
+              quantity: { type: integer, minimum: 1 }
+              performanceId: { type: string, format: uuid, nullable: true }
+        paymentMethod:
+          type: string
+          enum: [card, cash, wallet, giftCard, chargeToAccount]
+        note: { type: string, maxLength: 300 }
+        recordedAt: { type: string, format: date-time }
+
+    AppendEntitlementResult:
+      type: object
+      x-ticvai-persistence: "none — computed"
+      required: [order, media]
+      properties:
+        order:
+          allOf:
+            - $ref: '#/components/schemas/Order'
+          description: >
+            A **new** order. The original is untouched — it was paid, receipted and possibly
+            reported on, and editing it would move yesterday's revenue.
+        media:
+          allOf:
+            - $ref: '#/components/schemas/MediaEntitlements'
+          description: The full set now on the media, so the cashier can say what the QR does.
+        addedEntitlementIds:
+          type: array
+          items: { type: string }
+
+    AppendRefusedProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          x-ticvai-persistence: "none — error shape"
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - mediaExpired
+                - mediaBlocked
+                - mediaSurrendered
+                - entitlementCannotShareMedia
+                - venueMismatch
+                - guestAlreadyDeparted
+            mediaCode: { type: string }
+            detail: { type: string }
+
+    OrderResumeResult:
+      type: object
+      x-ticvai-persistence: "none — computed"
+      required: [order, hasChanged]
+      properties:
+        order: { $ref: '#/components/schemas/Order' }
+        hasChanged:
+          type: boolean
+          description: >
+            True where anything moved while the sale was parked. The cashier decides — silently
+            charging the old price loses money, silently charging the new one loses the guest.
+        changes:
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum: [priceChanged, promotionExpired, promotionNowApplies, soldOut, seatHoldExpired, productWithdrawn]
+              lineId: { type: string }
+              detail: { type: string }
+              wasAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              nowAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    ManualDiscountRequest:
+      type: object
+      x-ticvai-persistence: "none — request only"
+      required: [id, reason, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        lineId:
+          type: string
+          nullable: true
+          description: Omit to discount the order rather than a line.
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        percentage: { type: number, minimum: 0, maximum: 100 }
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 300
+          description: >
+            Required, and free text rather than a code list. A cashier forced to pick the
+            nearest reason picks the first one, and the register stops meaning anything.
+        reasonCode:
+          type: string
+          nullable: true
+          description: Optional alongside the free text, where the venue maintains a list.
+        approverPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required above the venue threshold. May not be the requester.
+        recordedAt: { type: string, format: date-time }
+
+    OrderChannel:
+      type: string
+      description: >
+        Where the order originated. Added when guest self-ordering was contracted — an order a
+        guest placed on their own phone is commercially and operationally different from one a
+        cashier typed, and reporting that cannot separate them cannot answer whether
+        self-ordering is working.
+      enum: [pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice]
+
     OrderStatus:
       type: string
-      enum: [pending, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, failed]
+      enum: [pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, failed]
+      description: >
+        `held` is a parked sale — the cashier freed the till and the guest will return. It
+        holds no inventory and expires, because a till that accumulates parked sales across a
+        shift cannot be closed.
 
     Channel:
       type: string
@@ -1568,6 +2033,12 @@ components:
       properties:
         id: { type: string }
         orderNumber: { type: string }
+        channel:
+          allOf:
+            - $ref: '#/components/schemas/OrderChannel'
+          description: >
+            Where it came from. Drives revenue attribution, promotion eligibility and the
+            self-service adoption figures the operator will ask for within a month of launch.
         venueId: { type: string, format: uuid }
         scopePath: { type: string }
         channel: { $ref: '#/components/schemas/Channel' }

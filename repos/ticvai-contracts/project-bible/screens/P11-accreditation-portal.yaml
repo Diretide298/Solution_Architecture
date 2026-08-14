@@ -5,7 +5,10 @@
 
 platform:
   code: P11
-  name: Accreditation Portal
+  audience: public
+  formFactor: web
+  shortName: Public Web
+  name: Public Web — Accreditation
   surface: public
   runtime: reactWeb
   offlineCapable: false

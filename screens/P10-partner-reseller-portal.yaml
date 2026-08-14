@@ -4,7 +4,10 @@
 
 platform:
   code: P10
-  name: Partner & Reseller Portal
+  audience: partner
+  formFactor: web
+  shortName: Partner Web
+  name: Partner Web — Reseller Portal
   surface: partner
   runtime: reactWeb
   offlineCapable: false
@@ -29,6 +32,7 @@ platform:
     deviceOwnership: partner device, unmanaged
     networkAssumption: public internet
     releaseCadence: monthly — partners integrate against it
+  wireframeBoard: wireframes/P10 Partner Web.dc.html
 screens:
 - id: PTR-001
   name: Partner Login / MFA
@@ -47,12 +51,17 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-001
   capability: C35
   apis:
   - operationId: login
     contract: identity
     purpose: from page inventory
+    trigger: onLoad
+  - operationId: getB2bCredit
+    contract: orders
+    purpose: From the flow it appears in
     trigger: onLoad
   implementation:
     app: partner-portal
@@ -79,7 +88,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-002
   capability: C34
   apis:
   - operationId: listOrders
@@ -118,7 +128,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-003
   capability: C56
   apis:
   - operationId: getPrincipal
@@ -150,7 +161,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-004
   capability: C59
   apis:
   - operationId: sendTransactionalMessage
@@ -182,12 +194,17 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-005
   capability: C103
   apis:
   - operationId: getChannelAllocations
     contract: catalogue
     purpose: from page inventory
+    trigger: onLoad
+  - operationId: createOrder
+    contract: orders
+    purpose: From the flow it appears in
     trigger: onLoad
   implementation:
     app: partner-portal
@@ -215,7 +232,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-006
   capability: C85
   apis:
   - operationId: listProducts
@@ -252,7 +270,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-007
   capability: C81
   implementation:
     app: partner-portal
@@ -289,12 +308,17 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-008
   capability: C02
   apis:
   - operationId: createOrder
     contract: orders
     purpose: from page inventory
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: From the flow it appears in
     trigger: onLoad
   implementation:
     app: partner-portal
@@ -325,7 +349,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-009
   capability: C54
   apis:
   - operationId: allocateBlockedSeats
@@ -357,7 +382,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-010
   capability: C02
   apis:
   - operationId: evaluatePromotions
@@ -390,7 +416,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-011
   openQuestions:
   - No contract — quotes are procurement-side only
   implementation:
@@ -419,7 +446,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-012
   capability: C04
   apis:
   - operationId: createPayment
@@ -451,7 +479,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-013
   capability: C34
   apis:
   - operationId: getB2bCredit
@@ -484,7 +513,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-014
   capability: C50
   apis:
   - operationId: listSettlements
@@ -517,7 +547,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-015
   capability: C34
   apis:
   - operationId: listOrders
@@ -553,7 +584,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-016
   capability: C09
   apis:
   - operationId: reprintOrder
@@ -586,7 +618,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-017
   openQuestions:
   - No contract — commission not modelled
   implementation:
@@ -615,7 +648,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-018
   capability: C21
   apis:
   - operationId: runReport
@@ -647,7 +681,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-019
   openQuestions:
   - Blocked — Developer & API workshop
   implementation:
@@ -676,7 +711,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-020
   capability: C56
   apis:
   - operationId: createGrant
@@ -708,7 +744,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P10 Partner Web.dc.html#ptr-021
   capability: C32
   apis:
   - operationId: createCase

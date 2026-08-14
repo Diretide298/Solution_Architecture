@@ -1,0 +1,123 @@
+# F06 — Guest enters the venue
+#
+# The highest-volume flow in the platform, and the only one that must work with no
+# network at all. Every branch below has been seen at a real gate.
+#
+# Validated by tools/check-flows.py.
+
+id: F06
+name: Guest enters the venue
+actor: gateOperator
+capability: C03
+wave: 1
+frequency: constant
+criticality: revenue
+platforms:
+- P07 Staff Scanner
+offlineBehaviour: '**The whole flow runs offline.** A gate that cannot validate without a network is
+  a queue. The handheld validates against a bundle loaded at shift start, journals every scan locally,
+  and syncs when it can. The reconciliation step is not optional — it is where the server tells the
+  steward that an admit they already granted was wrong.'
+trigger:
+  description: A guest presents a ticket, wristband or phone at a gate. This runs tens of thousands
+    of times a day and is the flow with the least tolerance for latency.
+  entryScreen: SCN-001
+  entryPoints:
+  - Start of shift
+  - Device handed over mid-shift
+  - Gate opened late
+steps:
+- step: 1
+  screen: SCN-001
+  action: Steward signs in with PIN or badge
+  operations:
+  - login
+  - getCurrentShift
+  outcome: Session carries the workstation, so every scan is attributable
+- step: 2
+  screen: SCN-002
+  action: Confirms access point and direction
+  operations:
+  - listAccessPoints
+  - setTurnstileMode
+  outcome: The device knows what it is doing before it does it
+- step: 3
+  screen: SCN-015
+  action: Loads the offline package
+  operations:
+  - getOfflinePackage
+  outcome: Entitlements, blacklist and admission profiles are local from here
+- step: 4
+  screen: SCN-003
+  action: Waits at the ready screen
+  operations: []
+  outcome: The loop. The device sits here all day
+- step: 5
+  screen: SCN-004
+  action: Scans and admits
+  operations:
+  - validateAccess
+  outcome: Green, party size, and the entitlement is consumed locally
+- step: 6
+  screen: SCN-014
+  action: Syncs the journal when signal returns
+  operations:
+  - syncScans
+  - listSyncRejections
+  outcome: The server accepts most and may reject some
+branches:
+- at: 5
+  condition: Entitlement already fully consumed
+  behaviour: SCN-005 shows denied with the reason and the time of the previous scan. **The reason matters
+    more than the denial** — a steward facing a guest needs to say what happened, not just no.
+  severity: recoverable
+  resolvedBy: Steward explains, or escalates to SCN-006
+- at: 5
+  condition: Guest is blacklisted
+  behaviour: 'SCN-010. Handled differently from an ordinary denial: no override offered on the device,
+    and a supervisor is summoned.'
+  severity: requiresStaff
+  resolvedBy: Supervisor
+- at: 5
+  condition: Media unreadable — damaged QR, dead phone
+  behaviour: SCN-008 manual entry by reference, or SCN-009 lookup by name. Both are slower and both
+    are necessary.
+  severity: recoverable
+  resolvedBy: Steward
+- at: 5
+  condition: Party larger than the entitlement
+  behaviour: SCN-007 group admission admits what is valid and states the shortfall, rather than refusing
+    the whole party at a gate with a queue behind it.
+  severity: recoverable
+  resolvedBy: Steward
+- at: 5
+  condition: Steward believes the denial is wrong
+  behaviour: SCN-006 override, which requires a permission a steward may not hold and records who, why
+    and against which scan.
+  severity: requiresStaff
+  resolvedBy: Supervisor
+- at: 4
+  condition: No network at shift start
+  behaviour: SCN-012. The bundle from the previous sync is used and its age is shown. **An old bundle
+    is better than no gate**, and the steward must be able to see how old.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 6
+  condition: Server rejects a scan the device already admitted
+  behaviour: SCN-014 reconciliation. The guest is already inside. This is a revenue and audit event,
+    not a gate event, and it is why the journal exists.
+  severity: requiresStaff
+  resolvedBy: Duty manager, after the fact
+- at: 6
+  condition: Journal too large to sync in one pass
+  behaviour: Batched. The device keeps journalling while it syncs — a device that stops scanning to
+    sync is a closed gate.
+  severity: recoverable
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Guest admitted and the scan reconciled
+- state: escalated
+  description: Denied and referred to a supervisor
+- state: deferred
+  description: Admitted offline, reconciliation pending

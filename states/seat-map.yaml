@@ -1,0 +1,51 @@
+# Seat map — state model
+# Contract: seating.SeatMapStatus
+# Checked by tools/check-states.py.
+
+entity: Seat map
+contract: seating
+enum: SeatMapStatus
+owner: seating
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: validated
+  operation: validateSeatMap
+  trigger: operation
+  guard: Geometry, categories and accessibility checked
+- from: validated
+  to: draft
+  operation: updateSeatMap
+  trigger: operation
+  guard: Edited after validation, so validation is void
+  isReversal: true
+- from: validated
+  to: published
+  operation: publishSeatMap
+  trigger: operation
+  guard: '**Available to sell against.** Publishing an unvalidated map is how a venue discovers on the
+    night that two seats share a number'
+  requiresApproval: true
+- from: published
+  to: archived
+  operation: updateSeatMap
+  trigger: operation
+  guard: '**Refused while a future performance uses it.** Archiving a map under a sold event orphans
+    every ticket'
+- from: archived
+  to: published
+  operation: publishSeatMap
+  trigger: operation
+  guard: Restored
+  isReversal: true
+  requiresApproval: true
+- from: draft
+  to: archived
+  operation: updateSeatMap
+  trigger: operation
+  guard: Abandoned before publishing
+notes: 'A map without geometry can be published and sold from a list — `noGeometry` is a render state,
+  not an invalid map. That is deliberate: a manifest arrives before a floor plan does.'

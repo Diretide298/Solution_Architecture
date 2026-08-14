@@ -1,9 +1,9 @@
-# platform-admin — screen and route manifest
-# Derived from screens/*.yaml by tools/link-frontend.py. Do not hand-edit.
-# Routes and component paths are conventional; a route that exists in code but
-# not here, or here but not in code, is caught by tools/check-frontend.py.
+# platform-admin — platformAdmin · web
+# Derived from screens/*.yaml. Do not hand-edit.
 
 app: platform-admin
+audience: platformAdmin
+formFactor: web
 status: not scaffolded
 runtime: reactWeb
 offlineCapable: false
@@ -11,13 +11,14 @@ directions:
 - ltr
 - rtl
 platforms:
-- P09 Platform Admin Console
+- P09 Admin Web — Platform Console
 packages:
 - design-tokens
 - ui
 - api-client
 contracts:
 - identity
+- platform-ops
 - subscription
 - white-label
 screenCount: 36
@@ -35,7 +36,7 @@ screens:
 - id: ADM-002
   name: Platform Dashboard
   route: /general/platform-dashboard
-  component: apps/platform-admin/src/routes/general/PlatformDashboardDashboard.tsx
+  component: apps/platform-admin/src/routes/general/PlatformDashboard.tsx
   wave: 1
   status: notStarted
 - id: ADM-005
@@ -89,7 +90,7 @@ screens:
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
   route: /general/cross-tenant-health-dashboard
-  component: apps/platform-admin/src/routes/general/CrossTenantHealthDashboardDashboard.tsx
+  component: apps/platform-admin/src/routes/general/CrossTenantHealthDashboard.tsx
   wave: 2
   status: notStarted
 - id: ADM-004
@@ -215,7 +216,7 @@ screens:
 - id: ADM-031
   name: Security & Compliance Dashboard
   route: /general/security-and-compliance-dashboard
-  component: apps/platform-admin/src/routes/general/SecurityAndComplianceDashboardDashboard.tsx
+  component: apps/platform-admin/src/routes/general/SecurityAndComplianceDashboard.tsx
   wave: 3
   status: notStarted
 - id: ADM-032

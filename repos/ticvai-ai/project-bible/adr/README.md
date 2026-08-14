@@ -25,6 +25,8 @@ One file per decision: `NNNN-short-title.md`. Format: Context · Decision · Sta
 | [0013](0013-local-first-point-of-sale.md) | Local-first point of sale — one read path, leases, local journal | Accepted | **CF-15** |
 | [0014](0014-cell-per-region.md) | **Cell per region** — supersedes the jurisdiction-only split | Accepted | **CF-32** |
 | [0016](0016-read-write-separation.md) | Read and write paths are separated, routing declared per operation | Accepted |
+| [0017](0017-deployment-models.md) | Deployment models — shared, dedicated, additional region, on-premise | Accepted |
+| [0018](0018-configuration-scope.md) | Configuration scope — three levels, nearest ancestor wins, venue is the floor | Accepted |
 | [0015](0015-standards-first-device-drivers.md) | Standards-first device drivers — ESC/POS, UnifiedPOS, OSDP | Accepted | — |
 
 ## Still needed

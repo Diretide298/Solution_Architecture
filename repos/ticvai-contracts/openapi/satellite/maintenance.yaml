@@ -565,6 +565,53 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /work-orders/{workOrderId}/cancel:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: cancelWorkOrder
+      summary: Cancel a work order
+      description: >
+        Raised in error, duplicated, or superseded by a larger job.
+
+        **Refused once work has started** — a job with recorded time and parts is completed or
+        abandoned, not cancelled, and the distinction matters when the asset's history is read
+        after an incident.
+      tags: [work]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum: [raisedInError, duplicate, superseded, noLongerRequired]
+                note: { type: string, maxLength: 300 }
+                supersededByWorkOrderId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: Work has started. Complete or abandon it instead
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /work-orders/{workOrderId}/complete:
     parameters:
       - name: workOrderId
@@ -806,13 +853,14 @@ paths:
 
     post:
       operationId: createInspectionTemplate
+      x-ticvai-config-scope: tenant
       summary: Create an inspection template
       description: >
         Items may be marked safety-critical. **A failed safety-critical item blocks the
         inspection from passing** — it cannot be overridden by completing the rest.
       tags: [inspection]
       x-ticvai-permission: INSPECTION_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:

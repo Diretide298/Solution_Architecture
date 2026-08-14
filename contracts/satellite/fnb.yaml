@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 9
   x-ticvai-tier: satellite
   x-ticvai-module: "7 — F&B POS  ·  5 — F&B & Guest Management (service)"
   x-ticvai-requirements: 151
@@ -94,6 +94,7 @@ security:
   - bearerAuth: []
 
 tags:
+  - name: guestOrdering
   - name: menu
   - name: modifier
   - name: order
@@ -103,6 +104,440 @@ tags:
   - name: production
 
 paths:
+  # ---------------------------------------------------------------- guest ordering
+  #
+  # Everything below is guest-facing. The rest of this contract is staff-operated —
+  # a cashier at a till, a server on a floor — and none of it was reachable with a
+  # guest token. `diningAndFnb` is a module a tenant can switch on in the White Label
+  # Builder, and until now there was nothing behind it.
+
+  /venues/{venueId}/dining:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listDiningOutlets
+      x-ticvai-consumed-by:
+        - "P02 GST-024 F&B – Browse & Order"
+      summary: Where a guest can eat, right now
+      description: >
+        The dining list in the guest app. Returns outlets that are **open now**, not every
+        outlet configured — a guest shown a restaurant that closed an hour ago walks there.
+
+        Ordering method is stated per outlet, because it varies within one venue: a table
+        service restaurant, a counter that takes app orders for collection, and a bar that
+        does neither are all normal.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: openNow
+          in: query
+          schema: { type: boolean, default: true }
+        - name: orderingMethod
+          in: query
+          schema: { $ref: '#/components/schemas/GuestOrderingMethod' }
+      responses:
+        '200':
+          description: Dining outlets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DiningOutlet' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /outlets/{outletId}/guest-menu:
+    parameters:
+      - name: outletId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getGuestMenu
+      x-ticvai-consumed-by:
+        - "P02 GST-024 F&B – Browse & Order"
+        - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-061 Menu Item Detail"
+      summary: The menu a guest sees
+      description: >
+        The menu in force **at this moment** — breakfast at nine, lunch at one. The staff
+        endpoint returns every menu with its availability window; this returns the one that
+        applies, because a guest does not want to work out which.
+
+        Unavailable items are returned marked, not removed. A guest who saw a dish yesterday
+        and cannot find it today assumes the app is broken; "sold out" is an answer.
+
+        Allergens are always present. Omitting them is not an option a tenant gets to choose.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: at
+          in: query
+          description: Evaluate menu availability at this time rather than now.
+          schema: { type: string, format: date-time }
+        - name: language
+          in: query
+          schema: { type: string, pattern: '^[a-z]{2}$' }
+      responses:
+        '200':
+          description: The menu in force
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestMenu' }
+        '404':
+          description: No menu in force at that time. The response says when the next one starts
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /venues/{venueId}/delivery-locations:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listDeliveryLocations
+      summary: Where an order can be delivered
+      description: >
+        4.6.26 — tables, seats, cabanas or designated locations. A venue runs several kinds at
+        once: a restaurant with tables, a poolside with cabanas and sunbeds, an auditorium
+        where the seat number is the address, and a set of named collection points.
+
+        They are one concept because a runner needs one instruction, and a guest needs one
+        way to say where they are.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/DeliveryLocationKind' }
+        - name: servingOutletId
+          in: query
+          description: Only locations this outlet delivers to.
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DeliveryLocation' }
+
+  /location-sessions:
+    post:
+      operationId: claimLocationSession
+      x-ticvai-consumed-by:
+        - "P02 GST-024 F&B – Browse & Order"
+        - "P02 GST-030 In-Venue Notifications"
+      summary: Tell the platform where the guest is
+      description: >
+        Scanning the code on a table, a cabana, a sunbed, or entering a seat number. One
+        operation for all of them — a guest at a poolside and a guest in an auditorium are
+        doing the same thing, and a separate endpoint per furniture type would be four ways
+        to say the same sentence.
+
+        **A claim is not a booking.** It attaches the guest to a location so an order can be
+        routed there. Where a table visit is already open the guest joins it rather than
+        starting a second, and both order onto one bill.
+
+        Codes rotate. A static code photographed once lets someone order to a cabana they are
+        not at, from outside the venue.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                locationCode:
+                  type: string
+                  description: From the QR or NFC tag. Rotates; a stale code is refused.
+                seatReference:
+                  type: object
+                  description: >
+                    For seated venues where the seat is the address and there is no code to
+                    scan. Validated against the performance's seat map.
+                  properties:
+                    performanceId: { type: string, format: uuid }
+                    seatId: { type: string }
+                partySize: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Attached, joining an open visit where one exists
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LocationSession' }
+        '400':
+          description: Neither a location code nor a seat reference supplied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: >
+            Code expired or unknown, the location is out of service, or no outlet currently
+            delivers to it — a cabana is useless as an address if nothing serves it.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guest-orders/{orderId}/delivery:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: recordOrderHandover
+      x-ticvai-consumed-by:
+        - "P08 BO-021 Order Search"
+      summary: Record that an order reached the guest
+      description: >
+        The closing state, and it differs by fulfilment: a server marks `served`, a counter
+        marks `collected`, a runner marks `delivered`. 4.6.35 distinguishes all three, and so
+        does this — "the guest has it" is not one event when the dispute is about which.
+
+        Offline-capable. A runner crossing a venue loses signal, and an order that cannot be
+        closed until they return is an order that reads as undelivered for ten minutes.
+      tags: [guestOrdering]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome, recordedAt]
+              properties:
+                outcome:
+                  type: string
+                  enum: [served, collected, delivered, guestNotFound, refused]
+                deliveredToLocationId: { type: string, format: uuid }
+                runnerPrincipalId: { type: string, format: uuid }
+                note:
+                  type: string
+                  maxLength: 500
+                  description: Required for guestNotFound and refused.
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestOrderStatus' }
+        '409':
+          description: Order is not ready, or already closed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /table-sessions:
+    post:
+      operationId: claimTableSession
+      summary: Identify which table a guest is sitting at
+      description: >
+        Scanning the QR code on a table. This is the step that makes ordering to a table
+        possible without a server — the guest tells the platform where they are.
+
+        **A claim is not a booking.** It attaches the guest to a table so an order can be
+        routed there. Where a visit is already open — a server seated them — the guest joins
+        it rather than starting a second one, and both order onto the same bill.
+
+        The code is short-lived and rotates. A static table code photographed once lets
+        someone order to a table they are not at, from outside the venue.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tableCode]
+              properties:
+                tableCode:
+                  type: string
+                  description: From the table QR. Rotates; a stale code is refused.
+                partySize: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Attached to the table, joining an open visit where one exists
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableSession' }
+        '409':
+          description: >
+            Code expired or unknown, the outlet is closed, or the table is out of service.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guest-orders:
+    post:
+      operationId: createGuestFnbOrder
+      x-ticvai-consumed-by:
+        - "P02 GST-024 F&B – Browse & Order"
+        - "P02 GST-032 AI Concierge – Chat"
+      summary: A guest orders food
+      description: >
+        Order to a table, or for collection from a counter.
+
+        **Distinct from `createFnbOrder`, which is staff-operated.** A server placing an order
+        is trusted with an outlet, a table and a price. A guest is trusted with none of those:
+        the outlet comes from the table session, the price is recomputed server-side and the
+        quoted total is checked against it.
+
+        Payment is required before the kitchen sees it, unless the outlet runs a tab — a
+        kitchen that cooks on an unpaid guest order is a kitchen giving food away.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateGuestOrderRequest' }
+      responses:
+        '201':
+          description: Placed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestOrderResult' }
+        '409':
+          description: >
+            An item became unavailable, the quoted total no longer matches, the table session
+            expired, or the outlet stopped taking orders. The response names which.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/GuestOrderProblem' }
+        '402':
+          description: Payment required or declined
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guest-orders/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getGuestOrderStatus
+      x-ticvai-consumed-by:
+        - "P02 GST-025 F&B – Order Tracking"
+        - "P02 GST-034 Lost & Found"
+      summary: Track an order
+      description: >
+        Received, preparing, ready, served. Fed by the kitchen ticket status the KDS already
+        reports, so the guest sees what the kitchen sees rather than a timer counting down
+        against nothing.
+
+        **Read from the primary.** A guest refreshing to see whether their food is ready is
+        the wrong place for replica lag.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestOrderStatus' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /table-sessions/{sessionId}/bill:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getGuestBill
+      x-ticvai-consumed-by:
+        - "P02 GST-025 F&B – Order Tracking"
+      summary: The bill for the guest's table
+      description: >
+        Everything ordered at the table this sitting, whether ordered through the app or by a
+        server. One bill — a guest who ordered a starter from a server and a dessert from
+        their phone has one meal, not two.
+      tags: [guestOrdering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      responses:
+        '200':
+          description: Bill
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bill' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
   # ---------------------------------------------------------------- menus
   /menus:
     get:
@@ -143,6 +578,7 @@ paths:
 
     post:
       operationId: createMenu
+      x-ticvai-config-scope: venue
       summary: Create a menu
       tags: [menu]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -188,6 +624,7 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
       operationId: updateMenu
+      x-ticvai-config-scope: venue
       summary: Amend a menu
       tags: [menu]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -220,6 +657,7 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setMenuSections
+      x-ticvai-config-scope: venue
       summary: Set menu sections and their item ordering
       description: >
         Ordering matters at a counter. The sequence here is the sequence on the sale board.
@@ -414,6 +852,102 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /fnb-orders/{orderId}/accept:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: acceptFnbOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
+      summary: The outlet takes the order
+      description: >
+        4.6.35 names `accepted` as a state and there was no way to reach it. An outlet may
+        refuse — past last orders, out of a key ingredient, or simply too far behind — and a
+        guest whose order sat unacknowledged for ten minutes before rejection has a worse
+        experience than one refused immediately.
+
+        May be automatic where the outlet is configured for it. The state still exists, because
+        the kitchen ticket is only created on acceptance.
+      tags: [service]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriterWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estimatedReadyAt: { type: string, format: date-time }
+                stationId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Accepted. The kitchen ticket now exists
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FnbOrder' }
+        '409':
+          description: Already accepted, cancelled, or the outlet has stopped taking orders
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fnb-orders/{orderId}/cancel:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: cancelFnbOrder
+      summary: Cancel an order
+      description: >
+        Before acceptance this is a refusal and needs no approval. **After acceptance the
+        kitchen may have started**, so waste is recorded separately and the cancellation needs
+        the same authority as a void.
+      tags: [service]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriterWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum: [outletRefused, guestCancelled, itemUnavailable, tooLong, error]
+                note: { type: string, maxLength: 300 }
+                recordWaste:
+                  type: boolean
+                  description: >
+                    Where preparation had started. Raises a waste movement rather than silently
+                    losing the cost.
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FnbOrder' }
+        '409':
+          description: Already served, collected or delivered — cancel is no longer the operation
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /fnb-orders/{orderId}:
     parameters:
       - name: orderId
@@ -502,6 +1036,7 @@ paths:
 
     put:
       operationId: setTableLayout
+      x-ticvai-config-scope: venue
       summary: Configure the table layout
       tags: [table]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -851,6 +1386,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     put:
       operationId: setKitchenTicketStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
       summary: Advance a kitchen ticket
       description: >
         Called by the KDS or a fallback screen. Status flows back to the guest app order
@@ -1078,6 +1615,310 @@ paths:
 
 components:
   schemas:
+    GuestOrderingMethod:
+      x-ticvai-persistence: "none — enum"
+      type: string
+      description: >
+        How a guest may order at this outlet. Varies within one venue, so it is per outlet
+        rather than a venue setting.
+      enum: [tableService, appToTable, appToCollect, counterOnly, notAvailable]
+
+    DiningOutlet:
+      type: object
+      x-ticvai-persistence: "none — projection over outlet, menu and table state"
+      required: [outletId, name, kind, isOpenNow, orderingMethod]
+      properties:
+        outletId: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string }
+        zone: { type: string, nullable: true }
+        cuisine:
+          type: array
+          items: { type: string }
+        isOpenNow: { type: boolean }
+        opensAt: { type: string, format: date-time, nullable: true }
+        closesAt: { type: string, format: date-time, nullable: true }
+        orderingMethod: { $ref: '#/components/schemas/GuestOrderingMethod' }
+        estimatedWaitMinutes:
+          type: integer
+          nullable: true
+          description: >
+            From current kitchen ticket volume, not a fixed figure. Null where the outlet has
+            no KDS reporting — an invented wait time is worse than none.
+        imageAssetRef: { type: string, nullable: true }
+        menuId: { type: string, format: uuid, nullable: true }
+
+    GuestMenu:
+      type: object
+      x-ticvai-persistence: "none — projection over menu, item and availability"
+      required: [outletId, menuId, name, inForceUntil, sections]
+      properties:
+        outletId: { type: string, format: uuid }
+        menuId: { type: string, format: uuid }
+        name: { type: string }
+        inForceUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            When this menu stops applying. The client shows it, because a guest browsing
+            breakfast at 10:55 should know.
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        currencyScale: { type: integer }
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              sortOrder: { type: integer }
+              items:
+                type: array
+                items:
+                  type: object
+                  required: [menuItemId, name, price, isAvailable, allergens]
+                  properties:
+                    menuItemId: { type: string, format: uuid }
+                    name: { type: string }
+                    description: { type: string, nullable: true }
+                    price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                    imageAssetRef: { type: string, nullable: true }
+                    isAvailable:
+                      type: boolean
+                      description: >
+                        Marked, not removed. A guest who saw a dish yesterday and cannot find
+                        it today assumes the app is broken; "sold out" is an answer.
+                    unavailableReason: { type: string, nullable: true }
+                    allergens:
+                      type: array
+                      description: Always present. Not a field a tenant may choose to omit.
+                      items: { type: string }
+                    preparationMinutes: { type: integer, nullable: true }
+                    modifierGroups:
+                      type: array
+                      items: { $ref: '#/components/schemas/ModifierGroup' }
+
+    DeliveryLocationKind:
+      type: string
+      description: 4.6.26. One concept, because a runner needs one instruction.
+      enum: [table, seat, cabana, sunbed, poolside, box, suite, lawn, collectionPoint, namedLocation]
+
+    DeliveryLocation:
+      type: object
+      x-ticvai-persistence: "fnb.delivery_location"
+      required: [id, venueId, kind, label, isServiceable]
+      properties:
+        id: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/DeliveryLocationKind' }
+        label:
+          type: string
+          description: What a runner is told. "Cabana 12", "Row H Seat 4", "Lawn — north gate".
+        zone: { type: string, nullable: true }
+        tableId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Set where the location is a restaurant table, so it shares table state.
+        seatId:
+          type: string
+          nullable: true
+          description: Set where the seat is the address. References the seat map.
+        servingOutletIds:
+          type: array
+          description: >
+            Which outlets deliver here. A cabana served by the pool bar and not the
+            restaurant is normal, and a location nothing serves is not an address.
+          items: { type: string, format: uuid }
+        isServiceable:
+          type: boolean
+          description: >
+            False where the location exists but is not currently taking delivery — closed
+            section, weather, no runner on shift.
+        unserviceableReason: { type: string, nullable: true }
+        walkTimeMinutes:
+          type: integer
+          nullable: true
+          description: >
+            From the serving outlet. Feeds the guest's estimate — a cabana eight minutes away
+            is not the same promise as a table by the kitchen.
+
+    LocationSession:
+      type: object
+      x-ticvai-persistence: "fnb.location_session"
+      required: [id, locationId, kind, label, expiresAt]
+      properties:
+        id: { type: string }
+        locationId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/DeliveryLocationKind' }
+        label: { type: string }
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The outlet serving this location. Where several serve it, the guest chooses and
+            this is set on the first order.
+        visitId:
+          type: string
+          nullable: true
+          description: >
+            The table visit this session orders onto, where the location is a table. Absent
+            for a cabana or a seat, which have no visit concept — the order stands alone.
+        joinedExistingVisit: { type: boolean }
+        subjectId: { type: string, format: uuid }
+        expiresAt:
+          type: string
+          format: date-time
+          description: >
+            Sessions expire so a guest who leaves cannot order to a lounger now occupied by
+            someone else.
+
+    TableSession:
+      type: object
+      x-ticvai-persistence: "fnb.table_session"
+      required: [id, outletId, tableId, tableLabel, visitId, expiresAt]
+      properties:
+        id: { type: string }
+        outletId: { type: string, format: uuid }
+        outletName: { type: string }
+        tableId: { type: string, format: uuid }
+        tableLabel: { type: string }
+        visitId:
+          type: string
+          description: >
+            The table visit this session orders onto. An existing open visit is joined rather
+            than duplicated — a guest seated by a server and then ordering by app is one
+            party, one bill.
+        joinedExistingVisit: { type: boolean }
+        subjectId: { type: string, format: uuid }
+        expiresAt:
+          type: string
+          format: date-time
+          description: >
+            Sessions expire so a guest who leaves cannot order to a table now occupied by
+            someone else.
+
+    CreateGuestOrderLine:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, menuItemId, quantity]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        menuItemId: { type: string, format: uuid }
+        quantity: { type: integer, minimum: 1, maximum: 20 }
+        modifierOptionIds:
+          type: array
+          items: { type: string, format: uuid }
+        note:
+          type: string
+          maxLength: 200
+          description: >
+            Free text to the kitchen. Allergy notes belong here and are surfaced prominently
+            on the ticket.
+
+    CreateGuestOrderRequest:
+      type: object
+      required: [id, lines, quotedTotal, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        locationSessionId:
+          type: string
+          nullable: true
+          description: >
+            Where the order is going. Required for delivery to a table, seat, cabana or named
+            location. Absent for collection, where the outlet is named instead.
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required for collection. Ignored where a table session is supplied.
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/CreateGuestOrderLine' }
+        quotedTotal:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            What the guest was shown. Checked against the server's recomputation — a guest is
+            never trusted with a price, and a mismatch is refused rather than silently
+            corrected in either direction.
+        paymentMethod:
+          type: string
+          enum: [card, wallet, roomCharge, addToTab]
+        recordedAt: { type: string, format: date-time }
+
+    GuestOrderResult:
+      type: object
+      x-ticvai-persistence: "none — projection over fnb_order"
+      required: [orderId, orderNumber, status, total]
+      properties:
+        orderId: { type: string }
+        orderNumber:
+          type: string
+          description: Short and readable. It gets called out across a counter.
+        fulfilment:
+          type: string
+          enum: [collect, deliverToLocation, tableService]
+        deliveryLabel:
+          type: string
+          nullable: true
+          description: Where it is going, as a runner would read it.
+        status: { $ref: '#/components/schemas/FnbOrderStatus' }
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        estimatedReadyAt: { type: string, format: date-time, nullable: true }
+        collectionPoint: { type: string, nullable: true }
+        tableLabel: { type: string, nullable: true }
+
+    GuestOrderStatus:
+      type: object
+      x-ticvai-persistence: "none — projection over kitchen_ticket"
+      required: [orderId, status, lines]
+      properties:
+        orderId: { type: string }
+        orderNumber: { type: string }
+        status: { $ref: '#/components/schemas/FnbOrderStatus' }
+        estimatedReadyAt: { type: string, format: date-time, nullable: true }
+        isReadyForCollection: { type: boolean }
+        lines:
+          type: array
+          description: Per-line status. A guest waiting on one dish should see which.
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              quantity: { type: integer }
+              status: { $ref: '#/components/schemas/KitchenTicketStatus' }
+
+    GuestOrderProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          x-ticvai-persistence: "none — error shape"
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - itemUnavailable
+                - priceChanged
+                - locationSessionExpired
+                - locationNotServiceable
+                - outletClosed
+                - outletNotAcceptingOrders
+                - modifierConstraintUnmet
+                - orderTooLarge
+            unavailableItems:
+              type: array
+              items:
+                type: object
+                properties:
+                  menuItemId: { type: string, format: uuid }
+                  name: { type: string }
+                  reason: { type: string }
+            quotedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            actualTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
     MenuAvailability:
       x-ticvai-persistence: "none — embedded in menu"
       type: object
@@ -1186,7 +2027,24 @@ components:
 
     FnbOrderStatus:
       type: string
-      enum: [placed, preparing, ready, served, completed, voided]
+      description: >
+        The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed
+        `accepted` into `placed` and had no `collected` or `delivered` at all, which made
+        collection and delivery indistinguishable from a server putting a plate down.
+
+        `accepted` matters because an outlet may refuse: past last orders, out of a key
+        ingredient, or simply too far behind. A guest whose order sat in `placed` for ten
+        minutes and was then rejected has a worse experience than one refused immediately.
+      enum:
+        - ordered        # guest or cashier placed it
+        - accepted       # the outlet took it. May be automatic, or a human decision
+        - inPreparation  # the kitchen started
+        - ready          # ready to hand over
+        - served         # given to a guest at a table by a server
+        - collected      # guest picked it up from a counter
+        - delivered      # a runner took it to a seat, cabana or named location
+        - cancelled
+        - refunded
 
     ServiceMode:
       type: string

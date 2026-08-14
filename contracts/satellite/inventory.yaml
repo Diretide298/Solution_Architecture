@@ -614,6 +614,78 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /stock-counts/{countId}/cancel:
+    parameters:
+      - name: countId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: cancelStockCount
+      summary: Abandon a count
+      description: >
+        Refused once counting has started — a partially counted location must be finished or recounted, because abandoning it leaves movements frozen.
+      tags: [count]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-counts/{countId}/recount:
+    parameters:
+      - name: countId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: recountStockCount
+      summary: Send a count back to be recounted
+      description: >
+        The alternative to accepting a variance. A large discrepancy is more often a miscount than a loss, and recounting is cheaper than investigating.
+      tags: [count]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /stock-counts/{countId}/post:
     parameters:
       - name: countId
@@ -712,6 +784,42 @@ paths:
               schema: { $ref: '#/components/schemas/StockTransfer' }
         '409':
           description: Insufficient stock at the source
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-transfers/{transferId}/close-short:
+    parameters:
+      - name: transferId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: closeTransferShort
+      summary: Close a transfer accepting the balance will not arrive
+      description: >
+        **Writes off stock that left one location and reached no other.** Requires approval, because without this state a partially received transfer stays open and the stock figure is wrong at both ends.
+      tags: [transfer]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -850,6 +958,114 @@ paths:
                   suggestions:
                     type: array
                     items: { $ref: '#/components/schemas/RequisitionSuggestion' }
+
+  /requisitions/{requisitionId}/reject:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rejectRequisition
+      summary: Reject a requisition
+      description: >
+        Refused with a reason. The requester may copy it into a new draft rather than losing the detail.
+      tags: [procurement]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /requisitions/{requisitionId}/return:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: returnRequisition
+      summary: Return a requisition for more information
+      description: >
+        **Not a rejection.** Sent back so the requester can amend rather than start again — without this state every incomplete request is a refusal and the requisition queue stops moving.
+      tags: [procurement]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /requisitions/{requisitionId}/cancel:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: cancelRequisition
+      summary: Cancel a requisition
+      description: >
+        Withdrawn by the requester, or abandoned in draft.
+      tags: [procurement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /requisitions/{requisitionId}/approve:
     parameters:
@@ -1095,6 +1311,105 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PurchaseOrder' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /purchase-orders/{purchaseOrderId}/send:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: sendPurchaseOrder
+      summary: Issue the order to the supplier
+      description: >
+        Raised and sent are different states because a raised order is still ours to change and a sent one is not.
+      tags: [procurement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /purchase-orders/{purchaseOrderId}/acknowledge:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: acknowledgePurchaseOrder
+      summary: Record the supplier acknowledgement
+      description: >
+        Optional in practice — goods often arrive without one, which is not an error. Recorded when it happens because a supplier who never acknowledges is a supplier performance figure.
+      tags: [procurement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [supplierReference]
+              properties:
+                supplierReference: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /purchase-orders/{purchaseOrderId}/close-short:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: closePurchaseOrderShort
+      summary: Close an order accepting the balance will not arrive
+      description: >
+        **Writes off a committed cost**, so it needs approval. Without this state a partially received order stays open indefinitely and the committed-cost figure is permanently wrong.
+      tags: [procurement]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /purchase-orders/{purchaseOrderId}/cancel:
     parameters:

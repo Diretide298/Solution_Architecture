@@ -1,0 +1,82 @@
+# Work order — state model
+# Contract: maintenance.WorkOrderStatus
+# Checked by tools/check-states.py against the contract enum and the event catalogue.
+
+entity: Work order
+contract: maintenance
+enum: WorkOrderStatus
+owner: maintenance
+initial:
+- open
+terminal:
+- verified
+- cancelled
+offlineReachable:
+- inProgress
+- paused
+- completed
+transitions:
+- from: open
+  to: assigned
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Technician assigned
+- from: assigned
+  to: inProgress
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Work started
+- from: inProgress
+  to: paused
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Interrupted
+- from: paused
+  to: inProgress
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Resumed
+- from: inProgress
+  to: awaitingParts
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Blocked on a part. Distinct from paused — one is a person, the other is supply
+- from: awaitingParts
+  to: inProgress
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Part received
+- from: inProgress
+  to: completed
+  operation: completeWorkOrder
+  trigger: operation
+  guard: Work done, findings recorded
+  emits:
+  - maintenance.workOrderCompleted
+- from: completed
+  to: verified
+  operation: verifyWorkOrder
+  trigger: operation
+  guard: Verified by someone other than the person who did it. **Safety-critical assets cannot return
+    to service without this**
+  requiresApproval: true
+  emits:
+  - maintenance.assetReturnedToService
+- from: completed
+  to: inProgress
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Verification failed and it goes back
+  isReversal: true
+- from: open
+  to: cancelled
+  operation: cancelWorkOrder
+  trigger: operation
+  guard: Raised in error
+- from: assigned
+  to: cancelled
+  operation: cancelWorkOrder
+  trigger: operation
+  guard: No longer required
+notes: '`verified` is terminal and `completed` is not. A safety-critical asset returning to service
+  on the word of the person who worked on it is the failure this separation prevents.'

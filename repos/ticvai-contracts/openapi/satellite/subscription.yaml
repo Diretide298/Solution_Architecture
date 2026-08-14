@@ -779,6 +779,319 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /cells/{cellId}/decommission:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: decommissionCell
+      summary: Begin decommissioning a cell
+      description: >
+        **Refused while any tenant remains on it.** Migrate them first — `planTenantMigration` exists for exactly this.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cells/{cellId}/cancel-decommission:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: cancelDecommission
+      summary: Halt a decommission
+      description: >
+        Returns the cell to active.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cells/{cellId}/capacity:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCellCapacity
+      summary: Load against headroom
+      description: >
+        **Capacity is driven by traffic and concurrent users, not by tenant count.** A shared
+        cell holding forty small tenants may be quieter than one holding three, and a two-week
+        event with 30,000 attendees a day is a small tenant commercially and a large one here.
+
+        Reported per dimension so the constrained one is visible. A cell short of connections
+        and long on storage needs a different response from one short of both.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: window
+          in: query
+          schema: { type: string, enum: [hour, day, week, month], default: day }
+      responses:
+        '200':
+          description: Capacity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CellCapacity' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /cell-clusters:
+    get:
+      operationId: listCellClusters
+      summary: Clusters in a region
+      description: >
+        A cluster is one or more identical cells serving a region. Scaling out is **launching
+        another identical cluster and placing tenants on it** — not growing one indefinitely,
+        because a single primary has a ceiling that arrives during an event rather than at a
+        planning meeting.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: regionId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/CellKind' }
+      responses:
+        '200':
+          description: Clusters
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CellCluster' }
+
+    post:
+      operationId: launchCellCluster
+      summary: Launch an identical cluster
+      description: >
+        Provisions a cell identical in shape, region and schema version to an existing one, so
+        tenants can be placed on it or moved to it.
+
+        **Identical matters.** A cluster running a different schema version is not additional
+        capacity — it is a second thing to maintain, and a tenant moved onto it lands on a
+        version the platform did not intend.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [regionId, kind, modelledOnCellId]
+              properties:
+                regionId: { type: string, format: uuid }
+                kind: { $ref: '#/components/schemas/CellKind' }
+                modelledOnCellId:
+                  type: string
+                  format: uuid
+                  description: >
+                    The cell to replicate — shape, tier and **schema version**. Copied rather
+                    than specified, so the two cannot diverge at birth.
+                name: { type: string }
+      responses:
+        '202':
+          description: Launching
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CellCluster' }
+        '409':
+          description: >
+            The model cell is mid-migration. Replicating a cell whose schema is moving
+            produces a cluster at neither version.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-migrations:
+    get:
+      operationId: listTenantMigrations
+      summary: Tenant moves between cells
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: tenantId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TenantMigrationStatus' }
+      responses:
+        '200':
+          description: Migrations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TenantMigration' }
+
+    post:
+      operationId: planTenantMigration
+      summary: Plan moving a tenant to another cell
+      description: >
+        **The upgrade path a tenant buys.** A client on shared infrastructure who later wants
+        isolation is migrated to their own cell — the shared start is not a decision they are
+        stuck with, and saying so is what makes the cheaper package sellable.
+
+        Also used to rebalance: a shared cell running hot moves a tenant to a newly launched
+        cluster.
+
+        Plans only. Reports what moves, how long the cutover window is, and what cannot move —
+        an entitlement redeemable in another region has a cross-cell link that must be
+        re-pointed rather than copied.
+
+        **Region cannot change.** Moving a tenant across a residency boundary is not a
+        migration, it is an export, and it is refused here.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tenantId, fromCellId, toCellId]
+              properties:
+                tenantId: { type: string, format: uuid }
+                fromCellId: { type: string, format: uuid }
+                toCellId: { type: string, format: uuid }
+                reason:
+                  type: string
+                  enum: [purchasedIsolation, rebalanceLoad, decommissionCell, complianceRequirement]
+      responses:
+        '200':
+          description: Plan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantMigrationPlan' }
+        '409':
+          description: >
+            Region mismatch, schema versions differ, or the tenant has open shifts. A tenant
+            mid-trade cannot be moved — a cutover during a shift loses the drawer.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MigrationBlockedProblem' }
+
+  /tenant-migrations/{migrationId}/execute:
+    parameters:
+      - name: migrationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: executeTenantMigration
+      summary: Move the tenant
+      description: >
+        Copies the tenant's data to the target, verifies row counts and checksums, re-points
+        cross-cell links, then cuts over and marks the source rows for retention rather than
+        deleting them.
+
+        **The source is retained, not dropped.** A cutover that goes wrong needs somewhere to
+        go back to, and a tenant's entire history is not something to delete on the same day it
+        moved.
+
+        Requires step-up and a stated cutover window.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cutoverWindowStart, cutoverWindowEnd, stepUpToken]
+              properties:
+                cutoverWindowStart: { type: string, format: date-time }
+                cutoverWindowEnd: { type: string, format: date-time }
+                stepUpToken: { type: string }
+                retainSourceDays: { type: integer, default: 30 }
+      responses:
+        '202':
+          description: Migration started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantMigration' }
+        '409':
+          description: Plan stale, or the tenant has traded since it was computed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /cells/{cellId}/health:
     parameters:
       - name: cellId
@@ -1328,7 +1641,47 @@ components:
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        tenantId: { type: string, format: uuid }
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Null on a shared cell, which holds many. Nullable since the ADR-0014 amendment of
+            14 August — it was required when a cell meant one tenant.
+        kind: { $ref: '#/components/schemas/CellKind' }
+        clusterId: { type: string, format: uuid, nullable: true }
+        isReachable:
+          type: boolean
+          default: true
+          description: >
+            False for `onPremise`. The Control Plane holds the record for licensing and support
+            and **cannot reach the installation** — it may sit behind a firewall with no inbound
+            route. Every operation assuming reachability must handle absence rather than timing
+            out, and a cell that has not called home for a month is not necessarily broken.
+        lastContactAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            When the site last called out. The only liveness signal for an unreachable cell,
+            and the number a support engineer asks for first.
+        licenceExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            On-premise only. Licensing cannot be enforced by a Control Plane the site cannot
+            reach, so a signed licence file is verified locally. **An expired licence degrades
+            rather than stops** — a venue whose gates refuse entry because a licence lapsed
+            over a weekend is worse than one running unlicensed until Monday.
+        participatesInCrossCell:
+          type: boolean
+          default: true
+          description: >
+            False by default for `onPremise`. Redeeming a pass issued elsewhere requires
+            reaching the issuing cell at that moment, and an on-premise site may not be able
+            to. Exclusion is the honest default; local-then-reconcile carries a
+            double-redemption risk that needs a decision rather than an assumption.
         regionId: { type: string, format: uuid }
         regionName: { type: string }
         countryCode: { type: string }
@@ -1350,6 +1703,183 @@ components:
             activeJobs:
               type: array
               items: { $ref: '#/components/schemas/CellJob' }
+
+    CellKind:
+      type: string
+      description: >
+        Four deployment models (ADR-0017). `shared` is the default; the others exist because a
+        client asked or a law requires it.
+      enum:
+        - shared       # TICVAI infrastructure, UAE. Many tenants, isolated by RLS. The default
+        - dedicated    # TICVAI infrastructure, own database and cluster. What the extra cost buys
+        - onPremise    # the venue's own hardware. Nothing leaves the site, and TICVAI cannot reach it
+        - controlPlane
+
+    CellCapacity:
+      type: object
+      x-ticvai-persistence: "none — measured, not stored"
+      required: [cellId, isConstrained, dimensions, measuredAt]
+      properties:
+        cellId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/CellKind' }
+        tenantCount:
+          type: integer
+          description: >
+            Reported, and **deliberately not the sizing signal.** Forty quiet tenants may load
+            a cell less than three busy ones.
+        isConstrained: { type: boolean }
+        constrainedDimension: { type: string, nullable: true }
+        dimensions:
+          type: array
+          description: >
+            Per dimension, because the response differs. Short of connections and long on
+            storage is a different problem from short of both.
+          items:
+            type: object
+            required: [dimension, used, headroom]
+            properties:
+              dimension:
+                type: string
+                enum:
+                  - concurrentUsers
+                  - transactionsPerSecond
+                  - scansPerSecond
+                  - databaseConnections
+                  - storageGb
+                  - replicationLag
+                  - cpu
+              used: { type: number }
+              limit: { type: number }
+              headroom:
+                type: number
+                description: Fraction remaining. Negative means already over.
+              peakAt: { type: string, format: date-time, nullable: true }
+        forecastBreachAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            When the constrained dimension is projected to run out at the current trend. Null
+            where there is no trend to project — an honest null beats an invented date.
+        measuredAt: { type: string, format: date-time }
+
+    CellCluster:
+      type: object
+      x-ticvai-persistence: "control.cell_cluster"
+      required: [id, regionId, kind, cellIds, status]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        regionId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/CellKind' }
+        cellIds:
+          type: array
+          items: { type: string, format: uuid }
+        schemaVersion:
+          type: string
+          description: >
+            Every cell in a cluster runs the same version. A cluster at mixed versions is not
+            capacity, it is two things to maintain.
+        modelledOnCellId: { type: string, format: uuid, nullable: true }
+        status:
+          type: string
+          enum: [provisioning, active, draining, retired]
+        acceptingNewTenants:
+          type: boolean
+          description: >
+            False on a cluster being drained, or one held back as headroom for a known event.
+        tenantCount: { type: integer }
+        provisionedAt: { type: string, format: date-time }
+
+    TenantMigrationStatus:
+      type: string
+      enum: [planned, copying, verifying, awaitingCutover, cuttingOver, complete, failed, rolledBack]
+
+    TenantMigrationPlan:
+      type: object
+      x-ticvai-persistence: "control.tenant_migration_plan"
+      required: [id, tenantId, fromCellId, toCellId, canProceed, computedAt]
+      properties:
+        id: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        fromCellId: { type: string, format: uuid }
+        toCellId: { type: string, format: uuid }
+        fromKind: { $ref: '#/components/schemas/CellKind' }
+        toKind: { $ref: '#/components/schemas/CellKind' }
+        canProceed: { type: boolean }
+        blockers:
+          type: array
+          items:
+            type: object
+            properties:
+              blocker:
+                type: string
+                enum:
+                  - regionMismatch
+                  - schemaVersionMismatch
+                  - openShifts
+                  - migrationInFlight
+                  - targetNotAcceptingTenants
+                  - crossCellLinksUnresolvable
+              detail: { type: string }
+        rowCounts:
+          type: object
+          additionalProperties: { type: integer }
+        estimatedCopyMinutes: { type: integer }
+        estimatedCutoverSeconds:
+          type: integer
+          description: >
+            How long the tenant is unavailable. The number the client asks about, and the only
+            one they will remember.
+        crossCellLinksToRepoint:
+          type: integer
+          description: >
+            Entitlements redeemable in another region hold a link that must be re-pointed
+            rather than copied. Copying leaves two cells claiming the same guest.
+        computedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+
+    TenantMigration:
+      type: object
+      x-ticvai-persistence: "control.tenant_migration"
+      required: [id, planId, tenantId, status, startedAt]
+      properties:
+        id: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        fromCellId: { type: string, format: uuid }
+        toCellId: { type: string, format: uuid }
+        reason: { type: string }
+        status: { $ref: '#/components/schemas/TenantMigrationStatus' }
+        rowsCopied: { type: integer }
+        rowsExpected: { type: integer }
+        verificationPassed: { type: boolean, nullable: true }
+        cutoverAt: { type: string, format: date-time, nullable: true }
+        sourceRetainedUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            The source is retained, not dropped. A cutover that goes wrong needs somewhere to
+            return to, and a tenant's whole history is not something to delete on the day it
+            moved.
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+        error: { type: string, nullable: true }
+
+    MigrationBlockedProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          x-ticvai-persistence: "none — error shape"
+          properties:
+            blockers:
+              type: array
+              items:
+                type: object
+                properties:
+                  blocker: { type: string }
+                  detail: { type: string }
 
     CellHealth:
       x-ticvai-persistence: "none — polled, not stored"

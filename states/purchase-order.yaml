@@ -1,0 +1,69 @@
+# Purchase order — state model
+# Contract: inventory.PurchaseOrderStatus
+# Checked by tools/check-states.py.
+
+entity: Purchase order
+contract: inventory
+enum: PurchaseOrderStatus
+owner: inventory
+initial:
+- raised
+terminal:
+- received
+- closedShort
+- cancelled
+transitions:
+- from: raised
+  to: sent
+  operation: sendPurchaseOrder
+  trigger: operation
+  guard: Issued to the supplier
+- from: sent
+  to: acknowledged
+  operation: acknowledgePurchaseOrder
+  trigger: operation
+  guard: Supplier confirmed
+- from: acknowledged
+  to: partiallyReceived
+  operation: createGoodsReceipt
+  trigger: operation
+  guard: Some lines received
+- from: sent
+  to: partiallyReceived
+  operation: createGoodsReceipt
+  trigger: operation
+  guard: Received without acknowledgement — common, and not an error
+- from: partiallyReceived
+  to: received
+  operation: createGoodsReceipt
+  trigger: operation
+  guard: All lines received
+  emits:
+  - inventory.purchaseOrderReceived
+- from: acknowledged
+  to: received
+  operation: createGoodsReceipt
+  trigger: operation
+  guard: Received in one delivery
+  emits:
+  - inventory.purchaseOrderReceived
+- from: partiallyReceived
+  to: closedShort
+  operation: closePurchaseOrderShort
+  trigger: operation
+  guard: '**Accepting that the balance will not arrive.** Requires approval, because it writes off a
+    committed cost'
+  requiresApproval: true
+- from: raised
+  to: cancelled
+  operation: cancelPurchaseOrder
+  trigger: operation
+  guard: Cancelled before sending
+- from: sent
+  to: cancelled
+  operation: cancelPurchaseOrder
+  trigger: operation
+  guard: Cancelled with the supplier
+  requiresApproval: true
+notes: '`closedShort` is the state most systems omit, and it is the one that reconciles. Without it
+  a partially received order stays open forever and the committed-cost figure is wrong.'

@@ -7,7 +7,10 @@
 
 platform:
   code: P01
-  name: Guest Web Storefront
+  audience: guest
+  formFactor: web
+  shortName: Guest Web
+  name: Guest Web — Storefront
   surface: guestFacing
   runtime: reactWeb
   offlineCapable: false
@@ -32,6 +35,7 @@ platform:
     deviceOwnership: guest device
     networkAssumption: public internet, unmanaged
     releaseCadence: continuous
+  wireframeBoard: wireframes/P01 Guest Web.dc.html
 screens:
 - id: WEB-001
   name: Home / Landing
@@ -65,7 +69,8 @@ screens:
     error: Config fetch failed. Falls back to the last cached configuration with a dismissible warning.
       A storefront that will not load because branding is unavailable is worse than an unbranded one.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-001
   capability: C79
   apis:
   - operationId: getTenantConfig
@@ -120,7 +125,8 @@ screens:
       with no action is a dead end.
     error: Retry with filters preserved. Filters are never silently reset.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-002
   capability: C79
   apis:
   - operationId: listProducts
@@ -159,7 +165,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-003
   capability: C79
   implementation:
     app: web-b2c
@@ -198,7 +205,8 @@ screens:
     empty: Not applicable — a product either exists or the screen is notFound.
     error: Product unavailable, with a route back to the listing.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-004
   capability: C79
   apis:
   - operationId: getProduct
@@ -247,7 +255,8 @@ screens:
     empty: No ticket types on sale, with the next on-sale date if known.
     error: Pricing unavailable. Continue is blocked rather than showing a stale price.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-005
   capability: C80
   apis:
   - operationId: listProductVariants
@@ -294,7 +303,8 @@ screens:
     empty: No sessions in range, with the next available date offered.
     error: Availability unavailable. Selection blocked — overselling is worse than waiting.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-006
   capability: C81
   apis:
   - operationId: getAvailability
@@ -343,7 +353,8 @@ screens:
     empty: No seats available in the selected category.
     error: Map unavailable, with the option to continue on best-available instead.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-007
   capability: C51
   apis:
   - operationId: getSeatAvailability
@@ -386,7 +397,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-008
   capability: C86
   apis:
   - operationId: getUpsellSuggestions
@@ -418,7 +430,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-009
   capability: C79
   apis:
   - operationId: getWishlist
@@ -471,7 +484,8 @@ screens:
     empty: Empty cart with a route back to browsing.
     error: Pricing failed. Checkout blocked rather than proceeding on a stale total.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-010
   capability: C02
   apis:
   - operationId: evaluatePromotions
@@ -528,7 +542,8 @@ screens:
     empty: Not applicable.
     error: Prefill failed. The form still works, entered manually.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-011
   capability: C03
   apis:
   - operationId: getGuestProfile
@@ -576,7 +591,8 @@ screens:
     error: Declined, with the reason where it is safe to show, and a retry that reuses the same idempotency
       key.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-012
   capability: C04
   apis:
   - operationId: createOrder
@@ -630,7 +646,8 @@ screens:
     error: Payment succeeded but confirmation did not load. Shows the order number and a support route
       — never implies the purchase failed.
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-013
   capability: C03
   apis:
   - operationId: getOrder
@@ -668,7 +685,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-014
   capability: C04
   apis:
   - operationId: createPayment
@@ -700,7 +718,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-015
   openQuestions:
   - CF-48 — Q2 Virtual Waiting Room. Edge infrastructure, not the Q1 queue contract. Build-or-buy decision
     outstanding with Dinesh and Qossai.
@@ -730,7 +749,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-016
   capability: C36
   apis:
   - operationId: registerGuest
@@ -763,7 +783,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-017
   capability: C36
   apis:
   - operationId: getGuestProfile
@@ -795,7 +816,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-018
   capability: C09
   notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards.
   apis:
@@ -829,7 +851,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-019
   capability: C34
   apis:
   - operationId: listOrders
@@ -865,7 +888,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-020
   capability: C36
   notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks.
   apis:
@@ -902,7 +926,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-021
   capability: C21
   apis:
   - operationId: getWallet
@@ -940,7 +965,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-022
   capability: C31
   implementation:
     app: web-b2c
@@ -970,7 +996,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-023
   capability: C31
   apis:
   - operationId: modifyOrder
@@ -1002,7 +1029,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-024
   capability: C93
   apis:
   - operationId: getGuestLoyalty
@@ -1036,7 +1064,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-025
   capability: C105
   notes: Same content the AI concierge grounds on. One source, two surfaces.
   apis:
@@ -1071,7 +1100,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-026
   capability: C33
   apis:
   - operationId: submitReview
@@ -1105,7 +1135,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-027
   capability: C59
   apis:
   - operationId: recordConsent
@@ -1140,7 +1171,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-028
   capability: C105
   apis:
   - operationId: listContentPages
@@ -1172,7 +1204,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P01 Guest Web.dc.html#web-029
   capability: C57
   notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's
     failure, not ours.

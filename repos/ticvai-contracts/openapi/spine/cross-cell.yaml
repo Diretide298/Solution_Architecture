@@ -613,6 +613,7 @@ paths:
 
     put:
       operationId: setWalletAllocationPolicy
+      x-ticvai-config-scope: region
       summary: Set the allocation cap policy
       tags: [wallet]
       x-ticvai-permission: REGION_CONFIGURE

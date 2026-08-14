@@ -5,11 +5,15 @@
 //   flow step -> screen -> operationId -> contract operation
 //
 // Nothing here is inferred. Every edge is declared in the YAML; the checks below
-// only report where a declaration points at something that does not exist.
+// only report where a declaration points at something that does not exist — with
+// one exception, kept apart in boards.mjs and labelled wherever it is shown:
+// which platform a design board belongs to.
 
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import yaml from 'js-yaml';
+import { buildBoards } from './boards.mjs';
+import { buildWireframes } from './wireframes.mjs';
 
 async function readYamlDir(root, dir, filter) {
   const out = [];
@@ -55,6 +59,12 @@ function indexScreens(files, problems) {
       appStatus: platform.appStatus ?? null,
       packages: Array.isArray(platform.packages) ? platform.packages : [],
       deployment: platform.deployment ?? null,
+      // the board this platform's screens are drawn on, declared rather than
+      // inferred from the file name the way a design board has to be
+      wireframeBoard: platform.wireframeBoard ?? null,
+      shortName: platform.shortName ?? null,
+      audience: platform.audience ?? null,
+      formFactor: platform.formFactor ?? null,
       file: rel,
       screenCount: list.length,
     });
@@ -126,7 +136,7 @@ function indexScreens(files, problems) {
  * deliberately — which is the whole reason the file exists.
  */
 async function readComponentVocabulary(root) {
-  const empty = { regions: new Set(), components: new Set(), patterns: new Set() };
+  const empty = { regions: new Set(), components: new Set(), patterns: new Set(), entries: {} };
   let doc;
   try {
     doc = yaml.load(await readFile(path.join(root, 'screens', '_components.yaml'), 'utf8'));
@@ -136,10 +146,34 @@ async function readComponentVocabulary(root) {
   // regions and patterns are keyed by `id`, components by `kind`
   const ids = (list, key) =>
     new Set((Array.isArray(list) ? list : []).map((x) => x?.[key]).filter(Boolean));
+
+  // Every entry carries a description, and often the states it must handle and
+  // a note saying why it is the way it is — "Cursor pagination, never offset.
+  // Offset drifts under concurrent writes." That is the answer to "what is a
+  // dataTable", and it was being thrown away in favour of the bare id.
+  const entries = {};
+  const collect = (list, key, group) => {
+    for (const item of Array.isArray(list) ? list : []) {
+      const id = item?.[key];
+      if (!id) continue;
+      entries[id] = {
+        id,
+        group,
+        description: item.description ?? '',
+        states: Array.isArray(item.states) ? item.states : [],
+        notes: item.notes ?? null,
+      };
+    }
+  };
+  collect(doc?.regions, 'id', 'region');
+  collect(doc?.components, 'kind', 'component');
+  collect(doc?.patterns, 'id', 'pattern');
+
   return {
     regions: ids(doc?.regions, 'id'),
     components: new Set([...ids(doc?.components, 'kind'), ...ids(doc?.patterns, 'id')]),
     patterns: ids(doc?.patterns, 'id'),
+    entries,
   };
 }
 
@@ -340,14 +374,44 @@ export async function buildJourneys(root, contractOperationIds = new Set()) {
 
   const apps = await readApps(root, screens, problems);
 
+  // the design boards the frontend plan was built from
+  const design = await buildBoards(root, [...screens.values()]);
+  problems.push(...design.problems);
+
+  // the rendered wireframes — matched by id, and by the board anchor each screen
+  // declares, rather than inferred from a file name as the design boards have to be.
+  // The platform records from screens/ are passed rather than the deployment table's
+  // because those are the ones carrying `wireframeBoard`.
+  const wireframes = await buildWireframes(root, {
+    screens: [...screens.values()],
+    flows,
+    platforms: platforms.length ? platforms : design.platforms,
+  });
+  problems.push(...wireframes.problems);
+
   return {
     flows,
     platforms,
     apps,
+    boards: design.boards,
+    boardDir: design.dir,
+    allPlatforms: design.platforms,
+    wireframes,
+    // the shared component library, so the viewer can say what a `dataTable` is
+    // rather than only that the name is spelled correctly
+    vocabulary: vocabulary.entries,
     screens: [...screens.values()],
     operationUsage: Object.fromEntries(operationUsage),
     problems,
     stats: {
+      boards: design.stats.boards,
+      boardsMatched: design.stats.matched,
+      wireframes: wireframes.stats.total,
+      screensWireframed: wireframes.stats.screens,
+      screensStandalone: wireframes.stats.screensStandalone,
+      screensOnBoard: wireframes.stats.screensOnBoard,
+      wireframeBoards: wireframes.stats.boards,
+      boardFrames: wireframes.stats.frames,
       flows: flows.length,
       steps: flows.reduce((a, f) => a + f.steps.length, 0),
       branches: flows.reduce((a, f) => a + f.branches.length, 0),

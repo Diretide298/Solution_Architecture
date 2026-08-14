@@ -1,15 +1,34 @@
-// Force-directed diagram of *boxes* rather than dots — used by both the ER view
-// (entities with their fields) and the Flow view (operations with their inputs
-// and outputs). Boxes carry rows, so collision has to work on rectangles.
+// Diagram of *boxes* rather than dots — used by the ER view (entities with
+// their fields) and the Data view (tables with their columns). Boxes carry
+// rows, so collision has to work on rectangles.
 //
-// The force recipe mirrors graph.js: clamped near-field repulsion, springs,
-// a speed cap, then hard collision resolution to guarantee nothing overlaps.
+// Boxes are placed in a hierarchy, not thrown into a force simulation: a table
+// sits below the tables it references, so the diagram opens as something you
+// can read top to bottom. Anything can then be dragged anywhere, and stays
+// where it is put — the physics is only used to settle a drag, never to decide
+// the initial arrangement. Re-picking the scope restores the tidy layout.
+
+import { enableTouch } from './touch.js';
 
 const HEADER_H = 26;
 const ROW_H = 17;
 const BOX_W = 216;
 const PAD_Y = 6;
 const MAX_ROWS = 11;
+
+// layout spacing
+const GAP_X = 34;
+const GAP_Y = 58;
+const MAX_PER_ROW = 8; // a layer wider than this wraps rather than running off
+
+/**
+ * Text scales with the zoom, like everything else on the canvas. It used to be
+ * capped, which meant zooming in grew the boxes while their labels stayed the
+ * same size — the one thing you zoom in to read. The floor keeps a zoomed-out
+ * label legible; the k thresholds in draw() stop drawing text well before it
+ * would turn into noise.
+ */
+const textSize = (base, k, floor = 6) => Math.max(floor, base * k);
 
 export class BoxDiagram {
   constructor(canvas, { onSelect, onRow } = {}) {
@@ -45,12 +64,14 @@ export class BoxDiagram {
   // ── data ────────────────────────────────────────────────────────
   setData(nodes, edges) {
     const previous = new Map(this.nodes.map((n) => [n.id, n]));
-    const spread = 90 * Math.sqrt(Math.max(1, nodes.length));
+    // An arrangement the user made by hand is theirs to keep — but only while
+    // the same boxes are on screen. A different scope gets a fresh layout.
+    const sameSet =
+      previous.size === nodes.length && nodes.every((n) => previous.has(n.id));
+    const keepPositions = this.userAdjusted && sameSet;
 
-    this.nodes = nodes.map((source, i) => {
+    this.nodes = nodes.map((source) => {
       const old = previous.get(source.id);
-      const angle = i * 2.399963;
-      const r = spread * Math.sqrt((i + 0.5) / nodes.length);
       const shown = Math.min(source.rows?.length ?? 0, MAX_ROWS);
       const hidden = (source.rows?.length ?? 0) - shown;
       return {
@@ -59,8 +80,8 @@ export class BoxDiagram {
         hiddenRows: hidden,
         w: BOX_W,
         h: HEADER_H + PAD_Y * 2 + shown * ROW_H + (hidden > 0 ? ROW_H : 0),
-        x: old?.x ?? Math.cos(angle) * r,
-        y: old?.y ?? Math.sin(angle) * r,
+        x: keepPositions ? old.x : 0,
+        y: keepPositions ? old.y : 0,
         vx: 0,
         vy: 0,
         degree: 0,
@@ -87,9 +108,122 @@ export class BoxDiagram {
       this.neighbours.get(edge.target.id).add(edge.source.id);
     }
 
-    this.userAdjusted = false;
-    this.alpha = 1;
+    if (!keepPositions) {
+      this.userAdjusted = false;
+      this.relayout();
+    }
+    // no simulation on open — the layout is already the answer
+    this.alpha = 0;
     this._run();
+  }
+
+  /**
+   * Places the boxes in layers: a box sits below everything it points at, so
+   * the most-referenced things — the tables the rest of the schema hangs off —
+   * end up along the top. Deterministic, so the same data always draws the
+   * same picture.
+   */
+  relayout() {
+    const nodes = this.nodes;
+    if (!nodes.length) return;
+
+    const outgoing = new Map(nodes.map((n) => [n.id, new Set()]));
+    for (const edge of this.edges) {
+      if (edge.source !== edge.target) outgoing.get(edge.source.id).add(edge.target.id);
+    }
+
+    // depth = longest chain of references leaving this box. A box that
+    // references nothing is depth 0 and sits at the top; a cycle stops at the
+    // box that closes it rather than looping forever.
+    const depth = new Map();
+    const visiting = new Set();
+    const measure = (id) => {
+      if (depth.has(id)) return depth.get(id);
+      if (visiting.has(id)) return 0;
+      visiting.add(id);
+      let d = 0;
+      for (const next of outgoing.get(id) ?? []) d = Math.max(d, measure(next) + 1);
+      visiting.delete(id);
+      depth.set(id, d);
+      return d;
+    };
+
+    // boxes with no relationships at all are not part of the hierarchy; they
+    // go in a block underneath rather than padding out the top row
+    const linked = nodes.filter((n) => n.degree > 0);
+    const loose = nodes.filter((n) => n.degree === 0);
+    for (const node of linked) measure(node.id);
+
+    const layers = [];
+    for (const node of linked) {
+      const d = depth.get(node.id) ?? 0;
+      (layers[d] ??= []).push(node);
+    }
+
+    // order each layer so its edges cross as little as possible: start from the
+    // busiest boxes, then sweep down putting each box near the average position
+    // of the ones above it that point at it
+    const index = new Map();
+    const reindex = (layer) => layer.forEach((n, i) => index.set(n.id, i));
+    if (layers[0]) {
+      layers[0].sort((a, b) => b.degree - a.degree || String(a.label ?? a.id).localeCompare(String(b.label ?? b.id)));
+      reindex(layers[0]);
+    }
+    for (let pass = 0; pass < 3; pass++) {
+      for (let d = 1; d < layers.length; d++) {
+        const layer = layers[d] ?? [];
+        const above = new Set((layers[d - 1] ?? []).map((n) => n.id));
+        for (const node of layer) {
+          const anchors = [...(this.neighbours.get(node.id) ?? [])]
+            .filter((id) => above.has(id))
+            .map((id) => index.get(id))
+            .filter((i) => i != null);
+          node._bary = anchors.length
+            ? anchors.reduce((a, b) => a + b, 0) / anchors.length
+            : Number.MAX_SAFE_INTEGER;
+        }
+        layer.sort(
+          (a, b) => a._bary - b._bary || String(a.label ?? a.id).localeCompare(String(b.label ?? b.id))
+        );
+        reindex(layer);
+      }
+    }
+
+    // each layer is one band, wrapped when it is wider than a screen can use
+    let y = 0;
+    const placeRow = (row) => {
+      const height = Math.max(...row.map((n) => n.h));
+      const width = row.reduce((a, n) => a + n.w, 0) + GAP_X * (row.length - 1);
+      let x = -width / 2;
+      for (const node of row) {
+        node.x = x + node.w / 2;
+        // tops aligned rather than centres — boxes in one layer differ in
+        // height by however many columns they have, and a ragged top edge
+        // reads as disorder rather than as a row
+        node.y = y + node.h / 2;
+        x += node.w + GAP_X;
+      }
+      y += height + GAP_Y;
+    };
+
+    for (const layer of layers) {
+      if (!layer?.length) continue;
+      for (let i = 0; i < layer.length; i += MAX_PER_ROW) placeRow(layer.slice(i, i + MAX_PER_ROW));
+    }
+    if (loose.length) {
+      loose.sort((a, b) => String(a.label ?? a.id).localeCompare(String(b.label ?? b.id)));
+      for (let i = 0; i < loose.length; i += MAX_PER_ROW) placeRow(loose.slice(i, i + MAX_PER_ROW));
+    }
+
+    // centre the whole thing on the origin, which is where the view is framed
+    const midY = y / 2;
+    for (const node of nodes) {
+      node.y -= midY;
+      node.vx = 0;
+      node.vy = 0;
+      delete node._bary;
+    }
+    this.draw();
   }
 
   _run() {
@@ -237,10 +371,16 @@ export class BoxDiagram {
       minY = Math.min(minY, node.y - node.h / 2);
       maxY = Math.max(maxY, node.y + node.h / 2);
     }
-    const k = Math.min(this.width / (maxX - minX + 100), this.height / (maxY - minY + 100), 1.4);
+    // the legend sits over the bottom-left corner, so the frame keeps clear of it
+    const LEGEND_H = 96;
+    const k = Math.min(
+      this.width / (maxX - minX + 100),
+      (this.height - LEGEND_H) / (maxY - minY + 60),
+      1.4
+    );
     this.transform.k = Math.max(0.08, k);
     this.transform.x = -((minX + maxX) / 2) * this.transform.k;
-    this.transform.y = -((minY + maxY) / 2) * this.transform.k;
+    this.transform.y = -((minY + maxY) / 2) * this.transform.k - LEGEND_H / 2;
     this.draw();
   }
 
@@ -270,6 +410,21 @@ export class BoxDiagram {
       ) return node;
     }
     return null;
+  }
+
+  /**
+   * The click behaviour, addressed by position. mouseup resolves the row against
+   * the box it picked up on mousedown; a tap has no such box, so it finds one
+   * first and then follows the same rule — a $ref row opens the reference, the
+   * rest of the box selects it.
+   */
+  _selectAt(sx, sy) {
+    const node = this.nodeAt(sx, sy);
+    if (!node) return false;
+    const row = this.rowAt(node, sx, sy);
+    if (row?.refTarget) this.onRow(row, node);
+    else this.onSelect(node);
+    return true;
   }
 
   rowAt(node, sx, sy) {
@@ -311,38 +466,63 @@ export class BoxDiagram {
         : null;
 
     // ── edges ──
-    for (const edge of this.edges) {
+    // Related edges are drawn last so they sit on top of everything rather than
+    // disappearing under a box, and they are drawn thicker, brighter and with a
+    // glow — following one relationship out of a busy schema is the whole job.
+    const drawEdge = (edge, active) => {
       const a = edge.source;
       const b = edge.target;
-      const active = related && related.has(a.id) && related.has(b.id);
-      if (related && !active) {
-        ctx.strokeStyle = light ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.04)';
-      } else {
-        ctx.strokeStyle = active
-          ? (light ? 'rgba(124,58,237,.8)' : 'rgba(167,139,250,.85)')
-          : (light ? 'rgba(0,0,0,.3)' : 'rgba(255,255,255,.3)');
-      }
 
-      // anchor the line on the facing edges of the two boxes
+      // Anchor on the facing edges of the two boxes, choosing the axis they
+      // are actually separated along — the layout stacks related boxes
+      // vertically, so most lines leave the bottom of one and enter the top
+      // of the next rather than crawling around their sides.
       const dx = b.x - a.x;
-      const from = this.toScreen(a.x + Math.sign(dx) * (a.w / 2), a.y);
-      const to = this.toScreen(b.x - Math.sign(dx) * (b.w / 2), b.y);
-      if (Math.max(from.y, to.y) < -60 || Math.min(from.y, to.y) > this.height + 60) continue;
+      const dy = b.y - a.y;
+      const vertical = Math.abs(dy) > Math.abs(dx) * 0.8;
+      const from = vertical
+        ? this.toScreen(a.x, a.y + Math.sign(dy) * (a.h / 2))
+        : this.toScreen(a.x + Math.sign(dx) * (a.w / 2), a.y);
+      const to = vertical
+        ? this.toScreen(b.x, b.y - Math.sign(dy) * (b.h / 2))
+        : this.toScreen(b.x - Math.sign(dx) * (b.w / 2), b.y);
+      if (Math.max(from.y, to.y) < -60 || Math.min(from.y, to.y) > this.height + 60) return;
 
-      ctx.lineWidth = (active ? 1.8 : 1) * Math.min(1.6, Math.max(0.5, k));
+      const muted = related && !active;
+      ctx.strokeStyle = muted
+        ? (light ? 'rgba(0,0,0,.10)' : 'rgba(255,255,255,.09)')
+        : active
+          ? (light ? '#6d28d9' : '#c4b5fd')
+          : (light ? 'rgba(0,0,0,.42)' : 'rgba(255,255,255,.46)');
+
+      // a child edge is the strongest statement on the diagram — this row
+      // belongs to that row — so it is drawn heaviest
+      const weight = edge.kind === 'child' ? 2.4 : 1.5;
+      ctx.lineWidth = (active ? 2.8 : muted ? 1 : weight) * Math.min(1.6, Math.max(0.55, k));
+      if (active) {
+        ctx.shadowColor = light ? 'rgba(109,40,217,.45)' : 'rgba(196,181,253,.55)';
+        ctx.shadowBlur = 10;
+      }
       // dashed marks a relationship that was inferred rather than declared
       ctx.setLineDash(edge.dashed ? [5 * Math.min(1.5, k), 4 * Math.min(1.5, k)] : []);
+
+      // control points, kept so the arrowhead can follow the curve's approach
       const midX = (from.x + to.x) / 2;
+      const midY = (from.y + to.y) / 2;
+      const c1 = vertical ? { x: from.x, y: midY } : { x: midX, y: from.y };
+      const c2 = vertical ? { x: to.x, y: midY } : { x: midX, y: to.y };
+
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
-      ctx.bezierCurveTo(midX, from.y, midX, to.y, to.x, to.y);
+      ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
       ctx.stroke();
       ctx.setLineDash([]);
+      ctx.shadowBlur = 0;
 
-      // arrowhead + label, only when zoomed enough to read
-      if (k > 0.45) {
-        const angle = Math.atan2(to.y - from.y, to.x - midX);
-        const size = 6 * Math.min(1.4, k);
+      // arrowhead + label, once the view is zoomed enough to read them
+      if (k > 0.35 && !muted) {
+        const angle = Math.atan2(to.y - c2.y, to.x - c2.x);
+        const size = (active ? 8 : 6.5) * Math.min(2, Math.max(0.6, k));
         ctx.beginPath();
         ctx.moveTo(to.x, to.y);
         ctx.lineTo(to.x - size * Math.cos(angle - 0.4), to.y - size * Math.sin(angle - 0.4));
@@ -352,19 +532,30 @@ export class BoxDiagram {
         ctx.fill();
 
         if (edge.label && (active || k > 0.8)) {
-          ctx.font = `${Math.min(11, 9 * k + 2)}px ui-monospace, Menlo, monospace`;
+          ctx.font = `${active ? 600 : 400} ${textSize(10, k, 8)}px ui-monospace, Menlo, monospace`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          const lx = (from.x + to.x) / 2;
-          const ly = (from.y + to.y) / 2;
           const metrics = ctx.measureText(edge.label);
-          ctx.fillStyle = light ? 'rgba(255,255,255,.9)' : 'rgba(20,20,26,.9)';
-          ctx.fillRect(lx - metrics.width / 2 - 3, ly - 7, metrics.width + 6, 14);
-          ctx.fillStyle = active ? accent : faint;
-          ctx.fillText(edge.label, lx, ly);
+          ctx.fillStyle = light ? 'rgba(255,255,255,.92)' : 'rgba(20,20,26,.92)';
+          ctx.fillRect(midX - metrics.width / 2 - 4, midY - 8, metrics.width + 8, 16);
+          if (active) {
+            ctx.strokeStyle = light ? 'rgba(109,40,217,.5)' : 'rgba(196,181,253,.5)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(midX - metrics.width / 2 - 4, midY - 8, metrics.width + 8, 16);
+          }
+          ctx.fillStyle = active ? (light ? '#6d28d9' : '#c4b5fd') : faint;
+          ctx.fillText(edge.label, midX, midY);
         }
       }
+    };
+
+    const activeEdges = [];
+    for (const edge of this.edges) {
+      const active = Boolean(related && related.has(edge.source.id) && related.has(edge.target.id));
+      if (active) activeEdges.push(edge);
+      else drawEdge(edge, false);
     }
+    for (const edge of activeEdges) drawEdge(edge, true);
 
     // ── boxes ──
     ctx.textBaseline = 'middle';
@@ -378,15 +569,31 @@ export class BoxDiagram {
 
       const faded = related && !related.has(node.id);
       const selected = node.id === this.selectedId;
-      ctx.globalAlpha = faded ? 0.25 : 1;
+      // a neighbour of the selection — not the thing itself, but part of the
+      // answer to "what is connected to this", so it is marked rather than
+      // merely left undimmed
+      const neighbour = !selected && related?.has(node.id);
+      ctx.globalAlpha = faded ? 0.18 : 1;
 
       // body
       ctx.beginPath();
       ctx.roundRect(left, top, w, h, 6 * Math.min(1.5, k));
       ctx.fillStyle = panel;
       ctx.fill();
-      ctx.lineWidth = selected ? 2 : 1;
-      ctx.strokeStyle = selected ? accent : border;
+      if (selected || neighbour) {
+        ctx.shadowColor = selected
+          ? (light ? 'rgba(109,40,217,.5)' : 'rgba(167,139,250,.55)')
+          : (light ? 'rgba(109,40,217,.22)' : 'rgba(167,139,250,.25)');
+        ctx.shadowBlur = selected ? 18 : 9;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      ctx.lineWidth = selected ? 2.6 : neighbour ? 1.8 : 1;
+      ctx.strokeStyle = selected
+        ? accent
+        : neighbour
+          ? (light ? 'rgba(109,40,217,.55)' : 'rgba(167,139,250,.6)')
+          : border;
       ctx.stroke();
 
       // header band in the node's own colour
@@ -404,13 +611,13 @@ export class BoxDiagram {
 
       // title
       ctx.textAlign = 'left';
-      const titleSize = Math.min(12.5, Math.max(7, 11.5 * k));
+      const titleSize = textSize(11.5, k, 7);
       ctx.font = `600 ${titleSize}px ui-sans-serif, system-ui, sans-serif`;
       ctx.fillStyle = selected ? accent : text;
       ctx.fillText(fit(ctx, node.title, w - 16 * k), left + 8 * k, top + (HEADER_H / 2) * k);
 
       if (node.badge && k > 0.5) {
-        ctx.font = `${Math.min(10, 9 * k)}px ui-monospace, Menlo, monospace`;
+        ctx.font = `${textSize(9, k, 6)}px ui-monospace, Menlo, monospace`;
         ctx.fillStyle = faint;
         ctx.textAlign = 'right';
         ctx.fillText(node.badge, left + w - 7 * k, top + (HEADER_H / 2) * k);
@@ -420,7 +627,7 @@ export class BoxDiagram {
       if (!this.showRows || k < 0.42 || !node.rows?.length) { ctx.globalAlpha = 1; continue; }
 
       // rows
-      const rowSize = Math.min(11, Math.max(6, 10 * k));
+      const rowSize = textSize(10, k, 6);
       let y = top + (HEADER_H + PAD_Y) * k + (ROW_H * k) / 2;
       for (let i = 0; i < node.shownRows; i++) {
         const row = node.rows[i];
@@ -526,6 +733,14 @@ export class BoxDiagram {
       this.transform.y += (after.y - before.y) * next;
       this.draw();
     }, { passive: false });
+
+    // Fingers. Boxes stay where they are put on touch — one finger has to pan,
+    // and the layout is already arranged sensibly without being dragged.
+    enableTouch(canvas, this, {
+      min: 0.06,
+      max: 3,
+      onTap: (x, y) => this._selectAt(x, y),
+    });
   }
 
   destroy() {

@@ -5,7 +5,10 @@
 
 platform:
   code: P11
-  name: Accreditation Portal
+  audience: public
+  formFactor: web
+  shortName: Public Web
+  name: Public Web — Accreditation
   surface: public
   runtime: reactWeb
   offlineCapable: false
@@ -29,6 +32,7 @@ platform:
     deviceOwnership: applicant device, unmanaged
     networkAssumption: public internet
     releaseCadence: monthly
+  wireframeBoard: wireframes/P11 Accreditation.dc.html
 screens:
 - id: ACC-001
   name: Landing / Programme Overview
@@ -45,7 +49,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-001
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
@@ -72,7 +77,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-002
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
@@ -100,7 +106,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-003
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
@@ -128,7 +135,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-004
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
@@ -158,7 +166,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-005
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
@@ -188,7 +197,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-006
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
@@ -218,7 +228,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-007
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
@@ -246,7 +257,8 @@ screens:
     empty: TODO
     error: TODO
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P11 Accreditation.dc.html#acc-008
   openQuestions:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.

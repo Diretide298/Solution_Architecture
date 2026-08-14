@@ -12,6 +12,7 @@ What this checks is the conventions a parser cannot know:
   * every migration registers itself in platform.schema_version
   * every migration has a ROLLBACK section
   * every referenced schema exists by the time it is used
+  * every foreign key points at a table some migration actually creates
   * money columns are numeric(18,4) and carry currency and scale
   * ULID columns are char(26)
   * no DROP or destructive ALTER outside a rollback block
@@ -70,6 +71,7 @@ def strip_comments(sql: str) -> str:
     return stripped
 
 
+CREATED: set[str] = set()   # every table created anywhere in the migration set
 ALTERED: set[str] = set()   # tables given a level-typed FK by a later ALTER TABLE
 EXEMPT = {
     # Written inside the same transaction as the state change it records. A foreign key
@@ -77,6 +79,19 @@ EXEMPT = {
     # copied from a row that was already validated.
     "platform.outbox",
 }
+
+
+def collect_created(files: list[Path]) -> None:
+    """Every table the set creates, so a reference to a missing one can be caught.
+
+    Added after four foreign keys were found pointing at pii.subject, a table that was
+    declared in a rollback and never created. psql would have failed on the first one;
+    this checker reported PASS, because it verified conventions and never verified that
+    a referenced table exists.
+    """
+    for f in files:
+        body = split_rollback(f.read_text())[0]
+        CREATED.update(re.findall(r"CREATE TABLE (?:IF NOT EXISTS )?([\w.]+)", body))
 
 
 def collect_alters(files: list[Path]) -> None:
@@ -191,6 +206,7 @@ def main() -> int:
         print("no migrations found", file=sys.stderr)
         return 1
 
+    collect_created(files)
     collect_alters(files)
     known: set[str] = set()
     print(f"checking {len(files)} migration(s) in {SCRIPTS}\n")

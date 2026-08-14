@@ -1,0 +1,46 @@
+# shift.closed v1 — published by shift
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: shift.closed
+version: 1
+publisher: shift
+description: A till has been counted and closed.
+aggregate: shift
+emittedWhen: ShiftStatus pendingClosure or pendingVariance to closed
+payload:
+- field: shiftId
+  type: string
+- field: venueId
+  type: uuid
+- field: workstationId
+  type: uuid
+- field: principalId
+  type: uuid
+- field: expected
+  type: Money
+- field: counted
+  type: Money
+- field: variance
+  type: Money
+  notes: Signed. Negative is short
+- field: varianceAccepted
+  type: boolean
+- field: acceptedByPrincipalId
+  type: uuid
+  notes: Null where within tolerance
+- field: closedAt
+  type: timestamp
+consumers:
+- context: ledger
+  purpose: Post the cash position and any variance
+  idempotencyKey: shiftId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: Shift and cashier performance
+  idempotencyKey: shiftId
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: Carries expected and counted rather than only the variance. A consumer that receives a difference
+  and not the inputs cannot explain it later.

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 8
+  x-ticvai-screen-count: 10
   x-ticvai-tier: spine
   x-ticvai-module: "1 — Ticketing Catalogue"
   x-ticvai-requirements: 312
@@ -119,6 +119,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-002 Event & Attraction Listing"
+        - "P02 GST-003 Attractions List"
+        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-read-routing: replica
       summary: List products
@@ -190,6 +192,7 @@ paths:
       operationId: getProduct
       x-ticvai-consumed-by:
         - "P01 WEB-004 Event / Attraction Detail"
+        - "P02 GST-004 Attraction Details"
       x-ticvai-read-routing: replica
       summary: Read a product
       tags: [product]
@@ -294,6 +297,7 @@ paths:
       operationId: listProductVariants
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
+        - "P04 POS-003 Sell — Timed Entry"
       x-ticvai-read-routing: replica
       summary: List generated variants
       tags: [product]
@@ -449,6 +453,7 @@ paths:
       operationId: listEvents
       x-ticvai-consumed-by:
         - "P01 WEB-002 Event & Attraction Listing"
+        - "P02 GST-005 What's On"
       x-ticvai-read-routing: replica
       summary: List events
       tags: [event]
@@ -911,6 +916,8 @@ paths:
 
     post:
       operationId: acquireLease
+      x-ticvai-consumed-by:
+        - "P04 POS-003 Sell — Timed Entry"
       summary: Acquire an inventory lease
       description: >
         Grants the caller N units of a capacity envelope for a TTL. The holder may sell
@@ -1071,6 +1078,7 @@ paths:
       operationId: getAvailability
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Session Selection"
+        - "P04 POS-003 Sell — Timed Entry"
         - "P10 PTR-007 Availability Search"
       x-ticvai-read-routing: primary
       summary: Live remaining capacity
@@ -1388,6 +1396,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getEvent
+      x-ticvai-consumed-by:
+        - "P02 GST-006 Event / Exhibition Details"
       x-ticvai-read-routing: replica
       summary: Read an event
       tags: [event]
@@ -1596,6 +1606,7 @@ paths:
 
     post:
       operationId: createEntitlementTemplate
+      x-ticvai-config-scope: venue
       summary: Create an entitlement template
       tags: [entitlement]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1724,6 +1735,20 @@ components:
         reentryAllowed: { type: boolean, default: false }
         admissionProfileId: { type: string, format: uuid, nullable: true }
         isTransferable: { type: boolean, default: true }
+        canShareMedia:
+          type: boolean
+          default: true
+          description: >
+            Whether this entitlement may be appended to media a guest already holds (CF-58).
+            False for anything surrendered at use — a single-entry ticket taken at the gate is
+            not a claim token for a locker bought afterwards.
+        canClaimShopAndDrop:
+          type: boolean
+          default: false
+          description: >
+            Whether this entitlement may be scanned to claim goods left under 4.4.7. False for
+            a single-entry ticket that is surrendered at the gate — a claim token the guest no
+            longer holds is not a claim token.
         isNameBound:
           type: boolean
           default: false

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 10
   x-ticvai-tier: spine
   x-ticvai-module: "3 — Admission and Access"
   x-ticvai-requirements: 201
@@ -113,6 +113,10 @@ paths:
   /access/validate:
     post:
       operationId: validateAccess
+      x-ticvai-consumed-by:
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-005 Denied"
+        - "P07 SCN-012 Offline scanning"
       summary: Validate media at an access point and admit or deny
       description: >
         The access point is inherited from the session's workstation and is not a request
@@ -154,6 +158,8 @@ paths:
   /access/override:
     post:
       operationId: overrideAccess
+      x-ticvai-consumed-by:
+        - "P07 SCN-006 Override"
       summary: Admit against a failed validation
       description: >
         Records the overriding principal, the original denial reason and a mandatory
@@ -202,6 +208,10 @@ paths:
   /access/lookup:
     get:
       operationId: lookupTicket
+      x-ticvai-consumed-by:
+        - "P05 KSK-011 Collect a booking"
+        - "P07 SCN-008 Manual entry"
+        - "P07 SCN-009 Ticket lookup"
       x-ticvai-read-routing: replica
       summary: Read-only validity check without admitting
       description: >
@@ -235,6 +245,8 @@ paths:
   /access/scans:
     post:
       operationId: syncScans
+      x-ticvai-consumed-by:
+        - "P07 SCN-014 Sync & reconciliation"
       summary: Replay scans recorded offline
       description: >
         Ordered batch. The server processes in `sequence` order and stops at the first
@@ -277,6 +289,8 @@ paths:
 
     get:
       operationId: listScans
+      x-ticvai-consumed-by:
+        - "P07 SCN-013 Offline journal"
       x-ticvai-read-routing: replica
       summary: List scan events
       tags: [sync]
@@ -320,6 +334,8 @@ paths:
   /access/offline-package:
     get:
       operationId: getOfflinePackage
+      x-ticvai-consumed-by:
+        - "P07 SCN-015 Offline package"
       x-ticvai-read-routing: replica
       summary: Entitlement and rule set for offline validation
       description: >
@@ -367,6 +383,9 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setTurnstileMode
+      x-ticvai-consumed-by:
+        - "P07 SCN-002 Access point & direction"
+        - "P07 SCN-016 Gate mode"
       summary: Set the operating mode of an access point
       description: >
         Podium operation. Changes what the gate does, not who may pass it.
@@ -399,6 +418,8 @@ paths:
   /access-points:
     get:
       operationId: listAccessPoints
+      x-ticvai-consumed-by:
+        - "P07 SCN-002 Access point & direction"
       x-ticvai-read-routing: replica
       summary: List access points
       tags: [accessPoint]
@@ -537,6 +558,7 @@ paths:
                         items: { $ref: '#/components/schemas/AdmissionProfile' }
     post:
       operationId: createAdmissionProfile
+      x-ticvai-config-scope: venue
       summary: Create an admission profile
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -565,6 +587,7 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: updateAdmissionProfile
+      x-ticvai-config-scope: venue
       summary: Update an admission profile
       description: >
         Changes take effect at terminals after the next offline package refresh, not
@@ -590,6 +613,8 @@ paths:
   /blacklist:
     get:
       operationId: listBlacklist
+      x-ticvai-consumed-by:
+        - "P07 SCN-010 Blacklisted"
       x-ticvai-read-routing: primary   # a removed-too-late blacklist entry admits someone barred
       summary: List blacklisted media
       tags: [accessPoint]
@@ -665,6 +690,8 @@ paths:
   /access/group-validate:
     post:
       operationId: validateGroupAccess
+      x-ticvai-consumed-by:
+        - "P07 SCN-007 Group admission"
       summary: Admit a group on one read
       description: >
         A school party or tour group entering on a single credential. Partial admission is

@@ -1,0 +1,653 @@
+# P13 — Staff Web — White-Label CMS
+#
+# Derived from the wireframe board on 14 August. **Purposes and navigation are real;
+# components, states and operations are not yet written.** Every screen carries
+# wireframe.status drafted so the gap is visible rather than implied.
+
+platform:
+  code: P13
+  audience: staff
+  formFactor: web
+  shortName: Staff Web
+  name: Staff Web — White-Label CMS
+  surface: staffFacing
+  runtime: reactWeb
+  app: backoffice
+  appStatus: scaffolded
+  offlineCapable: false
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: browser, desktop
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell
+    storeReview: false
+    deviceOwnership: tenant workstation
+    networkAssumption: public internet
+    releaseCadence: weekly
+  screenCount: 20
+  wireframeBoard: wireframes/P13 White-Label CMS.dc.html
+screens:
+- id: CMS-001
+  name: Tenant Workspace
+  module: White Label
+  purpose: Land a tenant somewhere that shows what is live and what is not.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-001
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/tenant-workspace
+    component: apps/backoffice/src/routes/white-label/TenantWorkspaceDetail.tsx
+    status: notStarted
+- id: CMS-002
+  name: Brand Kit
+  module: White Label
+  purpose: Set the things every surface reads.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-002
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/brand-kit
+    component: apps/backoffice/src/routes/white-label/BrandKitDetail.tsx
+    status: notStarted
+- id: CMS-003
+  name: Typography
+  module: White Label
+  purpose: Choose the two typefaces and the scale under them.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-003
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/typography
+    component: apps/backoffice/src/routes/white-label/TypographyDetail.tsx
+    status: notStarted
+- id: CMS-004
+  name: Logo & Assets
+  module: White Label
+  purpose: Hold the marks every surface needs, at the sizes it needs them.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-004
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/logo-assets
+    component: apps/backoffice/src/routes/white-label/LogoAssetsDetail.tsx
+    status: notStarted
+- id: CMS-005
+  name: Theme Editor
+  module: White Label
+  purpose: Tune the theme and watch it apply everywhere at once.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-005
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/theme-editor
+    component: apps/backoffice/src/routes/white-label/ThemeEditorDetail.tsx
+    status: notStarted
+- id: CMS-006
+  name: Component Preview
+  module: White Label
+  purpose: Check the theme against the components that carry it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-006
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/component-preview
+    component: apps/backoffice/src/routes/white-label/ComponentPreviewDetail.tsx
+    status: notStarted
+- id: CMS-007
+  name: Page Builder
+  module: White Label
+  purpose: Assemble a storefront page from blocks the tenant cannot break.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-007
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/page-builder
+    component: apps/backoffice/src/routes/white-label/PageBuilderDetail.tsx
+    status: notStarted
+- id: CMS-008
+  name: Content Blocks
+  module: White Label
+  purpose: Define what a block can and cannot contain.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-008
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/content-blocks
+    component: apps/backoffice/src/routes/white-label/ContentBlocksDetail.tsx
+    status: notStarted
+- id: CMS-009
+  name: Navigation & Menus
+  module: White Label
+  purpose: Decide what appears in the header and the footer.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-009
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/navigation-menus
+    component: apps/backoffice/src/routes/white-label/NavigationMenusDetail.tsx
+    status: notStarted
+- id: CMS-010
+  name: Media Library
+  module: White Label
+  purpose: Hold the imagery, and know where it is used.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-010
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/media-library
+    component: apps/backoffice/src/routes/white-label/MediaLibraryDetail.tsx
+    status: notStarted
+- id: CMS-013
+  name: SEO & Metadata
+  module: White Label
+  purpose: Control how a page looks everywhere it is not the page.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-013
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/seo-metadata
+    component: apps/backoffice/src/routes/white-label/SeoMetadataDetail.tsx
+    status: notStarted
+- id: CMS-011
+  name: Translations
+  module: White Label
+  purpose: Fill in what every language is missing.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-011
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/translations
+    component: apps/backoffice/src/routes/white-label/TranslationsDetail.tsx
+    status: notStarted
+- id: CMS-012
+  name: RTL Preview
+  module: White Label
+  purpose: See the site as an Arabic reader sees it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-012
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/rtl-preview
+    component: apps/backoffice/src/routes/white-label/RtlPreviewDetail.tsx
+    status: notStarted
+- id: CMS-014
+  name: Publishing Workflow
+  module: White Label
+  purpose: Move a change from draft to live, with someone accountable.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-014
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/publishing-workflow
+    component: apps/backoffice/src/routes/white-label/PublishingWorkflowDetail.tsx
+    status: notStarted
+- id: CMS-015
+  name: Version History
+  module: White Label
+  purpose: See what changed and go back if it was wrong.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-015
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/version-history
+    component: apps/backoffice/src/routes/white-label/VersionHistoryDetail.tsx
+    status: notStarted
+- id: CMS-016
+  name: Site Settings
+  module: White Label
+  purpose: The values the whole site inherits from.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-016
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/site-settings
+    component: apps/backoffice/src/routes/white-label/SiteSettingsDetail.tsx
+    status: notStarted
+- id: CMS-017
+  name: Domain & Certificate
+  module: White Label
+  purpose: Point the tenant’s own domain at their site.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-017
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/domain-certificate
+    component: apps/backoffice/src/routes/white-label/DomainCertificateDetail.tsx
+    status: notStarted
+- id: CMS-018
+  name: Consent & Legal
+  module: White Label
+  purpose: Manage the notices every consent is captured against.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-018
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/consent-legal
+    component: apps/backoffice/src/routes/white-label/ConsentLegalDetail.tsx
+    status: notStarted
+- id: CMS-019
+  name: User Access
+  module: White Label
+  purpose: Say who in the tenant may change what.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-019
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/user-access
+    component: apps/backoffice/src/routes/white-label/UserAccessDetail.tsx
+    status: notStarted
+- id: CMS-020
+  name: Change Log
+  module: White Label
+  purpose: See who changed what, before the publish that carried it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  navigation:
+    exitTo: []
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P13 White-Label CMS.dc.html#cms-020
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: backoffice
+    route: /white-label/change-log
+    component: apps/backoffice/src/routes/white-label/ChangeLogDetail.tsx
+    status: notStarted

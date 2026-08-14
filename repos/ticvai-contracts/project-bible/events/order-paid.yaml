@@ -1,0 +1,60 @@
+# order.paid v1 — published by orders
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: order.paid
+version: 1
+publisher: orders
+description: An order has been paid in full. The moment revenue is recognisable and entitlements may
+  be issued.
+aggregate: order
+emittedWhen: OrderStatus pending or partiallyPaid to paid
+payload:
+- field: orderId
+  type: string
+- field: venueId
+  type: uuid
+- field: subjectId
+  type: uuid
+  notes: Null for an anonymous counter sale
+- field: channel
+  type: string
+  notes: pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice
+- field: total
+  type: Money
+- field: lines
+  type: array
+  notes: variantId, quantity, lineTotal
+- field: paidAt
+  type: timestamp
+- field: sequence
+  type: integer
+  notes: Monotonic per order. Ordering is guaranteed within one order, never across orders
+consumers:
+- context: catalogue
+  purpose: Issue entitlements against the paid lines
+  idempotencyKey: orderId + lineId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: ledger
+  purpose: Post revenue and tax
+  idempotencyKey: orderId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: inventory
+  purpose: Deplete stock for physical lines
+  idempotencyKey: orderId + lineId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: marketing
+  purpose: Record purchase behaviour and award loyalty
+  idempotencyKey: orderId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Update the sales read model
+  idempotencyKey: orderId
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: '**The most consumed event in the platform.** Five consumers, three of them critical. A dead-lettered
+  order.paid means a guest paid and holds nothing, so it pages rather than logs.'

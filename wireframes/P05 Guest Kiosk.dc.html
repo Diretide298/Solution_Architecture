@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0a55c7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#1F2937;background:#EEF1F6;padding:44px 40px 90px">
+  <div style="max-width:1880px;margin:0 auto">
+
+    <div style="display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap;border-bottom:1px solid #DCE3ED;padding-bottom:26px">
+      <div style="flex:1;min-width:420px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#0D6EFD;text-transform:uppercase">Platform 05 · Guest Kiosk</div>
+        <h1 style="font-size:38px;font-weight:800;letter-spacing:-.02em;margin:8px 0 10px;line-height:1.05">Guest Kiosk</h1>
+        <p style="font-size:14.5px;line-height:1.65;color:#4B5563;max-width:74ch;margin:0;text-wrap:pretty">Not inventoried, not defined, and white-labelled — so this board starts by asking what a kiosk is for. The answer narrows it hard: a guest standing in a corridor, avoiding a queue, with a card and about ninety seconds of patience. Fourteen screens, card only, and two of them are failures.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+        <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;padding:13px 17px;min-width:100px"><div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:#0D6EFD;font-variant-numeric:tabular-nums">14</div><div style="font-size:10.5px;color:#6B7280;font-weight:600;margin-top:2px">screens</div></div><div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;padding:13px 17px;min-width:100px"><div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:#C02626;font-variant-numeric:tabular-nums">0</div><div style="font-size:10.5px;color:#6B7280;font-weight:600;margin-top:2px">were inventoried</div></div><div style="background:#0C2340;border:1px solid #0C2340;border-radius:14px;padding:13px 17px;min-width:100px"><div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:#00D4C4;font-variant-numeric:tabular-nums">2</div><div style="font-size:10.5px;color:#A9C2DC;font-weight:600;margin-top:2px">are failures</div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;padding:18px 0 4px">
+      <div style="flex:1;min-width:300px;background:#FFFFFF;border:1px solid #E5E7EB;border-left:3px solid #C02626;border-radius:12px;padding:14px 17px"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#C02626;text-transform:uppercase">Card only, and that is a design decision</div><p style="font-size:12.5px;line-height:1.6;color:#4B5563;margin:7px 0 0;text-wrap:pretty">A kiosk has no drawer, no blind count and nobody accountable for a variance. Cash here would put an unreconciled float in a public corridor, so the shift controls that make POS safe simply do not exist.</p></div><div style="flex:1;min-width:300px;background:#FFFFFF;border:1px solid #E5E7EB;border-left:3px solid #96650A;border-radius:12px;padding:14px 17px"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#96650A;text-transform:uppercase">Nobody is standing next to it</div><p style="font-size:12.5px;line-height:1.6;color:#4B5563;margin:7px 0 0;text-wrap:pretty">On every other surface a person resolves a payment stuck in unknown. Here nobody does, so KSK-008 has to call staff rather than time out — and that behaviour is unspecified everywhere in the package.</p></div><div style="flex:1;min-width:300px;background:#FFFFFF;border:1px solid #E5E7EB;border-left:3px solid #0D6EFD;border-radius:12px;padding:14px 17px"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#0D6EFD;text-transform:uppercase">White-labelled, so it reads the CMS</div><p style="font-size:12.5px;line-height:1.6;color:#4B5563;margin:7px 0 0;text-wrap:pretty">The attract loop, the palette and the language list all come from the tenant brand kit on P13. A kiosk is the most public surface a tenant has and the least supervised.</p></div>
+    </div>
+
+    <div style="margin-top:30px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:22px 26px 24px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#0D6EFD;text-transform:uppercase">Flow map</div>
+      <p style="font-size:12.5px;line-height:1.6;color:#6B7280;margin:7px 0 18px;max-width:78ch;text-wrap:pretty">One path, ninety seconds, and two recoveries hanging off it.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:stretch"><div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#0D6EFD;text-transform:uppercase">Sell</div>
+    <div style="border:1px solid #0D6EFD55;border-radius:12px;background:#0D6EFD0A;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="#ksk-001" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-001</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Attract loop</span></a><a href="#ksk-002" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-002</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Language</span></a><a href="#ksk-003" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-003</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">What are you buying</span></a><a href="#ksk-004" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-004</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Choose tickets</span></a><a href="#ksk-005" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-005</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Choose a session</span></a><a href="#ksk-006" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-006</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Review</span></a><a href="#ksk-007" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-007</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Payment</span></a><a href="#ksk-009" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-009</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Ticket issued</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">Eight touches from standing there to holding a ticket.</div>
+    </div></div><div style="flex:1;min-width:190px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#6E7681;text-transform:uppercase">Collect</div>
+    <div style="border:1px solid #E5E7EB;border-radius:12px;background:#F7F9FC;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="#ksk-011" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-011</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Collect a booking</span></a><a href="#ksk-012" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-012</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Booking found</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">Prints media against an existing entitlement; it does not reissue.</div>
+    </div></div><div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#C02626;text-transform:uppercase">When it fails</div>
+    <div style="border:1px solid #C0262655;border-radius:12px;background:#C026260A;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="#ksk-008" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-008</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Payment unresolved</span></a><a href="#ksk-010" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-010</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Print failure</span></a><a href="#ksk-013" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-013</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Call staff</span></a><a href="#ksk-014" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">KSK-014</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Out of service</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">Four screens, and they are the reason this board exists.</div>
+    </div></div></div>
+    </div>
+
+    
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">01 — Sell</div>
+    <p style="font-size:12.5px;line-height:1.6;color:#6B7280;margin:0 0 18px;max-width:82ch;text-wrap:pretty">Every screen here is one decision with large targets. An upsell carousel or an account prompt anywhere in this run sends the guest back to the queue they were avoiding.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:32px"><div id="ksk-001" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-001</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Attract Loop</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      <span style="border:1px solid #0D6EFD55;background:#0D6EFD12;color:#0D6EFD;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">WHITE-LABEL</span>
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Pull somebody standing in a queue out of it.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Attract Loop</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="height:120px;border-radius:10px;background:repeating-linear-gradient(135deg,#E4EAF2,#E4EAF2 7px,#EDF1F7 7px,#EDF1F7 14px);display:flex;align-items:flex-end;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681">venue photography · looping</div><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">Buy tickets here</div><div style="font-size:11.5px;color:#6B7280;line-height:1.5">No queue. Card only. Print or send to your phone.</div><div style="margin-top:auto"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Touch to start</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">attract loop — white-labelled per tenant, so it reads the CMS brand kit</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-002" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-002</a></div>
+  </div><div id="ksk-002" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-002</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Language Select</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Ask the only question that changes everything else.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Language Select</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">Choose a language</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">English</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">العربية</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Русский</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">中文</div></div><div style="border-left:3px solid #C02626;background:#FDF3F3;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#7A1F1F;line-height:1.55">Arabic flips the whole kiosk to RTL, including the numeric pad order and the receipt. CF-42 applies to the kiosk exactly as it does to the app.</div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">setLocale · CF-42</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-003" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-003</a></div>
+  </div><div id="ksk-003" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-003</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">What are you buying</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Get to a product in one touch.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">What are you buying</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Aquarium Entry</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Underwater Zoo</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Combined ticket</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Collect a booking</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">listProducts (kiosk channel) — BO-013 decides what appears here</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-004" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-004</a><a href="#ksk-011" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-011</a></div>
+  </div><div id="ksk-004" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-004</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Choose tickets</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Quantities, with targets a gloved hand can hit.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Choose tickets</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+   <div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;padding:11px 13px;display:flex;align-items:center;gap:11px">
+     <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1F2937">Adult</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B7280;margin-top:2px">AED 80.00</div></div>
+     <div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;font-size:18px;color:#6B7280">−</div><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;min-width:14px;text-align:center">2</span><div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px">+</div></div>
+   </div>
+   <div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;padding:11px 13px;display:flex;align-items:center;gap:11px">
+     <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1F2937">Child</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B7280;margin-top:2px">AED 45.00</div></div>
+     <div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;font-size:18px;color:#6B7280">−</div><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;min-width:14px;text-align:center">1</span><div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px">+</div></div>
+   </div>
+   <div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;padding:11px 13px;display:flex;align-items:center;gap:11px">
+     <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1F2937">Concession</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B7280;margin-top:2px">AED 60.00</div></div>
+     <div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;font-size:18px;color:#6B7280">−</div><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;min-width:14px;text-align:center">0</span><div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px">+</div></div>
+   </div><div style="margin-top:auto"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Continue · AED 205.00</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">listProductVariants — 44 px minimum targets, and these are larger</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-005" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-005</a></div>
+  </div><div id="ksk-005" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-005</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Choose a session</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Pick a time that still has room.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Choose a session</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #96650A55;background:#FDF8EE;border-radius:10px;padding:9px 12px">
+  <span style="font-size:10.5px;font-weight:600;color:#5E4408;line-height:1.4">Places held</span>
+  <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#96650A;font-variant-numeric:tabular-nums;flex:none">4:52</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px"><div style="border:1px solid #E5E7EB;background:#FFFFFF;border-radius:11px;padding:13px 6px;text-align:center;opacity:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#1F2937">10:00</div><div style="font-size:10px;margin-top:3px;color:#6B7280">92 left</div></div><div style="border:1px solid #E5E7EB;background:#FFFFFF;border-radius:11px;padding:13px 6px;text-align:center;opacity:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#1F2937">13:00</div><div style="font-size:10px;margin-top:3px;color:#96650A">8 left</div></div><div style="border:1px solid #0D6EFD;background:#F2F7FF;border-radius:11px;padding:13px 6px;text-align:center;opacity:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#0D6EFD">14:30</div><div style="font-size:10px;margin-top:3px;color:#6B7280">68 left</div></div><div style="border:1px solid #E5E7EB;background:#FFFFFF;border-radius:11px;padding:13px 6px;text-align:center;opacity:0.5"><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#1F2937">16:00</div><div style="font-size:10px;margin-top:3px;color:#6B7280">sold out</div></div><div style="border:1px solid #E5E7EB;background:#FFFFFF;border-radius:11px;padding:13px 6px;text-align:center;opacity:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#1F2937">17:30</div><div style="font-size:10px;margin-top:3px;color:#6B7280">88 left</div></div><div style="border:1px solid #E5E7EB;background:#FFFFFF;border-radius:11px;padding:13px 6px;text-align:center;opacity:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#1F2937">19:00</div><div style="font-size:10px;margin-top:3px;color:#6B7280">44 left</div></div></div><div style="margin-top:auto"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Continue</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">getAvailability · acquireLease</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-006" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-006</a></div>
+  </div><div id="ksk-006" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-006</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Review</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Show what is being bought before money moves.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Review</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Adult ×2</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">AED 160.00</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Child ×1</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">AED 45.00</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Session</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">Sat 2 Aug · 14:30</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Total</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">AED 205.00</span></div></div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">No account, no email required, no upsell carousel. A kiosk transaction that takes more than ninety seconds sends the guest back to the queue they were avoiding.</div><div style="margin-top:auto"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Pay AED 205.00</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">createOrder · evaluatePromotions</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-007" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-007</a></div>
+  </div><div id="ksk-007" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-007</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Payment</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      <span style="border:1px solid #C0262655;background:#C0262612;color:#C02626;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">CARD ONLY</span>
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Take a card, and nothing else.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Payment</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="text-align:center;padding:14px 0"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">Tap, insert or swipe</div><div style="font-size:12px;color:#6B7280;margin-top:6px">AED 205.00</div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">status</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#96650A;font-variant-numeric:tabular-nums">awaitingCard</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Provider</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">networkInternational</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Terminal</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">KSK-02</span></div></div></div><div style="border-left:3px solid #C02626;background:#FDF3F3;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#7A1F1F;line-height:1.55">Card only. A kiosk has no drawer, no blind count and nobody accountable for a variance — cash here would put an unreconciled float in a public corridor.</div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">createPayment · inquirePaymentStatus</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-008" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-008</a><a href="#ksk-009" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-009</a></div>
+  </div><div id="ksk-009" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-009</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Ticket issued</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Get the ticket into the guest’s hand.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Ticket issued</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="text-align:center"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">Take your tickets</div></div><div style="display:flex;gap:11px;align-items:center;justify-content:center;padding:6px 0"><div style="width:84px;height:84px;background:repeating-linear-gradient(45deg,#1F2937,#1F2937 3px,#fff 3px,#fff 6px);flex:none;border-radius:3px"></div><div><div style="font-size:12px;font-weight:800;color:#1F2937">3 tickets</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;margin-top:3px">printing…</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:auto"><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Send to my phone</div><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Done</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">getOrderTickets · issueMedia</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-010" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-010</a></div>
+  </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">02 — Collect an existing booking</div>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:32px"><div id="ksk-011" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-011</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Collect a booking</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Turn a reference into media.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Collect a booking</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">Find your booking</div><div style="display:grid;grid-template-columns:repeat(1,1fr);gap:9px"><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Reference</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">ORD-4471</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Or scan</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">confirmation email QR</div></div></div><div style="margin-top:auto"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Find booking</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">getOrder · issueMedia</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-012" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-012</a></div>
+  </div><div id="ksk-012" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-012</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Booking found</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Confirm it is the right booking, then print.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Booking found</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Order</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">ORD-4471</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Tickets</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">3</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Session</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">Sat 2 Aug · 14:30</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">status</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#0F7B4F;font-variant-numeric:tabular-nums">issued</span></div></div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">The kiosk prints media against an existing entitlement. It does not re-issue and does not void the original — that is BO-026, and it needs a person.</div><div style="margin-top:auto"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Print tickets</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">getOrderTickets</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-009" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-009</a></div>
+  </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">03 — When it fails</div>
+    <p style="font-size:12.5px;line-height:1.6;color:#6B7280;margin:0 0 18px;max-width:82ch;text-wrap:pretty">A paid order with no media, and a card charged with no answer, are the two states a kiosk creates and cannot resolve alone. Both need a person, and the screen has to fetch one.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:32px"><div id="ksk-008" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-008</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Payment unresolved</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      <span style="border:1px solid #C0262655;background:#C0262612;color:#C02626;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">NOBODY IS WATCHING</span>
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Handle the state that has nobody standing next to it.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Payment unresolved</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="border:1px solid #C02626;background:#FDF3F3;border-radius:12px;padding:14px"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">One moment</div><div style="font-size:12px;color:#7A1F1F;margin-top:6px;line-height:1.5">Your card may have been charged. Do not pay again — we are checking with the bank.</div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">status</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#C02626;font-variant-numeric:tabular-nums">unknown</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Checking</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">12s</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">If unresolved</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">staff will be called</span></div></div></div><div style="border-left:3px solid #C02626;background:#FDF3F3;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#7A1F1F;line-height:1.55">On every other surface a person resolves this. On a kiosk nobody does, so the timeout has to call staff rather than time out — and that behaviour is unspecified everywhere.</div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">inquirePaymentStatus</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-009" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-009</a></div>
+  </div><div id="ksk-010" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-010</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Print failure</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Recover when the paper runs out mid-sale.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Print failure</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="border:1px solid #96650A;background:#FDF8EE;border-radius:12px;padding:14px"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">Printer needs attention</div><div style="font-size:12px;color:#5E4408;margin-top:6px;line-height:1.5">Your tickets are paid for and safe. Send them to your phone, or a member of staff can print them.</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:auto"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Send to my phone</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#1F2937;border-radius:12px;padding:16px;font-size:14px;font-weight:800;text-align:center">Call staff</div></div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">A paid order with no media is the kiosk failure that matters. The order exists; only delivery failed</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-013" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-013</a></div>
+  </div><div id="ksk-013" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-013</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Call staff</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Get a human, without leaving the kiosk.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Call staff</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="text-align:center;padding:10px 0"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">Someone is coming</div><div style="font-size:12px;color:#6B7280;margin-top:6px">Called at 14:12 · Gate 3 desk</div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Reason</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">print failure</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Order</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">ORD-4471</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Kiosk</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">KSK-02</span></div></div></div><div style="border-left:3px solid #0D6EFD;background:#F2F7FF;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#12406E;line-height:1.55">The call carries the context. A staff member who arrives knowing the order reference resolves this in thirty seconds; one who arrives blind does not.</div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">callStaff — lands as a task on EMP-004</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-014" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-014</a></div>
+  </div><div id="ksk-014" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">KSK-014</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Out of service</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Fail in a way that does not strand anybody.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:20px;overflow:hidden;background:#FFFFFF;min-height:430px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.11)">
+    <div style="flex:none;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6B7280"><span>9:41</span><span>KSK-02</span></div>
+    <div style="flex:none;padding:9px 14px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#1F2937">Out of service</div></div>
+      
+    </div>
+    <div style="flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:9px"><div style="border:1px solid #C02626;background:#FDF3F3;border-radius:12px;padding:14px"><div style="font-size:19px;font-weight:800;color:#1F2937;line-height:1.2">This kiosk is out of service</div><div style="font-size:12px;color:#7A1F1F;margin-top:6px;line-height:1.5">Please use the ticket desk at Gate 3, or buy on your phone at tickets.gulfparks.ae</div></div><div style="border-left:3px solid #C02626;background:#FDF3F3;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#7A1F1F;line-height:1.55">Out of service has to name where to go instead. A blank screen in a corridor sends people to the back of the queue they were trying to skip.</div></div>
+    
+  </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">health check · maintenance state</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#ksk-001" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">KSK-001</a></div>
+  </div></div>
+
+    <div style="margin-top:54px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:26px 28px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#0D6EFD;text-transform:uppercase">Handed on</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px;margin-top:16px">
+        <div><div style="font-size:14.5px;font-weight:800">It had to be inventoried before it could be designed</div><p style="font-size:12.5px;line-height:1.65;color:#4B5563;margin:6px 0 0;text-wrap:pretty">The kiosk was counted at zero. These fourteen are a proposal for the inventory, derived from the same order, payment and access contracts the other surfaces use.</p></div><div><div style="font-size:14.5px;font-weight:800">Nothing here is new</div><p style="font-size:12.5px;line-height:1.65;color:#4B5563;margin:6px 0 0;text-wrap:pretty">Products, availability, leases, payment and media issuance all exist. The kiosk is a different arrangement of them with much larger targets and no operator.</p></div><div><div style="font-size:14.5px;font-weight:800">Two open questions</div><p style="font-size:12.5px;line-height:1.65;color:#4B5563;margin:6px 0 0;text-wrap:pretty">What a kiosk does when a payment stays unknown and nobody is watching, and whether an unattended device may print media for a booking it cannot verify the holder of.</p></div>
+      </div></div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1400}}"></script>
+</body>
+</html>

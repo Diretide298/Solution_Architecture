@@ -1,9 +1,9 @@
-# partner-portal — screen and route manifest
-# Derived from screens/*.yaml by tools/link-frontend.py. Do not hand-edit.
-# Routes and component paths are conventional; a route that exists in code but
-# not here, or here but not in code, is caught by tools/check-frontend.py.
+# partner-portal — partner · web
+# Derived from screens/*.yaml. Do not hand-edit.
 
 app: partner-portal
+audience: partner
+formFactor: web
 status: not scaffolded
 runtime: reactWeb
 offlineCapable: false
@@ -11,7 +11,7 @@ directions:
 - ltr
 - rtl
 platforms:
-- P10 Partner & Reseller Portal
+- P10 Partner Web — Reseller Portal
 packages:
 - design-tokens
 - ui
@@ -39,7 +39,7 @@ screens:
 - id: PTR-002
   name: Partner Dashboard
   route: /general/partner-dashboard
-  component: apps/partner-portal/src/routes/general/PartnerDashboardDashboard.tsx
+  component: apps/partner-portal/src/routes/general/PartnerDashboard.tsx
   wave: 2
   status: notStarted
 - id: PTR-003

@@ -281,6 +281,7 @@ paths:
     post:
       operationId: runReport
       x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
       summary: Run a report
@@ -635,6 +636,7 @@ paths:
 
     post:
       operationId: createDashboard
+      x-ticvai-config-scope: tenant
       summary: Create a dashboard
       description: >
         Tiles reference report definitions. Each tile carries its own refresh interval, and
@@ -642,7 +644,7 @@ paths:
         every thirty seconds is a load problem disguised as a convenience.
       tags: [dashboard]
       x-ticvai-permission: REPORT_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -694,10 +696,11 @@ paths:
 
     put:
       operationId: updateDashboard
+      x-ticvai-config-scope: tenant
       summary: Update a dashboard
       tags: [dashboard]
       x-ticvai-permission: REPORT_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       requestBody:

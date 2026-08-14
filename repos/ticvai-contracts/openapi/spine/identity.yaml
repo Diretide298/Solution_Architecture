@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 7
+  x-ticvai-screen-count: 8
   x-ticvai-tier: spine
   x-ticvai-module: "17 — Guest Mobile App & Branding (auth) + cross-cutting staff auth"
   x-ticvai-requirements: 107
@@ -613,6 +613,8 @@ paths:
   /auth/guest/otp:
     post:
       operationId: requestGuestOtp
+      x-ticvai-consumed-by:
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Request a one-time code
       description: >
         Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source
@@ -1013,6 +1015,7 @@ paths:
 
     put:
       operationId: setSsoConfig
+      x-ticvai-config-scope: tenant
       summary: Configure an identity provider
       description: >
         Per tenant. A tenant's Azure AD is theirs, not TICVAI's, and credentials are stored

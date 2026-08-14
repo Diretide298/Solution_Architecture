@@ -5,6 +5,8 @@
 // than by indentation alone. Scalars are single rows. Folding a block collapses
 // it to its header with a count of what is hidden.
 
+import { enableTouch } from './touch.js';
+
 const KIND_COLORS = {
   map: '#60a5fa',
   seq: '#fbbf24',
@@ -416,6 +418,45 @@ export class StructureTree {
     return { x: x * this.transform.k + this.transform.x, y: y * this.transform.k + this.transform.y };
   }
 
+  /**
+   * What a click does, in canvas-relative pixels. It lives here rather than in
+   * the mouseup handler so a tap runs exactly the same code — resolving a row,
+   * following a $ref and folding a block are three different outcomes, and none
+   * of them is worth writing twice.
+   */
+  _selectAt(sx, sy) {
+    const entry = this.entryAt(sx, sy);
+    if (!entry) return false;
+
+    // a click on a $ref row follows it rather than folding the block
+    if (this.layoutMode === 'tree' && entry.rows?.length) {
+      const world = (sy - this.transform.y) / this.transform.k;
+      const index = Math.floor((world - entry.y - BLOCK_HEAD) / FIELD_H);
+      const row = index >= 0 && index < entry.rows.length ? entry.rows[index] : null;
+      if (row) {
+        this.selectedPath = row.path;
+        if (row.kind === 'ref') this.onRef(row);
+        this.onSelect(row);
+        this.draw();
+        return true;
+      }
+    }
+
+    const node = entry.node;
+    this.selectedPath = node.path;
+
+    if (node.kind === 'ref') {
+      this.onRef(node);
+    } else if (node.children.length) {
+      if (this.collapsed.has(node.path)) this.collapsed.delete(node.path);
+      else this.collapsed.add(node.path);
+      this.layout();
+    }
+    this.onSelect(node);
+    this.draw();
+    return true;
+  }
+
   entryAt(sx, sy) {
     const { k } = this.transform;
     const x = (sx - this.transform.x) / k;
@@ -586,7 +627,7 @@ export class StructureTree {
 
       if (k < 0.3) continue; // text would be illegible
 
-      const fontSize = Math.min(12.5, Math.max(6.5, 11.5 * k));
+      const fontSize = Math.max(6.5, 11.5 * k);
       const bandCentre = p.y + ((entry.children.length ? HEADER_H : ROW_H) / 2) * k;
       let cursor = p.x + 8 * k;
 
@@ -756,13 +797,13 @@ export class StructureTree {
 
       // ▸ / ▾ so it is obvious which blocks open, and which way they are set
       if (node.children.length) {
-        ctx.font = `${Math.min(11, Math.max(6, 10 * k))}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.font = `${Math.max(6, 10 * k)}px ui-sans-serif, system-ui, sans-serif`;
         ctx.fillStyle = color;
         ctx.fillText(entry.collapsed ? '▸' : '▾', textLeft, titleY);
         textLeft += 10 * k;
       }
 
-      ctx.font = `600 ${Math.min(12, Math.max(6, 11 * k))}px ui-sans-serif, system-ui, sans-serif`;
+      ctx.font = `600 ${Math.max(6, 11 * k)}px ui-sans-serif, system-ui, sans-serif`;
       ctx.fillStyle = selected || isHit ? accent : text;
       ctx.fillText(fit(ctx, label, p.x + w * 0.55 - textLeft), textLeft, titleY);
 
@@ -773,7 +814,7 @@ export class StructureTree {
       else detail = node.kind === 'seq' ? `${node.children.length} items` : `${node.children.length} keys`;
 
       if (detail) {
-        ctx.font = `${Math.min(10.5, Math.max(5, 9.5 * k))}px ui-monospace, Menlo, monospace`;
+        ctx.font = `${Math.max(5, 9.5 * k)}px ui-monospace, Menlo, monospace`;
         ctx.fillStyle = faint;
         const detailY = rowList.length ? p.y + (BLOCK_HEAD / 2) * k : p.y + h * 0.72;
         ctx.textAlign = 'right';
@@ -842,35 +883,7 @@ export class StructureTree {
       if (!wasClick) return;
 
       const rect = canvas.getBoundingClientRect();
-      const entry = this.entryAt(e.clientX - rect.left, e.clientY - rect.top);
-      if (!entry) return;
-
-      // a click on a $ref row follows it rather than folding the block
-      if (this.layoutMode === 'tree' && entry.rows?.length) {
-        const world = (e.clientY - rect.top - this.transform.y) / this.transform.k;
-        const index = Math.floor((world - entry.y - BLOCK_HEAD) / FIELD_H);
-        const row = index >= 0 && index < entry.rows.length ? entry.rows[index] : null;
-        if (row) {
-          this.selectedPath = row.path;
-          if (row.kind === 'ref') this.onRef(row);
-          this.onSelect(row);
-          this.draw();
-          return;
-        }
-      }
-
-      const node = entry.node;
-      this.selectedPath = node.path;
-
-      if (node.kind === 'ref') {
-        this.onRef(node);
-      } else if (node.children.length) {
-        if (this.collapsed.has(node.path)) this.collapsed.delete(node.path);
-        else this.collapsed.add(node.path);
-        this.layout();
-      }
-      this.onSelect(node);
-      this.draw();
+      this._selectAt(e.clientX - rect.left, e.clientY - rect.top);
     });
 
     // Double-click folds a whole branch shut again. Single-click toggles one
@@ -911,6 +924,19 @@ export class StructureTree {
       this.transform.y = e.offsetY - wy * next;
       this.draw();
     }, { passive: false });
+
+    // Fingers. This tree projects from its top-left corner rather than from the
+    // middle of the canvas like the other renderers, and it has no toWorld() of
+    // its own, so the inverse goes in explicitly.
+    enableTouch(canvas, this, {
+      min: 0.1,
+      max: 3,
+      toWorld: (sx, sy) => ({
+        x: (sx - this.transform.x) / this.transform.k,
+        y: (sy - this.transform.y) / this.transform.k,
+      }),
+      onTap: (x, y) => this._selectAt(x, y),
+    });
   }
 
   destroy() {

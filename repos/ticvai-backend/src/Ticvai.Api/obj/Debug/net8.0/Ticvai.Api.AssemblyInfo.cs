@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ticvai.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f1414ee74f90e75bd9e753bda9d8ae3b4f68c03")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0bfdf5bd30b9aecb69fd783a32a7261143618974")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ticvai.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ticvai.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

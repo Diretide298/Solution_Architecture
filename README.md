@@ -2,53 +2,67 @@
 
 Generated 14 August 2026
 
-**587 API operations · 213 tables designed, 27 written · 102 screens defined · 5 flows**
+**654 API operations · 230 tables designed · 347 screens · 39 state models · 16 events · 18 ADRs**
+
+**Conflicts: 25 open, 41 closed, 0 blocking.**
 
 ---
+
+## Start here
+
+| | |
+|---|---|
+| **`COVERAGE.md`** | What is here and what is not, against the whole build. Every figure counted from the files |
+| **`conflict-status.md`** | Every conflict and its state, one line each |
+| **`wireframes/TICVAI Wireframe Boards.dc.html`** | **12 boards, 347 screens, one visual system.** Open in a browser |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | 230 tables, 2,026 columns, eight sheets |
+| **`handoff/screen-index.json`** | Every screen joined to its board, operations, service and tables |
+| **`handoff/services-and-procedures.md`** | Where each operation gets its data, 22 services, ten stored procedures |
+| **`handoff/storage-design.md`** | The 30% of a migration that does not derive from the contracts |
+| **`docs/active/design-plan.md`** | Boards, forms, and what combines |
 
 ## Folders
 
 | | |
 |---|---|
-| **`contracts/`** | 587 operations across 22 OpenAPI files. `spine/`, `satellite/`, `shared/` |
-| **`backend/`** | 4 SQL migrations, 27 tables. `MIGRATIONS.md` explains the conventions |
-| **`screens/`** | 102 screen definitions across 5 platforms, plus the schema and component library |
-| **`flows/`** | 5 user flows, each traced across screens with its unhappy paths |
-| **`frontend/`** | Per-app route and screen manifests, generated from the screens |
-| **`docs/`** | 16 ADRs, registers, architecture, the client agenda |
-| **`handoff/`** | API list, page inventory, schema reference workbook, deployment view |
-| **`tools/`** | Five validators. Run them |
-| **`sources/`** | Client documents — 7 MoMs, the matrix, designs |
-| **`repos/`** | The six git repositories. This is what gets pushed |
+| `contracts/` | 654 operations across 22 files |
+| `wireframes/` | **12 platform boards, 347 screens** |
+| `screens/` | 347 definitions across twelve platforms |
+| `flows/` | 12 user journeys with their unhappy paths |
+| `states/` · `events/` | 39 state models · 16 domain events, cross-checked |
+| `handoff/` | Schema workbook · storage design · integration register · artefact audit · tooltips |
+| `docs/` | 18 ADRs, registers, decisions |
+| `tools/` | **Six validators** and two generators |
+| `repos/` | The six git repositories |
+
+    python3 tools/check-screens.py    check-frontend    check-flows
+    python3 tools/check-states.py     check-config-scope   check-wireframes
+    python3 tools/build-cf-index.py   link-screens-contracts
 
 ---
 
-## Run the validators
+## Two levels of done
 
-    python3 tools/check-migrations.py          # DDL conventions, RLS, level typing
-    python3 tools/check-screens.py             # component vocabulary, operationIds, states
-    python3 tools/check-frontend.py            # apps, routes, component paths
-    python3 tools/check-flows.py               # flows against screens and contracts
-    python3 tools/link-screens-contracts.py    # rebuild the two-way linkage
+**Every screen inventoried is now defined — 347 of 347.** 167 arrived on 14 August,
+extracted from the wireframe boards, which carry real purposes and real navigation.
 
-They expect to run from the repo root. Each has found something real — between them they
-caught nine defects on 14 August that had all previously reported clean.
+**67 have their states written.** That is the number that matters. A screen with a
+purpose and a route can be drawn; it cannot be built from. The states are where the behaviour
+lives, and on the sixteen scanner screens — the surface where offline matters most — the
+offline state is `TODO`.
+
+The same distinction runs through the flows: 8 written of roughly sixty, and between them
+they have found one missing screen, four missing operations and **one missing contract** —
+a task, which the employee app's fifty screens are built around and which appears in none of
+642 operations (CF-71).
 
 ---
 
-## What changed on 14 August
+## No migrations, deliberately
 
-| | |
-|---|---|
-| **Three duplicate operationIds** | `getAsset`, `updateAsset`, `listBundles`. Media moved to `/media` — in a venue "asset" means a ride, not a JPEG |
-| **`platform.outlet`** | Referenced nine times by F&B, retail and games. Defined nowhere |
-| **`platform.tenant`** | A cell could not resolve its own tenant without a cross-database call it is not permitted to make |
-| **`marketing.guest_device`** | Push notifications had nowhere to land |
-| **Level-typed scope FKs** | `venue_id` was a bare uuid on 48 tables. Nothing stopped it pointing at a workstation |
-| **`platform.outbox` RLS** | Carried venue event payloads with no policy |
-| **Navigation** | 10 screens had it. Now 102 |
-| **F02 corrected** | The seated flow skipped guest details |
-| **Conflict register rebuilt** | CF-27 appeared twice, two open items were filed as closed, and six were never written in — including CF-37 |
+The SQL was removed. **The schema workbook is the working artefact** while the design settles.
+Writing DDL against a moving design produces migrations that must be rewritten, and a
+forward-only migration cannot be rewritten.
 
 ---
 
@@ -56,17 +70,15 @@ caught nine defects on 14 August that had all previously reported clean.
 
 | | Done | Total |
 |---|---|---|
-| Requirements mapped | 3,184 | 3,184 |
-| **API operations** | **587** | — |
-| Tables designed | 213 | — |
-| **Tables written as DDL** | **27** | 213 |
-| Screens inventoried | 305 | — |
-| Screens defined | 102 | 305 |
-| Flows | 5 | ~60 |
+| **API operations** | **654** | — |
+| Requirements covered | 2,842 | 3,184 |
+| Configuration levels decided | 321 | 321 |
+| Tables designed | 230 | — |
+| Tables written | 0 | deliberate |
+| **Screens defined** | **347** | **347** |
+| **Screens specified** | **67** | 347 |
+| Operations reaching a screen | 154 | 654 |
+| Flows | 12 | ~60 |
 | Sprint 0 | 0 | 11 |
 
-**Nothing has been executed.** No `dotnet build`, no `psql`, no `pnpm install`, no pipeline
-run. Everything validates structurally. The first real run will find things — every check
-added today found something the previous one had missed.
-
-**Blocking conflicts: 0.** Open: 14, of which 7 need a client decision. `docs/registers/conflicts.md`.
+**Nothing has been executed.** No build, no `psql`, no pipeline.

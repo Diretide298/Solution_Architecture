@@ -12,6 +12,8 @@ What this checks is the conventions a parser cannot know:
   * every migration registers itself in platform.schema_version
   * every migration has a ROLLBACK section
   * every referenced schema exists by the time it is used
+  * every foreign key points at a table some migration actually creates
+  * every Postgres enum holds the same values as its contract counterpart
   * money columns are numeric(18,4) and carry currency and scale
   * ULID columns are char(26)
   * no DROP or destructive ALTER outside a rollback block
@@ -22,7 +24,11 @@ import re
 import sys
 from pathlib import Path
 
-SCRIPTS = Path(__file__).resolve().parents[1] / "src/Ticvai.Migrations/Scripts"
+ROOT = Path(__file__).resolve().parents[1]
+# Ships in two layouts: inside the backend repo, and flat in the delivery package.
+SCRIPTS = ROOT / "src/Ticvai.Migrations/Scripts"
+if not SCRIPTS.exists():
+    SCRIPTS = ROOT / "backend"
 
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
@@ -66,6 +72,7 @@ def strip_comments(sql: str) -> str:
     return stripped
 
 
+CREATED: set[str] = set()   # every table created anywhere in the migration set
 ALTERED: set[str] = set()   # tables given a level-typed FK by a later ALTER TABLE
 EXEMPT = {
     # Written inside the same transaction as the state change it records. A foreign key
@@ -73,6 +80,69 @@ EXEMPT = {
     # copied from a row that was already validated.
     "platform.outbox",
 }
+
+
+CONTRACTS = Path(__file__).resolve().parents[1] / "../ticvai-contracts/openapi"
+if not CONTRACTS.exists():
+    CONTRACTS = Path(__file__).resolve().parents[2] / "ticvai-contracts/openapi"
+
+# A Postgres enum and its contract counterpart must hold the same values. Nothing checked
+# this until 14 August, when platform.device_kind was found with nine values the API did not
+# have and the API with six the database did not — and platform.scope_level had
+# 'sub_department' in the DDL against 'subDepartment' in the contract, which is a hierarchy
+# level that does not resolve.
+ENUM_PAIRS = {
+    "platform.device_kind": ("tenancy", "DeviceKind"),
+    "platform.outlet_kind": ("tenancy", "OutletKind"),
+    "platform.scope_level": ("tenancy", "ScopeLevel"),
+    "fnb.delivery_location_kind": ("fnb", "DeliveryLocationKind"),
+}
+
+
+def check_enums(files: list[Path]) -> None:
+    if not CONTRACTS.exists():
+        WARNINGS.append("contracts not found alongside — enum comparison skipped")
+        return
+    try:
+        import yaml as _yaml
+    except ImportError:
+        return
+    declared: dict[str, set[str]] = {}
+    for f in list((CONTRACTS / "spine").glob("*.yaml")) + list((CONTRACTS / "satellite").glob("*.yaml")):
+        doc = _yaml.safe_load(f.read_text())
+        for k, v in ((doc.get("components") or {}).get("schemas") or {}).items():
+            if isinstance(v, dict) and "enum" in v:
+                declared[f"{f.stem}.{k}"] = set(v["enum"])
+
+    body = " ".join(split_rollback(f.read_text())[0] for f in files)
+    for name, defn in re.findall(r"CREATE TYPE ([\w.]+) AS ENUM \(([^)]+)\)", body, re.S):
+        pair = ENUM_PAIRS.get(name)
+        if not pair:
+            continue
+        key = f"{pair[0]}.{pair[1]}"
+        if key not in declared:
+            ERRORS.append(f"enum {name} names contract schema {key}, which does not exist")
+            continue
+        values = set(re.findall(r"'(\w+)'", defn))
+        if values != declared[key]:
+            only_db = sorted(values - declared[key])
+            only_api = sorted(declared[key] - values)
+            ERRORS.append(
+                f"enum {name} disagrees with {key} — "
+                f"database only {only_db}, contract only {only_api}")
+
+
+def collect_created(files: list[Path]) -> None:
+    """Every table the set creates, so a reference to a missing one can be caught.
+
+    Added after four foreign keys were found pointing at pii.subject, a table that was
+    declared in a rollback and never created. psql would have failed on the first one;
+    this checker reported PASS, because it verified conventions and never verified that
+    a referenced table exists.
+    """
+    for f in files:
+        body = split_rollback(f.read_text())[0]
+        CREATED.update(re.findall(r"CREATE TABLE (?:IF NOT EXISTS )?([\w.]+)", body))
 
 
 def collect_alters(files: list[Path]) -> None:
@@ -187,6 +257,8 @@ def main() -> int:
         print("no migrations found", file=sys.stderr)
         return 1
 
+    collect_created(files)
+    check_enums(files)
     collect_alters(files)
     known: set[str] = set()
     print(f"checking {len(files)} migration(s) in {SCRIPTS}\n")

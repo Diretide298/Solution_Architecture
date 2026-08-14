@@ -1,0 +1,119 @@
+# F11 — Guest orders food to a lounger
+#
+# Built from the client's own description on 14 August — the beach seat with a QR
+# code. Every step here was contracted the same day.
+#
+# Validated by tools/check-flows.py.
+
+id: F11
+name: Guest orders food to a lounger
+actor: guest
+capability: C05
+wave: 2
+frequency: constant
+criticality: convenience
+platforms:
+- P02 Guest App
+- P08 Staff Web
+offlineBehaviour: 'The guest half needs a network — an order nobody received is worse than a queue.
+  The kitchen half tolerates a drop: tickets already accepted keep moving.'
+trigger:
+  description: A guest on a sunbed opens the app, scans the QR on their lounger, orders, and a runner
+    brings it. Described in detail by the client on 14 August.
+  entryScreen: GST-030
+  entryPoints:
+  - QR on the lounger
+  - Dining tab in the app
+  - Push notification offer
+steps:
+- step: 1
+  screen: GST-030
+  action: Scans the QR on the lounger
+  operations:
+  - claimLocationSession
+  outcome: The platform knows where they are. **Codes rotate**, so a photographed QR does not order
+    to someone else's seat next week
+- step: 2
+  screen: GST-031
+  action: Browses the menu
+  operations:
+  - getGuestMenu
+  outcome: Allergens are always present — 4.8.9
+- step: 3
+  screen: GST-032
+  action: Builds an order
+  operations:
+  - createGuestFnbOrder
+  outcome: Priced with any membership benefit applied
+- step: 4
+  screen: GST-033
+  action: Pays
+  operations:
+  - createPayment
+  outcome: Card or wallet
+- step: 5
+  screen: BO-020
+  action: Kitchen accepts and prepares
+  operations:
+  - acceptFnbOrder
+  - setKitchenTicketStatus
+  outcome: A ticket appears at the right station
+- step: 6
+  screen: GST-034
+  action: Tracks the order
+  operations:
+  - getGuestOrderStatus
+  outcome: Nine states, and the guest sees the ones that matter
+- step: 7
+  screen: BO-021
+  action: Runner delivers to the lounger
+  operations:
+  - recordOrderHandover
+  outcome: Delivered, not merely served
+branches:
+- at: 1
+  condition: QR is damaged or unreadable
+  behaviour: Manual location entry by lounger number. Every location has a human-readable code for this
+    reason.
+  severity: recoverable
+  resolvedBy: Guest
+- at: 1
+  condition: Location session expired
+  behaviour: Re-scan. Sessions expire so that yesterday's guest cannot order to today's lounger.
+  severity: recoverable
+  resolvedBy: Guest
+- at: 5
+  condition: Outlet refuses the order
+  behaviour: Past last orders, out of an ingredient, too far behind. **Refused immediately rather than
+    after ten minutes** — `cancelFnbOrder` before acceptance needs no approval for exactly this.
+  severity: recoverable
+  resolvedBy: Automatic, guest refunded
+- at: 5
+  condition: Item unavailable after acceptance
+  behaviour: Partial cancellation with a refund for the line. The rest is prepared.
+  severity: requiresStaff
+  resolvedBy: Outlet
+- at: 7
+  condition: Runner cannot find the guest
+  behaviour: The guest moved. The order is held at the outlet and the guest is notified to collect —
+    **not thrown away and not left in the sun**.
+  severity: requiresStaff
+  resolvedBy: Runner
+- at: 6
+  condition: Guest loses signal mid-order
+  behaviour: The order is already placed. Status updates resume on reconnect, and the food arrives regardless.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 4
+  condition: Payment unresolved
+  behaviour: Held, inquired, and the kitchen is not told until it resolves. Preparing food against a
+    payment that may not exist is a loss nobody records.
+  severity: recoverable
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Delivered to the lounger
+- state: deferred
+  description: Held at the outlet for collection
+- state: abandoned
+  description: Cancelled before acceptance and refunded

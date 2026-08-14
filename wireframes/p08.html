@@ -1,0 +1,69 @@
+<!doctype html><meta charset=utf-8><title>Staff Web — Venue Back Office</title><style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f4f5;color:#18181b;
+     font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+a{color:#18181b}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 22px 60px}
+h1{font-size:20px;margin:0 0 4px;font-weight:650}
+h2{font-size:15px;margin:34px 0 10px;font-weight:650}
+.sub{color:#71717a;margin:0 0 22px;max-width:70ch}
+.note{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #a1a1aa;
+      padding:10px 13px;margin:0 0 22px;max-width:74ch;color:#3f3f46}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #e4e4e7;padding:13px;text-decoration:none;display:block}
+.card:hover{border-color:#a1a1aa}
+.card h3{margin:0 0 3px;font-size:13px;font-weight:650}
+.card .m{color:#71717a;font-size:11px}
+
+/* the frame */
+.frame{background:#fff;border:1px solid #d4d4d8;margin:0 0 26px}
+.frame .bar{background:#fafafa;border-bottom:1px solid #e4e4e7;padding:7px 11px;
+            font-size:11px;color:#52525b;display:flex;justify-content:space-between}
+.frame .body{padding:0}
+.rg{border-bottom:1px dashed #e4e4e7;padding:11px 13px}
+.rg:last-child{border-bottom:none}
+.rg-l{font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#a1a1aa;margin-bottom:7px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-start}
+.el{background:#f4f4f5;border:1px solid #e4e4e7;flex:1;min-width:150px;
+    display:flex;align-items:center;justify-content:center;color:#71717a;font-size:11px;
+    text-align:center;padding:5px}
+.el.sm{flex:0 0 auto;min-width:104px}
+.el.btn-primary{background:#3f3f46;color:#fff;border-color:#3f3f46}
+.el.btn-danger{background:#fff;border-color:#a1a1aa;color:#52525b}
+.el.banner{background:#fafafa;border-style:dashed}
+.el.scan,.el.seatmap,.el.board,.el.preview{background:repeating-linear-gradient(45deg,#fafafa,#fafafa 7px,#f4f4f5 7px,#f4f4f5 14px)}
+.tip{color:#71717a;font-size:10.5px;margin:4px 0 0;max-width:66ch;font-style:italic}
+.el-full{flex:1 1 100%;min-width:0}
+table.wf{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e4e4e7}
+table.wf th{background:#fafafa;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+            color:#71717a;text-align:left;padding:6px 8px;border-bottom:1px solid #e4e4e7;font-weight:600}
+table.wf td{padding:6px 8px;border-bottom:1px solid #f4f4f5;color:#52525b;font-size:11.5px}
+.src{font-size:10px;color:#a1a1aa;margin:4px 0 0}
+.fields{background:#fff;border:1px solid #e4e4e7}
+.fld{display:flex;justify-content:space-between;padding:6px 9px;border-bottom:1px solid #f4f4f5;font-size:11.5px}
+.fld:last-child{border-bottom:none}
+.fld span{color:#71717a}.fld i{font-style:normal;color:#3f3f46}
+.fld.tot{background:#fafafa;font-weight:650}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.cardbox{background:#fff;border:1px solid #e4e4e7}
+.el.tile{flex:1 1 130px;min-width:130px;flex-direction:column;gap:2px;padding:11px;min-height:64px}
+.el.tile b{font-size:19px;color:#3f3f46;font-weight:650}
+.el.tile span{font-size:10px;color:#a1a1aa}
+.el.field{justify-content:space-between;padding:9px 11px}
+.el.field i{font-style:normal;color:#a1a1aa;font-size:10.5px}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px}
+.tilebox{background:#fff;border:1px solid #e4e4e7;padding:15px 8px;text-align:center;
+         font-size:11px;color:#52525b}
+
+table.st{border-collapse:collapse;width:100%;background:#fff;border:1px solid #e4e4e7;margin:0 0 22px}
+table.st td,table.st th{border:1px solid #e4e4e7;padding:6px 9px;text-align:left;vertical-align:top;font-size:12px}
+table.st th{background:#fafafa;font-weight:650;width:104px;color:#52525b}
+.pill{display:inline-block;background:#f4f4f5;border:1px solid #e4e4e7;padding:1px 7px;
+      font-size:10.5px;color:#52525b;margin:0 4px 4px 0}
+.pill.off{background:#3f3f46;color:#fff;border-color:#3f3f46}
+.crumb{font-size:11px;color:#71717a;margin:0 0 16px}
+.flowstep{display:flex;gap:11px;align-items:flex-start;margin:0 0 9px}
+.flowstep .n{background:#3f3f46;color:#fff;width:21px;height:21px;flex:0 0 21px;
+             display:flex;align-items:center;justify-content:center;font-size:11px}
+.br{color:#71717a;font-size:11.5px;margin:2px 0 0 32px}
+</style><div class=wrap><p class=crumb><a href='index.html'>index</a></p><h1>Staff Web — Venue Back Office</h1><p class=sub>staff on web, app <code>backoffice</code>. 6 screens.</p><div class=grid><a class=card href='screens/bo-001.html'><h3>BO-001 Queue Directory</h3><div class=m>Queue Management · wave 1 · notStarted</div></a><a class=card href='screens/bo-002.html'><h3>BO-002 Queue Configuration</h3><div class=m>Queue Management · wave 1 · notStarted</div></a><a class=card href='screens/bo-003.html'><h3>BO-003 Queue Integration Setup</h3><div class=m>Queue Management · wave 1 · notStarted</div></a><a class=card href='screens/bo-004.html'><h3>BO-004 Manual Wait Time Entry</h3><div class=m>Queue Management · wave 1 · notStarted</div></a><a class=card href='screens/bo-005.html'><h3>BO-005 Queue Monitor</h3><div class=m>Queue Management · wave 2 · notStarted</div></a><a class=card href='screens/bo-006.html'><h3>BO-006 Parking Configuration</h3><div class=m>Parking · wave 2 · notStarted</div></a></div><p class=crumb style='margin-top:40px'><a href='index.html'>index</a></p></div>

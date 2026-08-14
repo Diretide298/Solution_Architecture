@@ -16,6 +16,10 @@ Four checks, in order of how often they catch something:
      offline-capable. The empty state is the one that reaches production unconsidered.
 
   4. Navigation resolves — every entryFrom and exitTo points at a screen that exists.
+  5. Platform naming holds together — audience, form factor, surface and runtime must agree,
+     and a POS or handheld must be offline-capable.
+  5. Platform naming holds together — audience, form factor, surface and runtime must agree,
+     and a POS or handheld must be offline-capable.
 
 Run: python3 tools/check-screens.py
 """
@@ -59,9 +63,50 @@ def load_operation_ids() -> set[str]:
     return ops
 
 
+# A platform's name should say what the thing is before what it is for: audience and form
+# factor lead, purpose follows. "Guest App — Mobile", not "Guest Mobile App". These maps exist
+# so the four fields cannot drift apart — surface and runtime are the older vocabulary and
+# must keep agreeing with the newer one.
+SURFACE_FOR = {"guest": "guestFacing", "staff": "staffFacing",
+               "platformAdmin": "platformAdmin", "partner": "partner", "public": "public"}
+RUNTIME_FOR = {"web": {"reactWeb"}, "mobileApp": {"reactNative"},
+               "kiosk": {"reactWeb", "embedded"},
+               "posTerminal": {"reactNativeTablet", "electron"}, "handheld": {"reactNative"}}
+OFFLINE_REQUIRED = {"posTerminal", "handheld"}
+
+
+def check_platform(name: str, p: dict) -> None:
+    for k in ("code", "audience", "formFactor", "shortName", "name"):
+        if k not in p:
+            ERRORS.append(f"{name}: platform is missing '{k}'")
+            return
+
+    if not p["name"].startswith(p["shortName"]):
+        ERRORS.append(f"{name}: name '{p['name']}' does not lead with shortName "
+                      f"'{p['shortName']}' — audience and form factor come first")
+
+    expected = SURFACE_FOR.get(p["audience"])
+    if expected and p.get("surface") != expected:
+        ERRORS.append(f"{name}: surface '{p.get('surface')}' disagrees with audience "
+                      f"'{p['audience']}' (expected '{expected}')")
+
+    allowed = RUNTIME_FOR.get(p["formFactor"], set())
+    if allowed and p.get("runtime") not in allowed:
+        ERRORS.append(f"{name}: runtime '{p.get('runtime')}' is not valid for formFactor "
+                      f"'{p['formFactor']}'")
+
+    if p["formFactor"] in OFFLINE_REQUIRED and not p.get("offlineCapable"):
+        ERRORS.append(f"{name}: a {p['formFactor']} must be offlineCapable — a gate that "
+                      "cannot validate without a network is a queue (ADR-0013)")
+
+    if p["formFactor"] == "web" and p.get("offlineCapable"):
+        WARNINGS.append(f"{name}: a web surface declaring offlineCapable is unusual — confirm")
+
+
 def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids: set[str]) -> None:
     name = path.name
     doc = yaml.safe_load(path.read_text())
+    check_platform(name, doc["platform"])
     offline_capable = doc["platform"].get("offlineCapable", False)
 
     seen: set[str] = set()

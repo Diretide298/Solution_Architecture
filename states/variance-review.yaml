@@ -1,0 +1,26 @@
+# Shift variance review — state model
+# Contract: finance.VarianceReviewStatus
+# Checked by tools/check-states.py.
+
+entity: Shift variance review
+contract: finance
+enum: VarianceReviewStatus
+owner: ledger
+initial:
+- notRequired
+terminal:
+- reviewed
+transitions:
+- from: notRequired
+  to: pendingReview
+  trigger: job
+  guard: Variance exceeded the venue threshold at close
+- from: pendingReview
+  to: reviewed
+  operation: acceptShiftVariance
+  trigger: operation
+  guard: '**Accepted with a reason by someone other than the cashier.** A cashier signing off their
+    own shortfall is not a control'
+  requiresApproval: true
+notes: Starts at `notRequired` because most shifts are within tolerance and creating a review for each
+  one buries the ones that matter.

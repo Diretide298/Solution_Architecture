@@ -15,6 +15,20 @@
     <div id="app" class="app">
       <!-- ── top bar ─────────────────────────────────────────────── -->
       <header class="topbar">
+        <!-- Both rails become off-canvas drawers on a phone, so each needs a
+             way back. Rendered at every width and hidden by CSS above the
+             phone breakpoint, so nothing has to build them conditionally. -->
+        <button
+          id="drawer-left-toggle"
+          class="drawer-toggle"
+          type="button"
+          aria-label="Show the file tree"
+          aria-expanded="false"
+          aria-controls="sidebar-left"
+        >
+          <span class="icon-menu" aria-hidden="true"></span>
+        </button>
+
         <div class="brand">
           <span class="brand-mark"></span>
           <span class="brand-name">TICVAI</span>
@@ -25,9 +39,9 @@
              one deliberately: the API is the join between the other two. -->
         <div class="seg seg-layer" id="layers"></div>
 
-        <button id="search-trigger" class="search-trigger" type="button">
+        <button id="search-trigger" class="search-trigger" type="button" aria-label="Search">
           <span class="icon-search" aria-hidden="true"></span>
-          <span>Search…</span>
+          <span class="search-trigger-text">Search…</span>
           <kbd>Ctrl K</kbd>
         </button>
 
@@ -35,12 +49,25 @@
 
         <div class="topbar-right">
           <span id="live-dot" class="live-dot" title="Watching contracts for changes"></span>
+          <!-- hidden until the links pane actually holds something: on the
+               Decisions layer, and before anything is selected, it never does -->
+          <button
+            id="drawer-right-toggle"
+            class="drawer-toggle"
+            type="button"
+            aria-label="Show links to the selection"
+            aria-expanded="false"
+            aria-controls="sidebar-right"
+            hidden
+          >
+            <span class="icon-links" aria-hidden="true"></span>
+          </button>
           <button id="theme-toggle" class="icon-btn" title="Toggle theme" type="button">◐</button>
         </div>
       </header>
 
       <!-- ── left sidebar ────────────────────────────────────────── -->
-      <aside class="sidebar-left" id="sidebar-left">
+      <aside class="sidebar-left" id="sidebar-left" aria-label="File tree">
         <!-- the grouping options are rebuilt per layer, so this is empty here -->
         <div class="pane-head"><div class="seg seg-sm" id="group-by"></div></div>
         <div class="side-filter-row">
@@ -63,14 +90,26 @@
         <section class="view" id="view-graph" hidden>
           <div class="graph-toolbar">
             <div class="seg" id="graph-scope">
-              <button data-scope="files">Files</button>
-              <button data-scope="schemas">Schemas</button>
-              <button data-scope="permissions">Permissions</button>
-              <button data-scope="local">Local</button>
+              <button data-scope="spine" data-tip-title="Spine" data-tip="The architecture picture. shared/ at the centre, spine contracts in the inner ring, satellites outside — joined by the **events** between them, because no contract $refs another. Sized by operation count.">Spine</button>
+              <button data-scope="files" data-tip-title="Files" data-tip="The contracts and the $refs between them. Every one of the 44 links points at shared/, so this says everything uses common and little else — which is why Spine exists.">Files</button>
+              <button data-scope="schemas" data-tip-title="Schemas" data-tip="Every component in every contract and the $refs between them. The real reference graph, not a text search.">Schemas</button>
+              <button data-scope="permissions" data-tip-title="Permissions" data-tip="Which contracts use which permissions, aggregated per contract. The vocabulary comes from the single enum in shared/permissions.yaml.">Permissions</button>
+              <button data-scope="local" data-tip-title="Local" data-tip="The neighbourhood of whatever is selected — two hops from a component, one from a whole contract, since a contract is already dozens of nodes.">Local</button>
             </div>
             <label class="toggle">
               <input type="checkbox" id="graph-labels" checked />
-              <span>Labels</span>
+              <span data-tip-title="Labels" data-tip="Node names. Turned off, the shape of the graph is easier to read at a distance.">Labels</span>
+            </label>
+            <!-- every contract $refs shared/common and shared/permissions and
+                 nothing else, so those 44 edges are true of everything and say
+                 nothing about any one contract. Off by default, as with the
+                 ambient keys in the data view. -->
+            <label
+              class="toggle spine-only"
+              title="Every contract $refs shared/common and shared/permissions. True of all of them, so it distinguishes none of them."
+            >
+              <input type="checkbox" id="graph-shared" />
+              <span>Shared $refs</span>
             </label>
             <div class="graph-hint" id="graph-hint"></div>
             <div class="spacer"></div>
@@ -97,11 +136,11 @@
             />
             <label class="toggle">
               <input type="checkbox" id="struct-fields" checked />
-              <span>Fields</span>
+              <span data-tip-title="Fields" data-tip="Scalar leaves shown as rows inside their parent block. Off gives the bare skeleton of the document.">Fields</span>
             </label>
             <label class="toggle">
               <input type="checkbox" id="struct-links" checked />
-              <span>$ref links</span>
+              <span data-tip-title="$ref links" data-tip="Draw a line from each $ref to what it resolves to, including across files.">$ref links</span>
             </label>
             <button class="ghost-btn" id="struct-expand" type="button">Expand all</button>
             <button class="ghost-btn" id="struct-collapse" type="button">Collapse</button>
@@ -118,7 +157,7 @@
             <select class="scope-select" id="er-scope"></select>
             <label class="toggle">
               <input type="checkbox" id="er-rows" checked />
-              <span>Fields</span>
+              <span data-tip-title="Fields" data-tip="Every property of every schema, with its type. Off leaves just the entities and the refs between them.">Fields</span>
             </label>
             <button class="ghost-btn" id="er-fit" type="button">Fit</button>
             <div class="graph-hint" id="er-hint"></div>
@@ -127,16 +166,37 @@
           <div class="graph-legend" id="er-legend"></div>
         </section>
 
+        <!-- The join the viewer could not make for itself: which tables an
+             operation touches. Not derivable from the contracts, so it arrives
+             as data — and 318 of the 654 rows admit nobody has worked it out. -->
+        <section class="view sheet" id="view-lineage" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="lineage-scope">
+              <button data-scope="operations" data-tip-title="By operation" data-tip="Every operation against the tables it reads and writes, its service, and where the read is routed. Grouped by contract.">Operations</button>
+              <button data-scope="tables" data-tip-title="By table" data-tip="The other direction — each table with every operation that touches it. The busiest tables are the ones a schema change costs most to make.">Tables</button>
+              <button data-scope="services" data-tip-title="By service" data-tip="The 22 services the operations divide into, and the tables each one owns. A table written by two services is a boundary worth questioning.">Services</button>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="lineage-unresolved" checked />
+              <span data-tip-title="Resolves to no table" data-tip="318 of the 654, marked `unresolved` by the file itself. Not a defect list: most return a computed projection, which has no persistence marker because there is nothing to mark. Shown by default, because hiding them would make the other 336 read as the whole set.">No table</span>
+            </label>
+            <input id="lineage-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="lineage-hint"></div>
+          </div>
+          <div class="sheet-body" id="lineage-body"></div>
+        </section>
+
         <section class="view journey" id="view-journey" hidden>
           <div class="graph-toolbar">
             <select class="scope-select" id="journey-scope"></select>
             <label class="toggle">
               <input type="checkbox" id="journey-branches" checked />
-              <span>Branches</span>
+              <span data-tip-title="Branches" data-tip="Where the flow can go wrong or fork. A flow with only a happy path describes a demo, so a flow declaring none is reported.">Branches</span>
             </label>
             <label class="toggle">
               <input type="checkbox" id="journey-ops" checked />
-              <span>Operations</span>
+              <span data-tip-title="Operations" data-tip="The API calls each step makes. A step calling an operation its own screen never declares is a finding, and is marked.">Operations</span>
             </label>
             <div class="spacer"></div>
             <div class="graph-hint" id="journey-hint"></div>
@@ -150,7 +210,7 @@
             <select class="scope-select" id="screen-scope"></select>
             <label class="toggle">
               <input type="checkbox" id="screen-notes" checked />
-              <span>Notes</span>
+              <span data-tip-title="Notes" data-tip="The per-component notes from the screen definition — usually the reason a control is the way it is.">Notes</span>
             </label>
             <div class="spacer"></div>
             <div class="graph-hint" id="screen-hint"></div>
@@ -166,17 +226,87 @@
           <div class="sheet-body" id="apps-body"></div>
         </section>
 
+        <!-- Delivery sequencing — the one dimension nothing else here shows.
+             Every screen carries a wave, and a wave is a commitment. -->
+        <section class="view sheet" id="view-waves" hidden>
+          <div class="graph-toolbar">
+            <label class="toggle">
+              <input type="checkbox" id="waves-unbuilt" checked />
+              <span data-tip-title="Unbuildable" data-tip="Screens that name no operation. Somebody can draw them and nobody can build them — and 192 of 347 are in this state.">Mark unbuildable</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="waves-offline" />
+              <span data-tip-title="Offline only" data-tip="Only the screens on an offline-capable surface. These are the ones that must work with no network at all.">Offline only</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="waves-hint"></div>
+          </div>
+          <div class="sheet-body" id="waves-body"></div>
+        </section>
+
+        <!-- ── decisions layer ────────────────────────────────────── -->
+        <!-- Prose, which is where the reasons live. Plus the one spec in the
+             package that can be executed rather than read. -->
+        <section class="view sheet" id="view-decisions" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="decisions-scope">
+              <button data-scope="adrs" data-tip-title="Decisions" data-tip="The 18 ADRs — what was decided, when, what it closes and what it constrains. An ADR that is Accepted and partly superseded is marked, because it reads as current in a list and is not.">Decisions</button>
+              <button data-scope="permissions" data-tip-title="Permission vectors" data-tip="The normative authorisation spec, executed. Each vector is a set of grants, a query and the verdict the platform must reach — and the viewer resolves each one rather than listing it.">Permissions</button>
+              <button data-scope="gaps" data-tip-title="Artefact audit" data-tip="The delivery's own count of what the requirements demand and the package does not have. The only register here that measures absence.">Gaps</button>
+              <button data-scope="registers" data-tip-title="Registers" data-tip="The reference data — capabilities, actors, AI applications, conflicts, external dependencies — and the handoff narratives.">Registers</button>
+            </div>
+            <input id="decisions-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="decisions-hint"></div>
+          </div>
+          <div class="sheet-body" id="decisions-body"></div>
+        </section>
+
+        <!-- ── domain layer ───────────────────────────────────────── -->
+        <!-- states/ and events/. The contracts declare 38 status enums and not
+             one of them says which moves are legal; these two files do, and
+             they check each other. -->
+        <section class="view" id="view-states" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="states-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="states-guards" checked />
+              <span data-tip-title="Guards" data-tip="Show the condition that must hold, on whichever transition the pointer is over. The guard is the reason the move is allowed, and the reason the state model is written down at all.">Guards</span>
+            </label>
+            <button class="ghost-btn" id="states-fit" type="button">Fit</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="states-hint"></div>
+          </div>
+          <canvas id="states-canvas"></canvas>
+          <div class="graph-legend" id="states-legend"></div>
+        </section>
+
+        <section class="view sheet" id="view-events" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="events-scope"></select>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="events-hint"></div>
+          </div>
+          <div class="sheet-body" id="events-body"></div>
+        </section>
+
         <!-- ── backend layer ──────────────────────────────────────── -->
         <section class="view" id="view-data" hidden>
           <div class="graph-toolbar">
             <select class="scope-select" id="data-scope"></select>
             <label class="toggle">
               <input type="checkbox" id="data-rows" checked />
-              <span>Columns</span>
+              <span data-tip-title="Columns" data-tip="Every column with its type, and • on the required ones. Off leaves the tables and their relationships.">Columns</span>
             </label>
             <label class="toggle" title="Relationships read from *_id column names rather than declared anywhere">
               <input type="checkbox" id="data-inferred" checked />
-              <span>Inferred keys</span>
+              <span data-tip-title="Inferred keys" data-tip="Relationships the viewer worked out from *_id column names, because nothing declares them. Drawn dashed and counted separately, so a guess is never mistaken for a fact. Dropped entirely for any table the DDL covers.">Inferred keys</span>
+            </label>
+            <!-- venue_id, principal, subject, tenant: true of nearly every table,
+                 so they say nothing about this one. Off by default. -->
+            <label class="toggle" title="Keys to the hub tables — venue, principal, subject, tenant. True of nearly every table, so they say nothing about this one.">
+              <input type="checkbox" id="data-ambient" />
+              <span data-tip-title="Ambient keys" data-tip="Keys to the four hub tables — venue, principal, subject, tenant. platform.scope_node is referenced by 64 tables and identity.principal by 69, so these edges are true of nearly every table and say nothing about this one. Off by default.">Ambient keys</span>
             </label>
             <button class="ghost-btn" id="data-fit" type="button">Fit</button>
             <div class="spacer"></div>
@@ -230,13 +360,18 @@
       </main>
 
       <!-- ── right sidebar ───────────────────────────────────────── -->
-      <aside class="sidebar-right" id="sidebar-right">
+      <aside class="sidebar-right" id="sidebar-right" aria-label="Links to the selection">
         <div class="pane-head"><span>Links</span></div>
         <div class="links-pane" id="links-pane">
           <p class="pane-empty">Select a node to see what links to it.</p>
         </div>
       </aside>
     </div>
+
+    <!-- Dims the content behind an open drawer. Outside .app so it stacks
+         against the palette by z-index alone, and stops below the topbar so
+         the toggle that opened the drawer can still close it. -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
 
     <!-- ── command palette ───────────────────────────────────────── -->
     <div class="palette-backdrop" id="palette" hidden>

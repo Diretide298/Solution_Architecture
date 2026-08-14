@@ -1,0 +1,54 @@
+# Queue — state model
+# Contract: queue.QueueStatus
+# Checked by tools/check-states.py.
+
+entity: Queue
+contract: queue
+enum: QueueStatus
+owner: queue
+initial:
+- closed
+terminal: []
+transitions:
+- from: closed
+  to: open
+  operation: setQueueStatus
+  trigger: operation
+  guard: Attraction opened
+- from: open
+  to: atCapacity
+  trigger: job
+  guard: '**Computed, not set.** Wait time or party count passed the configured ceiling, and the guest
+    app stops offering it'
+- from: atCapacity
+  to: open
+  trigger: job
+  guard: Fell back below the ceiling
+- from: open
+  to: paused
+  operation: setQueueStatus
+  trigger: operation
+  guard: Temporarily halted — a ride stop, a weather hold. Parties already waiting keep their place
+- from: paused
+  to: open
+  operation: setQueueStatus
+  trigger: operation
+  guard: Resumed
+- from: open
+  to: closed
+  operation: setQueueStatus
+  trigger: operation
+  guard: Attraction closed. Waiting parties are released, not silently dropped
+- from: paused
+  to: closed
+  operation: setQueueStatus
+  trigger: operation
+  guard: Closed while paused
+- from: open
+  to: closed
+  operation: completeWorkOrder
+  trigger: cascade
+  guard: '**The asset behind it went out of service.** A queue for a broken ride is the failure this
+    cascade prevents'
+notes: 'No terminal state — a queue outlives every session of it. `atCapacity` is computed rather than
+  set, which matters: an operator cannot forget to set it, and cannot forget to unset it.'
