@@ -1,0 +1,14 @@
+{
+  "name": "ticvai-viewer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local graph viewer for the TICVAI OpenAPI contracts",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "yaml": "^2.9.0"
+  }
+}

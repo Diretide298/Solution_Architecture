@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI Contract Graph</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <!-- ── top bar ─────────────────────────────────────────────── -->
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span class="brand-name">TICVAI</span>
+          <span class="brand-sub">contract graph</span>
+        </div>
+
+        <button id="search-trigger" class="search-trigger" type="button">
+          <span class="icon-search" aria-hidden="true"></span>
+          <span>Search operations, schemas, permissions…</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+
+        <nav class="modes" id="modes">
+          <button class="mode" data-mode="graph">Graph</button>
+          <button class="mode" data-mode="structure">Structure</button>
+          <button class="mode" data-mode="er">ER</button>
+          <button class="mode" data-mode="flow">Flow</button>
+          <button class="mode" data-mode="reader">Reader</button>
+          <button class="mode" data-mode="audit">
+            Audit <span class="audit-count" id="audit-count"></span>
+          </button>
+        </nav>
+
+        <div class="topbar-right">
+          <span id="live-dot" class="live-dot" title="Watching contracts for changes"></span>
+          <button id="theme-toggle" class="icon-btn" title="Toggle theme" type="button">◐</button>
+        </div>
+      </header>
+
+      <!-- ── left sidebar ────────────────────────────────────────── -->
+      <aside class="sidebar-left" id="sidebar-left">
+        <div class="pane-head">
+          <div class="seg seg-sm" id="group-by">
+            <button data-group="contracts">Contracts</button>
+            <button data-group="modules">Modules</button>
+            <button data-group="platforms">Platforms</button>
+          </div>
+        </div>
+        <div class="side-filter-row">
+          <input
+            id="side-filter"
+            class="struct-filter side-filter"
+            type="search"
+            placeholder="Filter…"
+            autocomplete="off"
+          />
+          <span class="pane-count" id="file-count"></span>
+        </div>
+        <div class="filter-row" id="type-filters"></div>
+        <div class="side-note" id="side-note" hidden></div>
+        <div class="tree" id="tree"></div>
+      </aside>
+
+      <!-- ── main ────────────────────────────────────────────────── -->
+      <main class="main" id="main">
+        <section class="view" id="view-graph" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="graph-scope">
+              <button data-scope="files">Files</button>
+              <button data-scope="schemas">Schemas</button>
+              <button data-scope="permissions">Permissions</button>
+              <button data-scope="local">Local</button>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="graph-labels" checked />
+              <span>Labels</span>
+            </label>
+            <div class="graph-hint" id="graph-hint"></div>
+            <div class="spacer"></div>
+            <button class="ghost-btn" id="graph-recenter" type="button">Recenter</button>
+          </div>
+          <canvas id="graph-canvas"></canvas>
+          <div class="graph-legend" id="graph-legend"></div>
+          <div class="graph-tooltip" id="graph-tooltip" hidden></div>
+        </section>
+
+        <section class="view" id="view-structure" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="struct-layout">
+              <button data-layout="tree">Tree</button>
+              <button data-layout="nested">Nested</button>
+            </div>
+            <div class="struct-file" id="struct-file">No file selected</div>
+            <input
+              id="struct-filter"
+              class="struct-filter"
+              type="search"
+              placeholder="Filter keys and values…"
+              autocomplete="off"
+            />
+            <label class="toggle">
+              <input type="checkbox" id="struct-fields" checked />
+              <span>Fields</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="struct-links" checked />
+              <span>$ref links</span>
+            </label>
+            <button class="ghost-btn" id="struct-expand" type="button">Expand all</button>
+            <button class="ghost-btn" id="struct-collapse" type="button">Collapse</button>
+            <button class="ghost-btn" id="struct-fit" type="button">Fit</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="struct-hint"></div>
+          </div>
+          <canvas id="struct-canvas"></canvas>
+          <div class="graph-legend" id="struct-legend"></div>
+        </section>
+
+        <section class="view" id="view-er" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="er-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="er-rows" checked />
+              <span>Fields</span>
+            </label>
+            <button class="ghost-btn" id="er-fit" type="button">Fit</button>
+            <div class="graph-hint" id="er-hint"></div>
+          </div>
+          <canvas id="er-canvas"></canvas>
+          <div class="graph-legend" id="er-legend"></div>
+        </section>
+
+        <section class="view" id="view-flow" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="flow-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="flow-rows" checked />
+              <span>Payloads</span>
+            </label>
+            <button class="ghost-btn" id="flow-fit" type="button">Fit</button>
+            <div class="graph-hint" id="flow-hint"></div>
+          </div>
+          <canvas id="flow-canvas"></canvas>
+          <div class="graph-legend" id="flow-legend"></div>
+        </section>
+
+        <section class="view reader" id="view-reader" hidden>
+          <div class="reader-empty" id="reader-empty">
+            <div class="reader-empty-inner">
+              <h2>Nothing selected</h2>
+              <p>
+                Pick a contract on the left, click a node in the graph, or press
+                <kbd>Ctrl</kbd>+<kbd>K</kbd> to search.
+              </p>
+            </div>
+          </div>
+          <article class="reader-body" id="reader-body" hidden>
+            <div class="reader-head" id="reader-head"></div>
+            <div class="reader-meta" id="reader-meta"></div>
+            <div class="reader-source" id="reader-source"></div>
+          </article>
+        </section>
+
+        <section class="view audit" id="view-audit" hidden>
+          <div class="audit-head">
+            <h2>Contract audit</h2>
+            <p id="audit-summary" class="audit-summary"></p>
+          </div>
+          <div class="audit-filters" id="audit-filters"></div>
+          <div class="audit-list" id="audit-list"></div>
+        </section>
+      </main>
+
+      <!-- ── right sidebar ───────────────────────────────────────── -->
+      <aside class="sidebar-right" id="sidebar-right">
+        <div class="pane-head"><span>Links</span></div>
+        <div class="links-pane" id="links-pane">
+          <p class="pane-empty">Select a node to see what links to it.</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ── command palette ───────────────────────────────────────── -->
+    <div class="palette-backdrop" id="palette" hidden>
+      <div class="palette">
+        <input
+          id="palette-input"
+          class="palette-input"
+          type="text"
+          placeholder="Search operations, schemas, permissions, paths…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="palette-results" id="palette-results"></div>
+        <div class="palette-foot">
+          <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+          <span><kbd>↵</kbd> open</span>
+          <span><kbd>esc</kbd> close</span>
+          <span class="spacer"></span>
+          <span id="palette-count"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
