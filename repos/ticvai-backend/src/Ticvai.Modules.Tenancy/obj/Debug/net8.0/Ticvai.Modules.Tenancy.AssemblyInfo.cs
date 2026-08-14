@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ticvai.Modules.Tenancy")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d474b66905e129194f3c0046d508706414895cd2")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ticvai.Modules.Tenancy")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ticvai.Modules.Tenancy")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

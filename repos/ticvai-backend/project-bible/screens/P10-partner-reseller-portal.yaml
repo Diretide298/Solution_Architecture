@@ -20,6 +20,15 @@ platform:
   - design-tokens
   - ui
   - api-client
+  deployment:
+    target: browser
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: partner device, unmanaged
+    networkAssumption: public internet
+    releaseCadence: monthly — partners integrate against it
 screens:
 - id: PTR-001
   name: Partner Login / MFA
@@ -50,6 +59,9 @@ screens:
     route: /general/partner-login-mfa
     component: apps/partner-portal/src/routes/general/PartnerLoginMfaList.tsx
     status: notStarted
+  navigation:
+    isEntryPoint: true
+    inferred: true
 - id: PTR-002
   name: Partner Dashboard
   module: TODO
@@ -83,6 +95,13 @@ screens:
     route: /general/partner-dashboard
     component: apps/partner-portal/src/routes/general/PartnerDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-007
+    flowDerived: true
 - id: PTR-003
   name: Profile & Company Details
   module: TODO
@@ -111,6 +130,10 @@ screens:
     route: /general/profile-and-company-details
     component: apps/partner-portal/src/routes/general/ProfileAndCompanyDetailsDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-004
   name: Notifications
   module: TODO
@@ -139,6 +162,10 @@ screens:
     route: /general/notifications
     component: apps/partner-portal/src/routes/general/NotificationsDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-005
   name: Inventory & Allocation View
   module: TODO
@@ -167,6 +194,10 @@ screens:
     route: /general/inventory-and-allocation-view
     component: apps/partner-portal/src/routes/general/InventoryAndAllocationViewDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-006
   name: Product Catalog (B2B Pricing)
   module: TODO
@@ -200,6 +231,10 @@ screens:
     route: /general/product-catalog-b2b-pricing
     component: apps/partner-portal/src/routes/general/ProductCatalogB2bPricingList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-007
   name: Availability Search
   module: TODO
@@ -229,6 +264,14 @@ screens:
     contract: catalogue
     purpose: Per-performance capacity on the B2B channel
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - PTR-001
+    - PTR-002
+    inferred: true
+    exitTo:
+    - PTR-008
+    flowDerived: true
 - id: PTR-008
   name: Booking Creation
   module: TODO
@@ -258,6 +301,14 @@ screens:
     route: /general/booking-creation
     component: apps/partner-portal/src/routes/general/BookingCreationForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    - PTR-007
+    inferred: true
+    exitTo:
+    - PTR-016
+    flowDerived: true
 - id: PTR-009
   name: Group / Bulk Booking
   module: TODO
@@ -286,6 +337,10 @@ screens:
     route: /general/group-bulk-booking
     component: apps/partner-portal/src/routes/general/GroupBulkBookingDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-010
   name: Cart & Quote
   module: TODO
@@ -314,6 +369,10 @@ screens:
     route: /general/cart-and-quote
     component: apps/partner-portal/src/routes/general/CartAndQuoteDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-011
   name: Quote Management
   module: TODO
@@ -339,6 +398,10 @@ screens:
     route: /general/quote-management
     component: apps/partner-portal/src/routes/general/QuoteManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-012
   name: Checkout / Credit Purchase
   module: TODO
@@ -368,6 +431,10 @@ screens:
     route: /general/checkout-credit-purchase
     component: apps/partner-portal/src/routes/general/CheckoutCreditPurchaseWizard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-013
   name: Credit Limit & Balance
   module: TODO
@@ -396,6 +463,10 @@ screens:
     route: /general/credit-limit-and-balance
     component: apps/partner-portal/src/routes/general/CreditLimitAndBalanceDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-014
   name: Settlement & Payment History
   module: TODO
@@ -425,6 +496,10 @@ screens:
     route: /general/settlement-and-payment-history
     component: apps/partner-portal/src/routes/general/SettlementAndPaymentHistoryList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-015
   name: Order History
   module: TODO
@@ -458,6 +533,10 @@ screens:
     route: /general/order-history
     component: apps/partner-portal/src/routes/general/OrderHistoryList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-016
   name: Voucher / Ticket Download
   module: TODO
@@ -486,6 +565,11 @@ screens:
     route: /general/voucher-ticket-download
     component: apps/partner-portal/src/routes/general/VoucherTicketDownloadDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    - PTR-008
+    inferred: true
 - id: PTR-017
   name: Commission Statement
   module: TODO
@@ -510,6 +594,10 @@ screens:
     route: /general/commission-statement
     component: apps/partner-portal/src/routes/general/CommissionStatementDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-018
   name: Reports & Sales Performance
   module: TODO
@@ -539,6 +627,10 @@ screens:
     route: /general/reports-and-sales-performance
     component: apps/partner-portal/src/routes/general/ReportsAndSalesPerformanceDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-019
   name: API Credentials & Integration
   module: TODO
@@ -563,6 +655,10 @@ screens:
     route: /general/api-credentials-and-integration
     component: apps/partner-portal/src/routes/general/ApiCredentialsAndIntegrationDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-020
   name: Sub-Agent Management
   module: TODO
@@ -592,6 +688,10 @@ screens:
     route: /general/sub-agent-management
     component: apps/partner-portal/src/routes/general/SubAgentManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
 - id: PTR-021
   name: Support & Contact
   module: TODO
@@ -620,3 +720,7 @@ screens:
     route: /general/support-and-contact
     component: apps/partner-portal/src/routes/general/SupportAndContactDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true

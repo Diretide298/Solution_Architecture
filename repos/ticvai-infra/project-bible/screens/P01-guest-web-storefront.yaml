@@ -23,6 +23,15 @@ platform:
   - design-tokens
   - ui
   - api-client
+  deployment:
+    target: browser
+    distribution: CDN + edge
+    bundleUpdate: immediate on deploy
+    hosting: static build served from the cell region
+    storeReview: false
+    deviceOwnership: guest device
+    networkAssumption: public internet, unmanaged
+    releaseCadence: continuous
 screens:
 - id: WEB-001
   name: Home / Landing
@@ -157,6 +166,12 @@ screens:
     route: /discovery-and-browse/search-results
     component: apps/web-b2c/src/routes/discovery-and-browse/SearchResultsList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-004
+    inferred: true
 - id: WEB-004
   name: Event / Attraction Detail
   module: Discovery & Browse
@@ -383,6 +398,10 @@ screens:
     route: /booking-and-selection/add-ons-and-upsell
     component: apps/web-b2c/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-009
   name: Wishlist
   module: Booking & Selection
@@ -421,6 +440,10 @@ screens:
     route: /booking-and-selection/wishlist
     component: apps/web-b2c/src/routes/booking-and-selection/WishlistDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-010
   name: Shopping Cart
   module: Cart & Checkout
@@ -657,6 +680,10 @@ screens:
     route: /cart-and-checkout/payment-link-landing
     component: apps/web-b2c/src/routes/cart-and-checkout/PaymentLinkLandingDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-015
   name: Virtual Waiting Room
   module: High-Demand Access
@@ -682,6 +709,10 @@ screens:
     route: /high-demand-access/virtual-waiting-room
     component: apps/web-b2c/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-016
   name: Login / Register
   module: Account & Self-Service
@@ -711,6 +742,10 @@ screens:
     route: /account-and-self-service/login-register
     component: apps/web-b2c/src/routes/account-and-self-service/LoginRegisterList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-017
   name: My Account Dashboard
   module: Account & Self-Service
@@ -740,6 +775,10 @@ screens:
     route: /account-and-self-service/my-account-dashboard
     component: apps/web-b2c/src/routes/account-and-self-service/MyAccountDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service
@@ -769,6 +808,10 @@ screens:
     route: /account-and-self-service/my-tickets
     component: apps/web-b2c/src/routes/account-and-self-service/MyTicketsDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-019
   name: Order History
   module: Account & Self-Service
@@ -802,6 +845,10 @@ screens:
     route: /account-and-self-service/order-history
     component: apps/web-b2c/src/routes/account-and-self-service/OrderHistoryList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-020
   name: Profile & Preferences
   module: Account & Self-Service
@@ -835,6 +882,10 @@ screens:
     route: /account-and-self-service/profile-and-preferences
     component: apps/web-b2c/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-021
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
@@ -867,6 +918,12 @@ screens:
     route: /membership-loyalty-and-value/wallet-and-gift-cards
     component: apps/web-b2c/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-023
+    inferred: true
 - id: WEB-022
   name: Membership Plans
   module: Membership, Loyalty & Value
@@ -890,6 +947,12 @@ screens:
     route: /membership-loyalty-and-value/membership-plans
     component: apps/web-b2c/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-023
+    inferred: true
 - id: WEB-023
   name: Membership Management
   module: Membership, Loyalty & Value
@@ -919,6 +982,10 @@ screens:
     route: /membership-loyalty-and-value/membership-management
     component: apps/web-b2c/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-024
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
@@ -947,6 +1014,12 @@ screens:
     route: /membership-loyalty-and-value/loyalty-and-rewards
     component: apps/web-b2c/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-023
+    inferred: true
 - id: WEB-025
   name: Help Centre / FAQ
   module: Engagement & Support
@@ -976,6 +1049,12 @@ screens:
     route: /engagement-and-support/help-centre-faq
     component: apps/web-b2c/src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-028
+    inferred: true
 - id: WEB-026
   name: Survey & Feedback
   module: Engagement & Support
@@ -1004,6 +1083,12 @@ screens:
     route: /engagement-and-support/survey-and-feedback
     component: apps/web-b2c/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-028
+    inferred: true
 - id: WEB-027
   name: Newsletter Subscription
   module: Engagement & Support
@@ -1032,6 +1117,12 @@ screens:
     route: /engagement-and-support/newsletter-subscription
     component: apps/web-b2c/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-028
+    inferred: true
 - id: WEB-028
   name: Contact & Venue Information
   module: Engagement & Support
@@ -1061,6 +1152,10 @@ screens:
     route: /engagement-and-support/contact-and-venue-information
     component: apps/web-b2c/src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
 - id: WEB-029
   name: Error / Sold Out / Maintenance
   module: System States
@@ -1091,3 +1186,7 @@ screens:
     route: /system-states/error-sold-out-maintenance
     component: apps/web-b2c/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true

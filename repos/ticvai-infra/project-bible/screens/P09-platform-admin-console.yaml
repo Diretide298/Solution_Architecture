@@ -21,6 +21,15 @@ platform:
   - design-tokens
   - ui
   - api-client
+  deployment:
+    target: browser, desktop
+    distribution: served from the Control Plane
+    bundleUpdate: immediate on deploy
+    hosting: Control Plane, outside every cell
+    storeReview: false
+    deviceOwnership: platform staff device
+    networkAssumption: corporate network, IP-restricted
+    releaseCadence: weekly
 screens:
 - id: ADM-001
   name: Platform Login / MFA
@@ -51,6 +60,10 @@ screens:
     route: /general/platform-login-mfa
     component: apps/platform-admin/src/routes/general/PlatformLoginMfaList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-002
   name: Platform Dashboard
   module: TODO
@@ -80,6 +93,16 @@ screens:
     route: /general/platform-dashboard
     component: apps/platform-admin/src/routes/general/PlatformDashboard.tsx
     status: notStarted
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - ADM-001
+    - ADM-005
+    - ADM-006
+    - ADM-007
+    - ADM-008
+    - ADM-012
+    inferred: true
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
   module: TODO
@@ -109,6 +132,10 @@ screens:
     route: /general/cross-tenant-health-dashboard
     component: apps/platform-admin/src/routes/general/CrossTenantHealthDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-004
   name: Platform Audit Log
   module: TODO
@@ -135,6 +162,10 @@ screens:
     route: /general/platform-audit-log
     component: apps/platform-admin/src/routes/general/PlatformAuditLogList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-005
   name: Tenant Directory
   module: TODO
@@ -164,6 +195,10 @@ screens:
     route: /general/tenant-directory
     component: apps/platform-admin/src/routes/general/TenantDirectoryList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-006
   name: Tenant Hierarchy Explorer
   module: TODO
@@ -188,6 +223,10 @@ screens:
     route: /general/tenant-hierarchy-explorer
     component: apps/platform-admin/src/routes/general/TenantHierarchyExplorerList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-007
   name: Module & Feature Entitlement
   module: TODO
@@ -216,6 +255,10 @@ screens:
     route: /general/module-and-feature-entitlement
     component: apps/platform-admin/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-008
   name: Subscription & Plan Management
   module: TODO
@@ -249,6 +292,10 @@ screens:
     route: /general/subscription-and-plan-management
     component: apps/platform-admin/src/routes/general/SubscriptionAndPlanManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-009
   name: Tenant Billing & Invoicing
   module: TODO
@@ -277,6 +324,10 @@ screens:
     route: /general/tenant-billing-and-invoicing
     component: apps/platform-admin/src/routes/general/TenantBillingAndInvoicingDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-010
   name: Usage Metering
   module: TODO
@@ -305,6 +356,10 @@ screens:
     route: /general/usage-metering
     component: apps/platform-admin/src/routes/general/UsageMeteringDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-011
   name: Licence & Seat Management
   module: TODO
@@ -334,6 +389,10 @@ screens:
     route: /general/licence-and-seat-management
     component: apps/platform-admin/src/routes/general/LicenceAndSeatManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-012
   name: Tenant Isolation & Resource Pool
   module: TODO
@@ -362,6 +421,10 @@ screens:
     route: /general/tenant-isolation-and-resource-pool
     component: apps/platform-admin/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-013
   name: Tenant Performance Monitor
   module: TODO
@@ -391,6 +454,10 @@ screens:
     route: /general/tenant-performance-monitor
     component: apps/platform-admin/src/routes/general/TenantPerformanceMonitorDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-014
   name: Auto-Scaling Configuration
   module: TODO
@@ -417,6 +484,10 @@ screens:
     route: /general/auto-scaling-configuration
     component: apps/platform-admin/src/routes/general/AutoScalingConfigurationForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-015
   name: API Rate Limit & Quota Management
   module: TODO
@@ -442,6 +513,10 @@ screens:
     route: /general/api-rate-limit-and-quota-management
     component: apps/platform-admin/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-016
   name: White-Label Branding Management
   module: TODO
@@ -471,6 +546,10 @@ screens:
     route: /general/white-label-branding-management
     component: apps/platform-admin/src/routes/general/WhiteLabelBrandingManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-017
   name: Domain & Certificate Management
   module: TODO
@@ -497,6 +576,10 @@ screens:
     route: /general/domain-and-certificate-management
     component: apps/platform-admin/src/routes/general/DomainAndCertificateManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-018
   name: Localisation & Language Pack
   module: TODO
@@ -525,6 +608,10 @@ screens:
     route: /general/localisation-and-language-pack
     component: apps/platform-admin/src/routes/general/LocalisationAndLanguagePackDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-019
   name: Global Configuration & Defaults
   module: TODO
@@ -551,6 +638,10 @@ screens:
     route: /general/global-configuration-and-defaults
     component: apps/platform-admin/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-020
   name: Platform User Directory
   module: TODO
@@ -580,6 +671,10 @@ screens:
     route: /general/platform-user-directory
     component: apps/platform-admin/src/routes/general/PlatformUserDirectoryList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-021
   name: Platform Role Management
   module: TODO
@@ -613,6 +708,10 @@ screens:
     route: /general/platform-role-management
     component: apps/platform-admin/src/routes/general/PlatformRoleManagementForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-022
   name: Release & Version Management
   module: TODO
@@ -652,6 +751,13 @@ screens:
     contract: platform-ops
     purpose: Which gates pass and which block
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-027
+    flowDerived: true
 - id: ADM-023
   name: Staging Promotion & Approval
   module: TODO
@@ -687,6 +793,14 @@ screens:
     contract: platform-ops
     purpose: Checked before the request is offered
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    - ADM-027
+    inferred: true
+    exitTo:
+    - ADM-029
+    flowDerived: true
 - id: ADM-024
   name: Release Notification Composer
   module: TODO
@@ -718,6 +832,10 @@ screens:
     contract: platform-ops
     purpose: Compose and publish a notice
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-025
   name: Tenant Upgrade Scheduler
   module: TODO
@@ -753,6 +871,10 @@ screens:
     contract: platform-ops
     purpose: Schedule or defer
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-026
   name: End-of-Support Notice Management
   module: TODO
@@ -784,6 +906,10 @@ screens:
     contract: platform-ops
     purpose: End-of-support notices
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-027
   name: Database Migration Console
   module: TODO
@@ -826,6 +952,14 @@ screens:
     contract: platform-ops
     purpose: Schema and application version per cell
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    - ADM-022
+    inferred: true
+    exitTo:
+    - ADM-023
+    flowDerived: true
 - id: ADM-028
   name: Environment Registry
   module: TODO
@@ -860,6 +994,10 @@ screens:
     contract: platform-ops
     purpose: Register an environment
     trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-029
   name: Deployment Monitor
   module: TODO
@@ -905,6 +1043,11 @@ screens:
     route: /general/deployment-monitor
     component: apps/platform-admin/src/routes/general/DeploymentMonitorDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    - ADM-023
+    inferred: true
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
   module: TODO
@@ -931,6 +1074,10 @@ screens:
     route: /general/infrastructure-sizing-and-scaling-policy
     component: apps/platform-admin/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-031
   name: Security & Compliance Dashboard
   module: TODO
@@ -957,6 +1104,10 @@ screens:
     route: /general/security-and-compliance-dashboard
     component: apps/platform-admin/src/routes/general/SecurityAndComplianceDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-032
   name: WAF & Security Policy View
   module: TODO
@@ -983,6 +1134,10 @@ screens:
     route: /general/waf-and-security-policy-view
     component: apps/platform-admin/src/routes/general/WafAndSecurityPolicyViewForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-033
   name: Backup & DR Status
   module: TODO
@@ -1012,6 +1167,10 @@ screens:
     route: /general/backup-and-dr-status
     component: apps/platform-admin/src/routes/general/BackupAndDrStatusDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-034
   name: Archival Job Monitor
   module: TODO
@@ -1038,6 +1197,10 @@ screens:
     route: /general/archival-job-monitor
     component: apps/platform-admin/src/routes/general/ArchivalJobMonitorDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-035
   name: Support & Escalation Console
   module: TODO
@@ -1062,6 +1225,10 @@ screens:
     route: /general/support-and-escalation-console
     component: apps/platform-admin/src/routes/general/SupportAndEscalationConsoleDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
 - id: ADM-036
   name: Platform Notification Broadcast
   module: TODO
@@ -1088,3 +1255,7 @@ screens:
     route: /general/platform-notification-broadcast
     component: apps/platform-admin/src/routes/general/PlatformNotificationBroadcastForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true

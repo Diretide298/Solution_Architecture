@@ -37,6 +37,13 @@ steps:
   - evaluatePromotions
   outcome: Held seats itemised with the countdown still visible
 - step: 4
+  screen: WEB-011
+  action: Enters contact details and answers consent
+  operations:
+  - getGuestProfile
+  - listConsentPurposes
+  outcome: The hold is still counting down. The countdown stays visible through this step
+- step: 5
   screen: WEB-012
   action: Pays
   operations:
@@ -61,11 +68,17 @@ branches:
   behaviour: Seats return to the pool and the cart shows what was lost, with one action to re-select.
     A silent expiry discovered at payment is the worst outcome in this flow.
   resolvedBy: WEB-007
-- at: 4
+- at: 5
   condition: The hold expires between cart and payment
   severity: requiresStaff
   behaviour: Extension is offered before expiry rather than after. Where it has already lapsed and the
     seats are gone, the guest is told which seats and offered the nearest equivalent.
+  resolvedBy: extendSeatHold
+- at: 4
+  condition: The hold expires while the guest fills in the details form
+  behaviour: The most likely place to lose it — a form takes longer than a cart. Extension is offered
+    proactively as the countdown nears zero, not after it passes.
+  severity: requiresStaff
   resolvedBy: extendSeatHold
 exitStates:
 - state: completed

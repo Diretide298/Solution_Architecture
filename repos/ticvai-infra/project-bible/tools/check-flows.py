@@ -30,15 +30,26 @@ ERRORS: list[str] = []
 WARNINGS: list[str] = []
 
 
-def load_screens() -> tuple[set[str], dict[str, set[str]]]:
+def load_screens() -> tuple[set[str], dict[str, set[str]], set[tuple[str, str]], set[str]]:
+    """Screen ids, their declared operations, the navigation graph, and which edges are inferred."""
     ids: set[str] = set()
     apis: dict[str, set[str]] = {}
+    edges: set[tuple[str, str]] = set()
+    inferred: set[str] = set()
     for f in SCREENS.glob("P*.yaml"):
         for s in yaml.safe_load(f.read_text())["screens"]:
-            ids.add(s["id"])
-            apis[s["id"]] = {a["operationId"] for a in (s.get("apis") or [])
-                             if a.get("operationId") not in (None, "TODO")}
-    return ids, apis
+            sid = s["id"]
+            ids.add(sid)
+            apis[sid] = {a["operationId"] for a in (s.get("apis") or [])
+                         if a.get("operationId") not in (None, "TODO")}
+            nav = s.get("navigation") or {}
+            if nav.get("inferred"):
+                inferred.add(sid)
+            for t in nav.get("exitTo", []) or []:
+                edges.add((sid, t))
+            for t in nav.get("entryFrom", []) or []:
+                edges.add((t, sid))
+    return ids, apis, edges, inferred
 
 
 def load_operations() -> set[str]:
@@ -65,7 +76,7 @@ def main() -> int:
         print("no flows found", file=sys.stderr)
         return 1
 
-    screen_ids, screen_apis = load_screens()
+    screen_ids, screen_apis, edges, inferred = load_screens()
     ops = load_operations()
 
     print(f"checking {len(files)} flow(s) against {len(screen_ids)} screens "
@@ -101,6 +112,25 @@ def main() -> int:
                     WARNINGS.append(f"{name}: branch resolvedBy '{r}' is neither a screen nor an operation")
             if b.get("at") and not any(s.get("step") == b["at"] for s in steps):
                 ERRORS.append(f"{name}: branch at step {b['at']}, which does not exist")
+
+        # Do the flow and the screens agree on what leads to what?
+        #
+        # A flow can route A -> B while the screens declare no such edge. Nothing caught
+        # that until now, and it is the disagreement most likely to survive review: both
+        # documents look right on their own.
+        ordered = [st.get("screen") for st in steps if st.get("screen")]
+        for a, b in zip(ordered, ordered[1:]):
+            if a == b or a not in screen_ids or b not in screen_ids:
+                continue
+            if (a, b) not in edges:
+                if a in inferred or b in inferred:
+                    WARNINGS.append(
+                        f"{name}: step {a} -> {b} is not in the navigation graph, but one of "
+                        "them has inferred navigation. The flow is probably right and the "
+                        "inference incomplete")
+                else:
+                    ERRORS.append(
+                        f"{name}: step {a} -> {b} is not declared in either screen's navigation")
 
         entry = (doc.get("trigger") or {}).get("entryScreen")
         if entry and entry not in screen_ids:

@@ -20,6 +20,15 @@ platform:
   packages:
   - design-tokens
   - ui
+  deployment:
+    target: browser
+    distribution: public, served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: applicant device, unmanaged
+    networkAssumption: public internet
+    releaseCadence: monthly
 screens:
 - id: ACC-001
   name: Landing / Programme Overview
@@ -45,6 +54,9 @@ screens:
     route: /applicant-journey/landing-programme-overview
     component: apps/accreditation/src/routes/applicant-journey/LandingProgrammeOverviewDetail.tsx
     status: notStarted
+  navigation:
+    isEntryPoint: true
+    inferred: true
 - id: ACC-002
   name: Registration Form
   module: Applicant Journey
@@ -69,6 +81,10 @@ screens:
     route: /applicant-journey/registration-form
     component: apps/accreditation/src/routes/applicant-journey/RegistrationForm.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ACC-001
+    inferred: true
 - id: ACC-003
   name: Application Review & Submit
   module: Applicant Journey
@@ -93,6 +109,10 @@ screens:
     route: /applicant-journey/application-review-and-submit
     component: apps/accreditation/src/routes/applicant-journey/ApplicationReviewAndSubmitWizard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ACC-001
+    inferred: true
 - id: ACC-004
   name: Application Status Tracking
   module: Applicant Journey
@@ -117,6 +137,12 @@ screens:
     route: /applicant-journey/application-status-tracking
     component: apps/accreditation/src/routes/applicant-journey/ApplicationStatusTrackingDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ACC-001
+    exitTo:
+    - ACC-002
+    inferred: true
 - id: ACC-005
   name: Accreditation Badge
   module: Applicant Journey
@@ -141,6 +167,12 @@ screens:
     route: /applicant-journey/accreditation-badge
     component: apps/accreditation/src/routes/applicant-journey/AccreditationBadgeDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ACC-001
+    exitTo:
+    - ACC-002
+    inferred: true
 - id: ACC-006
   name: Reviewer Queue
   module: Reviewer (Internal)
@@ -165,6 +197,12 @@ screens:
     route: /reviewer-internal/reviewer-queue
     component: apps/accreditation/src/routes/reviewer-internal/ReviewerQueueList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ACC-001
+    exitTo:
+    - ACC-007
+    inferred: true
 - id: ACC-007
   name: Reviewer Application Detail
   module: Reviewer (Internal)
@@ -189,6 +227,10 @@ screens:
     route: /reviewer-internal/reviewer-application-detail
     component: apps/accreditation/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ACC-001
+    inferred: true
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)
@@ -213,3 +255,9 @@ screens:
     route: /reviewer-internal/credential-register
     component: apps/accreditation/src/routes/reviewer-internal/CredentialRegisterList.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ACC-001
+    exitTo:
+    - ACC-007
+    inferred: true
