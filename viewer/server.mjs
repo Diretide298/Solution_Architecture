@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { buildIndex } from './lib/indexer.mjs';
 import { buildStructure } from './lib/structure.mjs';
 import { buildJourneys } from './lib/journeys.mjs';
+import { buildBackend } from './lib/backend.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..');
@@ -31,6 +32,7 @@ const args = parseArgs(process.argv.slice(2));
 
 let index = null;
 let journeys = null;
+let backend = null;
 let indexing = null;
 
 async function refreshIndex(reason = 'startup') {
@@ -39,18 +41,27 @@ async function refreshIndex(reason = 'startup') {
     const started = Date.now();
     try {
       index = await buildIndex(ROOT, args.dir);
-      // journeys resolve against the contracts, so they rebuild together
+
+      // both other layers resolve against the contracts, so all three rebuild
+      // together — the API is the join between the frontend and the backend
       const operationIds = new Set(
         index.nodes.filter((n) => n.type === 'operation').map((n) => n.name)
       );
-      journeys = await buildJourneys(ROOT, operationIds);
+      const schemas = index.nodes.filter((n) => n.type === 'schema');
+
+      [journeys, backend] = await Promise.all([
+        buildJourneys(ROOT, operationIds),
+        buildBackend(ROOT, schemas),
+      ]);
 
       const { stats } = index;
       const j = journeys.stats;
+      const b = backend.stats;
       console.log(
         `[index] ${reason}: ${stats.files} files · ${stats.operations} operations · ` +
           `${stats.schemas} schemas · ${stats.links} links · ${stats.errors} errors | ` +
-          `${j.flows} flows · ${j.screens} screens · ${journeys.problems.length} journey problems ` +
+          `frontend ${j.flows} flows · ${j.screens} screens · ${j.apps} apps | ` +
+          `backend ${b.tables ?? 0} tables · ${b.columns ?? 0} columns · ${b.linked ?? 0} linked ` +
           `(${Date.now() - started}ms)`
       );
     } catch (err) {
@@ -108,6 +119,11 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, JSON.stringify(journeys), MIME['.json']);
     }
 
+    if (url.pathname === '/api/backend') {
+      if (!backend) await refreshIndex('on demand');
+      return send(res, 200, JSON.stringify(backend), MIME['.json']);
+    }
+
     if (url.pathname === '/api/file' || url.pathname === '/api/tree') {
       const rel = url.searchParams.get('path') ?? '';
       // contain reads to the project root
@@ -153,14 +169,18 @@ const server = http.createServer(async (req, res) => {
 
 await refreshIndex();
 
-// flows and screens resolve against the contracts, so all three are watched
-const watchDirs = [args.dir, 'flows', 'screens'];
+// every layer resolves against the contracts, so every layer is watched
+const WATCH_DIRS = [args.dir, 'flows', 'screens', 'frontend', 'backend'];
+const WATCHABLE = /\.(ya?ml|xlsx|md)$/i;
 const watched = [];
-for (const dir of watchDirs) {
+for (const dir of WATCH_DIRS) {
   const target = path.join(ROOT, dir);
   try {
     watch(target, { recursive: true }, (_event, filename) => {
-      if (filename && /\.ya?ml$/i.test(filename)) scheduleRebuild(`${dir}/${filename}`);
+      // Excel writes through a lock file and a temp copy; neither is the workbook
+      if (filename && WATCHABLE.test(filename) && !/^~\$|^\./.test(path.basename(filename))) {
+        scheduleRebuild(`${dir}/${filename}`);
+      }
     });
     watched.push(dir);
   } catch {

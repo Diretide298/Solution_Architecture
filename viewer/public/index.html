@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TICVAI Contract Graph</title>
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
@@ -20,22 +21,17 @@
           <span class="brand-sub">contract graph</span>
         </div>
 
+        <!-- which layer of the system is on screen. Contracts are the middle
+             one deliberately: the API is the join between the other two. -->
+        <div class="seg seg-layer" id="layers"></div>
+
         <button id="search-trigger" class="search-trigger" type="button">
           <span class="icon-search" aria-hidden="true"></span>
-          <span>Search operations, schemas, permissions…</span>
+          <span>Search…</span>
           <kbd>Ctrl K</kbd>
         </button>
 
-        <nav class="modes" id="modes">
-          <button class="mode" data-mode="graph">Graph</button>
-          <button class="mode" data-mode="structure">Structure</button>
-          <button class="mode" data-mode="er">ER</button>
-          <button class="mode" data-mode="journey">Journey</button>
-          <button class="mode" data-mode="reader">Reader</button>
-          <button class="mode" data-mode="audit">
-            Audit <span class="audit-count" id="audit-count"></span>
-          </button>
-        </nav>
+        <nav class="modes" id="modes"></nav>
 
         <div class="topbar-right">
           <span id="live-dot" class="live-dot" title="Watching contracts for changes"></span>
@@ -45,13 +41,8 @@
 
       <!-- ── left sidebar ────────────────────────────────────────── -->
       <aside class="sidebar-left" id="sidebar-left">
-        <div class="pane-head">
-          <div class="seg seg-sm" id="group-by">
-            <button data-group="contracts">Contracts</button>
-            <button data-group="modules">Modules</button>
-            <button data-group="platforms">Platforms</button>
-          </div>
-        </div>
+        <!-- the grouping options are rebuilt per layer, so this is empty here -->
+        <div class="pane-head"><div class="seg seg-sm" id="group-by"></div></div>
         <div class="side-filter-row">
           <input
             id="side-filter"
@@ -151,6 +142,52 @@
             <div class="graph-hint" id="journey-hint"></div>
           </div>
           <div class="journey-body" id="journey-body"></div>
+        </section>
+
+        <!-- ── frontend layer ─────────────────────────────────────── -->
+        <section class="view sheet" id="view-screen" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="screen-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="screen-notes" checked />
+              <span>Notes</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="screen-hint"></div>
+          </div>
+          <div class="sheet-body" id="screen-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-apps" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="apps-hint"></div>
+          </div>
+          <div class="sheet-body" id="apps-body"></div>
+        </section>
+
+        <!-- ── backend layer ──────────────────────────────────────── -->
+        <section class="view" id="view-data" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="data-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="data-rows" checked />
+              <span>Columns</span>
+            </label>
+            <button class="ghost-btn" id="data-fit" type="button">Fit</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="data-hint"></div>
+          </div>
+          <canvas id="data-canvas"></canvas>
+          <div class="graph-legend" id="data-legend"></div>
+        </section>
+
+        <section class="view sheet" id="view-routing" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="routing-hint"></div>
+          </div>
+          <div class="sheet-body" id="routing-body"></div>
         </section>
 
         <section class="view reader" id="view-reader" hidden>

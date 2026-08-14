@@ -71,6 +71,8 @@ function indexScreens(files, problems) {
         name: screen.name ?? screen.id,
         module: screen.module ?? null,
         purpose: screen.purpose ?? '',
+        capability: screen.capability ?? null,
+        requirements: Array.isArray(screen.requirements) ? screen.requirements : [],
         wave: screen.wave ?? null,
         permission: screen.permission ?? null,
         platform: platform.code ?? null,
@@ -81,15 +83,25 @@ function indexScreens(files, problems) {
           operationId: a?.operationId ?? '',
           purpose: a?.purpose ?? '',
           trigger: a?.trigger ?? null,
+          contract: a?.contract ?? null,
         })),
         states: screen.states ?? null,
         navigation: screen.navigation ?? null,
+        accessibility: screen.accessibility ?? null,
+        wireframe: screen.wireframe ?? null,
+        implementation: screen.implementation ?? null,
+        openQuestions: Array.isArray(screen.openQuestions) ? screen.openQuestions : [],
+        notes: screen.notes ?? null,
+        template: screen.layout?.template ?? null,
         regions: (screen.layout?.regions ?? []).map((r) => ({
           name: r?.name ?? '',
+          ref: r?.ref ?? null,
           components: (r?.components ?? []).map((c) => ({
             kind: c?.kind ?? '',
             label: c?.label ?? '',
+            bindsTo: c?.bindsTo ?? null,
             permission: c?.permission ?? null,
+            notes: c?.notes ?? null,
           })),
         })),
       });
@@ -97,6 +109,29 @@ function indexScreens(files, problems) {
   }
 
   return { screens, platforms };
+}
+
+/**
+ * The shared vocabulary a screen's `kind` and region `ref` must draw from.
+ * A component that is not in here is either the wrong one or needs adding
+ * deliberately — which is the whole reason the file exists.
+ */
+async function readComponentVocabulary(root) {
+  const empty = { regions: new Set(), components: new Set(), patterns: new Set() };
+  let doc;
+  try {
+    doc = yaml.load(await readFile(path.join(root, 'screens', '_components.yaml'), 'utf8'));
+  } catch {
+    return empty; // no vocabulary file means the check simply does not run
+  }
+  // regions and patterns are keyed by `id`, components by `kind`
+  const ids = (list, key) =>
+    new Set((Array.isArray(list) ? list : []).map((x) => x?.[key]).filter(Boolean));
+  return {
+    regions: ids(doc?.regions, 'id'),
+    components: new Set([...ids(doc?.components, 'kind'), ...ids(doc?.patterns, 'id')]),
+    patterns: ids(doc?.patterns, 'id'),
+  };
 }
 
 /**
@@ -109,9 +144,10 @@ export async function buildJourneys(root, contractOperationIds = new Set()) {
   const screenFiles = await readYamlDir(root, 'screens', (n) => !n.startsWith('_'));
   const flowFiles = await readYamlDir(root, 'flows', (n) => !n.startsWith('_'));
   const { screens, platforms } = indexScreens(screenFiles, problems);
+  const vocabulary = await readComponentVocabulary(root);
 
-  // screens whose declared apis point at an operation the contracts do not have
   for (const screen of screens.values()) {
+    // apis pointing at an operation the contracts do not have
     for (const api of screen.apis) {
       if (api.operationId && contractOperationIds.size && !contractOperationIds.has(api.operationId)) {
         problems.push({
@@ -120,6 +156,62 @@ export async function buildJourneys(root, contractOperationIds = new Set()) {
           file: screen.file,
           message: `Screen ${screen.id} calls ${api.operationId}, which no contract declares`,
         });
+      }
+    }
+
+    // the four states rule — offline only where the platform is offline-capable
+    const required = ['loading', 'empty', 'error'];
+    if (screen.offlineCapable) required.push('offline');
+    const missing = required.filter((state) => !screen.states?.[state]);
+    if (missing.length) {
+      problems.push({
+        severity: 'warning',
+        kind: 'screen-missing-state',
+        file: screen.file,
+        message:
+          `Screen ${screen.id} declares no ${missing.join(', ')} state` +
+          `${missing.length > 1 ? 's' : ''} — the empty state is the one that reaches production unconsidered`,
+      });
+    }
+
+    // component kinds must exist in the shared vocabulary, and regions too
+    for (const region of screen.regions) {
+      if (region.ref && vocabulary.regions.size && !vocabulary.regions.has(region.ref)) {
+        problems.push({
+          severity: 'error',
+          kind: 'screen-unknown-region',
+          file: screen.file,
+          message: `Screen ${screen.id} uses region ${region.ref}, which _components.yaml does not define`,
+        });
+      }
+      for (const component of region.components) {
+        if (component.kind && vocabulary.components.size && !vocabulary.components.has(component.kind)) {
+          problems.push({
+            severity: 'error',
+            kind: 'screen-unknown-component',
+            file: screen.file,
+            message: `Screen ${screen.id} uses component ${component.kind}, which _components.yaml does not define`,
+          });
+        }
+      }
+    }
+  }
+
+  // navigation has to resolve, or a route leads somewhere that does not exist
+  for (const screen of screens.values()) {
+    for (const [direction, list] of [
+      ['entryFrom', screen.navigation?.entryFrom],
+      ['exitTo', screen.navigation?.exitTo],
+    ]) {
+      for (const target of Array.isArray(list) ? list : []) {
+        if (!screens.has(target)) {
+          problems.push({
+            severity: 'error',
+            kind: 'screen-unknown-navigation',
+            file: screen.file,
+            message: `Screen ${screen.id} ${direction} ${target}, which no platform file defines`,
+          });
+        }
       }
     }
   }
@@ -237,9 +329,12 @@ export async function buildJourneys(root, contractOperationIds = new Set()) {
     }
   }
 
+  const apps = await readApps(root, screens, problems);
+
   return {
     flows,
     platforms,
+    apps,
     screens: [...screens.values()],
     operationUsage: Object.fromEntries(operationUsage),
     problems,
@@ -249,7 +344,87 @@ export async function buildJourneys(root, contractOperationIds = new Set()) {
       branches: flows.reduce((a, f) => a + f.branches.length, 0),
       screens: screens.size,
       platforms: platforms.length,
+      apps: apps.length,
+      scaffolded: apps.filter((a) => a.status === 'scaffolded').length,
       operationsCovered: operationUsage.size,
     },
   };
+}
+
+/**
+ * The per-app manifests in frontend/. Generated from screens/, so the check
+ * worth making here is whether the two still agree.
+ */
+async function readApps(root, screens, problems) {
+  const files = await readYamlDir(root, 'frontend');
+  const apps = [];
+
+  for (const { rel, doc, error } of files) {
+    if (error) {
+      problems.push({ severity: 'error', kind: 'parse-error', file: rel, message: error });
+      continue;
+    }
+    if (!doc?.app) continue;
+
+    const list = Array.isArray(doc.screens) ? doc.screens : [];
+    const routes = new Map();
+    for (const screen of list) {
+      if (!screen?.route) continue;
+      if (routes.has(screen.route)) {
+        problems.push({
+          severity: 'error',
+          kind: 'app-route-collision',
+          file: rel,
+          message:
+            `${doc.app} maps ${routes.get(screen.route)} and ${screen.id} to ${screen.route} — ` +
+            `two screens on one route surfaces as "sometimes the wrong page loads"`,
+        });
+      } else {
+        routes.set(screen.route, screen.id);
+      }
+      if (screen.id && !screens.has(screen.id)) {
+        problems.push({
+          severity: 'warning',
+          kind: 'app-unknown-screen',
+          file: rel,
+          message: `${doc.app} lists ${screen.id}, which no platform file defines`,
+        });
+      }
+    }
+
+    // an app that queues writes needs somewhere to queue them
+    if (doc.offlineCapable && !(doc.packages ?? []).some((p) => /offline/i.test(p))) {
+      problems.push({
+        severity: 'warning',
+        kind: 'app-offline-without-core',
+        file: rel,
+        message: `${doc.app} is offline-capable but depends on no offline package`,
+      });
+    }
+
+    apps.push({
+      app: doc.app,
+      file: rel,
+      status: doc.status ?? null,
+      runtime: doc.runtime ?? null,
+      offlineCapable: Boolean(doc.offlineCapable),
+      directions: Array.isArray(doc.directions) ? doc.directions : [],
+      platforms: Array.isArray(doc.platforms) ? doc.platforms : [],
+      packages: Array.isArray(doc.packages) ? doc.packages : [],
+      contracts: Array.isArray(doc.contracts) ? doc.contracts : [],
+      screenCount: doc.screenCount ?? list.length,
+      byWave: doc.byWave ?? null,
+      screens: list.map((s) => ({
+        id: s?.id ?? '',
+        name: s?.name ?? '',
+        route: s?.route ?? '',
+        component: s?.component ?? '',
+        wave: s?.wave ?? null,
+        status: s?.status ?? null,
+      })),
+    });
+  }
+
+  apps.sort((a, b) => b.screenCount - a.screenCount);
+  return apps;
 }

@@ -1,0 +1,277 @@
+/* Styles for the layer switch and the views the frontend and backend layers
+   add. Loaded after styles.css, so the few overrides here win. */
+
+/* ── layer switch ───────────────────────────────────────────────── */
+/* Each layer carries its own accent, so the shell says which part of the
+   system is on screen without the label having to be read. */
+body { --layer: var(--accent); --layer-soft: var(--accent-soft); }
+body[data-layer="frontend"] { --layer: #38bdf8; --layer-soft: rgba(56, 189, 248, 0.16); }
+body[data-layer="contracts"] { --layer: var(--accent); --layer-soft: var(--accent-soft); }
+body[data-layer="backend"] { --layer: #fbbf24; --layer-soft: rgba(251, 191, 36, 0.16); }
+
+.seg-layer button { padding: 5px 13px; font-weight: 550; }
+.seg-layer button.active { background: var(--layer-soft); color: var(--layer); }
+
+.brand-mark { background: linear-gradient(135deg, var(--layer), var(--satellite)); }
+.tree-file.selected { background: var(--layer-soft); border-left-color: var(--layer); color: var(--layer); }
+.search-trigger { min-width: 120px; }
+
+.tree-file-code { flex: none; font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+.tree-file.selected .tree-file-code { color: inherit; }
+
+/* ── sheet views: screen, apps, routing ─────────────────────────── */
+.sheet { overflow: hidden; }
+.sheet-body {
+  position: absolute;
+  inset: 46px 0 0 0;
+  overflow: auto;
+  padding: 8px 20px 40px;
+}
+.inline-legend { margin-top: 18px; display: flex; flex-direction: column; gap: 3px; }
+
+/* ── screen: the layout board ───────────────────────────────────── */
+.screen-board { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 22px; }
+.region-card {
+  flex: 1 1 260px;
+  max-width: 420px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.region-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+.region-name { font-weight: 600; font-size: 12.5px; }
+.region-ref {
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--layer-soft);
+  color: var(--layer);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+.region-count { margin-left: auto; color: var(--text-faint); font-size: 11px; }
+
+.component-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  padding: 6px 11px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 12px;
+}
+.component-row:last-child { border-bottom: 0; }
+.component-kind { font-family: var(--mono); font-size: 11.5px; color: var(--spine); }
+.component-label { color: var(--text); }
+.component-binds {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--satellite) 10%, transparent);
+  color: var(--satellite);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+.component-perm { color: var(--permission); font-family: var(--mono); font-size: 10px; }
+.component-notes {
+  flex-basis: 100%;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+/* ── screen: the four states ────────────────────────────────────── */
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+  margin: 8px 0 22px;
+}
+.state-card {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-faint);
+  background: var(--bg-panel);
+  border-radius: 6px;
+}
+.state-card.loading { border-left-color: var(--info); }
+.state-card.empty { border-left-color: var(--warning); }
+.state-card.error { border-left-color: var(--error); }
+.state-card.offline { border-left-color: var(--patch); }
+.state-card.denied { border-left-color: var(--permission); }
+/* a required state with nothing declared is the finding, so it looks like one */
+.state-card.missing {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--error) 6%, transparent);
+}
+.state-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.state-name { font-weight: 600; font-size: 12px; }
+.state-when { color: var(--text-faint); font-size: 10.5px; }
+.state-desc { color: var(--text-dim); font-size: 12px; line-height: 1.55; }
+.state-card.missing .state-desc { color: var(--error); font-style: italic; }
+
+/* ── screen: operations and navigation ──────────────────────────── */
+.api-list { margin: 8px 0 22px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.api-row {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 7px 11px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 12px;
+  cursor: pointer;
+}
+.api-row:last-child { border-bottom: 0; }
+.api-row:hover { background: var(--bg-hover); }
+.api-row.unknown .api-id { color: var(--error); text-decoration: line-through; }
+.api-trigger {
+  flex: none;
+  min-width: 62px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-raised);
+  color: var(--text-faint);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.api-trigger.onLoad { color: var(--info); }
+.api-trigger.onAction { color: var(--satellite); }
+.api-trigger.background, .api-trigger.onInterval { color: var(--patch); }
+.api-id { font-family: var(--mono); font-size: 11.5px; }
+.api-purpose { color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.api-contract { margin-left: auto; flex: none; color: var(--text-faint); font-size: 11px; }
+
+.nav-row { display: flex; flex-wrap: wrap; gap: 26px; margin: 8px 0 22px; }
+.nav-side { flex: 1 1 300px; }
+.nav-label {
+  margin-bottom: 6px;
+  color: var(--text-faint);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.nav-none { color: var(--text-faint); }
+.nav-pill {
+  display: inline-block;
+  margin: 0 5px 5px 0;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.nav-pill:hover { border-color: var(--layer); color: var(--layer); }
+.nav-pill.unknown { border-color: var(--error); color: var(--error); }
+
+.impl-card {
+  max-width: 900px;
+  margin: 8px 0 22px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-panel);
+}
+.impl-row { display: flex; gap: 12px; padding: 3px 0; font-size: 12px; }
+.impl-label { min-width: 78px; color: var(--text-faint); }
+.impl-row code { color: var(--text-dim); font-family: var(--mono); font-size: 11.5px; }
+
+/* ── apps ───────────────────────────────────────────────────────── */
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+.app-card {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--satellite);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+.app-card.pending { border-top-color: var(--warning); }
+.app-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+.app-name { font-family: var(--mono); font-weight: 600; font-size: 13.5px; }
+.app-status { margin-left: auto; font-size: 10.5px; }
+.app-status.ok { color: var(--satellite); }
+.app-status.warn { color: var(--warning); }
+.app-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+
+.wave-bar { display: flex; gap: 2px; height: 20px; margin-bottom: 11px; }
+.wave-seg {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--spine);
+  color: #10121a;
+  font-size: 10px;
+  font-weight: 600;
+}
+.wave-seg.wave2 { background: var(--satellite); }
+.wave-seg.wave3 { background: var(--shared); }
+.wave-seg.wave4 { background: var(--patch); }
+
+.app-contracts { margin-bottom: 10px; }
+.app-routes summary { padding: 4px 0; color: var(--text-dim); font-size: 12px; cursor: pointer; }
+.route-row {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 4px 0;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.route-row:hover .route-id { color: var(--layer); }
+.route-id { flex: none; color: var(--text-faint); font-family: var(--mono); }
+.route-path {
+  overflow: hidden;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.route-status { margin-left: auto; flex: none; color: var(--text-faint); font-size: 10.5px; }
+
+/* ── routing ────────────────────────────────────────────────────── */
+.adr-file { margin-top: 6px; color: var(--text-faint); font-family: var(--mono); font-size: 11px; }
+.routing-table { max-width: 900px; margin: 8px 0; }
+.routing-row { display: flex; align-items: center; gap: 12px; padding: 3px 0; }
+.routing-name {
+  flex: none;
+  width: 130px;
+  border: 0;
+  background: none;
+  color: var(--text-dim);
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: right;
+  cursor: pointer;
+}
+.routing-name:hover { color: var(--layer); }
+.routing-name.unknown { color: var(--text-faint); }
+.routing-bar { display: flex; gap: 1px; height: 17px; overflow: hidden; border-radius: 3px; }
+.routing-seg {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  color: #10121a;
+  font-size: 10px;
+  font-weight: 600;
+}
+.routing-total {
+  flex: none;
+  width: 34px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
