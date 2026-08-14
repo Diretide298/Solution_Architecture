@@ -40,7 +40,13 @@ Keys `1` `2` `3` switch layer. A view shortcut for another layer follows you the
 inside, each showing what it binds to and which permission hides it; the **four states** as their
 own panel, with a required state that is not declared drawn as the finding it is; every operation
 the screen calls, clickable into the contract; navigation in and out, clickable to the screen
-either side; and the app, route and component path that implement it.
+either side; the platform's deployment block; and the app, route and component path that
+implement it.
+
+**Navigation says which kind it is.** 92 of the 102 navigation blocks carry `inferred: true` —
+derived from module and flow order rather than drawn by anyone. Those render with dashed pills
+under a heading that says so, because a sitemap that looks authoritative while being mostly
+guessed is worse than no sitemap.
 
 **Journey** — the flows in `flows/` drawn as what they are: one job a person came to do, traced
 across screens. Steps run left to right; each carries its screen, the operations it calls and its
@@ -59,13 +65,31 @@ The schema reference in `backend/` is an `.xlsx`, so it is **read directly rathe
 converted**: the spreadsheet stays the one source of truth and there is no generated copy to
 drift from it. The zip and sheet reader is `lib/xlsx.mjs` — about 200 lines, no dependency.
 
-**Data** — the tables of one schema module as entity boxes, every column with its type and `•`
-marking required. Green is a table in the module, blue a child table, amber one pulled in from
-another module because something here points at it.
+**Data** — the ER diagram, at two zoom levels.
 
-Relationships are only what is **declared**: the workbook's `Child of`, and columns whose source
-property is a `$ref` in the contracts. A column called `tenant_id` is not treated as a foreign
-key, because nothing declares it as one — so the diagram is thin where the truth is thin.
+*Whole database* is one box per schema, each listing which other schemas its keys reach into and
+how many columns do the reaching. 20 boxes rather than 197: all 197 tables at once is a hairball
+with no room for labels. Click a schema to drill into it.
+
+*One schema* is its tables as entity boxes, every column with its type and `•` marking required.
+Green is a table in the schema, blue a child table, amber one pulled in from another schema
+because something here points at it.
+
+**Relationships come in two kinds, drawn differently.**
+
+- **Solid — declared.** The workbook's `Child of`, and columns whose source property is a `$ref`
+  in the contracts. There are 32 of these.
+- **Dashed — inferred.** A column ending `_id` whose name resolves to a table. `principal_id`
+  matches `identity.principal`; `added_by_principal_id` resolves by trying successively shorter
+  suffixes. A table in the column's own schema wins over one elsewhere, and a name owned by two
+  schemas is refused rather than guessed at. There are 244 of these.
+
+The workbook has no key column and only 11 relationships survive as `$ref`s, so an ER drawn from
+declarations alone is a page of boxes with almost no lines. The inferred ones make it a diagram —
+but they are switchable off, counted separately, and never presented as declared.
+
+**127 `_id` columns resolve to nothing**, and the ones that recur are reported: `venue_id` appears
+49 times with no `venue` table anywhere.
 
 **Routing** — ADR-0016 made visible: every contract's operations split across primary-write,
 primary-read, replica and analytical.
@@ -77,7 +101,8 @@ The right-hand pane answers "what links to this" about whatever is selected:
 - an **operation** → which screens call it, which flows traverse it, what `$ref`s it
 - a **schema** → what references it, and **which table it is persisted as**
 - a **screen** → which flows step through it, which screens reach it
-- a **table** → the contract schema it derives from, its children, and its declared keys
+- a **table** → the contract schema it derives from, its children, its declared references, its
+  inferred keys, and any `_id` column pointing at no table at all
 
 Every one of those is a click, so a database column can be followed back to the screen that
 displays it and forward to the migration that creates it.
@@ -141,7 +166,8 @@ operation their own screen never declares; route collisions within an app; an of
 with no offline package.
 
 **Backend** — a table whose parent is not in the table list, a table deriving from a schema no
-contract declares, a table with no columns.
+contract declares, a table with no columns, and any `_id` column name used five or more times
+with no table behind it.
 
 ## Live
 
@@ -175,9 +201,11 @@ Node ids are stable and live in the URL hash, so any operation or schema can be 
 ## Not represented yet
 
 - **Screen-to-screen sitemap** — `entryFrom`/`exitTo` are shown per screen and are clickable, but
-  there is no whole-platform navigation graph.
-- **The 203 screens** on P02, P04, P06, P07, P08 and P13 have UI/UX boards rather than screen
-  files, so they cannot appear until those are converted.
+  there is no whole-platform navigation graph. Worth building only once more of the 92 inferred
+  navigation blocks are confirmed.
+- **The 203 inventoried screens** on P02, P03, P04, P07, P08 and P13 have UI/UX boards rather than
+  screen files, so they cannot appear until those are converted. 232 inventoried, 102 defined.
+- **`docs/`** — the ADRs and registers are on disk but only ADR-0016 is surfaced, on Routing.
 
 ## Three things the audit found
 

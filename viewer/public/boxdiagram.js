@@ -330,11 +330,14 @@ export class BoxDiagram {
       if (Math.max(from.y, to.y) < -60 || Math.min(from.y, to.y) > this.height + 60) continue;
 
       ctx.lineWidth = (active ? 1.8 : 1) * Math.min(1.6, Math.max(0.5, k));
+      // dashed marks a relationship that was inferred rather than declared
+      ctx.setLineDash(edge.dashed ? [5 * Math.min(1.5, k), 4 * Math.min(1.5, k)] : []);
       const midX = (from.x + to.x) / 2;
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
       ctx.bezierCurveTo(midX, from.y, midX, to.y, to.x, to.y);
       ctx.stroke();
+      ctx.setLineDash([]);
 
       // arrowhead + label, only when zoomed enough to read
       if (k > 0.45) {

@@ -51,6 +51,10 @@ function indexScreens(files, problems) {
       surface: platform.surface ?? null,
       runtime: platform.runtime ?? null,
       offlineCapable: Boolean(platform.offlineCapable),
+      app: platform.app ?? null,
+      appStatus: platform.appStatus ?? null,
+      packages: Array.isArray(platform.packages) ? platform.packages : [],
+      deployment: platform.deployment ?? null,
       file: rel,
       screenCount: list.length,
     });
@@ -87,6 +91,11 @@ function indexScreens(files, problems) {
         })),
         states: screen.states ?? null,
         navigation: screen.navigation ?? null,
+        // 92 of 102 navigation blocks are derived rather than declared, so
+        // the viewer has to say which — a sitemap that looks authoritative
+        // while being mostly guessed is worse than no sitemap
+        navigationInferred: Boolean(screen.navigation?.inferred),
+        deployment: platform.deployment ?? null,
         accessibility: screen.accessibility ?? null,
         wireframe: screen.wireframe ?? null,
         implementation: screen.implementation ?? null,
@@ -343,6 +352,8 @@ export async function buildJourneys(root, contractOperationIds = new Set()) {
       steps: flows.reduce((a, f) => a + f.steps.length, 0),
       branches: flows.reduce((a, f) => a + f.branches.length, 0),
       screens: screens.size,
+      screensWithNavigation: [...screens.values()].filter((s) => s.navigation).length,
+      navigationInferred: [...screens.values()].filter((s) => s.navigationInferred).length,
       platforms: platforms.length,
       apps: apps.length,
       scaffolded: apps.filter((a) => a.status === 'scaffolded').length,

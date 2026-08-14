@@ -105,6 +105,79 @@ function addReferences(tables, columns, contractSchemas) {
 }
 
 /**
+ * Foreign keys by naming convention — the other half of the ER diagram.
+ *
+ * The workbook has no key column, and only 11 relationships survive as `$ref`s
+ * in the contracts, so an ER drawn from declarations alone is a page of boxes.
+ * A column ending `_id` whose name resolves to a table almost always is a key,
+ * so those edges are drawn too — but marked inferred, kept in their own count,
+ * and switchable off, because "almost always" is not "declared".
+ *
+ * `added_by_principal_id` resolves by trying successively shorter suffixes:
+ * `added_by_principal`, `by_principal`, `principal`. A table in the column's
+ * own schema wins over one in another, and a name owned by two schemas is
+ * refused rather than guessed at.
+ */
+function addForeignKeys(tables, columns, problems, workbookName) {
+  const full = new Set(tables.map((t) => t.name));
+  const short = new Map();
+  const ambiguous = new Set();
+  for (const table of tables) {
+    const bare = table.name.split('.').slice(1).join('.');
+    if (short.has(bare)) ambiguous.add(bare);
+    else short.set(bare, table.name);
+  }
+
+  const resolve = (module, column) => {
+    const parts = column.replace(/_id$/, '').split('_');
+    for (let i = 0; i < parts.length; i++) {
+      const candidate = parts.slice(i).join('_');
+      if (full.has(`${module}.${candidate}`)) return `${module}.${candidate}`;
+      if (short.has(candidate) && !ambiguous.has(candidate)) return short.get(candidate);
+    }
+    return null;
+  };
+
+  const unresolved = new Map();
+
+  for (const table of tables) {
+    table.foreignKeys = [];
+    const declared = new Set((table.references ?? []).map((r) => r.column));
+
+    for (const column of columns[table.name] ?? []) {
+      if (!/_id$/.test(column.name) || declared.has(column.name)) continue;
+      const target = resolve(table.module, column.name);
+      if (!target) {
+        unresolved.set(column.name, (unresolved.get(column.name) ?? 0) + 1);
+        continue;
+      }
+      column.foreignKeyTable = target;
+      table.foreignKeys.push({
+        column: column.name,
+        toTable: target,
+        self: target === table.name,
+        crossSchema: target.split('.')[0] !== table.module,
+      });
+    }
+  }
+
+  // a name referenced everywhere with no table behind it is worth saying once
+  for (const [column, count] of [...unresolved].sort((a, b) => b[1] - a[1])) {
+    if (count < 5) continue;
+    problems.push({
+      severity: 'warning',
+      kind: 'backend-dangling-key',
+      file: `backend/${workbookName}`,
+      message:
+        `${count} columns are called ${column}, and no table is named for it — ` +
+        `either the entity is not persisted here or the table is missing`,
+    });
+  }
+
+  return unresolved;
+}
+
+/**
  * @param contractSchemas  the schema nodes from the contract index, so each
  *                         table can be linked to the schema it derives from and
  *                         its columns to the `$ref`s that schema declares
@@ -283,6 +356,7 @@ export async function buildBackend(root, contractSchemas = []) {
     .filter((r) => [r.writes, r.primaryReads, r.replicaReads, r.analyticalReads].every((n) => n !== null));
 
   addReferences(tables, columns, contractSchemas);
+  addForeignKeys(tables, columns, problems, workbookName);
 
   const columnCount = Object.values(columns).reduce((a, list) => a + list.length, 0);
 
@@ -304,6 +378,7 @@ export async function buildBackend(root, contractSchemas = []) {
       linked: tables.filter((t) => t.schemaId).length,
       childTables: tables.filter((t) => t.childOf).length,
       references: tables.reduce((a, t) => a + (t.references?.length ?? 0), 0),
+      foreignKeys: tables.reduce((a, t) => a + (t.foreignKeys?.length ?? 0), 0),
     },
   };
 }

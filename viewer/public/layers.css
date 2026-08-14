@@ -275,3 +275,38 @@ body[data-layer="backend"] { --layer: #fbbf24; --layer-soft: rgba(251, 191, 36, 
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
+
+/* an inferred link is a hint, not a fact — it should not read as one */
+.link-item.inferred .link-name { border-bottom: 1px dashed var(--text-faint); }
+.nav-pill.inferred { border-style: dashed; }
+.nav-note { max-width: 780px; margin-left: 0; }
+
+/* ── deployment, declared per platform ──────────────────────────── */
+.deploy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+  margin: 8px 0 22px;
+  max-width: 1100px;
+}
+.deploy-cell {
+  padding: 8px 11px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-panel);
+}
+.deploy-cell.warn { border-color: color-mix(in srgb, var(--warning) 55%, transparent); }
+.deploy-label {
+  margin-bottom: 3px;
+  color: var(--text-faint);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.deploy-value { color: var(--text-dim); font-size: 12px; line-height: 1.45; }
+.pane-note {
+  margin: 4px 10px 12px;
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.5;
+}

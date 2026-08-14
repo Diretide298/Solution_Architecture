@@ -55,6 +55,7 @@ const state = {
   screenId: null,
   tableName: null,
   dataModule: null,
+  dataRows: true,
   // each layer groups its sidebar by something different, so this is per layer
   groupBy: { frontend: 'platforms', contracts: 'contracts', backend: 'modules' },
   sideFilter: '',
@@ -104,10 +105,17 @@ async function boot() {
     onRow: openRow,
   });
 
-  // the same box renderer, drawing tables instead of schemas
+  // the same box renderer, drawing database tables — or, zoomed out, schemas
   data = new BoxDiagram($('data-canvas'), {
-    onSelect: (node) => selectTable(node.id.replace(/^table:/, '')),
-    onRow: (row) => { if (row.refTarget) selectTable(row.refTarget); },
+    onSelect: (node) => {
+      if (node.id.startsWith('schema:')) openSchema(node.id.slice(7));
+      else selectTable(node.id.replace(/^table:/, ''));
+    },
+    onRow: (row) => {
+      if (!row.refTarget) return;
+      if (state.dataModule === ALL_SCHEMAS) openSchema(row.refTarget);
+      else selectTable(row.refTarget);
+    },
   });
 
   tree = new StructureTree($('struct-canvas'), {
@@ -266,7 +274,8 @@ async function loadIndex() {
   fillScopeSelect($('er-scope'), state.erScope);
 
   // defaults for the other two layers, so neither opens empty
-  state.dataModule = state.dataModule ?? backend?.modules?.[0]?.name ?? null;
+  // opens on the whole database, so the first thing seen is the shape of it
+  state.dataModule = state.dataModule ?? (backend?.modules?.length ? ALL_SCHEMAS : null);
   state.screenId = state.screenId ?? journeys?.screens?.[0]?.id ?? null;
 
   renderSideGroups();
@@ -1445,7 +1454,9 @@ function renderScreen() {
   const entryFrom = screen.navigation?.entryFrom ?? [];
   const exitTo = screen.navigation?.exitTo ?? [];
   if (entryFrom.length || exitTo.length || screen.navigation?.isEntryPoint) {
-    body.append(el('div', 'journey-section-label', 'navigation'));
+    const inferred = screen.navigationInferred;
+    body.append(el('div', 'journey-section-label',
+      inferred ? 'navigation · inferred' : 'navigation · declared'));
     const nav = el('div', 'nav-row');
     const side = (label, ids) => {
       const box = el('div', 'nav-side');
@@ -1453,7 +1464,11 @@ function renderScreen() {
       if (!ids.length) box.append(el('span', 'nav-none', '—'));
       for (const id of ids) {
         const target = screenById(id);
-        const pill = el('button', `nav-pill${target ? '' : ' unknown'}`, target ? `${id} ${target.name}` : id);
+        const pill = el(
+          'button',
+          `nav-pill${target ? '' : ' unknown'}${inferred ? ' inferred' : ''}`,
+          target ? `${id} ${target.name}` : id
+        );
         pill.onclick = () => (target ? selectScreen(id) : toast(`${id} is not defined`));
         box.append(pill);
       }
@@ -1462,6 +1477,38 @@ function renderScreen() {
     nav.append(side(screen.navigation?.isEntryPoint ? 'entry point · from' : 'from', entryFrom));
     nav.append(side('to', exitTo));
     body.append(nav);
+    if (inferred) {
+      body.append(el('p', 'pane-note nav-note',
+        'This screen carries navigation: inferred — the routes were derived from the module ' +
+        'and flow order, not drawn by anyone. Treat them as a starting point for the sitemap.'));
+    }
+  }
+
+  // ---- deployment ------------------------------------------------------
+  if (screen.deployment) {
+    body.append(el('div', 'journey-section-label', 'deployment · whole platform'));
+    const grid = el('div', 'deploy-grid');
+    const LABELS = {
+      target: 'runs on',
+      distribution: 'ships by',
+      hosting: 'hosted',
+      bundleUpdate: 'updates',
+      releaseCadence: 'cadence',
+      networkAssumption: 'network',
+      deviceOwnership: 'device',
+      storeReview: 'store review',
+    };
+    for (const [key, label] of Object.entries(LABELS)) {
+      const value = screen.deployment[key];
+      if (value == null || value === '') continue;
+      const cell = el('div', 'deploy-cell');
+      cell.append(el('div', 'deploy-label', label));
+      cell.append(el('div', 'deploy-value', String(value)));
+      // store review turns a fix into a release, so it earns a colour
+      if (key === 'storeReview' && value === true) cell.classList.add('warn');
+      grid.append(cell);
+    }
+    body.append(grid);
   }
 
   // ---- implementation --------------------------------------------------
@@ -1574,6 +1621,15 @@ function renderApps() {
 }
 
 // ── backend: the data model ──────────────────────────────────────────
+/** Drill from the schema map into one schema's tables. */
+function openSchema(name) {
+  if (!state.backend?.modules?.some((m) => m.name === name)) return;
+  state.dataModule = name;
+  $('data-scope').value = name;
+  data.userAdjusted = false;
+  renderData();
+}
+
 function selectTable(name) {
   state.tableName = name;
   const table = (state.backend?.tables ?? []).find((t) => t.name === name);
@@ -1592,15 +1648,80 @@ function selectTable(name) {
   renderSidePane();
 }
 
+const ALL_SCHEMAS = '*';
+
 /**
- * The tables of one schema module, plus any table they reference from another —
- * drawn external, so a cross-module relationship is visible rather than implied.
+ * All 197 tables at once is a hairball with no labels, so the whole-database
+ * view zooms out a level instead: one box per schema, listing which other
+ * schemas its keys reach into and how many columns do the reaching.
  */
-function buildData(module) {
+function buildSchemaMap() {
+  const backend = state.backend;
+  const byName = new Map(backend.modules.map((m) => [m.name, m]));
+  const tableModule = new Map(backend.tables.map((t) => [t.name, t.module]));
+
+  // schema -> schema -> { count, declared }
+  const links = new Map();
+  const note = (from, to, declared) => {
+    if (!from || !to || from === to) return;
+    if (!links.has(from)) links.set(from, new Map());
+    const row = links.get(from).get(to) ?? { count: 0, declared: 0 };
+    row.count += 1;
+    if (declared) row.declared += 1;
+    links.get(from).set(to, row);
+  };
+
+  for (const table of backend.tables) {
+    note(table.module, tableModule.get(table.childOf), true);
+    for (const ref of table.references ?? []) note(table.module, tableModule.get(ref.toTable), true);
+    for (const key of table.foreignKeys ?? []) note(table.module, tableModule.get(key.toTable), false);
+  }
+
+  const nodes = backend.modules.map((module) => {
+    const out = [...(links.get(module.name) ?? [])].sort((a, b) => b[1].count - a[1].count);
+    return {
+      id: `schema:${module.name}`,
+      title: module.name,
+      badge: `${module.tables}t`,
+      // green where the migration is written, amber where it is only derivable
+      color: module.written ? '#34d399' : '#fbbf24',
+      rows: out.map(([target, info]) => ({
+        label: `→ ${target}`,
+        value: `${info.count}`,
+        strong: info.declared > 0,
+        refTarget: target,
+      })),
+    };
+  });
+
+  const edges = [];
+  for (const [from, targets] of links) {
+    for (const [to, info] of targets) {
+      if (!byName.has(from) || !byName.has(to)) continue;
+      edges.push({
+        source: `schema:${from}`,
+        target: `schema:${to}`,
+        label: String(info.count),
+        dashed: info.declared === 0,
+      });
+    }
+  }
+
+  return { nodes, edges, own: nodes.length, declared: 0, inferred: 0, links };
+}
+
+/**
+ * The tables of one schema module, plus any table they relate to in another —
+ * drawn external, so a cross-schema relationship is visible rather than implied.
+ */
+function buildData(module, { inferred = true } = {}) {
   const backend = state.backend;
   const all = new Map(backend.tables.map((t) => [t.name, t]));
+  const everything = module === ALL_SCHEMAS;
   const included = new Map();
-  for (const table of backend.tables) if (table.module === module) included.set(table.name, table);
+  for (const table of backend.tables) {
+    if (everything || table.module === module) included.set(table.name, table);
+  }
 
   const pull = (name) => {
     if (!name || included.has(name)) return;
@@ -1610,42 +1731,62 @@ function buildData(module) {
   for (const table of [...included.values()]) {
     pull(table.childOf);
     for (const ref of table.references ?? []) pull(ref.toTable);
+    if (inferred) for (const key of table.foreignKeys ?? []) pull(key.toTable);
   }
 
+  const isOwn = (table) => everything || table.module === module;
+
   const nodes = [...included.values()].map((table) => {
-    const external = table.module !== module;
     const columns = backend.columns[table.name] ?? [];
+    const own = isOwn(table);
     return {
       id: `table:${table.name}`,
-      title: table.name.split('.').slice(1).join('.') || table.name,
-      badge: external ? table.module : String(columns.length),
-      color: external ? '#fbbf24' : table.childOf ? '#60a5fa' : '#34d399',
-      rows: columns.map((column) => ({
-        label: `${column.required ? '• ' : ''}${column.name}`,
-        value: column.type,
-        strong: column.required,
-        refTarget: column.referencesTable ?? null,
-      })),
-      external,
+      title: everything ? table.name : table.name.split('.').slice(1).join('.') || table.name,
+      badge: own ? String(columns.length) : table.module,
+      color: !own ? '#fbbf24' : table.childOf ? '#60a5fa' : '#34d399',
+      rows: columns.map((column) => {
+        const target = column.referencesTable ?? (inferred ? column.foreignKeyTable : null) ?? null;
+        return {
+          label: `${column.required ? '• ' : ''}${column.name}`,
+          value: column.type,
+          strong: column.required,
+          refTarget: target,
+        };
+      }),
+      external: !own,
     };
   });
 
-  // only what is declared: the workbook's Child of, and $refs in the contracts
   const edges = [];
   const seen = new Set();
-  const push = (from, to, label) => {
-    if (!included.has(from) || !included.has(to)) return;
-    const key = `${from}|${to}|${label}`;
-    if (seen.has(key)) return;
+  const push = (from, to, label, dashed) => {
+    if (!included.has(from) || !included.has(to) || from === to) return;
+    const key = `${from}|${to}`;
+    if (seen.has(key)) return; // one line per pair, however many columns join them
     seen.add(key);
-    edges.push({ source: `table:${from}`, target: `table:${to}`, label });
+    edges.push({ source: `table:${from}`, target: `table:${to}`, label, dashed });
   };
+
+  // declared first, so a pair that is both keeps the solid line
+  let declared = 0;
   for (const table of included.values()) {
-    if (table.childOf) push(table.name, table.childOf, 'child of');
-    for (const ref of table.references ?? []) push(table.name, ref.toTable, ref.column);
+    if (table.childOf) { push(table.name, table.childOf, 'child of', false); declared++; }
+    for (const ref of table.references ?? []) { push(table.name, ref.toTable, ref.column, false); declared++; }
+  }
+  const declaredPairs = seen.size;
+  if (inferred) {
+    for (const table of included.values()) {
+      for (const key of table.foreignKeys ?? []) push(table.name, key.toTable, key.column, true);
+    }
   }
 
-  return { nodes, edges, own: [...included.values()].filter((t) => t.module === module).length };
+  return {
+    nodes,
+    edges,
+    own: [...included.values()].filter(isOwn).length,
+    declared: declaredPairs,
+    inferred: seen.size - declaredPairs,
+  };
 }
 
 function renderData({ focus } = {}) {
@@ -1660,33 +1801,55 @@ function renderData({ focus } = {}) {
     return;
   }
 
-  if (picker.options.length !== backend.modules.length) {
+  if (picker.options.length !== backend.modules.length + 1) {
     picker.innerHTML = '';
+    const everything = el('option', null, `whole database · ${backend.modules.length} schemas`);
+    everything.value = ALL_SCHEMAS;
+    picker.append(everything);
     for (const module of backend.modules) {
       const option = el('option', null, `${module.name} · ${module.tables} tables`);
       option.value = module.name;
       picker.append(option);
     }
   }
-  if (!state.dataModule || !backend.modules.some((m) => m.name === state.dataModule)) {
-    state.dataModule = backend.modules[0].name;
-  }
+  const valid = state.dataModule === ALL_SCHEMAS || backend.modules.some((m) => m.name === state.dataModule);
+  if (!valid) state.dataModule = backend.modules[0].name;
   picker.value = state.dataModule;
 
-  const { nodes, edges, own } = buildData(state.dataModule);
+  const inferred = $('data-inferred').checked;
+  const wholeDatabase = state.dataModule === ALL_SCHEMAS;
+  const built = wholeDatabase ? buildSchemaMap() : buildData(state.dataModule, { inferred });
+  const { nodes, edges, own } = built;
+
+  data.showRows = state.dataRows;
+  $('data-rows').checked = data.showRows;
+  $('data-inferred').disabled = wholeDatabase;
+
   data.setData(nodes, edges);
-  data.setSelected(state.tableName ? `table:${state.tableName}` : null);
+  data.setSelected(state.tableName && !wholeDatabase ? `table:${state.tableName}` : null);
 
-  const module = backend.modules.find((m) => m.name === state.dataModule);
-  $('data-hint').textContent =
-    `${own} tables · ${nodes.length - own} pulled in from other schemas · ${edges.length} declared relationships · ` +
-    `migration ${module?.migration ?? '—'} (${module?.status ?? 'unknown'})`;
-
-  renderBoxLegend($('data-legend'), [
-    ['#34d399', 'table in this schema'],
-    ['#60a5fa', 'child table'],
-    ['#fbbf24', 'table from another schema'],
-  ], 'only Child of and contract $refs are drawn — a column named *_id is not assumed to be a key');
+  if (wholeDatabase) {
+    const crossings = edges.reduce((a, e) => a + Number(e.label), 0);
+    $('data-hint').textContent =
+      `${nodes.length} schemas · ${backend.tables.length} tables · ${edges.length} schema-to-schema ` +
+      `relationships across ${crossings} columns · click a row to open that schema`;
+    renderBoxLegend($('data-legend'), [
+      ['#34d399', 'migration written'],
+      ['#fbbf24', 'derivable, not written'],
+    ], 'one box per schema · the number on a line is how many columns cross it');
+  } else {
+    const module = backend.modules.find((m) => m.name === state.dataModule);
+    const pulled = nodes.length - own;
+    $('data-hint').textContent =
+      `${own} tables${pulled ? ` · ${pulled} pulled in from other schemas` : ''} · ` +
+      `${built.declared} declared and ${built.inferred} inferred relationships` +
+      (module ? ` · migration ${module.migration ?? '—'} (${module.status ?? 'unknown'})` : '');
+    renderBoxLegend($('data-legend'), [
+      ['#34d399', 'table in this schema'],
+      ['#60a5fa', 'child table'],
+      ['#fbbf24', 'table from another schema'],
+    ], 'solid = declared (Child of, or a $ref in the contracts) · dashed = inferred from a *_id column name');
+  }
 
   // the layout is seeded in a knot and spreads as it settles, so framing it
   // now would frame the knot — wait for the simulation to converge
@@ -1846,11 +2009,14 @@ function renderScreenLinks() {
       screen.navigation?.isEntryPoint ? 'An entry point — reached from outside the app.' : 'No screen exits to this one.'));
   }
   for (const from of inbound) {
-    const row = el('div', 'link-item');
+    const row = el('div', `link-item${from.navigationInferred ? ' inferred' : ''}`);
     row.append(el('span', 'link-name', `${from.id} ${from.name}`));
-    row.append(el('span', 'link-file', from.platform ?? ''));
+    row.append(el('span', 'link-file', from.navigationInferred ? 'inferred' : from.platform ?? ''));
     row.onclick = () => selectScreen(from.id);
     pane.append(row);
+  }
+  if (inbound.some((s) => s.navigationInferred)) {
+    pane.append(el('p', 'pane-note', 'Underlined routes come from a navigation block marked inferred.'));
   }
 }
 
@@ -1895,7 +2061,7 @@ function renderTableLinks() {
   if (!children.length) pane.append(el('p', 'pane-empty', 'Nothing is a child of this table.'));
 
   const references = table.references ?? [];
-  pane.append(sectionHead('References', references.length));
+  pane.append(sectionHead('Declared references', references.length));
   for (const ref of references) {
     const row = el('div', 'link-item');
     row.append(el('span', 'link-name', ref.toTable));
@@ -1905,6 +2071,38 @@ function renderTableLinks() {
   }
   if (!references.length) {
     pane.append(el('p', 'pane-empty', 'No relationship the contracts declare as a $ref.'));
+  }
+
+  const keys = table.foreignKeys ?? [];
+  pane.append(sectionHead('Inferred keys', keys.length));
+  for (const key of keys) {
+    const row = el('div', 'link-item inferred');
+    row.append(el('span', 'link-name', key.toTable));
+    row.append(el('span', 'link-weight', key.column));
+    if (key.self) row.append(el('span', 'link-file', 'self'));
+    else if (key.crossSchema) row.append(el('span', 'link-file', key.toTable.split('.')[0]));
+    row.onclick = () => selectTable(key.toTable);
+    pane.append(row);
+  }
+  pane.append(
+    el('p', 'pane-note',
+      keys.length
+        ? 'Read from *_id column names, not declared anywhere. Treat as a strong hint.'
+        : 'No column here ends in _id with a table named for it.')
+  );
+
+  // columns pointing at nothing are the interesting gap
+  const dangling = (state.backend?.columns?.[table.name] ?? []).filter(
+    (c) => /_id$/.test(c.name) && !c.foreignKeyTable && !c.referencesTable
+  );
+  if (dangling.length) {
+    pane.append(sectionHead('Keys with no table', dangling.length));
+    for (const column of dangling) {
+      const row = el('div', 'link-item');
+      row.append(el('span', 'link-name', column.name));
+      row.append(el('span', 'link-weight', column.type));
+      pane.append(row);
+    }
   }
 }
 
@@ -2323,6 +2521,7 @@ function auditSummary() {
       `${j.stats.screens} screens across ${j.stats.platforms} platforms · ${j.stats.flows} flows · ` +
       `${j.stats.apps} apps (${j.stats.scaffolded} scaffolded) · ` +
       `${j.stats.operationsCovered} of ${ops} operations are called by a screen · ` +
+      `${j.stats.navigationInferred} of ${j.stats.screensWithNavigation} navigation blocks are inferred · ` +
       `${errors(j.problems)} errors`
     );
   }
@@ -2579,7 +2778,15 @@ function bindUI() {
     data.resize();
     data.fit();
   };
-  $('data-rows').onchange = (e) => { data.showRows = e.target.checked; data.draw(); };
+  $('data-rows').onchange = (e) => {
+    state.dataRows = e.target.checked;
+    data.showRows = state.dataRows;
+    data.draw();
+  };
+  $('data-inferred').onchange = () => {
+    data.userAdjusted = false;
+    renderData({ focus: state.tableName });
+  };
   $('data-fit').onclick = () => { data.resize(); data.fit(); };
 
   $('er-rows').onchange = (e) => { er.showRows = e.target.checked; er.draw(); };
