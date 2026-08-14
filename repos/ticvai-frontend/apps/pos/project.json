@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "pos",
+  "sourceRoot": "apps/pos/src",
+  "projectType": "application",
+  "tags": ["type:app", "platform:react-native"],
+  "targets": {
+    "lint": { "executor": "@nx/eslint:lint" },
+    "test": { "executor": "@nx/vite:test" },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p apps/pos/tsconfig.json --noEmit" }
+    }
+  }
+}

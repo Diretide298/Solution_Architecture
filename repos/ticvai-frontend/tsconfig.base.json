@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ticvai/api-client": ["packages/api-client/src/index.ts"],
+      "@ticvai/offline-core": ["packages/offline-core/src/index.ts"],
+      "@ticvai/design-tokens": ["packages/design-tokens/src/index.ts"],
+      "@ticvai/ui": ["packages/ui/src/index.ts"]
+    }
+  }
+}

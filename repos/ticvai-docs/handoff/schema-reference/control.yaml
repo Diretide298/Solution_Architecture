@@ -1,0 +1,306 @@
+# control — derived from the API contracts, not hand-written
+# Migration: separate database — Control Plane
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: control
+migration: separate database — Control Plane
+tableCount: 8
+columnCount: 88
+tables:
+  control.cell:
+    derivedFrom: Cell
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: tenant_id
+      type: uuid
+      required: true
+    - name: region_id
+      type: uuid
+      required: true
+    - name: region_name
+      type: text
+      required: false
+    - name: country_code
+      type: text
+      required: true
+    - name: tier
+      type: jsonb
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: cloud_provider
+      type: text
+      required: false
+    - name: cloud_region
+      type: text
+      required: false
+    - name: api_endpoint
+      type: text
+      required: false
+    - name: venue_count
+      type: integer
+      required: false
+    - name: provisioned_at
+      type: timestamptz
+      required: false
+  control.cell_job:
+    derivedFrom: CellJob
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: cell_id
+      type: uuid
+      required: true
+    - name: kind
+      type: text
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: progress_percent
+      type: integer
+      required: false
+    - name: message
+      type: text
+      required: false
+    - name: error
+      type: text
+      required: false
+    - name: scheduled_for
+      type: timestamptz
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: completed_at
+      type: timestamptz
+      required: false
+  control.invoice:
+    derivedFrom: SubscriptionInvoice
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: invoice_number
+      type: text
+      required: true
+    - name: tenant_id
+      type: uuid
+      required: true
+    - name: period_start
+      type: date
+      required: true
+    - name: period_end
+      type: date
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: lines
+      type: jsonb
+      required: false
+    - name: subtotal
+      type: numeric(18,4)
+      required: false
+    - name: tax_amount
+      type: numeric(18,4)
+      required: false
+    - name: total
+      type: numeric(18,4)
+      required: true
+    - name: plan_version_used
+      type: text
+      required: false
+      description: Priced against the version the tenant is subscribed to, not the latest.
+    - name: issued_at
+      type: timestamptz
+      required: false
+    - name: due_at
+      type: date
+      required: false
+    - name: paid_at
+      type: timestamptz
+      required: false
+  control.licence_add_on:
+    derivedFrom: LicenceAddOn
+    columns:
+    - name: module_key
+      type: text
+      required: true
+    - name: limit_overrides
+      type: jsonb
+      required: false
+    - name: price
+      type: numeric(18,4)
+      required: false
+    - name: valid_from
+      type: date
+      required: false
+    - name: valid_to
+      type: date
+      required: false
+    - name: note
+      type: varchar(500)
+      required: false
+  control.plan:
+    derivedFrom: Plan
+    columns:
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: varchar(1000)
+      required: false
+    - name: cell_tier
+      type: jsonb
+      required: true
+    - name: licensed_modules
+      type: jsonb
+      required: true
+    - name: limits
+      type: jsonb
+      required: true
+    - name: base_price
+      type: numeric(18,4)
+      required: true
+    - name: billing_period
+      type: text
+      required: false
+    - name: includes_branded_app
+      type: boolean
+      required: false
+      description: Branded native publishing carries per-tenant operational cost and is priced, not absorbed.
+    - name: included_ai_tokens
+      type: integer
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: version
+      type: text
+      required: true
+      description: Existing subscribers stay on the version they were sold. A price change never applies
+        retroactively.
+    - name: is_active
+      type: boolean
+      required: true
+    - name: subscriber_count
+      type: integer
+      required: true
+    - name: published_at
+      type: timestamptz
+      required: false
+  control.subscription:
+    derivedFrom: Subscription
+    columns:
+    - name: tenant_id
+      type: uuid
+      required: true
+    - name: plan_id
+      type: uuid
+      required: true
+    - name: plan_name
+      type: text
+      required: false
+    - name: plan_version
+      type: text
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: starts_at
+      type: date
+      required: true
+    - name: renews_at
+      type: date
+      required: false
+    - name: cancelled_at
+      type: date
+      required: false
+    - name: current_price
+      type: numeric(18,4)
+      required: false
+    - name: billing_period
+      type: text
+      required: false
+  control.tenant:
+    derivedFrom: Tenant
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: suspension_mode
+      type: jsonb
+      required: false
+    - name: suspension_reason
+      type: text
+      required: false
+    - name: plan_id
+      type: uuid
+      required: false
+    - name: plan_name
+      type: text
+      required: false
+    - name: cell_count
+      type: integer
+      required: false
+    - name: venue_count
+      type: integer
+      required: false
+    - name: billing_email
+      type: text
+      required: false
+    - name: account_manager_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: activated_at
+      type: timestamptz
+      required: false
+  control.usage_record:
+    derivedFrom: UsageRecord
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+    - name: metric
+      type: jsonb
+      required: true
+    - name: quantity
+      type: numeric
+      required: true
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: capability
+      type: text
+      required: false
+      description: For AI token usage — which capability consumed them.
+    - name: recorded_at
+      type: timestamptz
+      required: true

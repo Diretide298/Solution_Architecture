@@ -1,0 +1,1627 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Maintenance & Safety
+  version: 0.1.0
+  x-ticvai-screen-count: 0
+  x-ticvai-tier: satellite
+  x-ticvai-module: "15 — Maintenance & Safety Management"
+  x-ticvai-requirements: 50
+  x-ticvai-capabilities: [C11, C12, C94]
+  x-ticvai-platforms:
+    - "P06 Staff Ops App"
+    - "P08 Venue Back Office"
+  description: >
+    ## What this contract covers
+
+    **Assets, work orders, inspections and incidents. Photo-first, offline-capable.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 15 — Maintenance & Safety Management |
+    | **Requirements** | ~50 |
+    | **Capabilities** | C11, C12, C94 |
+    | **Consumed by** | P06 Staff Ops App · P08 Venue Back Office |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Assets, work orders, planned maintenance, safety inspections and incident reporting.
+    Domain 15 — 50 requirements.
+
+    Positions this encodes:
+
+    - **Photo-first capture** (10 Aug §5.3). A technician in a plant room documents with a
+      camera, not a keyboard. Attachments are first-class on work orders, inspections and
+      incidents rather than an afterthought.
+    - **Every operation a field technician performs is offline-capable.** Plant rooms, roof
+      spaces and back-of-house corridors have no signal, and a maintenance app that stops
+      working there is a maintenance app nobody uses.
+    - **An asset out of service closes the loop into operations.** A ride flagged unsafe
+      appears on the venue map, blocks its access point, and stops its product selling. A
+      maintenance system that only tells maintenance is half a system.
+    - **Incidents are not work orders.** An incident is something that happened to a person
+      or a place and carries regulatory weight; a work order is something to be fixed. An
+      incident may raise a work order, never the reverse.
+    - Compliance inspections are retained for seven years alongside the financial trail.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: asset
+  - name: workOrder
+  - name: planned
+  - name: inspection
+  - name: incident
+
+paths:
+  # ---------------------------------------------------------------- assets
+  /assets:
+    get:
+      operationId: listAssets
+      x-ticvai-read-routing: replica
+      summary: List assets
+      tags: [asset]
+      x-ticvai-permission: ASSET_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: categoryId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/AssetStatus' }
+        - name: maintenanceDue
+          in: query
+          description: Assets with a planned task due or overdue.
+          schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Assets
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Asset' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createAsset
+      summary: Register an asset
+      description: >
+        Rides, plant, vehicles, IT equipment, furniture. Where the asset backs a sellable
+        product or an access point, that link is recorded here and is what allows a fault to
+        stop a sale.
+      tags: [asset]
+      x-ticvai-permission: ASSET_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateAssetRequest' }
+      responses:
+        '201':
+          description: Registered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Asset' }
+        '409':
+          description: Asset tag already in use
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /assets/{assetId}:
+    parameters:
+      - name: assetId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getAsset
+      x-ticvai-read-routing: replica
+      summary: Read an asset with history and documents
+      description: >
+        What a technician sees after scanning a tag — specification, service history, open
+        work orders, attached procedures and manuals, warranty position.
+      tags: [asset]
+      x-ticvai-permission: ASSET_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Asset
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssetDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateAsset
+      summary: Amend an asset
+      tags: [asset]
+      x-ticvai-permission: ASSET_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                locationDescription: { type: string, maxLength: 500 }
+                categoryId: { type: string, format: uuid }
+                warrantyExpiresAt: { type: string, format: date }
+                supplierId: { type: string, format: uuid }
+                documentRefs:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Asset' }
+
+  /assets/lookup:
+    get:
+      operationId: lookupAsset
+      x-ticvai-read-routing: replica
+      summary: Find an asset by tag or QR
+      description: >
+        The scanner path, and the first thing a technician does on arriving at a fault.
+        Offline-capable, because plant rooms have no signal.
+      tags: [asset]
+      x-ticvai-permission: ASSET_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: assetTag
+          in: query
+          schema: { type: string }
+        - name: serialNumber
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Asset
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssetDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /assets/{assetId}/status:
+    parameters:
+      - name: assetId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setAssetStatus
+      summary: Take an asset out of service or return it
+      description: >
+        **This closes the loop into operations.** Taking a ride out of service marks it on the
+        venue map, blocks its access point, and stops its product selling — a maintenance
+        system that only tells maintenance is half a system.
+
+        Returning to service requires a completed inspection where the asset's category
+        demands one. A technician cannot simply declare a ride safe.
+      tags: [asset]
+      x-ticvai-permission: ASSET_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetAssetStatusRequest' }
+      responses:
+        '200':
+          description: Status set, with downstream effects reported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssetStatusResult' }
+        '409':
+          description: >
+            Return to service attempted without the inspection this asset category requires.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /assets/{assetId}/history:
+    parameters:
+      - name: assetId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getAssetHistory
+      x-ticvai-read-routing: analytical
+      summary: Service history
+      description: >
+        Every work order, inspection, incident and status change, in sequence. What an
+        insurer or a regulator asks for after something goes wrong.
+      tags: [asset]
+      x-ticvai-permission: ASSET_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: History
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/AssetHistoryEntry' }
+
+  # ---------------------------------------------------------------- work orders
+  /work-orders:
+    get:
+      operationId: listWorkOrders
+      x-ticvai-read-routing: replica
+      summary: List work orders
+      description: >
+        A technician's queue. Defaults to their own assignments; a supervisor sees the venue.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: assignedToPrincipalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/WorkOrderStatus' }
+        - name: priority
+          in: query
+          schema: { $ref: '#/components/schemas/WorkOrderPriority' }
+        - name: assetId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: overdueOnly
+          in: query
+          schema: { type: boolean, default: false }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Work orders
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/WorkOrder' }
+
+    post:
+      operationId: createWorkOrder
+      summary: Raise a work order
+      description: >
+        Raised by anyone — a technician, a duty supervisor, a cashier who noticed a broken
+        turnstile, or automatically from a planned task or a failed inspection.
+
+        **Photo-first.** Attachments are expected at creation, not added later from memory.
+
+        Offline-capable: a fault found in a plant room is recorded there, not remembered
+        until the technician finds signal.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateWorkOrderRequest' }
+      responses:
+        '201':
+          description: Raised
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /work-orders/{workOrderId}:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getWorkOrder
+      x-ticvai-read-routing: replica
+      summary: Read a work order
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Work order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrderDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateWorkOrder
+      summary: Assign, reprioritise or amend
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                assignedToPrincipalId: { type: string, format: uuid }
+                priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+                dueAt: { type: string, format: date-time }
+                description: { type: string, maxLength: 5000 }
+                categoryId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+
+  /work-orders/{workOrderId}/time:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: recordWorkOrderTime
+      summary: Start, pause or stop work
+      description: >
+        The timer. Labour time drives cost and is the ground truth for how long jobs actually
+        take, which is what makes planned maintenance intervals meaningful rather than
+        guessed.
+
+        Offline-capable, so a technician records against the job in front of them rather than
+        reconstructing the day afterwards.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, action, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                action:
+                  type: string
+                  enum: [start, pause, resume, stop]
+                pauseReason:
+                  type: string
+                  enum: [awaitingParts, awaitingAccess, awaitingApproval, endOfShift, reassigned, other]
+                note: { type: string, maxLength: 500 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: Action inconsistent with the current timer state
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /work-orders/{workOrderId}/parts:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: recordWorkOrderParts
+      summary: Record parts consumed
+      description: >
+        Issues stock through the inventory movement ledger — one ledger, not a second parts
+        count maintained by maintenance.
+
+        **Not offline-capable**, for the same reason retail is not: stock depletes in real
+        time. Parts used offline are recorded on reconnect and may fail if stock has gone.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lines]
+              properties:
+                lines:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [inventoryItemId, quantity]
+                    properties:
+                      inventoryItemId: { type: string, format: uuid }
+                      quantity: { type: number, minimum: 0 }
+                      locationId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Recorded and stock issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrderDetail' }
+        '409':
+          description: Insufficient stock
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /work-orders/{workOrderId}/complete:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: completeWorkOrder
+      summary: Complete a work order
+      description: >
+        Requires a resolution note and, where the category demands it, completion photographs.
+        A safety-critical job closed with "fixed" and no evidence is not closed.
+
+        Where the work order took an asset out of service, completion does **not** return it —
+        that is a separate, deliberate act.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resolution, recordedAt]
+              properties:
+                resolution: { type: string, minLength: 3, maxLength: 5000 }
+                resolutionCode: { $ref: '#/components/schemas/ResolutionCode' }
+                attachmentRefs:
+                  type: array
+                  items: { type: string }
+                followUpRequired: { type: boolean, default: false }
+                followUpNote: { type: string, maxLength: 1000 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Completed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+        '400':
+          description: Completion photographs required for this category and none supplied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /work-orders/{workOrderId}/verify:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: verifyWorkOrder
+      summary: Supervisor verification
+      description: >
+        Where the category requires it, a second person confirms the work. The verifier may
+        not be the technician who did it — the point is a second pair of eyes, and enforcing
+        that is cheaper than discovering it was skipped.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_VERIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome]
+              properties:
+                outcome:
+                  type: string
+                  enum: [verified, rejected]
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: Verified or returned to the technician
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+        '403':
+          description: Verifier is the technician who completed the work
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- planned
+  /maintenance-plans:
+    get:
+      operationId: listMaintenancePlans
+      x-ticvai-read-routing: replica
+      summary: List planned maintenance schedules
+      tags: [planned]
+      x-ticvai-permission: ASSET_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Plans
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/MaintenancePlan' }
+
+    post:
+      operationId: createMaintenancePlan
+      summary: Create a planned maintenance schedule
+      description: >
+        By elapsed time, by usage, or both — whichever comes first. A ride serviced every
+        three months **or** every ten thousand cycles is one plan, not two.
+
+        Work orders are generated ahead of the due date by the plan's lead time, so parts can
+        be ordered before the job is already late.
+      tags: [planned]
+      x-ticvai-permission: ASSET_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MaintenancePlan' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MaintenancePlan' }
+        '400':
+          description: Neither an interval nor a usage trigger supplied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /maintenance-plans/{planId}:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateMaintenancePlan
+      summary: Amend or suspend a plan
+      tags: [planned]
+      x-ticvai-permission: ASSET_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                intervalDays: { type: integer, minimum: 1 }
+                usageInterval: { type: number, minimum: 0 }
+                leadTimeDays: { type: integer, minimum: 0 }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MaintenancePlan' }
+
+  /maintenance-plans/due:
+    get:
+      operationId: getDueMaintenance
+      x-ticvai-read-routing: replica
+      summary: Planned tasks due or overdue
+      description: >
+        The morning view for a maintenance supervisor. Overdue safety-critical tasks sort
+        first, because that is the order they matter in.
+      tags: [planned]
+      x-ticvai-permission: ASSET_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: withinDays
+          in: query
+          schema: { type: integer, default: 14 }
+      responses:
+        '200':
+          description: Due tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DueMaintenanceTask' }
+
+  # ---------------------------------------------------------------- inspections
+  /inspection-templates:
+    get:
+      operationId: listInspectionTemplates
+      x-ticvai-read-routing: replica
+      summary: List inspection templates
+      description: >
+        Opening checks, closing checks, daily ride inspections, fire safety, food hygiene.
+      tags: [inspection]
+      x-ticvai-permission: INSPECTION_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/InspectionTemplate' }
+
+    post:
+      operationId: createInspectionTemplate
+      summary: Create an inspection template
+      description: >
+        Items may be marked safety-critical. **A failed safety-critical item blocks the
+        inspection from passing** — it cannot be overridden by completing the rest.
+      tags: [inspection]
+      x-ticvai-permission: INSPECTION_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InspectionTemplate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InspectionTemplate' }
+
+  /inspections:
+    get:
+      operationId: listInspections
+      x-ticvai-read-routing: replica
+      summary: List completed inspections
+      description: >
+        Retained for seven years alongside the financial audit trail. This is the record an
+        inspector asks for.
+      tags: [inspection]
+      x-ticvai-permission: INSPECTION_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: templateId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: assetId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: outcome
+          in: query
+          schema: { $ref: '#/components/schemas/InspectionOutcome' }
+        - name: performedFrom
+          in: query
+          schema: { type: string, format: date }
+        - name: performedTo
+          in: query
+          schema: { type: string, format: date }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Inspections
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Inspection' }
+
+    post:
+      operationId: submitInspection
+      summary: Submit a completed inspection
+      description: >
+        Offline-capable and photo-first. A failed item may raise a work order automatically,
+        and a failed **safety-critical** item takes the asset out of service without waiting
+        for anyone to decide.
+
+        The inspector is recorded. An inspection nobody signed is not an inspection.
+      tags: [inspection]
+      x-ticvai-permission: INSPECTION_SUBMIT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubmitInspectionRequest' }
+      responses:
+        '201':
+          description: Submitted, with any consequences reported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InspectionResult' }
+        '400':
+          description: A required item was not answered
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- incidents
+  /incidents:
+    get:
+      operationId: listIncidents
+      x-ticvai-read-routing: replica
+      summary: List incidents
+      tags: [incident]
+      x-ticvai-permission: INCIDENT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: severity
+          in: query
+          schema: { $ref: '#/components/schemas/IncidentSeverity' }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/IncidentStatus' }
+        - name: isReportable
+          in: query
+          description: Incidents requiring notification to an external authority.
+          schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Incidents
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Incident' }
+
+    post:
+      operationId: reportIncident
+      summary: Report an incident
+      description: >
+        **An incident is not a work order.** It is something that happened to a person or a
+        place and carries regulatory weight. An incident may raise a work order; a work order
+        never raises an incident.
+
+        Reportable by any member of staff, offline-capable, photo-first. The barrier to
+        reporting should be as low as it can be — an unreported near-miss is the one that
+        recurs.
+
+        Personal details of anyone involved go to the erasable store, referenced by opaque
+        ID, so the incident record survives an erasure request intact.
+      tags: [incident]
+      x-ticvai-permission: INCIDENT_REPORT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReportIncidentRequest' }
+      responses:
+        '201':
+          description: Reported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Incident' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /incidents/{incidentId}:
+    parameters:
+      - name: incidentId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getIncident
+      x-ticvai-read-routing: replica
+      summary: Read an incident
+      tags: [incident]
+      x-ticvai-permission: INCIDENT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Incident
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IncidentDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateIncident
+      summary: Investigate, escalate or close an incident
+      description: >
+        Closure requires findings and, where a corrective action was identified, a linked
+        work order. An incident closed without either is a lesson nobody learned.
+
+        **The original report is never edited.** Investigation adds to the record.
+      tags: [incident]
+      x-ticvai-permission: INCIDENT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                status: { $ref: '#/components/schemas/IncidentStatus' }
+                severity: { $ref: '#/components/schemas/IncidentSeverity' }
+                assignedToPrincipalId: { type: string, format: uuid }
+                investigationNote: { type: string, maxLength: 10000 }
+                rootCause: { type: string, maxLength: 2000 }
+                correctiveActions: { type: string, maxLength: 5000 }
+                correctiveWorkOrderId: { type: string }
+                attachmentRefs:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Incident' }
+        '400':
+          description: Closure attempted without findings or a corrective action
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /incidents/{incidentId}/notify-authority:
+    parameters:
+      - name: incidentId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: recordAuthorityNotification
+      summary: Record notification to an external authority
+      description: >
+        Some incidents must be reported externally within a statutory window. This records
+        that it happened, when, to whom, and with what reference — the evidence that the
+        obligation was met.
+      tags: [incident]
+      x-ticvai-permission: INCIDENT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [authority, notifiedAt]
+              properties:
+                authority: { type: string, maxLength: 200 }
+                reference: { type: string, maxLength: 128 }
+                notifiedAt: { type: string, format: date-time }
+                notifiedByPrincipalId: { type: string, format: uuid }
+                attachmentRefs:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Incident' }
+
+components:
+  schemas:
+    AssetStatus:
+      type: string
+      enum: [inService, outOfService, underMaintenance, awaitingParts, retired, disposed]
+
+    AssetCriticality:
+      type: string
+      enum: [safetyCritical, revenueCritical, standard, low]
+
+    CreateAssetRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [assetTag, name, venueId, criticality]
+      properties:
+        assetTag: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        categoryId: { type: string, format: uuid }
+        locationDescription: { type: string, maxLength: 500 }
+        criticality: { $ref: '#/components/schemas/AssetCriticality' }
+        manufacturer: { type: string, maxLength: 200 }
+        model: { type: string, maxLength: 200 }
+        serialNumber: { type: string, maxLength: 128 }
+        commissionedAt: { type: string, format: date }
+        warrantyExpiresAt: { type: string, format: date }
+        supplierId: { type: string, format: uuid }
+        linkedProductIds:
+          type: array
+          description: >
+            Products this asset delivers. A fault here can stop them selling.
+          items: { type: string, format: uuid }
+        linkedAccessPointId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Access point this asset controls. Out of service blocks it.
+        requiresInspectionToReturn:
+          type: boolean
+          default: false
+          description: >
+            True means a completed inspection is required before return to service. A
+            technician cannot simply declare a ride safe.
+        documentRefs:
+          type: array
+          items: { type: string }
+
+    Asset:
+      x-ticvai-persistence: "maintenance.asset"
+      allOf:
+        - $ref: '#/components/schemas/CreateAssetRequest'
+        - type: object
+          required: [id, status]
+          properties:
+            id: { type: string, format: uuid }
+            status: { $ref: '#/components/schemas/AssetStatus' }
+            statusReason: { type: string, nullable: true }
+            openWorkOrderCount: { type: integer }
+            nextMaintenanceDueAt: { type: string, format: date-time, nullable: true }
+            isMaintenanceOverdue: { type: boolean }
+            lastInspectionAt: { type: string, format: date-time, nullable: true }
+            usageCounter:
+              type: number
+              nullable: true
+              description: Cycles, hours or kilometres. Drives usage-based maintenance.
+
+    AssetDetail:
+      x-ticvai-persistence: "maintenance.asset"
+      allOf:
+        - $ref: '#/components/schemas/Asset'
+        - type: object
+          properties:
+            openWorkOrders:
+              type: array
+              items: { $ref: '#/components/schemas/WorkOrder' }
+            maintenancePlans:
+              type: array
+              items: { $ref: '#/components/schemas/MaintenancePlan' }
+            documents:
+              type: array
+              description: Manuals, procedures, certificates. What a technician needs on site.
+              items:
+                type: object
+                properties:
+                  ref: { type: string }
+                  name: { type: string }
+                  kind:
+                    type: string
+                    enum: [manual, sop, certificate, warranty, drawing, riskAssessment]
+
+    SetAssetStatusRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [status, reason, recordedAt]
+      properties:
+        status: { $ref: '#/components/schemas/AssetStatus' }
+        reason: { type: string, minLength: 3, maxLength: 1000 }
+        inspectionId:
+          type: string
+          nullable: true
+          description: Required for return to service where the asset demands it.
+        raiseWorkOrder: { type: boolean, default: false }
+        recordedAt: { type: string, format: date-time }
+
+    AssetStatusResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [asset, downstreamEffects]
+      properties:
+        asset: { $ref: '#/components/schemas/Asset' }
+        downstreamEffects:
+          type: object
+          description: >
+            What else changed. Surfaced so the person taking a ride out of service sees the
+            commercial consequence at the moment they do it.
+          properties:
+            productsSuspended:
+              type: array
+              items: { type: string, format: uuid }
+            accessPointBlocked: { type: boolean }
+            performancesAffected: { type: integer }
+            workOrderId: { type: string, nullable: true }
+
+    AssetHistoryEntry:
+      x-ticvai-persistence: "none — union view over work orders, inspections and incidents"
+      type: object
+      required: [kind, occurredAt, summary]
+      properties:
+        kind:
+          type: string
+          enum: [workOrder, inspection, incident, statusChange, partReplaced, planCompleted]
+        referenceId: { type: string, nullable: true }
+        summary: { type: string }
+        principalId: { type: string, format: uuid, nullable: true }
+        occurredAt: { type: string, format: date-time }
+
+    WorkOrderStatus:
+      type: string
+      enum: [open, assigned, inProgress, paused, awaitingParts, completed, verified, cancelled]
+
+    WorkOrderPriority:
+      type: string
+      enum: [low, normal, high, urgent, emergency]
+
+    WorkOrderKind:
+      type: string
+      enum: [corrective, planned, inspectionFollowUp, incidentCorrective, improvement]
+
+    ResolutionCode:
+      type: string
+      enum: [repaired, partReplaced, adjusted, cleaned, noFaultFound, referredExternal, replaced, deferred]
+
+    CreateWorkOrderRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, title, venueId, priority, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        title: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 5000 }
+        venueId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid }
+        locationDescription: { type: string, maxLength: 500 }
+        kind:
+          allOf:
+            - $ref: '#/components/schemas/WorkOrderKind'
+          default: corrective
+        priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+        categoryId: { type: string, format: uuid }
+        assignedToPrincipalId: { type: string, format: uuid }
+        dueAt: { type: string, format: date-time }
+        attachmentRefs:
+          type: array
+          description: Photo-first. Expected at creation, not added later from memory.
+          items: { type: string }
+        takeAssetOutOfService:
+          type: boolean
+          default: false
+          description: >
+            Raise and immediately suspend the asset. For a fault found on a live ride, the
+            two are one action.
+        recordedAt: { type: string, format: date-time }
+
+    WorkOrder:
+      x-ticvai-persistence: "maintenance.work_order"
+      type: object
+      required: [id, workOrderNumber, title, venueId, status, priority, kind, createdAt]
+      properties:
+        id: { type: string }
+        workOrderNumber: { type: string }
+        title: { type: string }
+        venueId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid, nullable: true }
+        assetName: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/WorkOrderStatus' }
+        priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+        kind: { $ref: '#/components/schemas/WorkOrderKind' }
+        assignedToPrincipalId: { type: string, format: uuid, nullable: true }
+        raisedByPrincipalId: { type: string, format: uuid }
+        elapsedMinutes: { type: integer }
+        isTimerRunning: { type: boolean }
+        dueAt: { type: string, format: date-time, nullable: true }
+        isOverdue: { type: boolean }
+        requiresVerification: { type: boolean }
+        sourcePlanId: { type: string, format: uuid, nullable: true }
+        sourceInspectionId: { type: string, nullable: true }
+        sourceIncidentId: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        recordedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+        syncedAt: { type: string, format: date-time, nullable: true }
+
+    WorkOrderDetail:
+      x-ticvai-persistence: "maintenance.work_order"
+      allOf:
+        - $ref: '#/components/schemas/WorkOrder'
+        - type: object
+          properties:
+            description: { type: string, nullable: true }
+            resolution: { type: string, nullable: true }
+            resolutionCode: { $ref: '#/components/schemas/ResolutionCode' }
+            attachmentRefs:
+              type: array
+              items: { type: string }
+            timeEntries:
+              type: array
+              items:
+                type: object
+                properties:
+                  action: { type: string }
+                  principalId: { type: string, format: uuid }
+                  pauseReason: { type: string, nullable: true }
+                  recordedAt: { type: string, format: date-time }
+            parts:
+              type: array
+              items:
+                type: object
+                properties:
+                  inventoryItemId: { type: string, format: uuid }
+                  itemName: { type: string }
+                  quantity: { type: number }
+                  cost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            labourCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            partsCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            totalCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            verifiedByPrincipalId: { type: string, format: uuid, nullable: true }
+
+    MaintenancePlan:
+      x-ticvai-persistence: "maintenance.maintenance_plan"
+      type: object
+      required: [id, name, assetId, taskTemplate]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, maxLength: 200 }
+        assetId: { type: string, format: uuid }
+        assetCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Applies to every asset in the category rather than one.
+        intervalDays:
+          type: integer
+          nullable: true
+          description: Elapsed-time trigger.
+        usageInterval:
+          type: number
+          nullable: true
+          description: >
+            Usage trigger — cycles, hours, kilometres. **Whichever comes first** when both are
+            set. A ride serviced every three months or ten thousand cycles is one plan.
+        leadTimeDays:
+          type: integer
+          default: 7
+          description: >
+            How far ahead the work order is generated, so parts can be ordered before the job
+            is already late.
+        taskTemplate:
+          type: object
+          required: [title, priority]
+          properties:
+            title: { type: string }
+            description: { type: string }
+            priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+            estimatedMinutes: { type: integer }
+            inspectionTemplateId: { type: string, format: uuid }
+            requiredPartIds:
+              type: array
+              items: { type: string, format: uuid }
+        lastCompletedAt: { type: string, format: date-time, nullable: true }
+        nextDueAt: { type: string, format: date-time, nullable: true }
+        isActive: { type: boolean }
+
+    DueMaintenanceTask:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [planId, assetId, assetName, dueAt, isOverdue, criticality]
+      properties:
+        planId: { type: string, format: uuid }
+        planName: { type: string }
+        assetId: { type: string, format: uuid }
+        assetName: { type: string }
+        criticality: { $ref: '#/components/schemas/AssetCriticality' }
+        dueAt: { type: string, format: date-time }
+        isOverdue: { type: boolean }
+        daysOverdue: { type: integer }
+        triggeredBy:
+          type: string
+          enum: [interval, usage]
+        workOrderId: { type: string, nullable: true }
+
+    InspectionItemKind:
+      type: string
+      enum: [passFail, yesNo, numeric, text, photo, signature]
+
+    InspectionTemplate:
+      x-ticvai-persistence: "maintenance.inspection_template + maintenance.inspection_template_item"
+      type: object
+      required: [id, code, name, items]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid, nullable: true }
+        appliesToAssetCategoryId: { type: string, format: uuid, nullable: true }
+        frequency:
+          type: string
+          enum: [preOpening, postClosing, daily, weekly, monthly, annual, adHoc]
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [key, label, kind, isRequired]
+            properties:
+              key: { type: string }
+              label: { type: string }
+              kind: { $ref: '#/components/schemas/InspectionItemKind' }
+              isRequired: { type: boolean }
+              isSafetyCritical:
+                type: boolean
+                default: false
+                description: >
+                  A failed safety-critical item **blocks the inspection from passing** and
+                  cannot be overridden by completing the rest.
+              requiresPhotoOnFail: { type: boolean, default: true }
+              minValue: { type: number, nullable: true }
+              maxValue: { type: number, nullable: true }
+              guidance: { type: string, nullable: true }
+        retentionYears:
+          type: integer
+          default: 7
+          description: Compliance inspections are retained alongside the financial trail.
+        isActive: { type: boolean }
+
+    InspectionOutcome:
+      type: string
+      enum: [passed, passedWithObservations, failed]
+
+    SubmitInspectionRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, templateId, venueId, responses, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        templateId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid }
+        responses:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [key, value]
+            properties:
+              key: { type: string }
+              value: {}
+              passed: { type: boolean, nullable: true }
+              note: { type: string, maxLength: 1000 }
+              attachmentRefs:
+                type: array
+                items: { type: string }
+        signatureRef: { type: string, nullable: true }
+        recordedAt: { type: string, format: date-time }
+
+    Inspection:
+      x-ticvai-persistence: "maintenance.inspection + maintenance.inspection_response"
+      type: object
+      required: [id, templateId, venueId, outcome, performedByPrincipalId, performedAt]
+      properties:
+        id: { type: string }
+        templateId: { type: string, format: uuid }
+        templateName: { type: string }
+        venueId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid, nullable: true }
+        outcome: { $ref: '#/components/schemas/InspectionOutcome' }
+        failedItemCount: { type: integer }
+        failedSafetyCriticalCount: { type: integer }
+        performedByPrincipalId:
+          type: string
+          format: uuid
+          description: An inspection nobody signed is not an inspection.
+        performedAt: { type: string, format: date-time }
+        recordedAt: { type: string, format: date-time }
+        syncedAt: { type: string, format: date-time, nullable: true }
+        retainUntil: { type: string, format: date, nullable: true }
+
+    InspectionResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [inspection, consequences]
+      properties:
+        inspection: { $ref: '#/components/schemas/Inspection' }
+        consequences:
+          type: object
+          description: >
+            What the submission triggered. A failed safety-critical item takes the asset out
+            of service without waiting for anyone to decide.
+          properties:
+            assetTakenOutOfService: { type: boolean }
+            workOrdersRaised:
+              type: array
+              items: { type: string }
+            productsSuspended:
+              type: array
+              items: { type: string, format: uuid }
+            escalatedToPrincipalId: { type: string, format: uuid, nullable: true }
+
+    IncidentSeverity:
+      type: string
+      enum: [nearMiss, minor, moderate, major, critical]
+
+    IncidentStatus:
+      type: string
+      enum: [reported, underInvestigation, actionRequired, closed]
+
+    IncidentKind:
+      type: string
+      enum:
+        - guestInjury
+        - staffInjury
+        - nearMiss
+        - propertyDamage
+        - equipmentFailure
+        - securityIncident
+        - fireOrEvacuation
+        - foodSafety
+        - environmental
+        - other
+
+    ReportIncidentRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, kind, severity, venueId, description, occurredAt, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        kind: { $ref: '#/components/schemas/IncidentKind' }
+        severity: { $ref: '#/components/schemas/IncidentSeverity' }
+        venueId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid }
+        locationDescription: { type: string, maxLength: 500 }
+        description: { type: string, minLength: 3, maxLength: 10000 }
+        involvedSubjectIds:
+          type: array
+          description: >
+            Opaque references. Personal details live in the erasable store, so the incident
+            record survives an erasure request intact.
+          items: { type: string, format: uuid }
+        involvedStaffPrincipalIds:
+          type: array
+          items: { type: string, format: uuid }
+        witnessCount: { type: integer }
+        firstAidGiven: { type: boolean, default: false }
+        emergencyServicesCalled: { type: boolean, default: false }
+        attachmentRefs:
+          type: array
+          items: { type: string }
+        occurredAt: { type: string, format: date-time }
+        recordedAt: { type: string, format: date-time }
+
+    Incident:
+      x-ticvai-persistence: "maintenance.incident"
+      type: object
+      required: [id, incidentNumber, kind, severity, status, venueId, occurredAt, reportedByPrincipalId]
+      properties:
+        id: { type: string }
+        incidentNumber: { type: string }
+        kind: { $ref: '#/components/schemas/IncidentKind' }
+        severity: { $ref: '#/components/schemas/IncidentSeverity' }
+        status: { $ref: '#/components/schemas/IncidentStatus' }
+        venueId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid, nullable: true }
+        locationDescription: { type: string, nullable: true }
+        isReportable:
+          type: boolean
+          description: Requires notification to an external authority within a statutory window.
+        notificationDueAt: { type: string, format: date-time, nullable: true }
+        notifiedAt: { type: string, format: date-time, nullable: true }
+        assignedToPrincipalId: { type: string, format: uuid, nullable: true }
+        reportedByPrincipalId: { type: string, format: uuid }
+        correctiveWorkOrderId: { type: string, nullable: true }
+        occurredAt: { type: string, format: date-time }
+        recordedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time, nullable: true }
+        syncedAt: { type: string, format: date-time, nullable: true }
+
+    IncidentDetail:
+      x-ticvai-persistence: "maintenance.incident"
+      allOf:
+        - $ref: '#/components/schemas/Incident'
+        - type: object
+          properties:
+            description:
+              type: string
+              description: The original report. Never edited — investigation adds to the record.
+            investigationNote: { type: string, nullable: true }
+            rootCause: { type: string, nullable: true }
+            correctiveActions: { type: string, nullable: true }
+            firstAidGiven: { type: boolean }
+            emergencyServicesCalled: { type: boolean }
+            witnessCount: { type: integer }
+            attachmentRefs:
+              type: array
+              items: { type: string }
+            authorityNotifications:
+              type: array
+              items:
+                type: object
+                properties:
+                  authority: { type: string }
+                  reference: { type: string, nullable: true }
+                  notifiedAt: { type: string, format: date-time }
+                  notifiedByPrincipalId: { type: string, format: uuid }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

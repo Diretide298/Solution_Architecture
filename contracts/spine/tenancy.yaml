@@ -1,0 +1,995 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Tenancy & Organisation
+  version: 1.0.0
+  x-ticvai-screen-count: 0
+  x-ticvai-tier: spine
+  x-ticvai-module: "Cross-cutting — organisation hierarchy"
+  x-ticvai-capabilities: [C95, C20]
+  x-ticvai-platforms:
+    - "P08 Venue Back Office"
+    - "P04 POS"
+    - "P07 Access Handheld"
+    - "P09 Platform Admin"
+  description: >
+    ## What this contract covers
+
+    **Defines where everything else lives.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | Cross-cutting — organisation hierarchy |
+    | **Capabilities** | C95, C20 |
+    | **Consumed by** | P08 Venue Back Office · P04 POS · P07 Access Handheld · P09 Platform Admin |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    The scope hierarchy, region settings and workstation configuration.
+
+    Three positions shape this contract:
+
+    - A cell serves exactly one tenant in one REGION (ADR-0014). Every path here operates
+      within the current cell; there is no cross-cell read. Jurisdiction is a placement
+      constraint on regions, not the split rule.
+    - Region owns currency, decimal scale, time zone, date format and fiscal year.
+      These inherit to every venue beneath and are not overridable at venue level.
+    - Point of sale is local-first (ADR-0013). A workstation reads its catalogue from a
+      signed bundle held locally, so `Workstation` carries the deployment profile and the
+      applied bundle version. Those fields are what a terminal needs at boot.
+
+    The hierarchy is binding (ADR-0011): seven levels, Tenant through Workstation. The
+    example populating the original client diagram was illustrative; the structure was not.
+    Scope paths are variable-length ltree, so the model is depth-tolerant, but the level
+    names below are now settled and a change to them is a breaking contract change.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+        description: Resolved per tenant from the Control Plane. Never hardcoded in a client.
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: scope
+  - name: region
+  - name: workstation
+
+paths:
+  /scope-nodes:
+    get:
+      operationId: listScopeNodes
+      x-ticvai-read-routing: replica
+      summary: List scope nodes visible to the session
+      tags: [scope]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: under
+          in: query
+          description: Return descendants of this path only. Omit for the full visible set.
+          schema: { type: string }
+        - name: level
+          in: query
+          schema: { $ref: '#/components/schemas/ScopeLevel' }
+        - name: includeInactive
+          in: query
+          schema: { type: boolean, default: false }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Nodes at or beneath the session's granted scopes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ScopeNode' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createScopeNode
+      summary: Create a scope node
+      tags: [scope]
+      x-ticvai-permission: SCOPE_MANAGE
+      x-ticvai-scope-level: brand
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateScopeNodeRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScopeNode' }
+          headers:
+            X-Consistency-Token:
+              schema: { type: string }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409': { $ref: '../shared/common.yaml#/components/responses/Conflict' }
+
+  /scope-nodes/{scopeNodeId}:
+    parameters:
+      - name: scopeNodeId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getScopeNode
+      x-ticvai-read-routing: replica
+      summary: Read a scope node
+      tags: [scope]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScopeNode' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    patch:
+      operationId: updateScopeNode
+      summary: Rename or deactivate a scope node
+      description: >
+        Deactivating a node causes every permission query at or beneath it to resolve to
+        DENY. It does not delete data.
+      tags: [scope]
+      x-ticvai-permission: SCOPE_MANAGE
+      x-ticvai-scope-level: brand
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScopeNode' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /regions/{regionId}/settings:
+    parameters:
+      - name: regionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getRegionSettings
+      x-ticvai-read-routing: replica
+      summary: Read region settings
+      description: >
+        Currency, decimal scale, time zone, date format and fiscal year. These inherit to
+        every venue beneath and are not overridable at venue level.
+      tags: [region]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RegionSettings' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    put:
+      operationId: updateRegionSettings
+      summary: Update region settings
+      description: >
+        Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
+        The ledger is append-only; a scale change would silently reinterpret historic
+        amounts.
+      tags: [region]
+      x-ticvai-permission: REGION_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegionSettings' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RegionSettings' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            Currency or scale change rejected because transactions exist in this region.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /workstations:
+    get:
+      operationId: listWorkstations
+      x-ticvai-read-routing: replica
+      summary: List workstations
+      tags: [workstation]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: saleBoardKind
+          in: query
+          schema: { $ref: '#/components/schemas/SaleBoardKind' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Workstations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Workstation' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /workstations/{workstationId}:
+    parameters:
+      - name: workstationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getWorkstation
+      x-ticvai-read-routing: replica
+      summary: Read a workstation
+      description: >
+        Returns the sale board, connected devices, inherited access point and the region's
+        currency settings. A client calls this at boot to know what surface to load and
+        what hardware is attached.
+
+        Workstation determines presentation, hardware binding, till identity, access point
+        and reporting dimension. It is never a permission source.
+      tags: [workstation]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Workstation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workstation' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    put:
+      operationId: configureWorkstation
+      summary: Configure a workstation
+      tags: [workstation]
+      x-ticvai-permission: WORKSTATION_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfigureWorkstationRequest' }
+      responses:
+        '200':
+          description: Configured
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workstation' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /outlets:
+    get:
+      operationId: listOutlets
+      summary: List outlets
+      description: >
+        A point of sale within a venue — a shop, a restaurant, a bar, a kiosk cluster. F&B,
+        retail and games all key off it, and until now it was referenced by all three without
+        being defined anywhere.
+
+        An outlet is not a workstation. Several workstations sit in one outlet, and the outlet
+        is what carries the menu, the stock location and the revenue attribution.
+      tags: [workstation]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/OutletKind' }
+      responses:
+        '200':
+          description: Outlets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Outlet' }
+
+    post:
+      operationId: createOutlet
+      summary: Create an outlet
+      tags: [workstation]
+      x-ticvai-permission: REGION_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Outlet' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Outlet' }
+        '409':
+          description: Code already in use in this venue
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /outlets/{outletId}:
+    parameters:
+      - name: outletId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateOutlet
+      summary: Amend an outlet
+      tags: [workstation]
+      x-ticvai-permission: REGION_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                stockLocationId: { type: string, format: uuid }
+                costCenterId: { type: string, format: uuid }
+                openingHours: { type: array, items: { type: object } }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Outlet' }
+
+  /sale-boards:
+    get:
+      operationId: listSaleBoards
+      x-ticvai-read-routing: replica
+      summary: List sale boards
+      description: >
+        The configured front ends a workstation may load. A board determines presentation and
+        layout, never authorisation (ADR-0002).
+      tags: [workstation]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/SaleBoardKind' }
+      responses:
+        '200':
+          description: Sale boards
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SaleBoard' }
+
+    post:
+      operationId: createSaleBoard
+      summary: Create a sale board
+      description: >
+        Tiles reference catalogue variants and are grouped into pages. A cashier finds an item
+        faster on a well-arranged board than through search, which is the entire reason boards
+        exist rather than a product list.
+      tags: [workstation]
+      x-ticvai-permission: WORKSTATION_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaleBoard' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SaleBoard' }
+        '400':
+          description: A tile references an unknown or unsellable variant
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /sale-boards/{saleBoardId}:
+    parameters:
+      - name: saleBoardId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: updateSaleBoard
+      summary: Update a sale board
+      description: >
+        Changes reach terminals with the next catalogue bundle, not immediately — a board that
+        rearranged itself mid-transaction would be worse than one that lags.
+      tags: [workstation]
+      x-ticvai-permission: WORKSTATION_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaleBoard' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SaleBoard' }
+
+  /devices:
+    get:
+      operationId: listDevices
+      x-ticvai-read-routing: replica
+      summary: List registered devices
+      description: >
+        Physical devices bound to workstations. Distinct from Device Management, which covers
+        the full estate lifecycle — this is the binding a workstation needs at boot.
+      tags: [workstation]
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: workstationId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/DeviceKind' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Devices
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/RegisteredDevice' }
+
+    post:
+      operationId: registerDevice
+      summary: Register a device
+      description: >
+        Binds a device to a workstation and names the driver. Drivers are built to open
+        standards where they exist — ESC/POS, UnifiedPOS, OSDP — so adding a vendor is a
+        driver plus configuration rather than a core change (ADR-0015).
+      tags: [workstation]
+      x-ticvai-permission: DEVICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisteredDevice' }
+      responses:
+        '201':
+          description: Registered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RegisteredDevice' }
+        '409':
+          description: Identifier already bound to another workstation
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /devices/{deviceId}/heartbeat:
+    parameters:
+      - name: deviceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: recordDeviceHeartbeat
+      summary: Device heartbeat and status
+      description: >
+        Reports reachability and consumables — paper low, drawer open, reader offline. A
+        required device that stops reporting blocks shift open, which is better discovered
+        before a queue forms than during one.
+      tags: [workstation]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-self-scoped: principal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status, recordedAt]
+              properties:
+                status:
+                  type: string
+                  enum: [online, offline, error, consumableLow, needsAttention]
+                detail: { type: string, maxLength: 500 }
+                firmwareVersion: { type: string }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '204': { description: Recorded }
+
+components:
+  schemas:
+    OutletKind:
+      type: string
+      enum: [shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile]
+
+    Outlet:
+      type: object
+      x-ticvai-persistence: "platform.outlet"
+      required: [id, code, name, venueId, kind]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/OutletKind' }
+        zone: { type: string, nullable: true }
+        stockLocationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where this outlet draws stock from. A shop and its stockroom are one location; a
+            bar drawing from a central cellar is not.
+        costCenterId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Revenue and cost attribution. Outlet is the natural grain for both.
+        openingHours:
+          type: array
+          items: { type: object }
+        isActive: { type: boolean }
+
+    SaleBoard:
+      x-ticvai-persistence: "platform.sale_board"
+      type: object
+      required: [id, code, name, venueId, kind, pages]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/SaleBoardKind' }
+        pages:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [name, sortOrder, tiles]
+            properties:
+              name: { type: string }
+              sortOrder: { type: integer }
+              tiles:
+                type: array
+                items:
+                  type: object
+                  required: [position, kind]
+                  properties:
+                    position: { type: integer }
+                    kind:
+                      type: string
+                      enum: [product, category, action, spacer]
+                    variantId: { type: string, format: uuid, nullable: true }
+                    label: { type: string }
+                    colour: { type: string, nullable: true }
+                    imageAssetRef: { type: string, nullable: true }
+        isActive: { type: boolean }
+
+    RegisteredDevice:
+      x-ticvai-persistence: "platform.device"
+      type: object
+      required: [id, kind, driver, workstationId]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/DeviceKind' }
+        driver:
+          type: string
+          description: >
+            Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a
+            vendor is a driver plus configuration, not a core change (ADR-0015).
+        identifier: { type: string, nullable: true }
+        workstationId: { type: string, format: uuid }
+        model: { type: string, nullable: true }
+        firmwareVersion: { type: string, nullable: true }
+        isRequired:
+          type: boolean
+          description: True blocks shift open when the device is unreachable.
+        status:
+          type: string
+          enum: [online, offline, error, consumableLow, needsAttention, unknown]
+        lastHeartbeatAt: { type: string, format: date-time, nullable: true }
+
+    ScopeLevel:
+      type: string
+      description: >
+        Confirmed binding (ADR-0011). Seven levels, these names, this order. Region owns
+        currency, decimal scale, time zone and fiscal year, inherited by every venue beneath
+        and not overridable at venue level.
+      enum: [tenant, brand, region, venue, department, subDepartment, workstation]
+
+    ScopeNode:
+      x-ticvai-persistence: "platform.scope_node"
+      type: object
+      required: [id, level, path, code, name, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        level: { $ref: '#/components/schemas/ScopeLevel' }
+        parentId: { type: string, format: uuid, nullable: true }
+        path:
+          type: string
+          description: Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.
+          pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        isActive:
+          type: boolean
+          description: >
+            False causes every permission query at or beneath this node to resolve to DENY.
+        childCount: { type: integer, minimum: 0 }
+
+    CreateScopeNodeRequest:
+      type: object
+      required: [level, parentId, code, name]
+      properties:
+        level: { $ref: '#/components/schemas/ScopeLevel' }
+        parentId:
+          type: string
+          format: uuid
+          description: Required for every level except tenant, which the cell creates at provisioning.
+        code:
+          type: string
+          maxLength: 64
+          pattern: '^[a-z0-9_]+$'
+          description: Becomes the final ltree segment. Immutable once created.
+        name: { type: string, maxLength: 200 }
+
+    RegionSettings:
+      x-ticvai-persistence: "platform.region_settings"
+      type: object
+      required: [countryCode, currencyCode, currencyScale, timeZone, fiscalYearStartMonth]
+      properties:
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          description: ISO 3166-1 alpha-2. Determines the jurisdiction, and therefore the cell.
+        currencyCode:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        currencyScale:
+          type: integer
+          minimum: 0
+          maximum: 4
+          description: >
+            Decimal places for this region's currency. Varies by currency — some use 2, some
+            use 3. Money columns are numeric(18,4) and carry the scale explicitly, because a
+            fixed 2-place type silently truncates 3-place currencies.
+        timeZone:
+          type: string
+          description: IANA zone, e.g. `Asia/Dubai`.
+        dateFormat: { type: string, default: 'dd/MM/yyyy' }
+        numberFormat: { type: string, default: '#,##0.00' }
+        fiscalYearStartMonth:
+          type: integer
+          minimum: 1
+          maximum: 12
+          description: Varies by country.
+        placement:
+          $ref: '#/components/schemas/Placement'
+        cellName:
+          type: string
+          readOnly: true
+          description: >
+            The cell serving this region. One cell per tenant per region (ADR-0014).
+
+    Placement:
+      x-ticvai-persistence: "none — embedded in region_settings"
+      type: object
+      description: >
+        Read-only here. Set by the Control Plane at provisioning.
+
+        Every region is its own logical cell. Placement determines the infrastructure
+        backing it, which is how cost is controlled without varying the split rule:
+        `shared` puts several regions' databases on one cluster; `dedicated` and `isolated`
+        give a region its own. Regions in different countries MUST have placements in their
+        respective jurisdictions.
+      readOnly: true
+      required: [mode]
+      properties:
+        mode:
+          type: string
+          enum: [shared, dedicated, isolated, clientHosted]
+        cellName: { type: string }
+        cloudRegion: { type: string }
+
+    DeploymentProfile:
+      type: string
+      description: >
+        How this workstation obtains catalogue and inventory (ADR-0013).
+
+        - `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites
+        - `venueEdge` — own SQLite, distributed via the venue edge node which holds the
+          venue lease and sub-leases to terminals. Mid and large venues, stadium gates
+        - `thin` — no local catalogue, server reads. Non-transactional surfaces only
+      enum: [terminalLocal, venueEdge, thin]
+
+    CatalogueState:
+      x-ticvai-persistence: "none — computed from workstation bundle_version"
+      type: object
+      description: >
+        The workstation's local catalogue position. A terminal beyond `staleAfter` must
+        refuse to trade rather than transact against stale prices.
+      required: [appliedBundleVersion, appliedAt, staleAfter, isStale]
+      properties:
+        appliedBundleVersion: { type: string }
+        appliedAt: { type: string, format: date-time }
+        staleAfter:
+          type: string
+          format: date-time
+          description: Beyond this the terminal refuses to trade.
+        isStale: { type: boolean }
+        pendingBundleVersion:
+          type: string
+          nullable: true
+          description: Published but not yet applied.
+
+    SaleBoardKind:
+      type: string
+      enum: [ticketing, fnb, retail, mixed]
+
+    DeviceKind:
+      type: string
+      enum:
+        - receiptPrinter
+        - ticketPrinter
+        - cashDrawer
+        - barcodeScanner
+        - rfidReader
+        - nfcReader
+        - paymentTerminal
+        - customerDisplay
+        - biometricReader
+        - idReader
+        - signageDisplay
+
+    DeviceBinding:
+      x-ticvai-persistence: "platform.device"
+      type: object
+      required: [kind, driver]
+      properties:
+        kind: { $ref: '#/components/schemas/DeviceKind' }
+        driver:
+          type: string
+          description: >
+            Driver identifier. Adding a vendor is a driver plus configuration, never a core
+            change — every venue arrives with hardware not previously seen.
+        identifier: { type: string, description: Serial, port or network address. }
+        isRequired:
+          type: boolean
+          default: false
+          description: >
+            When true, the workstation refuses to open a shift if the device is absent.
+
+    Workstation:
+      x-ticvai-persistence: "platform.workstation"
+      type: object
+      required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        regionId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid, nullable: true }
+        scopePath: { type: string }
+        saleBoard:
+          type: object
+          description: >
+            Determines which front end loads. Bound to the workstation, not the role — the
+            F&B terminal opens the F&B board. What the operator may then DO within it is
+            governed by their permissions.
+          required: [id, kind]
+          properties:
+            id: { type: string, format: uuid }
+            kind: { $ref: '#/components/schemas/SaleBoardKind' }
+            name: { type: string }
+        accessPointId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Inherited from the workstation, never selected by the operator. Null where the
+            workstation is not at an access point.
+        devices:
+          type: array
+          items: { $ref: '#/components/schemas/DeviceBinding' }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        currencyScale: { type: integer, minimum: 0, maximum: 4 }
+        timeZone: { type: string }
+        deploymentProfile:
+          $ref: '#/components/schemas/DeploymentProfile'
+        edgeNodeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Present when `deploymentProfile` is `venueEdge`.
+        catalogueState:
+          $ref: '#/components/schemas/CatalogueState'
+        offlineCapable:
+          type: boolean
+          description: >
+            Derived from `deploymentProfile`. False only for `thin`. Under local-first,
+            catalogue READS are always local on transactional surfaces; this flag governs
+            whether WRITES can be queued.
+        isActive: { type: boolean }
+
+    ConfigureWorkstationRequest:
+      type: object
+      required: [name, saleBoardId]
+      properties:
+        name: { type: string, maxLength: 200 }
+        saleBoardId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid, nullable: true }
+        accessPointId: { type: string, format: uuid, nullable: true }
+        devices:
+          type: array
+          items: { $ref: '#/components/schemas/DeviceBinding' }
+        deploymentProfile:
+          $ref: '#/components/schemas/DeploymentProfile'
+        edgeNodeId: { type: string, format: uuid, nullable: true }
+        isActive: { type: boolean, default: true }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

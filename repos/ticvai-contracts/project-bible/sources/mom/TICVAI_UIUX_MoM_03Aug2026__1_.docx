@@ -1,0 +1,277 @@
+**Minutes of Meeting**
+
+*TICVAI UI/UX Discovery Workshop — Point of Sale, F**&**B, Web **&** Mobile*
+
+| **Date** | 3 August 2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | UI/UX Discovery Workshop — POS, F&B, Web & Mobile | **Prepared by** | Chitrangi Mestry |
+
+## **Primary Objective**
+
+To walk through TICVAI's vision for the point-of-sale (cashier) interface, food & beverage module, and B2C/B2B web and mobile applications, and to align on the UI/UX approach, reference material, and next steps for wireframing.
+
+## **Participants**
+
+- TICVAI Team
+
+- Softlabs Team
+
+## **Agenda**
+
+- Session framing and scope for the day
+
+- Point-of-sale (cashier) UI walkthrough
+
+- UX design approach discussion (hot functions vs. search-driven UI)
+
+- Food & beverage module walkthrough
+
+- Table management & dining service models
+
+- B2C/B2B website walkthrough (multi-site, white-label configuration)
+
+- AI-assisted website generation
+
+- Ticket flow variations by product type
+
+- Website structure, localization & authentication
+
+- Reference material & design research
+
+- Mobile application strategy
+
+- Wireframing approach & next steps
+
+- Email communication & scheduling
+
+# **Discussion Summary**
+
+**1. Session Framing**
+
+Qossai noted he had received Chinmay's document but needed more time to review it fully. He proposed that today's session instead focus on addressing the questions Chinmay had submitted in advance, and on walking through the food & beverage and point-of-sale ticket-selling flows. Chinmay confirmed he had spent the weekend reviewing various UI reference platforms but had no additional material specifically prepared for today's session.
+
+**2. Point-of-Sale (Cashier) UI Walkthrough**
+
+Qossai shared his screen to walk through a point-of-sale interface his team had previously built. He was clear this was intended as a design reference and starting point only, not something to copy directly — the goal is to enhance and redesign it enough that it doesn't look like a copy, while retaining the strong underlying UX ideas. He highlighted several elements of the design:
+
+- A prominent search ("magic banner") letting the cashier reach functionality — such as refunds or resending a ticket — via search, rather than through static menus or sidebars
+
+- A right-hand panel surfacing events, tour guides, and packages, with filtering across exhibitions, tours, and films
+
+- Header metrics showing tickets sold and revenue for the current shift
+
+- The ability to hold multiple in-progress carts ("cards"), plus a transaction history view supporting delete, expire, and merge actions
+
+- An embedded AI assistant the cashier can query directly — for example, to find today's promo code, process a refund, or switch between light/night themes
+
+- A notification system surfacing both ticket-related alerts (cancellations, capacity nearing or at its limit) and system alerts (printer offline, POS offline)
+
+- A slide-in "drawer" pattern for ticket details, replacing full-page navigation — selecting a ticket opens a drawer showing inclusions and rules/restrictions, followed by date/time selection and, where relevant, seat selection, including configurable seating rules (e.g., requiring a group's seats to stay together)
+
+- Add-to-cart with upsell add-ons, including an AI-generated upsell prompt (e.g., suggesting the cashier add two more items to unlock a bundle discount)
+
+- Membership integration: searching a customer by mobile number or name to link a sale to their membership, viewing wallet balance, loyalty points, linked family members, and an RFID/barcode reference, with the ability to top up a member's wallet directly
+
+- Shift-level settings: light/dark mode, currency selection (affecting displayed pricing based on the cashier's location), language selection, screen brightness, and manual online/offline toggling
+
+- End-of-shift reconciliation: the cashier enters cash on hand and reviews a shift summary before confirming it for reporting and audit
+
+**3. UX Design Approach Discussion**
+
+Allam proposed a hybrid pattern: alongside the search-driven approach, provide a set of always-visible "hot function" buttons for high-frequency actions (e.g., refund, check transaction, print last receipt), rather than requiring the cashier to search for everything. He asked for Softlabs' recommendation on the best-practice approach. Qossai agreed a combination of both might be ideal and deferred to Softlabs' UX judgment on the right balance.
+
+Chinmay compared the demoed interface to a separate AI-generated reference PDF shared previously, noting the demoed version felt cleaner and better spaced, while the PDF felt more cluttered with smaller touch targets — a meaningful concern for touchscreen/tablet use, where adequate spacing helps prevent mis-taps. Qossai agreed the PDF was the older, dated design, and confirmed the demoed interface should be treated as the primary direction, with the PDF only as secondary reference. Allam added that whichever approach is chosen needs to work consistently across all cashier device types — POS terminals, tablets, iPads, and kiosks.
+
+Aishwarya More sought clarification on scope, asking whether the earlier-shared reference link was for the customer-facing (B2C) side while today's demo was the cashier/admin-facing POS. Allam and Qossai clarified that both the current demo and the earlier link were cashier-facing POS interfaces — not a back-office configuration panel — and that the previously shared PDF was AI-generated inspiration material for color and theming only, not a literal design to follow.
+
+**4. Food ****&**** Beverage Module Walkthrough**
+
+Qossai walked through a simplified F&B flow: from the menu, the cashier selects a category (e.g., drink or meal), then item-level options (e.g., sauce, size), adds to cart, and proceeds to payment — again noting the final design should follow the primary POS reference rather than this specific screen. For table service, a "new order" flow shows a seat/table layout; once a table is selected, the associated menu is assigned to that table for ordering.
+
+**5. Table Management ****&**** Dining Service Models**
+
+Allam noted the demoed table layout was dated and recommended a more graphical, visual table-map style — for example, visually distinct two-seat vs. four-seat tables — where the cashier selects a table and then enters the number of covers. He distinguished two common service models the platform needs to support:
+
+- Quick-service: the guest orders and pays at the counter before food is served
+
+- Fine dining: a table is opened, items are added over the course of the visit, and the bill/invoice is only printed and paid at the end
+
+Chinmay asked for clarification on the purpose of per-seat/per-table tracking, noting that in India a single combined bill is typical without itemized splitting. Allam explained the functionality exists to support flexible bill-splitting for a table — by amount, by number of covers, or by category (e.g., one guest paying for food and another for drinks) — which Chinmay confirmed made sense once explained.
+
+Qossai added that within a venue/park, the F&B module would be accessed from the same top-level navigation area as other experiences (tours, guides), and that table-management functionality would only surface for venues with an associated restaurant configuration, per the requirement matrix.
+
+**6. B2C/B2B Website Walkthrough (Multi-Site, White-Label)**
+
+Qossai demonstrated several live client websites — including a general example, a museum-style site, and a science-centre example — to illustrate the platform's white-label, multi-site configuration model:
+
+- Each site shares the same underlying platform/template but is configured independently — header, footer, logo, colors, fonts, and hero banner are all client-editable from the backend
+
+- Ticket listings are data-driven: creating a new ticket automatically surfaces it on the relevant site based on category configuration
+
+- Some clients operate multiple branded sites from the same underlying setup (e.g., two brands sharing a footer but with distinct headers and hero banners)
+
+- A "powered by [platform]" footer credit is fixed and not client-editable
+
+- One example site included a live integration with a government satisfaction-survey ("happiness meter") service
+
+- All sites are fully mobile-responsive — for example, the desktop calendar view collapses into a mobile-optimized layout
+
+Qossai stressed the goal of giving clients as much design flexibility as possible within this configurable structure.
+
+**7. AI-Assisted Website Generation**
+
+Qossai showcased a personal example — a website for his own football academy — built entirely using AI website-generation tools within about one day, supporting three languages (Arabic, Russian, English). He strongly advocated for incorporating AI-assisted design/generation directly into the platform's website-building capability, keeping site design (header, footer, color, font, layout) separate from content (tickets and their data), with tickets automatically flowing into the site's structure once published.
+
+He noted a second, larger client website shown earlier had also been built almost entirely by an AI design tool integrated with Microsoft's AI services, with human review layered on top to catch and correct small errors — a process that took only four to five days end-to-end.
+
+**8. Ticket Flow Variations by Product Type**
+
+Allam shared a further demo website containing multiple live ticket types (event tickets, open-dated tickets, time-slot tickets) to illustrate flow variation. Qossai and Allam described the different navigation patterns required per ticket type:
+
+- Admission tickets: no date/time selection — goes straight to quantity/cart
+
+- Dated tickets: date selection only
+
+- Timed tickets: date, then time
+
+- Seated tickets: date, then time, then seat selection
+
+- Some clients (e.g., certain museums with a small number of standard configurations, such as 5–6 floors) prefer to start by asking for the number of guests first, which narrows the calendar to only dates/times with sufficient availability
+
+Allam summarized this as two broad selection patterns: (a) choose the event, then date, then time, see availability, then select the product; or (b) choose the product, enter a quantity, choose a date, and see only the time slots with sufficient remaining capacity. Chinmay flagged that this range of variations will need deeper UI exploration, since a meaningful number of customization scenarios are likely to be required.
+
+**9. Website Structure, Localization ****&**** Authentication**
+
+Allam clarified the platform's customization boundaries: banner, header, footer, and background color are all CMS-configurable per client, but the overall site structure and navigation flow remain fixed — the flow automatically adapts based on the underlying product's configuration (e.g., dated vs. non-dated vs. seated vs. membership products each surface the appropriate fields automatically).
+
+Additional platform capabilities demonstrated included a multi-language toggle switching the entire site's content; checkout support for guest checkout, registered-account checkout, and single sign-on (e.g., Okta, Azure AD, and a ticketing-specific SSO); and a distinction between "ticket holder" (per-ticket detail capture, where required) and "reservation owner"/buyer (the single point of contact whose details are captured once per booking and who receives the tickets by email).
+
+Qossai demonstrated a UAE Pass integration as a live example: a customer logs in via mobile number, approves a push notification, and confirms with biometric verification, after which their verified personal details are pulled automatically into the booking and a linked backend account is created. Chinmay noted this is conceptually similar to Aadhaar-based KYC autofill flows used on many Indian government and consumer platforms.
+
+**10. Reference Material ****&**** Design Research**
+
+Qossai proposed that a similar interaction pattern used in the POS drawer (e.g., a right-to-left slide-in panel) could also suit the B2C cart/checkout experience, and asked Softlabs to research current market best practices for ticket-booking UX (web and mobile) to help guide the design, rather than simply reusing the demoed references as-is. He shared several reference links (including a PDF and three example client websites) in the meeting chat for the team's review, noting some file-attachment issues in the call platform meant a couple of items would be sent via email instead. Allam specifically recommended the team review the "Viva Ticket" website as a reference containing many of the flow variations discussed.
+
+**11. Design Alignment ****&**** Team Input**
+
+Aishwarya confirmed that, having gone through the walkthrough, her outstanding UI questions had largely been addressed and she would review the shared reference material further.
+
+Sahil Karangutkar, joining partway through, shared design-trend observations from his own research — noting a broader shift toward modern, minimalistic, spacious, cross-device designs that still convey a sense of place (e.g., a venue or park) — and asked for confirmation on process: whether Softlabs should propose two to three enhanced visual concepts drawing on the shown references, for TICVAI to react to and steer, rather than directly replicating what was shown.
+
+Qossai confirmed this was exactly the intent — the demoed material was for concept understanding only, and Softlabs, as the design partner, should research the market and propose the strongest modern UI/UX direction, leveraging AI-assisted design tooling where useful, similar to how his own example sites had been produced.
+
+Chinmay proposed that Sahil collate the design references/inspiration he had gathered over the previous week and share them with Qossai and Allam for feedback, organized separately for the customer-facing mobile app, the customer-facing website, and the back-office/admin pages. Sahil and Qossai agreed to exchange reference material both ways.
+
+**12. Mobile Application Strategy**
+
+Qossai noted the team's existing mobile applications are dated and not ideal references, but mentioned having seen an interesting pattern elsewhere using product video rather than static images for tickets, which he would try to share separately if he could locate it.
+
+On Chinmay's earlier email question about whether access-control and employee functionality should be combined into one mobile app or kept separate, Qossai expressed a clear preference for two separate applications:
+
+- A dedicated access-control app, installed on handheld devices or fixed terminals, scoped purely to entry validation/scanning
+
+- A separate employee app covering broader staff functionality (approvals, alerts/messages, and other matrix-defined features), which may include a basic ticket-validity lookup for support purposes, but not full scanning
+
+Qossai's reasoning was that access control needs to remain narrowly scoped and reliable, and that in some cases the two capabilities may even be licensed or sold separately. Chinmay agreed this isolation made sense. Qossai noted further access-control screen details (e.g., customer photo, ticket information, validity status) would be covered in a future workshop.
+
+**13. Wireframing Approach ****&**** Next Steps**
+
+Chinmay proposed that, since Softlabs already has a full list of required screens (maintained in a tracking spreadsheet), the team begin wireframing the screens where requirements are already clear, sharing them with TICVAI for feedback as they go — expecting that seeing tangible designs will likely surface further ideas and refinements from TICVAI's side. Qossai agreed this iterative approach was the right one, expecting some follow-up changes as wireframes are reviewed, and confirmed today's discussion had addressed two of the three questions Chinmay had submitted in advance, with the remaining item largely covered as well.
+
+**14. Email Communication ****&**** Scheduling**
+
+Chinmay proposed splitting ongoing email communication into two separate threads going forward: one for shared reference material/data, and a separate one for kickoff meeting and workshop minutes — consistent with the topic-specific threading approach agreed in the previous session. He confirmed the link/chain for reference material that Qossai had requested previously.
+
+On scheduling, Chinmay proposed the next session for the following day, offering Wednesday as an alternative. Qossai confirmed TICVAI was flexible on either date and asked Chinmay to confirm based on his team's availability and send a calendar invite.
+
+Separately, Allam proposed that a33 into a shared tracker, with a separate, recurring weekly meeting set up specifically to review it and confirm task ownership. Chinmay agreed and confirmed he would set this up. The call closed with thanks all around.
+
+# **Decisions Made**
+
+**Point of Sale**
+
+- Qossai's demoed cashier interface is confirmed as the primary reference/baseline, to be enhanced by Softlabs rather than copied directly; the previously shared PDF remains secondary color/theme inspiration only
+
+- Softlabs will explore a hybrid of quick-access "hot function" buttons and search-driven functionality, and recommend the best approach
+
+- The slide-in "drawer" interaction pattern (for date/time and seat selection) is retained in place of full-page navigation
+
+- Membership management, the embedded AI assistant, and shift-management features (as demoed) are confirmed directions for the POS, to be refined by Softlabs
+
+- The design must work consistently across all cashier device types: POS terminals, tablets, iPads, and kiosks
+
+**Food ****&**** Beverage**
+
+- The core F&B flow (menu → item options → cart → payment) and table management are confirmed as required; final visuals will be redesigned by Softlabs with a more modern, graphical table-map style
+
+- Table/seat-level structure is required to support flexible bill-splitting (by amount, covers, or category)
+
+- The platform must support both quick-service and fine-dining service models
+
+**Website ****&**** B2C/B2B**
+
+- Multi-site, white-label configuration is confirmed: header, footer, color, font, and hero banner are client-editable; the "powered by" footer credit is fixed; site structure stays fixed but adapts automatically based on product configuration
+
+- AI-assisted website generation will be explored as part of the platform's website-building capability
+
+- Ticket flow must support multiple navigation patterns depending on product type (admission, dated, timed, seated), requiring further UI exploration for customization scenarios
+
+- Checkout will support guest, registered, and SSO-based login (including a UAE Pass-style integration), with a clear separation between "ticket holder" and "reservation owner"/buyer
+
+- Softlabs will research current market best practices for ticket-booking UX rather than replicate the shown references as-is
+
+**Mobile Applications**
+
+- Access control and employee functionality will be built as two separate mobile applications, not combined
+
+- Access-control screen details will be discussed in a future workshop
+
+**Process**
+
+- Wireframing will begin immediately on screens with clear requirements, shared iteratively with TICVAI for feedback
+
+- Sahil will collate and share design references, organized by mobile app, website, and admin/back-office pages
+
+- Email communication will be split into separate threads for reference material vs. meeting minutes/workshops
+
+- The next session will be tomorrow or Wednesday, to be confirmed based on Softlabs' availability
+
+- A shared open-items tracker and a recurring weekly review meeting will be set up
+
+# **Action Items**
+
+| **Action Item** | **Owner** | **Status** |
+| --- | --- | --- |
+| Collate design references/inspiration and share with TICVAI, organized by mobile app, website, and admin/back-office pages | Softlabs (Sahil & Aishwarya) | **Pending** |
+| Begin wireframing screens with clear requirements and share iteratively with TICVAI for feedback | Softlabs Design Team | **In Progress** |
+| Recommend a UX approach combining quick-access "hot function" buttons with search-driven POS functionality | Softlabs Design Team | **Pending** |
+| Research current market best practices for ticket-booking UX (web and mobile) | Softlabs Design Team | **Pending** |
+| Set up separate email threads for reference material vs. meeting minutes/workshops | Chinmay Parab | **Pending** |
+| Confirm team availability and send calendar invite for the next session (tomorrow or Wednesday) | Chinmay Parab | **Pending** |
+| Create and populate a shared open-items tracker (HLD/LLD progress, pending TICVAI requests, etc.) | Chinmay Parab | **Pending** |
+| Propose a time for a recurring weekly tracker-review meeting | Chinmay Parab | **Pending** |
+| Share the referenced PDF and additional example website links via email (Teams attachment issue) | Qossai | **Pending** |
+| Locate and share the mobile app example using product video instead of static images, if found | Qossai | **Pending** |
+| Review the "Viva Ticket" website as a reference for flow variations | Softlabs Design Team | **Pending** |
+| Confirm availability for the proposed weekly review meeting | TICVAI Team | **Pending** |
+
+# **Next Meeting**
+
+**Date:  **Tomorrow (Tuesday, 4 August 2026) or Wednesday, 5 August 2026 — to be confirmed
+
+**Time:  **To be confirmed
+
+**Planned Topics**
+
+- Continued UI/UX discussion and review of any wireframes completed in the interim
+
+- Access-control screen details (customer photo, ticket information, validity status)
+
+- Review of design references shared by both teams
+
+# **Closing Remarks**
+
+This session was a deep, screen-shared walkthrough of TICVAI's vision for the point-of-sale, food & beverage, and B2C/B2B web and mobile experiences. Both teams aligned on treating the demoed POS and website examples as directional references rather than literal designs to copy, with Softlabs taking the lead on researching best-practice UX and proposing enhanced concepts — including possible use of AI-assisted design tooling. Key structural decisions were confirmed around white-label site configuration, ticket-flow variations by product type, authentication options, and a two-app split for access control vs. employee mobile functionality. The session closed with an agreement to begin wireframing immediately on clear-requirement screens, split email communication by topic, and set up a shared tracker with a recurring weekly review meeting.
+
+|  |  |  |
+| --- | --- | --- |

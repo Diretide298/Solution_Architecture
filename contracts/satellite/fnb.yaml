@@ -1,0 +1,1535 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Food & Beverage
+  version: 0.1.0
+  x-ticvai-screen-count: 0
+  x-ticvai-tier: satellite
+  x-ticvai-module: "7 — F&B POS  ·  5 — F&B & Guest Management (service)"
+  x-ticvai-requirements: 151
+  x-ticvai-capabilities: [C05, C06, C07, C08, C27, C36, C90]
+  x-ticvai-platforms:
+    - "P04 POS"
+    - "P02 Guest App"
+    - "KDS integration"
+  description: >
+    ## What this contract covers
+
+    **Menus, table service and kitchen handoff. KDS is an integration point, not a build.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 7 — F&B POS  ·  5 — F&B & Guest Management (service) |
+    | **Requirements** | ~151 |
+    | **Capabilities** | C05, C06, C07, C08, C27, C36, C90 |
+    | **Consumed by** | P04 POS · P02 Guest App · KDS integration |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Menus, modifiers, quick-service ordering, table service, bill splitting and kitchen
+    handoff. Domains 4 and 7 — roughly 190 requirements.
+
+    Positions this encodes:
+
+    - **KDS is an integration point, not a build** (31 Jul §11). This contract sends tickets
+      to whatever kitchen display the venue already runs and receives status back. It does
+      not implement a kitchen display.
+    - **Menus read from the local bundle** at point of sale, like the rest of the catalogue
+      (ADR-0013). The endpoints here that a terminal calls on the transaction path are order
+      submission and table state — not menu retrieval.
+    - **A table visit is not an order.** A guest sits, orders, orders again, then pays. The
+      visit accumulates; orders attach to it; the bill closes it.
+    - **Splitting happens at close, not at order time.** By amount, by covers, or by
+      category — 03 Aug §5. A split computed at order time falls apart the moment someone
+      orders another drink.
+    - Stock depletion for recipe-linked items is real-time, so **F&B is blocked offline
+      where inventory is tracked**, and available offline where it is not.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: menu
+  - name: modifier
+  - name: order
+  - name: table
+  - name: bill
+  - name: kitchen
+  - name: production
+
+paths:
+  # ---------------------------------------------------------------- menus
+  /menus:
+    get:
+      operationId: listMenus
+      x-ticvai-read-routing: replica
+      summary: List menus
+      description: >
+        Back-office use. A terminal reads its menu from the catalogue bundle.
+      tags: [menu]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: outletId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: activeAt
+          in: query
+          description: Return menus in force at this time — breakfast, lunch, happy hour.
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Menus
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Menu' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createMenu
+      summary: Create a menu
+      tags: [menu]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateMenuRequest' }
+      responses:
+        '201':
+          description: Created. Visible at terminals after the next bundle publish
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Menu' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /menus/{menuId}:
+    parameters:
+      - name: menuId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getMenu
+      x-ticvai-read-routing: replica
+      summary: Read a menu with sections and items
+      tags: [menu]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Menu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Menu' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    patch:
+      operationId: updateMenu
+      summary: Amend a menu
+      tags: [menu]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                availability: { $ref: '#/components/schemas/MenuAvailability' }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Menu' }
+
+  /menus/{menuId}/sections:
+    parameters:
+      - name: menuId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setMenuSections
+      summary: Set menu sections and their item ordering
+      description: >
+        Ordering matters at a counter. The sequence here is the sequence on the sale board.
+      tags: [menu]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sections]
+              properties:
+                sections:
+                  type: array
+                  items: { $ref: '#/components/schemas/MenuSection' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Menu' }
+
+  /menu-items/{itemId}/availability:
+    parameters:
+      - name: itemId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setItemAvailability
+      summary: Mark an item available or eighty-sixed
+      description: >
+        The most-used endpoint in a live kitchen. A sold-out item must disappear from every
+        terminal in the outlet immediately — this does not wait for a bundle publish.
+      tags: [menu]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isAvailable]
+              properties:
+                isAvailable: { type: boolean }
+                reason:
+                  type: string
+                  enum: [soldOut, ingredientUnavailable, equipmentDown, seasonal, other]
+                restoreAt:
+                  type: string
+                  format: date-time
+                  description: Automatic restore, typically at next service.
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MenuItem' }
+
+  # ---------------------------------------------------------------- modifiers
+  /modifier-groups:
+    get:
+      operationId: listModifierGroups
+      x-ticvai-read-routing: replica
+      summary: List modifier groups
+      tags: [modifier]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ModifierGroup' }
+
+    post:
+      operationId: createModifierGroup
+      summary: Create a modifier group
+      description: >
+        Groups carry selection constraints — minimum, maximum, required. A burger that must
+        have exactly one cooking temperature and may have up to three extras is two groups
+        with different constraints, not free-text.
+      tags: [modifier]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ModifierGroup' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ModifierGroup' }
+        '400':
+          description: Constraints are unsatisfiable — minimum exceeds available options
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- orders
+  /fnb-orders:
+    get:
+      operationId: listFnbOrders
+      x-ticvai-read-routing: replica
+      summary: List F&B orders
+      tags: [order]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: outletId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: tableVisitId
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/FnbOrderStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Orders
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/FnbOrder' }
+
+    post:
+      operationId: createFnbOrder
+      summary: Place an F&B order
+      description: >
+        Quick service pays immediately; table service attaches to a visit and pays at close.
+
+        Offline behaviour depends on the items: an order containing only untracked items
+        queues normally, while one containing a recipe-linked item is refused offline because
+        stock depletes in real time.
+      tags: [order]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateFnbOrderRequest' }
+      responses:
+        '201':
+          description: Created and sent to the kitchen where a KDS is configured
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FnbOrder' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: >
+            An item is unavailable, modifier constraints are unmet, or a tracked item was
+            ordered offline.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fnb-orders/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getFnbOrder
+      x-ticvai-read-routing: replica
+      summary: Read an F&B order
+      tags: [order]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FnbOrder' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: amendFnbOrder
+      summary: Amend an order before it is prepared
+      description: >
+        Once a line is `preparing`, amendment is refused — the kitchen has started. Removing
+        it becomes a void with a reason, which is a different and auditable action.
+      tags: [order]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                addLines:
+                  type: array
+                  items: { $ref: '#/components/schemas/CreateFnbOrderLine' }
+                removeLineIds:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200':
+          description: Amended
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FnbOrder' }
+        '409':
+          description: A targeted line is already preparing or served
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- tables
+  /outlets/{outletId}/tables:
+    parameters:
+      - name: outletId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getTableMap
+      x-ticvai-read-routing: replica
+      summary: Table map with live state
+      description: >
+        The floor as the server sees it — free, seated, ordered, bill requested, needs
+        clearing. This is the F&B sale board's landing view.
+      tags: [table]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Table map
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableMap' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    put:
+      operationId: setTableLayout
+      summary: Configure the table layout
+      tags: [table]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tables]
+              properties:
+                tables:
+                  type: array
+                  items: { $ref: '#/components/schemas/TableDefinition' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableMap' }
+
+  /table-visits:
+    post:
+      operationId: openTableVisit
+      summary: Seat a party and open a visit
+      description: >
+        A visit accumulates orders across the sitting. It is not an order — the guest may
+        order three times and pay once.
+
+        Covers is captured at seating because it drives split-by-covers at close.
+      tags: [table]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OpenTableVisitRequest' }
+      responses:
+        '201':
+          description: Visit opened
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableVisit' }
+        '409':
+          description: Table already occupied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /table-visits/{visitId}:
+    parameters:
+      - name: visitId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getTableVisit
+      x-ticvai-read-routing: replica
+      summary: Read a visit with all its orders
+      tags: [table]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Visit
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableVisit' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateTableVisit
+      summary: Amend covers, move table, or reassign server
+      description: >
+        Moving a party to another table is routine and must not lose the visit. The visit is
+        the unit that survives; the table is an attribute of it.
+      tags: [table]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                covers: { type: integer, minimum: 1 }
+                tableId: { type: string, format: uuid }
+                serverPrincipalId: { type: string, format: uuid }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableVisit' }
+        '409':
+          description: Target table is occupied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /table-visits/{visitId}/merge:
+    parameters:
+      - name: visitId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: mergeTableVisits
+      summary: Merge another visit into this one
+      description: >
+        Two tables pushed together. Orders and covers combine; the absorbed visit closes with
+        a reference to this one so the audit trail survives.
+      tags: [table]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sourceVisitId]
+              properties:
+                sourceVisitId: { type: string }
+      responses:
+        '200':
+          description: Merged
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableVisit' }
+        '409':
+          description: Either visit is already closed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- bill
+  /table-visits/{visitId}/bill:
+    parameters:
+      - name: visitId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getBill
+      x-ticvai-read-routing: replica
+      summary: Bill for a visit
+      description: >
+        Every line across every order in the visit, with tax and service charge. Presentation
+        only until it is split or settled.
+      tags: [bill]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Bill
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bill' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /table-visits/{visitId}/bill/split:
+    parameters:
+      - name: visitId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: splitBill
+      summary: Split a bill
+      description: >
+        By amount, by covers, or by category (03 Aug §5). Splitting happens **at close, not
+        at order time** — a split computed while the party is still ordering falls apart the
+        moment someone orders another drink.
+
+        Remainders are distributed to the minor unit. A split that does not sum to the total
+        is rejected rather than rounded away.
+      tags: [bill]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SplitBillRequest' }
+      responses:
+        '200':
+          description: Split into sub-bills
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BillSplit' }
+        '400':
+          description: Split does not sum to the bill total, or a line is assigned twice
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Visit already settled
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /table-visits/{visitId}/close:
+    parameters:
+      - name: visitId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: closeTableVisit
+      summary: Settle and close a visit
+      description: >
+        Converts the visit into one or more sales orders and posts to the ledger. The table
+        moves to `needsClearing`, not `free` — clearing is a separate act by a separate
+        person.
+      tags: [bill]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [payments]
+              properties:
+                payments:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [subBillId, tender, amount]
+                    properties:
+                      subBillId: { type: string }
+                      tender: { type: string }
+                      amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                gratuity: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+      responses:
+        '200':
+          description: Settled
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [visit, orderIds]
+                properties:
+                  visit: { $ref: '#/components/schemas/TableVisit' }
+                  orderIds:
+                    type: array
+                    items: { type: string }
+        '409':
+          description: Payments do not cover the bill, or lines remain unserved
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tables/{tableId}/clear:
+    parameters:
+      - name: tableId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: clearTable
+      summary: Mark a table cleared and free
+      tags: [table]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Cleared
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableState' }
+
+  # ---------------------------------------------------------------- kitchen
+  /kitchen/tickets:
+    get:
+      operationId: listKitchenTickets
+      x-ticvai-read-routing: replica
+      summary: Kitchen ticket queue
+      description: >
+        Read by the venue's KDS, or by a fallback screen where none is configured. TICVAI
+        does not implement a kitchen display — this is the integration surface.
+      tags: [kitchen]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: stationId
+          in: query
+          description: Route to a preparation station — grill, cold, bar.
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/KitchenTicketStatus' }
+      responses:
+        '200':
+          description: Tickets, priority order
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/KitchenTicket' }
+
+  /kitchen/tickets/{ticketId}/status:
+    parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    put:
+      operationId: setKitchenTicketStatus
+      summary: Advance a kitchen ticket
+      description: >
+        Called by the KDS or a fallback screen. Status flows back to the guest app order
+        tracker — received, preparing, ready, completed.
+      tags: [kitchen]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status, recordedAt]
+              properties:
+                status: { $ref: '#/components/schemas/KitchenTicketStatus' }
+                lineIds:
+                  type: array
+                  items: { type: string }
+                  description: Advance specific lines. Omit for the whole ticket.
+                stationId: { type: string, format: uuid }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KitchenTicket' }
+
+  /kitchen/tickets/{ticketId}/prioritise:
+    parameters:
+      - name: ticketId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: prioritiseKitchenTicket
+      summary: Move a ticket up the queue
+      description: >
+        Supervisor override, and the mechanism behind Fast Pass order prioritisation
+        (4.6.34). Recorded against the authorising principal — jumping the queue is an act
+        someone should own.
+      tags: [kitchen]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                priority: { type: integer, minimum: 0, maximum: 100 }
+      responses:
+        '200':
+          description: Prioritised
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KitchenTicket' }
+
+  /kitchen/stations:
+    get:
+      operationId: listKitchenStations
+      x-ticvai-read-routing: replica
+      summary: List preparation stations and their routing
+      tags: [kitchen]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Stations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/KitchenStation' }
+    put:
+      operationId: setKitchenStations
+      summary: Configure stations and item routing
+      tags: [kitchen]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stations]
+              properties:
+                stations:
+                  type: array
+                  items: { $ref: '#/components/schemas/KitchenStation' }
+      responses:
+        '200':
+          description: Configured
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/KitchenStation' }
+
+  # ---------------------------------------------------------------- production
+  /recipes:
+    get:
+      operationId: listRecipes
+      x-ticvai-read-routing: replica
+      summary: List recipes
+      description: >
+        Links menu items to inventory. A recipe is what makes stock deplete when a dish is
+        sold, and what makes an item unavailable when an ingredient runs out.
+      tags: [production]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Recipes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Recipe' }
+
+    put:
+      operationId: setRecipe
+      summary: Define a recipe for a menu item
+      tags: [production]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Recipe' }
+      responses:
+        '200':
+          description: Set. The item becomes stock-tracked and therefore unavailable offline
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Recipe' }
+
+  /outlets/{outletId}/waste:
+    parameters:
+      - name: outletId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: recordWaste
+      summary: Record waste
+      description: >
+        Depletes stock without a sale. Also the ground truth for waste prediction, so the
+        reason code matters more than it appears to.
+      tags: [production]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, lines, reason, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                lines:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [itemId, quantity]
+                    properties:
+                      itemId: { type: string, format: uuid }
+                      quantity: { type: number, minimum: 0 }
+                      unit: { type: string }
+                reason:
+                  type: string
+                  enum: [spoilage, preparationError, customerReturn, breakage, overProduction, expired]
+                note: { type: string, maxLength: 500 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  totalCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+components:
+  schemas:
+    MenuAvailability:
+      x-ticvai-persistence: "none — embedded in menu"
+      type: object
+      description: When this menu is in force. Absent means always.
+      properties:
+        daysOfWeek:
+          type: array
+          items: { type: integer, minimum: 0, maximum: 6 }
+        startTime: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        endTime: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        validFrom: { type: string, format: date, nullable: true }
+        validTo: { type: string, format: date, nullable: true }
+
+    Menu:
+      x-ticvai-persistence: "fnb.menu"
+      type: object
+      required: [id, code, name, outletId, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        outletId: { type: string, format: uuid }
+        availability: { $ref: '#/components/schemas/MenuAvailability' }
+        sections:
+          type: array
+          items: { $ref: '#/components/schemas/MenuSection' }
+        isActive: { type: boolean }
+
+    CreateMenuRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [code, name, outletId]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        outletId: { type: string, format: uuid }
+        availability: { $ref: '#/components/schemas/MenuAvailability' }
+
+    MenuSection:
+      x-ticvai-persistence: "fnb.menu_section"
+      type: object
+      required: [code, name, sortOrder]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        sortOrder: { type: integer }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/MenuItem' }
+
+    MenuItem:
+      x-ticvai-persistence: "fnb.menu_item"
+      type: object
+      required: [id, productVariantId, name, price, isAvailable]
+      properties:
+        id: { type: string, format: uuid }
+        productVariantId:
+          type: string
+          format: uuid
+          description: >
+            The catalogue variant this item sells. Pricing and tax come from there — a menu
+            is a presentation of the catalogue, not a second catalogue.
+        name: { type: string }
+        description: { type: string, nullable: true }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        sortOrder: { type: integer }
+        modifierGroupIds:
+          type: array
+          items: { type: string, format: uuid }
+        stationId: { type: string, format: uuid, nullable: true }
+        isStockTracked:
+          type: boolean
+          description: True where a recipe exists. Stock-tracked items cannot be sold offline.
+        isAvailable: { type: boolean }
+        unavailableReason: { type: string, nullable: true }
+        preparationMinutes: { type: integer, nullable: true }
+        allergens:
+          type: array
+          items: { type: string }
+
+    ModifierGroup:
+      x-ticvai-persistence: "fnb.modifier_group + fnb.modifier_option"
+      type: object
+      required: [id, code, name, minSelections, maxSelections, options]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        minSelections:
+          type: integer
+          minimum: 0
+          description: Greater than zero makes the group required.
+        maxSelections: { type: integer, minimum: 1 }
+        options:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [id, name, priceDelta]
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              priceDelta: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              isDefault: { type: boolean }
+              isAvailable: { type: boolean }
+
+    FnbOrderStatus:
+      type: string
+      enum: [placed, preparing, ready, served, completed, voided]
+
+    ServiceMode:
+      type: string
+      enum: [quickService, tableService, roomService, collection, delivery]
+
+    CreateFnbOrderLine:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, menuItemId, quantity]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        menuItemId: { type: string, format: uuid }
+        quantity: { type: integer, minimum: 1 }
+        modifierOptionIds:
+          type: array
+          items: { type: string, format: uuid }
+        note:
+          type: string
+          maxLength: 200
+          description: Free text to the kitchen. Allergy notes belong here and are surfaced prominently.
+        seatNumber:
+          type: integer
+          nullable: true
+          description: Which cover ordered it. Drives split-by-covers accurately.
+        course:
+          type: integer
+          nullable: true
+          description: Course grouping, so the kitchen fires in sequence.
+
+    CreateFnbOrderRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, outletId, serviceMode, lines, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        outletId: { type: string, format: uuid }
+        serviceMode: { $ref: '#/components/schemas/ServiceMode' }
+        tableVisitId:
+          type: string
+          nullable: true
+          description: Required for table service. Absent for quick service.
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/CreateFnbOrderLine' }
+        recordedAt: { type: string, format: date-time }
+
+    FnbOrder:
+      x-ticvai-persistence: "fnb.fnb_order + fnb.fnb_order_line"
+      type: object
+      required: [id, orderNumber, outletId, serviceMode, status, lines, grossAmount, createdAt]
+      properties:
+        id: { type: string }
+        orderNumber: { type: string }
+        outletId: { type: string, format: uuid }
+        serviceMode: { $ref: '#/components/schemas/ServiceMode' }
+        tableVisitId: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/FnbOrderStatus' }
+        lines:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CreateFnbOrderLine'
+              - type: object
+                properties:
+                  status: { $ref: '#/components/schemas/FnbOrderStatus' }
+                  unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                  lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        grossAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        kitchenTicketId: { type: string, nullable: true }
+        estimatedReadyAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        recordedAt: { type: string, format: date-time }
+        syncedAt: { type: string, format: date-time, nullable: true }
+
+    TableStatus:
+      type: string
+      enum: [free, seated, ordered, billRequested, needsClearing, reserved, outOfService]
+
+    TableDefinition:
+      x-ticvai-persistence: "fnb.table"
+      type: object
+      required: [id, label, capacity]
+      properties:
+        id: { type: string, format: uuid }
+        label: { type: string, maxLength: 32 }
+        capacity: { type: integer, minimum: 1 }
+        zone: { type: string, nullable: true }
+        position:
+          type: object
+          properties:
+            x: { type: number }
+            y: { type: number }
+        shape:
+          type: string
+          enum: [round, square, rectangle, booth, bar]
+
+    TableState:
+      x-ticvai-persistence: "none — projection over table and visit"
+      allOf:
+        - $ref: '#/components/schemas/TableDefinition'
+        - type: object
+          required: [status]
+          properties:
+            status: { $ref: '#/components/schemas/TableStatus' }
+            visitId: { type: string, nullable: true }
+            covers: { type: integer, nullable: true }
+            seatedAt: { type: string, format: date-time, nullable: true }
+            serverPrincipalId: { type: string, format: uuid, nullable: true }
+            billTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    TableMap:
+      x-ticvai-persistence: "none — projection"
+      type: object
+      required: [outletId, tables]
+      properties:
+        outletId: { type: string, format: uuid }
+        zones:
+          type: array
+          items: { type: string }
+        tables:
+          type: array
+          items: { $ref: '#/components/schemas/TableState' }
+
+    OpenTableVisitRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, tableId, covers, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        tableId: { type: string, format: uuid }
+        covers:
+          type: integer
+          minimum: 1
+          description: Captured at seating because it drives split-by-covers at close.
+        serverPrincipalId: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid }
+        recordedAt: { type: string, format: date-time }
+
+    TableVisit:
+      x-ticvai-persistence: "fnb.table_visit"
+      type: object
+      required: [id, tableId, outletId, covers, status, orders, openedAt]
+      properties:
+        id: { type: string }
+        tableId: { type: string, format: uuid }
+        tableLabel: { type: string }
+        outletId: { type: string, format: uuid }
+        covers: { type: integer }
+        status:
+          type: string
+          enum: [open, billRequested, settled, merged, cancelled]
+        serverPrincipalId: { type: string, format: uuid, nullable: true }
+        subjectId: { type: string, format: uuid, nullable: true }
+        orders:
+          type: array
+          items: { $ref: '#/components/schemas/FnbOrder' }
+        mergedIntoVisitId: { type: string, nullable: true }
+        mergedFromVisitIds:
+          type: array
+          items: { type: string }
+        runningTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        openedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time, nullable: true }
+
+    Bill:
+      x-ticvai-persistence: "none — computed from visit orders"
+      type: object
+      required: [visitId, lines, subtotal, taxAmount, total]
+      properties:
+        visitId: { type: string }
+        covers: { type: integer }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [lineId, name, quantity, lineTotal]
+            properties:
+              lineId: { type: string }
+              orderId: { type: string }
+              name: { type: string }
+              quantity: { type: integer }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              categoryCode: { type: string, nullable: true }
+              seatNumber: { type: integer, nullable: true }
+        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        serviceCharge: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        discountAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    SplitMethod:
+      type: string
+      enum: [byAmount, byCovers, byCategory, byLine, bySeat]
+
+    SplitBillRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [method]
+      properties:
+        method: { $ref: '#/components/schemas/SplitMethod' }
+        parts:
+          type: integer
+          minimum: 2
+          description: For `byCovers` — defaults to the visit's cover count.
+        amounts:
+          type: array
+          description: For `byAmount`. Must sum to the bill total.
+          items: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lineAssignments:
+          type: array
+          description: For `byLine` or `bySeat`. Every line must be assigned exactly once.
+          items:
+            type: object
+            required: [lineId, partIndex]
+            properties:
+              lineId: { type: string }
+              partIndex: { type: integer, minimum: 0 }
+        categoryAssignments:
+          type: array
+          description: For `byCategory` — food to one part, beverage to another.
+          items:
+            type: object
+            required: [categoryCode, partIndex]
+            properties:
+              categoryCode: { type: string }
+              partIndex: { type: integer, minimum: 0 }
+
+    BillSplit:
+      x-ticvai-persistence: "fnb.bill_split + fnb.sub_bill"
+      type: object
+      required: [visitId, method, subBills]
+      properties:
+        visitId: { type: string }
+        method: { $ref: '#/components/schemas/SplitMethod' }
+        subBills:
+          type: array
+          items:
+            type: object
+            required: [subBillId, total, status]
+            properties:
+              subBillId: { type: string }
+              lineIds:
+                type: array
+                items: { type: string }
+              subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              status:
+                type: string
+                enum: [unpaid, paid]
+
+    KitchenTicketStatus:
+      type: string
+      enum: [received, preparing, ready, served, recalled, cancelled]
+
+    KitchenTicket:
+      x-ticvai-persistence: "fnb.kitchen_ticket + fnb.kitchen_ticket_line"
+      type: object
+      required: [id, orderId, outletId, status, lines, createdAt]
+      properties:
+        id: { type: string }
+        orderId: { type: string }
+        orderNumber: { type: string }
+        outletId: { type: string, format: uuid }
+        tableLabel: { type: string, nullable: true }
+        serviceMode: { $ref: '#/components/schemas/ServiceMode' }
+        status: { $ref: '#/components/schemas/KitchenTicketStatus' }
+        priority:
+          type: integer
+          description: Higher fires sooner. Raised by Fast Pass or supervisor override.
+        prioritisedByPrincipalId: { type: string, format: uuid, nullable: true }
+        prioritiseReason: { type: string, nullable: true }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [lineId, name, quantity, status]
+            properties:
+              lineId: { type: string }
+              name: { type: string }
+              quantity: { type: integer }
+              modifiers:
+                type: array
+                items: { type: string }
+              note: { type: string, nullable: true }
+              allergens:
+                type: array
+                items: { type: string }
+              course: { type: integer, nullable: true }
+              stationId: { type: string, format: uuid, nullable: true }
+              status: { $ref: '#/components/schemas/KitchenTicketStatus' }
+        createdAt: { type: string, format: date-time }
+        targetReadyAt: { type: string, format: date-time, nullable: true }
+        elapsedSeconds: { type: integer }
+
+    KitchenStation:
+      x-ticvai-persistence: "fnb.kitchen_station"
+      type: object
+      required: [id, code, name]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        outletId: { type: string, format: uuid }
+        menuItemIds:
+          type: array
+          items: { type: string, format: uuid }
+          description: Items routed to this station.
+        displayEndpoint:
+          type: string
+          nullable: true
+          description: >
+            Where the venue's KDS listens. Absent where a fallback screen is used instead.
+        isActive: { type: boolean }
+
+    Recipe:
+      x-ticvai-persistence: "fnb.recipe + fnb.recipe_ingredient"
+      type: object
+      required: [menuItemId, ingredients]
+      properties:
+        menuItemId: { type: string, format: uuid }
+        yield:
+          type: number
+          minimum: 0
+          description: Portions produced by one execution.
+        ingredients:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [inventoryItemId, quantity, unit]
+            properties:
+              inventoryItemId: { type: string, format: uuid }
+              quantity: { type: number, minimum: 0 }
+              unit: { type: string }
+              isOptional: { type: boolean, default: false }
+        costPerPortion: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

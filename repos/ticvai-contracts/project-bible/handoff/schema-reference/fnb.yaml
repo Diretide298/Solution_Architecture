@@ -1,0 +1,330 @@
+# fnb — derived from the API contracts, not hand-written
+# Migration: V0011
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: fnb
+migration: V0011
+tableCount: 11
+columnCount: 92
+tables:
+  fnb.bill_split:
+    derivedFrom: BillSplit
+    columns:
+    - name: visit_id
+      type: text
+      required: true
+    - name: method
+      type: jsonb
+      required: true
+    - name: sub_bills
+      type: jsonb
+      required: true
+  fnb.fnb_order:
+    derivedFrom: FnbOrder
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: order_number
+      type: text
+      required: true
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: service_mode
+      type: jsonb
+      required: true
+    - name: table_visit_id
+      type: text
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: lines
+      type: jsonb
+      required: true
+    - name: gross_amount
+      type: numeric(18,4)
+      required: true
+    - name: tax_amount
+      type: numeric(18,4)
+      required: false
+    - name: kitchen_ticket_id
+      type: text
+      required: false
+    - name: estimated_ready_at
+      type: timestamptz
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+    - name: synced_at
+      type: timestamptz
+      required: false
+  fnb.kitchen_station:
+    derivedFrom: KitchenStation
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: outlet_id
+      type: uuid
+      required: false
+    - name: menu_item_ids
+      type: jsonb
+      required: false
+      description: Items routed to this station.
+    - name: display_endpoint
+      type: text
+      required: false
+      description: Where the venue's KDS listens. Absent where a fallback screen is used instead.
+    - name: is_active
+      type: boolean
+      required: false
+  fnb.kitchen_ticket:
+    derivedFrom: KitchenTicket
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: order_id
+      type: text
+      required: true
+    - name: order_number
+      type: text
+      required: false
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: table_label
+      type: text
+      required: false
+    - name: service_mode
+      type: jsonb
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: priority
+      type: integer
+      required: false
+      description: Higher fires sooner. Raised by Fast Pass or supervisor override.
+    - name: prioritised_by_principal_id
+      type: uuid
+      required: false
+    - name: prioritise_reason
+      type: text
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: target_ready_at
+      type: timestamptz
+      required: false
+    - name: elapsed_seconds
+      type: integer
+      required: false
+  fnb.menu:
+    derivedFrom: Menu
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: availability
+      type: jsonb
+      required: false
+    - name: sections
+      type: jsonb
+      required: false
+    - name: is_active
+      type: boolean
+      required: true
+  fnb.menu_item:
+    derivedFrom: MenuItem
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: product_variant_id
+      type: uuid
+      required: true
+      description: The catalogue variant this item sells. Pricing and tax come from there — a menu is
+        a presentation of the catalogue, not a second catalogue.
+    - name: name
+      type: text
+      required: true
+    - name: description
+      type: text
+      required: false
+    - name: price
+      type: numeric(18,4)
+      required: true
+    - name: sort_order
+      type: integer
+      required: false
+    - name: modifier_group_ids
+      type: jsonb
+      required: false
+    - name: station_id
+      type: uuid
+      required: false
+    - name: is_stock_tracked
+      type: boolean
+      required: false
+      description: True where a recipe exists. Stock-tracked items cannot be sold offline.
+    - name: is_available
+      type: boolean
+      required: true
+    - name: unavailable_reason
+      type: text
+      required: false
+    - name: preparation_minutes
+      type: integer
+      required: false
+    - name: allergens
+      type: jsonb
+      required: false
+  fnb.menu_section:
+    derivedFrom: MenuSection
+    columns:
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: sort_order
+      type: integer
+      required: true
+    - name: items
+      type: jsonb
+      required: false
+  fnb.modifier_group:
+    derivedFrom: ModifierGroup
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: min_selections
+      type: integer
+      required: true
+      description: Greater than zero makes the group required.
+    - name: max_selections
+      type: integer
+      required: true
+    - name: options
+      type: jsonb
+      required: true
+  fnb.recipe:
+    derivedFrom: Recipe
+    columns:
+    - name: menu_item_id
+      type: uuid
+      required: true
+    - name: yield
+      type: numeric
+      required: false
+      description: Portions produced by one execution.
+    - name: ingredients
+      type: jsonb
+      required: true
+    - name: cost_per_portion
+      type: numeric(18,4)
+      required: false
+  fnb.table:
+    derivedFrom: TableDefinition
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: label
+      type: varchar(32)
+      required: true
+    - name: capacity
+      type: integer
+      required: true
+    - name: zone
+      type: text
+      required: false
+    - name: position
+      type: jsonb
+      required: false
+    - name: shape
+      type: text
+      required: false
+  fnb.table_visit:
+    derivedFrom: TableVisit
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: table_id
+      type: uuid
+      required: true
+    - name: table_label
+      type: text
+      required: false
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: covers
+      type: integer
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: server_principal_id
+      type: uuid
+      required: false
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: orders
+      type: jsonb
+      required: true
+    - name: merged_into_visit_id
+      type: text
+      required: false
+    - name: merged_from_visit_ids
+      type: jsonb
+      required: false
+    - name: running_total
+      type: numeric(18,4)
+      required: false
+    - name: opened_at
+      type: timestamptz
+      required: true
+    - name: closed_at
+      type: timestamptz
+      required: false

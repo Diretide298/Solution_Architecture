@@ -1,0 +1,381 @@
+# promotions — derived from the API contracts, not hand-written
+# Migration: V0014
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: promotions
+migration: V0014
+tableCount: 10
+columnCount: 106
+tables:
+  promotions.allocation_component:
+    derivedFrom: AllocationComponent
+    columns:
+    - name: variant_id
+      type: uuid
+      required: true
+    - name: percentage
+      type: numeric
+      required: false
+    - name: fixed_amount
+      type: numeric(18,4)
+      required: false
+    - name: list_price
+      type: numeric(18,4)
+      required: false
+      description: For `proRataListPrice` — weights derived from list prices.
+    - name: revenue_account_id
+      type: uuid
+      required: false
+    - name: legal_entity_id
+      type: uuid
+      required: false
+      description: Set where the component is earned by a different legal entity. Cross-currency allocation
+        is deferred pending the FX policy decision.
+    - name: venue_id
+      type: uuid
+      required: false
+  promotions.allocation_split:
+    derivedFrom: AllocationSplit
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: bundle_id
+      type: uuid
+      required: true
+    - name: method
+      type: jsonb
+      required: true
+    - name: components
+      type: jsonb
+      required: true
+    - name: crosses_legal_entities
+      type: boolean
+      required: false
+      description: True where components are earned by different legal entities. Such splits generate
+        inter-company positions.
+  promotions.bundle:
+    derivedFrom: Bundle
+    columns:
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: varchar(1000)
+      required: false
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: price
+      type: numeric(18,4)
+      required: true
+    - name: components
+      type: jsonb
+      required: true
+    - name: allocation
+      type: jsonb
+      required: true
+    - name: valid_from
+      type: timestamptz
+      required: false
+    - name: valid_to
+      type: timestamptz
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: savings_amount
+      type: numeric(18,4)
+      required: true
+      description: Sum of component list prices less the bundle price.
+    - name: savings_percentage
+      type: numeric
+      required: false
+    - name: has_been_sold
+      type: boolean
+      required: true
+      description: True locks components and allocation against amendment.
+    - name: is_active
+      type: boolean
+      required: true
+  promotions.bundle_component:
+    derivedFrom: BundleComponent
+    columns:
+    - name: variant_id
+      type: uuid
+      required: true
+    - name: quantity
+      type: integer
+      required: true
+    - name: is_optional
+      type: boolean
+      required: false
+    - name: substitute_variant_ids
+      type: jsonb
+      required: false
+      description: For dynamic bundles — guest chooses among these.
+    - name: venue_id
+      type: uuid
+      required: false
+      description: Where this component is redeemed. Differs from the selling venue for multi-venue passes,
+        which is why the allocation split exists.
+  promotions.coupon_campaign:
+    derivedFrom: CouponCampaign
+    columns:
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: discount
+      type: jsonb
+      required: true
+    - name: conditions
+      type: jsonb
+      required: false
+    - name: is_single_use
+      type: boolean
+      required: false
+      description: True generates individually redeemable codes. False issues one shared code with a redemption
+        limit.
+    - name: max_redemptions_per_code
+      type: integer
+      required: false
+    - name: valid_from
+      type: timestamptz
+      required: true
+    - name: valid_to
+      type: timestamptz
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: generated_count
+      type: integer
+      required: true
+    - name: redeemed_count
+      type: integer
+      required: true
+    - name: is_active
+      type: boolean
+      required: false
+  promotions.coupon_code:
+    derivedFrom: CouponCode
+    columns:
+    - name: code
+      type: text
+      required: true
+    - name: campaign_id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: assigned_subject_id
+      type: uuid
+      required: false
+    - name: redemption_count
+      type: integer
+      required: false
+    - name: max_redemptions
+      type: integer
+      required: false
+    - name: discount
+      type: jsonb
+      required: false
+    - name: invalid_reason
+      type: text
+      required: false
+      description: Why the code cannot be applied. A cashier reading `expired` to a guest is a very different
+        conversation from reading `already used`.
+    - name: valid_from
+      type: timestamptz
+      required: false
+    - name: valid_to
+      type: timestamptz
+      required: false
+    - name: redeemed_at
+      type: timestamptz
+      required: false
+    - name: redeemed_order_id
+      type: text
+      required: false
+  promotions.promotion:
+    derivedFrom: Promotion
+    columns:
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: varchar(1000)
+      required: false
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: discount
+      type: jsonb
+      required: true
+    - name: conditions
+      type: jsonb
+      required: false
+    - name: stacking_mode
+      type: jsonb
+      required: false
+    - name: stacking_group
+      type: varchar(64)
+      required: false
+    - name: precedence
+      type: integer
+      required: false
+      description: Higher evaluates first where several could apply.
+    - name: valid_from
+      type: timestamptz
+      required: true
+    - name: valid_to
+      type: timestamptz
+      required: false
+    - name: max_redemptions
+      type: integer
+      required: false
+    - name: max_redemptions_per_guest
+      type: integer
+      required: false
+    - name: budget_cap
+      type: numeric(18,4)
+      required: false
+      description: Total discount value after which the promotion stops automatically.
+    - name: id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: is_paused
+      type: boolean
+      required: false
+    - name: redemption_count
+      type: integer
+      required: false
+    - name: discount_given
+      type: numeric(18,4)
+      required: false
+    - name: published_at
+      type: timestamptz
+      required: false
+  promotions.upsell_rule:
+    derivedFrom: UpsellRule
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: placement
+      type: jsonb
+      required: true
+    - name: trigger_variant_ids
+      type: jsonb
+      required: true
+    - name: trigger_category_ids
+      type: jsonb
+      required: false
+    - name: suggested_variant_ids
+      type: jsonb
+      required: true
+    - name: suggested_bundle_id
+      type: uuid
+      required: false
+    - name: channels
+      type: jsonb
+      required: false
+      description: Empty applies to every channel. Restriction is opt-in — a rule that fires on the website
+        but not at a counter is a guest experience inconsistency.
+    - name: priority
+      type: integer
+      required: false
+    - name: max_suggestions
+      type: integer
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  promotions.voucher:
+    derivedFrom: Voucher
+    columns:
+    - name: code
+      type: text
+      required: true
+    - name: batch_id
+      type: uuid
+      required: true
+    - name: face_value
+      type: numeric(18,4)
+      required: true
+    - name: balance
+      type: numeric(18,4)
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: valid_to
+      type: timestamptz
+      required: false
+  promotions.voucher_batch:
+    derivedFrom: VoucherBatch
+    columns:
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: face_value
+      type: numeric(18,4)
+      required: true
+    - name: quantity
+      type: integer
+      required: true
+    - name: allow_partial_redemption
+      type: boolean
+      required: false
+      description: False forfeits any unused balance, which is then recognised as breakage.
+    - name: valid_from
+      type: timestamptz
+      required: false
+    - name: valid_to
+      type: timestamptz
+      required: true
+    - name: restrict_to_variant_ids
+      type: jsonb
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: issued_count
+      type: integer
+      required: true
+    - name: redeemed_value
+      type: numeric(18,4)
+      required: true
+    - name: outstanding_liability
+      type: numeric(18,4)
+      required: true
+      description: Unredeemed value. A liability until redeemed or expired.

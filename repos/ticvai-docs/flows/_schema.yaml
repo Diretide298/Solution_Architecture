@@ -1,0 +1,138 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "ticvai/flows/_schema.yaml"
+title: TICVAI user flow
+
+description: >
+  ## What this is
+
+  **The meta-schema for user flows.** A flow is one job a person came to do, traced across
+  screens.
+
+  Screens answer *what is on this page*. Flows answer *how does someone get from wanting a
+  ticket to holding one*, and — more usefully — *what happens when that goes wrong at step
+  four*.
+
+  ## Why flows are separate from screens
+
+  A screen is owned by whoever builds it. A flow crosses screens, often crosses apps, and is
+  owned by nobody unless it is written down. The failures that cost most are almost never
+  inside a screen; they are in the joins. A hold that expires while the guest is on the
+  payment page, a scan that succeeds offline against an entitlement revoked an hour ago, a
+  refund approved after the shift it belongs to has closed.
+
+  Those live between screens, so they are recorded between screens.
+
+  ## The branch rule
+
+  **Every flow declares its unhappy paths.** A flow with only a happy path describes a demo,
+  not a product. The `branches` array is required and must be non-empty — if a flow genuinely
+  cannot fail, that claim is worth stating explicitly rather than leaving implied.
+
+  ## Validation
+
+  `tools/check-flows.py` verifies that every screen exists, every operation exists, and — the
+  useful one — that a step's operation is actually declared on the screen it runs from. A flow
+  that assumes a screen calls an endpoint the screen does not call is a flow written against
+  an imagined product.
+
+type: object
+required: [id, name, actor, trigger, steps, branches]
+properties:
+  id: { type: string, pattern: '^F[0-9]{2}$' }
+  name: { type: string }
+  actor:
+    type: string
+    enum: [guest, cashier, gateOperator, supervisor, venueManager, financeController,
+           technician, storekeeper, marketer, agent, partner, platformAdmin, system]
+  capability: { type: string }
+  wave: { type: integer, minimum: 1, maximum: 4 }
+  frequency:
+    type: string
+    enum: [constant, hourly, daily, weekly, monthly, rare]
+    description: >
+      How often this runs in a live venue. Drives where optimisation effort goes — a flow
+      that runs constantly deserves attention a monthly one does not.
+  criticality:
+    type: string
+    enum: [revenue, safety, compliance, operational, convenience]
+    description: >
+      What breaks when the flow breaks. `revenue` and `safety` flows get the offline and
+      recovery scrutiny; `convenience` flows may fail gracefully.
+
+  platforms:
+    type: array
+    items: { type: string }
+  offlineBehaviour:
+    type: string
+    description: >
+      What the whole flow does with no network — completes locally, completes partially, or
+      cannot start. Required where any platform in the flow is offline-capable.
+
+  trigger:
+    type: object
+    required: [description]
+    properties:
+      description: { type: string }
+      entryScreen: { type: string }
+      entryPoints:
+        type: array
+        items: { type: string }
+
+  steps:
+    type: array
+    minItems: 2
+    items:
+      type: object
+      required: [step, screen, action]
+      properties:
+        step: { type: integer }
+        screen:
+          type: string
+          description: Screen id. Must exist in a platform file.
+        action: { type: string }
+        operations:
+          type: array
+          description: >
+            operationIds this step calls. Checked against the screen's own `apis` — a step
+            calling an operation the screen does not declare is one of the two out of step.
+          items: { type: string }
+        outcome: { type: string }
+        duration:
+          type: string
+          description: Rough target. Only where it matters — a gate scan, a payment.
+
+  branches:
+    type: array
+    minItems: 1
+    description: >
+      Required and non-empty. A flow with only a happy path describes a demo.
+    items:
+      type: object
+      required: [at, condition, behaviour]
+      properties:
+        at:
+          type: integer
+          description: Step number where this can occur.
+        condition: { type: string }
+        behaviour: { type: string }
+        severity:
+          type: string
+          enum: [recoverable, requiresStaff, abandonsFlow, dataLoss]
+        resolvedBy:
+          type: string
+          description: Screen id or operation that resolves it, where one exists.
+
+  exitStates:
+    type: array
+    items:
+      type: object
+      required: [state, description]
+      properties:
+        state:
+          type: string
+          enum: [completed, abandoned, failed, deferred, escalated]
+        description: { type: string }
+
+  openQuestions:
+    type: array
+    items: { type: string }

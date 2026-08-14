@@ -1,0 +1,161 @@
+# identity — derived from the API contracts, not hand-written
+# Migration: V0002 — DONE
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: identity
+migration: V0002 — DONE
+tableCount: 6
+columnCount: 41
+tables:
+  identity.grant:
+    derivedFrom: Grant
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: principal_id
+      type: uuid
+      required: false
+    - name: role_id
+      type: uuid
+      required: false
+    - name: permission
+      type: text
+      required: true
+      description: From the permission enum. `*` permitted on DENY only.
+    - name: scope_path
+      type: text
+      required: true
+    - name: effect
+      type: text
+      required: true
+    - name: valid_from
+      type: timestamptz
+      required: false
+    - name: valid_to
+      type: timestamptz
+      required: false
+    - name: created_by_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: false
+  identity.mfa_method:
+    derivedFrom: MfaMethod
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: label
+      type: text
+      required: false
+    - name: masked_target
+      type: text
+      required: false
+      description: Partially masked destination, so a person can tell two methods apart.
+    - name: is_active
+      type: boolean
+      required: true
+    - name: is_primary
+      type: boolean
+      required: false
+    - name: enrolled_at
+      type: timestamptz
+      required: true
+    - name: last_used_at
+      type: timestamptz
+      required: false
+  identity.principal:
+    derivedFrom: Principal
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: username
+      type: text
+      required: true
+    - name: display_name
+      type: text
+      required: true
+    - name: is_active
+      type: boolean
+      required: true
+    - name: valid_from
+      type: timestamptz
+      required: false
+    - name: valid_to
+      type: timestamptz
+      required: false
+      description: Past this, resolution returns DENY regardless of grants.
+    - name: primary_role_id
+      type: uuid
+      required: false
+      description: Determines the landing screen when the principal holds several roles and picks one
+        at login.
+    - name: roles
+      type: jsonb
+      required: false
+    - name: last_login_at
+      type: timestamptz
+      required: false
+  identity.role:
+    derivedFrom: Role
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: description
+      type: text
+      required: false
+    - name: principal_count
+      type: integer
+      required: false
+    - name: grant_count
+      type: integer
+      required: false
+  identity.sso_group_mapping:
+    derivedFrom: SsoGroupMapping
+    columns:
+    - name: external_group
+      type: text
+      required: true
+    - name: role_id
+      type: uuid
+      required: true
+    - name: scope_path
+      type: text
+      required: false
+      description: Scope the mapped role is granted at.
+  identity.sso_provider:
+    derivedFrom: SsoProvider
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: display_name
+      type: text
+      required: true
+    - name: protocol
+      type: jsonb
+      required: true
+    - name: icon_asset_ref
+      type: text
+      required: false
+    - name: is_enforced
+      type: boolean
+      required: false
+      description: True disables password login for principals covered by this provider.

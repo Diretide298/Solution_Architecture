@@ -1,0 +1,269 @@
+# whitelabel — derived from the API contracts, not hand-written
+# Migration: V0018
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: whitelabel
+migration: V0018
+tableCount: 11
+columnCount: 72
+tables:
+  whitelabel.banner:
+    derivedFrom: Banner
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: title
+      type: jsonb
+      required: true
+    - name: subtitle
+      type: jsonb
+      required: false
+    - name: image_asset_ref
+      type: text
+      required: true
+    - name: placement
+      type: text
+      required: false
+    - name: link_target
+      type: jsonb
+      required: false
+    - name: starts_at
+      type: timestamptz
+      required: true
+    - name: ends_at
+      type: timestamptz
+      required: false
+    - name: sort_order
+      type: integer
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  whitelabel.config_version:
+    derivedFrom: ConfigVersion
+    columns:
+    - name: version
+      type: text
+      required: true
+    - name: published_at
+      type: timestamptz
+      required: true
+    - name: published_by_principal_id
+      type: uuid
+      required: true
+    - name: published_by_name
+      type: text
+      required: false
+    - name: note
+      type: text
+      required: true
+    - name: is_current
+      type: boolean
+      required: true
+    - name: scheduled_for
+      type: timestamptz
+      required: false
+    - name: content_hash
+      type: text
+      required: false
+    - name: pending_build_time_changes
+      type: jsonb
+      required: false
+      description: Changes in this version that will not reach guests until the next store release. Surfaced
+        at publish so nobody expects a new icon tomorrow.
+  whitelabel.content_page:
+    derivedFrom: ContentPage
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: slug
+      type: text
+      required: true
+    - name: title
+      type: jsonb
+      required: true
+    - name: body
+      type: jsonb
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: icon_asset_ref
+      type: text
+      required: false
+    - name: category_code
+      type: text
+      required: false
+    - name: sort_order
+      type: integer
+      required: false
+  whitelabel.faq_category:
+    derivedFrom: FaqCategory
+    columns:
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: jsonb
+      required: true
+    - name: sort_order
+      type: integer
+      required: false
+    - name: entries
+      type: jsonb
+      required: true
+  whitelabel.feature_toggle:
+    derivedFrom: FeatureToggle
+    columns:
+    - name: feature_key
+      type: text
+      required: true
+    - name: display_name
+      type: text
+      required: false
+    - name: is_enabled
+      type: boolean
+      required: true
+    - name: requires_configuration
+      type: boolean
+      required: false
+      description: True where the feature needs credentials or setup elsewhere first.
+  whitelabel.homepage_section:
+    derivedFrom: HomepageLayout
+    columns:
+    - name: sections
+      type: jsonb
+      required: true
+  whitelabel.module_enablement:
+    derivedFrom: ModuleEnablement
+    columns:
+    - name: module_key
+      type: jsonb
+      required: true
+    - name: display_name
+      type: text
+      required: false
+    - name: is_licensed
+      type: boolean
+      required: true
+      description: From the tenant's subscription. False makes enablement impossible.
+    - name: is_enabled
+      type: boolean
+      required: true
+  whitelabel.navigation_item:
+    derivedFrom: NavigationConfig
+    columns:
+    - name: kind
+      type: text
+      required: true
+    - name: items
+      type: jsonb
+      required: true
+  whitelabel.policy:
+    derivedFrom: Policy
+    columns:
+    - name: kind
+      type: jsonb
+      required: true
+    - name: version
+      type: text
+      required: true
+      description: Immutable. A guest who consented to version 3 consented to version 3, and a policy
+        that changes under a recorded consent is a compliance failure.
+    - name: body
+      type: jsonb
+      required: true
+    - name: requires_reconsent
+      type: boolean
+      required: false
+    - name: effective_from
+      type: date
+      required: true
+    - name: published_by_principal_id
+      type: uuid
+      required: false
+    - name: published_at
+      type: timestamptz
+      required: true
+  whitelabel.promo_block:
+    derivedFrom: PromoBlock
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: title
+      type: jsonb
+      required: true
+    - name: description
+      type: jsonb
+      required: false
+    - name: icon_asset_ref
+      type: text
+      required: false
+    - name: promotion_id
+      type: uuid
+      required: false
+      description: Presentation only. A block may point at a promotion; it does not create or price one.
+    - name: link_target
+      type: jsonb
+      required: false
+    - name: starts_at
+      type: timestamptz
+      required: false
+    - name: ends_at
+      type: timestamptz
+      required: false
+    - name: sort_order
+      type: integer
+      required: false
+  whitelabel.tenant_config:
+    derivedFrom: TenantConfig
+    columns:
+    - name: tenant_id
+      type: uuid
+      required: true
+    - name: version
+      type: text
+      required: true
+    - name: is_draft
+      type: boolean
+      required: false
+    - name: brand
+      type: jsonb
+      required: true
+    - name: app_icons
+      type: jsonb
+      required: false
+    - name: theme
+      type: jsonb
+      required: true
+    - name: fonts
+      type: jsonb
+      required: true
+    - name: header
+      type: jsonb
+      required: false
+    - name: navigation
+      type: jsonb
+      required: true
+    - name: homepage
+      type: jsonb
+      required: true
+    - name: modules
+      type: jsonb
+      required: false
+    - name: features
+      type: jsonb
+      required: false
+    - name: languages
+      type: jsonb
+      required: true
+    - name: updated_at
+      type: timestamptz
+      required: false

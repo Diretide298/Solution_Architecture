@@ -1,0 +1,282 @@
+**Minutes of Meeting**
+
+*TICVAI Technical Discovery Workshop — **B2C App, Employee App and Layout builder App*
+
+| **Date** | 10-August-2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Technical Discovery Workshop — B2B, B2C and Employee app | **Prepared by** | Chitrangi Mestry |
+
+## **Primary Objective**
+
+** **Softlabs Group to demonstrate the proposed UI/UX design and functionality for the TICVAI Guest (B2C) mobile application and the Staff/Employee mobile application, for review and feedback.
+
+##  **Agenda**
+
+- Walkthrough of the B2C Guest Mobile App — design, configuration/back-office builder, and end-to-end booking journey
+
+- Walkthrough of the Employee (Staff Operations) Mobile App — roles, task/work order management, inventory, approvals, and ticket scanning
+
+- Discussion of open questions on AI concierge, multi-currency, third-party integrations, database/tenancy architecture, and app ownership
+
+- Alignment on next steps: action item tracker, and scheduling of the next deep-dive session
+
+# 4. Detailed Discussion
+
+## 4.1 B2C Guest Mobile App — Configuration & Builder Module
+
+- Allam walked through the mobile app back-office “builder” module that lets a tenant white-label and configure the guest app without code changes.
+
+- Branding & theming: Client logo upload (multiple formats), selectable colour themes, app icon, and custom font upload. A live preview is available before publishing changes.
+
+- Font & layout guardrails (open question raised): Chinmay flagged that unrestricted custom fonts/sizes could break layouts (e.g., cursive/bold fonts overflowing banner or description components). Agreed that size/format restrictions and pixel limits (e.g., banner image ≤ 1024px) are needed, with validation on upload and an explanatory note shown to the tenant admin.
+
+- Layout builder: Header, footer, logo, bottom navigation icons, and colours are all configurable from the builder.
+
+- Banner & promotion management: Configurable banner sizing; promotion/block activation via toggle.
+
+- Custom content pages: Museum/venue-specific pages (e.g., “Plan Your Visit”, Accessibility) with accessibility-guideline compliance to be followed.
+
+- FAQs and Policies: Configurable FAQ section; Terms & Conditions, Privacy Policy, Cookie Policy (accept/deny prompt), and a fully configurable, tiered Refund Policy (e.g., no refund <24h, 50% between 24–48h, 100% refund >48h) driven by back-office rules per business.
+
+- Module & page enablement: Ticketing & Booking, Membership, Events, Attractions, Virtual Queue, F&B, Retail, and Parking modules can be enabled/disabled per tenant based on licence. Tenant-specific add-ons (Lost & Found, AI Concierge Chat, multi-language support, integrations) are similarly toggleable and will appear automatically as new integrations are built.
+
+- Review & Publish: Final step in the builder flow before the configuration goes live.
+
+## 4.2 AI Concierge Chat — Open Item
+
+Chinmay raised that the AI concierge was originally scoped to use a third-party LLM API with PII scrubbing/masking of sensitive data. Qossai indicated the AI approach is not yet fully clear on the client side and requested a dedicated AI workshop to align on the technical approach before committing to a token/billing model.
+
+- Chinmay noted token utilisation cost would likely need to be billed separately from a fixed subscription fee, to avoid cost exposure if a tenant's usage exceeds planned limits.
+
+- Decision: Deferred — a separate AI workshop to be scheduled to walk through the mechanism and jointly decide the best approach (aligns with the platform's Tier 1/Tier 2/Tier 3 AI framework already documented separately).
+
+## 4.3 B2C Guest App — End-to-End Booking Journey
+
+- Home page: Logo, banner, and category tabs (Tickets, What's On, Plan Your Visit, Map).
+
+- Explore & purchase flow: Categories (Attractions, Exhibitions, Events, Dining, Shops, Experiences) → attraction/admission ticket selection (driven by back-office configuration) → date/time slot selection → add-ons (configurable per ticket type or generic) → review & pay → confirmation.
+
+- Confirmation & delivery: “Add to Wallet” (Apple Wallet / Google Wallet based on device), and tickets can additionally be sent via WhatsApp, SMS, or email depending on the guest's chosen delivery method.
+
+- Guest profile & wallet: Gift vouchers and a stored-value “money card”/wallet; “My Tickets” (all purchased tickets) and “My Reservations” (bookings, each containing one or more tickets) with reservation details and date-modification capability.
+
+- Ticket transfer: Tickets can be transferred to another person via email/SMS with an optional message; supports keeping ownership while renaming the ticket holder, or fully transferring both.
+
+- Membership: Membership ID, validity, entitlements (free entry, F&B offers, etc.), linked members (view), membership card, and renewal/history.
+
+- Calendar integration & wishlist: Add bookings to Apple/Google/Outlook calendar with reminders; wishlist for F&B and retail items to purchase later on-site.
+
+## 4.4 Venue Map, Queueing, F&B, Retail & Parking
+
+- Venue map: Customisable park/venue map showing attractions, dining, retail, and restrooms. Qossai proposed defining image/format guidance for tenants uploading maps to avoid errors, and referenced the Kidzania app's interactive 3D-style map as a benchmark for a better experience.
+
+- Live wait times / virtual queue: Displays estimated wait time per ride/attraction (e.g., “41 minutes”). Confirmed this typically depends on a third-party camera/sensor system at the venue; TAIS/TICVAI will build the underlying functionality and expose a standard API for the client's chosen third-party system to feed queue data into.
+
+- Food & Beverage: Browse restaurants/outlets and order; pickup-location option shown automatically per outlet, with delivery as an additional option (delivery requires the guest's location) when the venue uses the platform's own F&B module — a distinct, separate integration path exists if a venue uses a third-party F&B solution.
+
+- Retail: Similar model to F&B — pickup location or delivery.
+
+- Parking: Two supported models: (1) fully platform-native — guest purchases parking, receives a QR code scanned by a handheld device at the gate; (2) integrated with a third-party parking/ANPR system — guest enters their plate number, which is whitelisted so the barrier opens automatically on arrival. Both flows are to be supported in the app.
+
+## 4.5 Third-Party Integration Approach
+
+- Chinmay asked whether all B2B/third-party integrations (parking, queue timing, etc.) would follow one standard pattern.
+
+- Agreed approach: Standardise on exposing the platform's own APIs for third parties to consume wherever possible (this is the preferred default). Where a third-party provider insists the platform must instead push data into their API, that will be handled as an additional bespoke integration, assessed for effort case by case.
+
+## 4.6 AI Functions, Lost & Found, Reviews, Loyalty
+
+- AI concierge: Guests can ask natural-language questions (ticketing, F&B, retail, venue info, timings) and receive answers grounded in the venue's configured data.
+
+- Lost & Found: Guests can log lost items; back-office staff can match and mark items as found for guest collection, with full tracking.
+
+- Post-visit review/feedback (survey), Loyalty & Rewards, Offers & Promotions, Profile, and Help & Support are also part of the app.
+
+## 4.7 Account Creation, Localisation & Multi-Currency
+
+- Sign-up: Simple registration via phone number or email, each verified with an OTP (sent via WhatsApp or SMS/email as configured), followed by minimal profile capture (first/last name).
+
+- Language: Full multi-language support (Arabic and others such as Chinese), consistent with the platform's i18n/RTL architecture already agreed.
+
+- Multi-currency display vs settlement — key discussion: Two options were discussed: (a) a display-only “approximate” conversion using a back-office-configured rate, useful only so the guest understands roughly what they will pay while the transaction still settles in the local/base currency; and (b) full Dynamic Currency Conversion (DCC) via the payment gateway itself, where the guest genuinely pays and is charged in their own currency at the gateway level, while the booking/back-office record is always kept in the venue's configured base currency.
+
+- Real-time FX rate (raised by Reshma): Exchange rates fluctuate constantly and should not be hardcoded as static master data; a live/real-time FX rate source (API) is needed.
+
+- Client rate-setting behaviour (Qossai): In practice, most regional clients (~90%) prefer to set the conversion rate manually in the back office and apply a margin (e.g., quoting 3.80 when the market rate is 3.68) as an additional revenue source, rather than integrating a live exchange-rate API (e.g., XE). Both a manual-with-margin option and a third-party live-rate integration option should be supported.
+
+- POS parity: The same foreign-currency display/charge logic should apply at the Point of Sale, with all transactions recorded in the base currency for accounting, plus a dedicated report showing total foreign-currency collections by currency.
+
+## 4.8 Checkout Extras — Delivery, Waiting Room, Upsell/Cross-Sell, Seating, Resources
+
+- Ticket delivery method: WhatsApp, SMS, email, or Apple Wallet, selectable at checkout/confirmation; tickets can also be emailed to a third party.
+
+- Branded virtual waiting room: Activates automatically above a configurable concurrent-buyer threshold (example discussed: 500 concurrent buyers) during high-demand on-sales; shows a wait time and is branded consistently with the tenant's mobile app theme.
+
+- Maintenance page: Customisable holding page shown to guests during planned platform maintenance/upgrades.
+
+- Upsell & cross-sell: System-driven prompts — e.g., upsell a yearly membership on top of a general admission purchase, or cross-sell a family ticket bundle when two adult + two child tickets are added to the cart, each with associated discounts/benefits.
+
+- Seating & resource booking: Seated events use the previously agreed seat-map flow; resource bookings (e.g., cabana rental) decrement a capacity-based inventory on booking.
+
+## 4.9 “Plan Your Adventure” (Itinerary Planner)
+
+- A guided itinerary-planning feature (benchmarked against Skidata's equivalent) letting a guest plan their visit day (which rides/attractions, in what order) ahead of time, tied to their ticket purchase and saved as a personal visit profile.
+
+- Group sharing (raised by Chinmay): Requested the ability to share an itinerary with a group — e.g., via an in-app QR code a friend can scan to receive/join the itinerary, or an invite-to-join mechanism. Agreed as a valuable addition (Qossai confirmed interest); to be incorporated into the design.
+
+- Dynamic QR code: Ticket QR codes are temporary/non-scannable until the guest is on-site (validated by location/system state), then activate and continuously refresh to prevent misuse — previously agreed approach, reconfirmed.
+
+## 4.10 Bundle Packages
+
+- Packages combine multiple components (ticket + meal + retail, or ticket + event ticket, etc.) within a single attraction, sold at a discount to encourage cross-module spend — distinct from an itinerary spanning multiple attractions.
+
+- Reshma's clarification/question: Whether this differs from a Klook-style multi-attraction custom package. Confirmed it is a within-attraction package, not a cross-attraction one.
+
+- Pre-defined vs dynamically built packages: Both approaches were discussed — offering curated pre-built packages for direct purchase, and/or allowing guests to dynamically build their own bundle by adding items to the cart, with the system automatically detecting eligible combinations and applying an automatic discount (e.g., 5–10%). Softlabs to consider how to incorporate the dynamic-bundling approach.
+
+- Design inspiration: Qossai suggested reviewing product presentation on apps such as Talabat/similar platforms (using product video rather than static images) and referenced a previously shared benchmark app (“222”) for further UI/UX inspiration.
+
+## 4.11 Queue Wait-Time Accuracy (Follow-up)
+
+- Reshma followed up on how ride wait-time accuracy would actually be achieved. Confirmed two standard integration options: consuming a third-party queue-management/ticketing API, or consuming camera/people-counting sensor data installed on-ride. Agreed approach: TICVAI exposes a standard API for queue/wait-time data that any third-party system can push into; direct integration with a specific vendor's system would be treated as additional bespoke work.
+
+## 4.12 B2C App — Customisation, Ownership & Architecture (Q&A)
+
+- Customisation scope (Pradnya): Confirmed the guest app's structure/layout is fixed; tenants can customise graphics, colours, fonts, and enabled tabs/modules, and the checkout flow adapts automatically to the product type configured (seated, timed-slot, date-only, etc.) — no ability to add entirely new custom components.
+
+- App store ownership (Pradnya): Open question — Qossai's view is the tenant should own the published app (their own Apple/Google developer account, since they bear the cost and account terms), but with the platform's branding embedded (e.g., “built by Ticvai”). Softlabs to advise on the recommended approach and process, including a simple flow for the tenant to enter their developer credentials and as automated a submission/approval process as possible.
+
+- Data architecture per tenant (Pradnya): Confirmed each tenant gets its own dedicated database (e.g., a “Dubai Museum” database), with all of that tenant's sales channels (B2C web, B2C mobile, B2B, kiosk, tablet) connecting into the same single database so a guest's login/session is consistent across channels. Two deployment models exist: (1) shared TICVAI-hosted infrastructure with an isolated database per tenant, or (2) a fully separate, client-hosted database (e.g., on the client's own Azure/AWS) when the client wants full physical separation.
+
+- Reshma's supporting rationale: Separate databases per tenant avoid any risk of configuration or data mixing between customers and keep each tenant's settings, rates, and views fully independent.
+
+# 5. Employee (Staff Operations) App — Walkthrough
+
+## 5.1 Login, Roles & Dashboard
+
+- Login: Username/password or SSO.
+
+- Role selection (changed during discussion): Original design showed a manual role-selection screen after login; Qossai proposed this should instead be fully automatic based on the user's back-office role configuration, taking the employee directly to their role-specific home screen. agreed this makes more sense and will be adopted.
+
+- Role-based dashboard: Shows task counts, work orders, and inspections relevant to the logged-in employee's access; the entire navigation set (approvals, inventory, etc.) is filtered by the employee's assigned role/permissions.
+
+## 5.2 Core Navigation & Modules
+
+- Work Orders, Task & Assets, Inventory/Safety/Inspections, Attendance, Approvals/Requests (store requisitions, leave requests, etc.), Incidents, Communications, and Venue Map.
+
+- Notifications: Categorised by type — some requiring action, some purely informational.
+
+- Search: Search across tasks and incidents.
+
+- Create: Quick-create for maintenance requests, IT support, cleaning/safety/security requests, store requests, purchase requests, and leave requests.
+
+- Employee ID/profile and preferences.
+
+## 5.3 Task, Work Order & Asset Management
+
+- Task logging: Maintenance/operations staff log tasks (e.g., “fix water leak”, “fire extinguisher inspection”) with priority and scheduled date/time.
+
+- Work order lifecycle: Created → assigned → in progress → review → closed, with a timer tracking resolution duration.
+
+- Photo vs barcode capture (raised by Chinmay): Asked whether faulty assets without a barcode (e.g., a broken pipe or valve) could instead be logged with a photo rather than a barcode scan. Confirmed: yes — photo capture is the primary/preferred method for this use case, since many maintenance items (pipes, lighting, etc.) have no barcode to scan.
+
+## 5.4 Inventory & Procurement
+
+- Item lookup: Search by name or barcode scan to view stock levels and availability across stores/warehouses.
+
+- Inventory count & goods receipt: Both manageable directly from the employee app.
+
+- Procurement workflow: Requisition raised in the app → department-head approval → purchasing creates a Purchase Order (comparing vendor quotations for best price) → PO sent to vendor → goods received → items issued to the requesting department.
+
+- Low-stock / par-level automation: Minimum stock thresholds (e.g., 100 units) automatically trigger a draft requisition when breached, for review and confirmation before it proceeds through the purchasing workflow.
+
+## 5.5 Multi-Stage Approval Workflow
+
+- A generic, configurable multi-step approval engine applies broadly — not only to inventory/procurement, but also to actions such as price changes and new product creation.
+
+- Example flow (pricing change) walked through by Qossai: IT/Operations initiates → Operations Manager approves → Finance approves → CEO approves → returns to IT for publishing to the relevant sales channels.
+
+- Approval actions: Approve, Reject, Return, or Request More Information, with an AI-generated approval summary shown alongside the request and a visible workflow trail of who has approved at each stage.
+
+- Confirmed audience: Applicable to venue-level managers and supervisors, with the specific approval chain/assignees configurable per workflow type.
+
+## 5.6 Roster, Leave & Break Management, Resources
+
+- Roster/shift schedule: View shift timings, upcoming shifts, and clock in/out of a shift.
+
+- Leave requests: Submitted through the app so resourcing/coverage is visible in advance.
+
+- Break management: Staff log break windows so a replacement can be scheduled (e.g., to avoid leaving a ticket counter unstaffed).
+
+- Guest assistance / resources: Team supervisors, announcements, and quick access to venue information (e.g., opening hours) so staff can answer guest queries directly from the app.
+
+- Attraction status & Lost and Found: Live ride/attraction status visibility, and staff can log found items directly, which then surface for guest claim via the Lost & Found desk/workflow.
+
+## 5.7 Ticket Scanning / Access Control App
+
+- Dedicated scanning app: A separate, dedicated iOS/Android app for ticket validation, intended for devices used solely as scanners (e.g., mounted at turnstiles/gates), so those devices show only scanning functionality rather than the full employee app.
+
+- Embedded scanning: The same ticket-validation capability is also available inside the main Employee App, so staff do not need to switch apps if using a general-purpose device for occasional scanning.
+
+- Offline requirement (raised by Chinmay — important): Scanning must work as a native/installable app capability (not a web app), so that ticket validation continues to function fully offline (e.g., if turnstile network connectivity drops or a device has no data connection), storing scans locally and syncing to the server once connectivity is restored.Allam confirmed this is the intended offline-first approach, consistent with the platform's offline architecture.
+
+## 5.8 Additional Employee App Areas (Noted, Not Demoed in Detail)
+
+- Training & Knowledge Base, Employee Recognition, and further AI-assisted functionality within the employee app.
+
+# 6. Key Decisions & Agreements
+
+- Font and image upload restrictions (size/pixel limits) will be enforced in the mobile app builder to protect layout integrity, with guidance notes shown to tenant admins.
+
+- A dedicated AI workshop will be scheduled to align on the AI concierge's technical approach and commercial/token-billing model before finalising the design.
+
+- Standardise third-party integrations on TICVAI exposing its own APIs for partners to consume as the default pattern; vendor-mandated inbound-push integrations will be scoped as additional bespoke work case by case.
+
+- Support both a manual (admin-set, margin-inclusive) and a live third-party FX-rate option for multi-currency display, in addition to full Dynamic Currency Conversion at the payment gateway; all transactions settle and are recorded in the venue's base currency, with a separate foreign-currency collections report.
+
+- Add group-sharing capability (QR code / invite-to-join) to the “Plan Your Adventure” itinerary planner.
+
+- Employee app role screen will be removed in favour of fully automatic, back-office-driven role routing immediately after login.
+
+- Asset/incident logging in the employee app will prioritise photo capture over barcode scanning for items without barcodes (pipes, valves, lighting, etc.).
+
+- Ticket scanning/access-control functionality must be a native, installable capability with full offline operation and sync-on-reconnect — not a web-based feature — available both as a dedicated scanner app and embedded within the general employee app.
+
+- Each tenant will have its own isolated database; all of a tenant's sales channels (web, mobile, B2B, kiosk, tablet) connect to that single tenant database. A separate, client-hosted database option remains available for tenants requiring full physical separation.
+
+# 7. Open Items / Questions for Follow-Up
+
+- App store ownership model: whether the tenant or TICVAI owns the published Apple/Google Play app listing, and how TICVAI branding is embedded regardless of ownership — Softlabs to advise on recommended approach and a simplified credential/submission flow for tenants.
+
+- Detailed design/build of dynamically bundled packages (auto-discounting on qualifying cart combinations) to be worked through.
+
+- Confirm final venue-map guidance/format standard for tenants (referencing Kidzania-style interactive map as a UX benchmark).
+
+- AI concierge technical mechanism and cost/billing model — pending dedicated AI workshop.
+
+# 8. Action Items
+
+| **Action Item** | **Owner** | **Due** | **Status** |
+| --- | --- | --- | --- |
+| Share today's presentation slides via email | Allam | EOD 10 Aug | Open |
+| Share the meeting recording link along with the MoM | Chinmay Parab | EOD 10 Aug | Open |
+| Consolidate and share the action item / task tracker for review | Chinmay Parab | EOD 10 Aug | Open |
+| Confirm and share the list of topics for the next (Wednesday) deep-dive session | Chinmay Parab | EOD 10 Aug | Open |
+| Schedule a call to review the action item tracker and current status | Allam / Qossai | 11 Aug | Open |
+| Team to review the shared functionality matrix and screens; flag gaps or enhancements | Softlabs Group Team | Before next session | Open |
+| Advise on B2C app store ownership model and submission process | Softlabs Group | Next session | Open |
+| Incorporate group-sharing (QR/invite) into “Plan Your Adventure” design | Client (Qossai/Alan side) | TBD | Open |
+| Define and circulate image/font upload limits (pixel/size) for the mobile builder | Client (Qossai/Alan side) | TBD | Open |
+| Schedule dedicated AI concierge workshop | Both parties | TBD | Open |
+
+# 9. Next Steps
+
+- Softlabs team to review all shared design documents (functionality matrix + demo screens) with the wider team before the next call.
+
+- Next working session tentatively planned for Wednesday, 12 August 2026 (subject to confirmation by end of day), focused on reviewing the consolidated action item tracker and agreeing next module deep-dive topics (e.g., Resource Module).
+
+- Module-specific deep-dive sessions to be scheduled as backend development begins on each module, starting with detailed requirements walkthroughs (e.g., resource-to-reservation assignment logic).
+
+*— End of Minutes —*
+
+Confidential | Page 1 of 2

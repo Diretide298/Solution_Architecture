@@ -1,0 +1,215 @@
+# P11 — Accreditation Portal
+# BLOCKED on the Accreditation workshop.
+# Note the split: this portal is Wave 3, but accreditation VALIDATION appears on the
+# employee scanner in Wave 1. That is why this is the urgent one of the four workshops.
+
+platform:
+  code: P11
+  name: Accreditation Portal
+  surface: public
+  runtime: reactWeb
+  offlineCapable: false
+  themes:
+  - light
+  directions:
+  - ltr
+  - rtl
+  screenCount: 8
+  app: accreditation
+  appStatus: not scaffolded
+  packages:
+  - design-tokens
+  - ui
+screens:
+- id: ACC-001
+  name: Landing / Programme Overview
+  module: Applicant Journey
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /applicant-journey/landing-programme-overview
+    component: apps/accreditation/src/routes/applicant-journey/LandingProgrammeOverviewDetail.tsx
+    status: notStarted
+- id: ACC-002
+  name: Registration Form
+  module: Applicant Journey
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /applicant-journey/registration-form
+    component: apps/accreditation/src/routes/applicant-journey/RegistrationForm.tsx
+    status: notStarted
+- id: ACC-003
+  name: Application Review & Submit
+  module: Applicant Journey
+  wave: 3
+  layout:
+    template: wizard
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /applicant-journey/application-review-and-submit
+    component: apps/accreditation/src/routes/applicant-journey/ApplicationReviewAndSubmitWizard.tsx
+    status: notStarted
+- id: ACC-004
+  name: Application Status Tracking
+  module: Applicant Journey
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /applicant-journey/application-status-tracking
+    component: apps/accreditation/src/routes/applicant-journey/ApplicationStatusTrackingDetail.tsx
+    status: notStarted
+- id: ACC-005
+  name: Accreditation Badge
+  module: Applicant Journey
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /applicant-journey/accreditation-badge
+    component: apps/accreditation/src/routes/applicant-journey/AccreditationBadgeDetail.tsx
+    status: notStarted
+- id: ACC-006
+  name: Reviewer Queue
+  module: Reviewer (Internal)
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /reviewer-internal/reviewer-queue
+    component: apps/accreditation/src/routes/reviewer-internal/ReviewerQueueList.tsx
+    status: notStarted
+- id: ACC-007
+  name: Reviewer Application Detail
+  module: Reviewer (Internal)
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /reviewer-internal/reviewer-application-detail
+    component: apps/accreditation/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx
+    status: notStarted
+- id: ACC-008
+  name: Credential Register
+  module: Reviewer (Internal)
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: TODO
+    empty: TODO
+    error: TODO
+  wireframe:
+    status: notStarted
+  openQuestions:
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
+    mapping until the domain is discussed.
+  implementation:
+    app: accreditation
+    route: /reviewer-internal/credential-register
+    component: apps/accreditation/src/routes/reviewer-internal/CredentialRegisterList.tsx
+    status: notStarted

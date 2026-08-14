@@ -1,0 +1,211 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Shared Components
+  version: 1.0.0
+  description: >
+    ## How to read this file
+
+    **Shared types. Every other contract references these rather than redefining them.**
+
+    A type defined once and referenced everywhere is a type that cannot drift. `Money`
+    declared separately in eleven contracts would be eleven chances to forget that some
+    currencies use three decimal places.
+
+    | Defined here | Why it is shared |
+    |---|---|
+    | `Money` | Amount, currency and **scale**. A fixed two-place type truncates 3dp currencies |
+    | `ScopeRef` | A node in the seven-level hierarchy, with its ltree path |
+    | `Problem` | RFC 9457 error shape with an enumerated `type`. Clients switch on it |
+    | `Page` | Cursor pagination. Offset drifts under concurrent writes |
+    | Parameters | `Idempotency-Key`, page size, page cursor |
+    | **Security schemes** | The four authentication models — see below |
+
+    ## Authentication
+
+    | Scheme | Used by |
+    |---|---|
+    | `bearerAuth` | Staff sessions. Carries `sid`, validated against the session registry |
+    | `guestAuth` | Guest sessions. No workstation, no role selection, no single-session rule |
+    | `serviceAuth` | Cell-to-cell and cell-to-Control-Plane. mTLS plus a cell-identity token |
+    | `apiKeyAuth` | Partner and developer. Deferred pending the Developer & API workshop |
+
+    Authorisation is **not** expressed through OAuth scopes. Permissions resolve at login
+    against a seven-level tree with deny-overrides-allow, which scopes cannot express — so
+    they live in `x-ticvai-permission` and `x-ticvai-scope-level` on each operation instead.
+
+    Components referenced by every TICVAI contract. Changes here are breaking
+    changes to every consumer — treat accordingly.
+
+components:
+  parameters:
+    PageSize:
+      name: pageSize
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+
+    PageCursor:
+      name: cursor
+      in: query
+      description: Opaque cursor from a previous page. Absent on first request.
+      schema: { type: string }
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: >
+        Client-generated ULID. Servers deduplicate on this value. Required on every
+        mutating request because offline clients replay their outbox on reconnect.
+      schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+
+    ConsistencyToken:
+      name: X-Consistency-Token
+      in: header
+      required: false
+      description: >
+        WAL LSN returned by a prior write. When present the read is routed to a
+        replica that has caught up past this position, or to the primary. Prevents
+        a ticket sold at the gate being refused by a lagging replica seconds later.
+      schema: { type: string }
+
+  schemas:
+    Money:
+      type: object
+      required: [amount, currency, scale]
+      properties:
+        amount:
+          type: string
+          description: >
+            Decimal string, never a float. Up to 4 decimal places. OMR uses 3,
+            AED uses 2 — scale is carried explicitly because it varies by region.
+          pattern: '^-?\d+(\.\d{1,4})?$'
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        scale:
+          type: integer
+          minimum: 0
+          maximum: 4
+
+    ScopeLevel:
+      type: string
+      enum: [tenant, brand, region, venue, department, subDepartment, workstation]
+
+    ScopeRef:
+      type: object
+      description: A node in the tenant hierarchy. Permissions resolve against this.
+      required: [level, id]
+      properties:
+        level: { $ref: '#/components/schemas/ScopeLevel' }
+        id: { type: string, format: uuid }
+        path:
+          type: string
+          description: Materialised ltree path, e.g. "t1.b2.r1.v3".
+          pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
+
+    Problem:
+      type: object
+      description: RFC 9457 problem details. Every error response uses this shape.
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        traceId: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            required: [field, code]
+            properties:
+              field: { type: string }
+              code: { type: string }
+              message: { type: string }
+
+    Page:
+      type: object
+      required: [items, hasMore]
+      properties:
+        items:
+          type: array
+          items: {}
+        nextCursor: { type: string }
+        hasMore: { type: boolean }
+
+  responses:
+    BadRequest:
+      description: Validation failed
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: Missing, expired or superseded session
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Authenticated but not permitted at the requested scope
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: Idempotency conflict or optimistic concurrency failure
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: The resource does not exist, or is outside the caller's scope
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    TooManyRequests:
+      description: Rate limit exceeded for this tenant, venue or principal
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Staff session token. Carries `sid` (validated against the session registry),
+        `tenant`, `cell` and the principal. Permissions are resolved at login and cached;
+        the token itself does not carry them.
+
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Guest session token. Structurally different from a staff token: no workstation, no
+        role selection, no single-session rule, longer lived, and revoked independently.
+        Scoped to the guest's own resources — a guest token can never widen to another
+        subject.
+
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Cell-to-cell and cell-to-Control-Plane authentication. There is no user, so the
+        permission model does not apply.
+
+        The token is issued to a cell identity, carries `aud: cell` or `aud: control-plane`,
+        names the calling cell in `sub`, and is short-lived. Transport is mTLS with per-cell
+        client certificates; the token identifies **which** cell, the certificate proves it.
+
+        A caller presenting a valid token from the wrong certificate is rejected. Neither
+        alone is sufficient.
+
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: >
+        Partner and developer authentication. Keys are tenant-scoped, carry their own
+        permission set, and are rate-limited per key. Deferred pending the Developer & API
+        workshop.

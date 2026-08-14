@@ -1,0 +1,70 @@
+# accreditation — screen and route manifest
+# Derived from screens/*.yaml by tools/link-frontend.py. Do not hand-edit.
+# Routes and component paths are conventional; a route that exists in code but
+# not here, or here but not in code, is caught by tools/check-frontend.py.
+
+app: accreditation
+status: not scaffolded
+runtime: reactWeb
+offlineCapable: false
+directions:
+- ltr
+- rtl
+platforms:
+- P11 Accreditation Portal
+packages:
+- design-tokens
+- ui
+contracts: []
+screenCount: 8
+byWave:
+  wave3: 8
+screens:
+- id: ACC-001
+  name: Landing / Programme Overview
+  route: /applicant-journey/landing-programme-overview
+  component: apps/accreditation/src/routes/applicant-journey/LandingProgrammeOverviewDetail.tsx
+  wave: 3
+  status: notStarted
+- id: ACC-002
+  name: Registration Form
+  route: /applicant-journey/registration-form
+  component: apps/accreditation/src/routes/applicant-journey/RegistrationFormForm.tsx
+  wave: 3
+  status: notStarted
+- id: ACC-003
+  name: Application Review & Submit
+  route: /applicant-journey/application-review-and-submit
+  component: apps/accreditation/src/routes/applicant-journey/ApplicationReviewAndSubmitWizard.tsx
+  wave: 3
+  status: notStarted
+- id: ACC-004
+  name: Application Status Tracking
+  route: /applicant-journey/application-status-tracking
+  component: apps/accreditation/src/routes/applicant-journey/ApplicationStatusTrackingDetail.tsx
+  wave: 3
+  status: notStarted
+- id: ACC-005
+  name: Accreditation Badge
+  route: /applicant-journey/accreditation-badge
+  component: apps/accreditation/src/routes/applicant-journey/AccreditationBadgeDetail.tsx
+  wave: 3
+  status: notStarted
+- id: ACC-006
+  name: Reviewer Queue
+  route: /reviewer-internal/reviewer-queue
+  component: apps/accreditation/src/routes/reviewer-internal/ReviewerQueueList.tsx
+  wave: 3
+  status: notStarted
+- id: ACC-007
+  name: Reviewer Application Detail
+  route: /reviewer-internal/reviewer-application-detail
+  component: apps/accreditation/src/routes/reviewer-internal/ReviewerApplicationDetailDetail.tsx
+  wave: 3
+  status: notStarted
+- id: ACC-008
+  name: Credential Register
+  route: /reviewer-internal/credential-register
+  component: apps/accreditation/src/routes/reviewer-internal/CredentialRegisterList.tsx
+  wave: 3
+  status: notStarted

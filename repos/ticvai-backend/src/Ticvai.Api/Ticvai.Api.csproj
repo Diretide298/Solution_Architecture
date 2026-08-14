@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Ticvai.Api</RootNamespace>
+    <UserSecretsId>ticvai-api</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Ticvai.Shared.Kernel/Ticvai.Shared.Kernel.csproj" />
+    <ProjectReference Include="../Ticvai.Modules.Identity/Ticvai.Modules.Identity.csproj" />
+    <ProjectReference Include="../Ticvai.Modules.Tenancy/Ticvai.Modules.Tenancy.csproj" />
+    <ProjectReference Include="../Ticvai.Modules.Catalogue/Ticvai.Modules.Catalogue.csproj" />
+    <ProjectReference Include="../Ticvai.Modules.Orders/Ticvai.Modules.Orders.csproj" />
+    <ProjectReference Include="../Ticvai.Modules.AccessControl/Ticvai.Modules.AccessControl.csproj" />
+    <ProjectReference Include="../Ticvai.Modules.Sync/Ticvai.Modules.Sync.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+    <PackageReference Include="Npgsql" Version="8.0.5" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.16" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+  </ItemGroup>
+</Project>

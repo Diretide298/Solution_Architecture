@@ -1,0 +1,470 @@
+# orders — derived from the API contracts, not hand-written
+# Migration: V0005
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: orders
+migration: V0005
+tableCount: 10
+columnCount: 132
+tables:
+  orders.b2b_credit:
+    derivedFrom: CreditPosition
+    columns:
+    - name: account_id
+      type: uuid
+      required: true
+    - name: account_name
+      type: text
+      required: false
+    - name: credit_limit
+      type: numeric(18,4)
+      required: true
+    - name: used
+      type: numeric(18,4)
+      required: true
+    - name: available
+      type: numeric(18,4)
+      required: true
+    - name: is_over_limit
+      type: boolean
+      required: false
+    - name: is_suspended
+      type: boolean
+      required: true
+    - name: payment_terms_days
+      type: integer
+      required: false
+    - name: oldest_unpaid_invoice_at
+      type: timestamptz
+      required: false
+    - name: days_overdue
+      type: integer
+      required: false
+    - name: active_overrides
+      type: jsonb
+      required: false
+  orders.cash_movement:
+    derivedFrom: CashMovement
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+      description: Client-generated ULID.
+    - name: kind
+      type: jsonb
+      required: true
+    - name: amount
+      type: numeric(18,4)
+      required: true
+    - name: denominations
+      type: jsonb
+      required: false
+    - name: reference
+      type: varchar(64)
+      required: false
+      description: Safe drop reference or bag number.
+    - name: reason
+      type: varchar(500)
+      required: false
+    - name: recorded_at
+      type: timestamptz
+      required: true
+    - name: shift_id
+      type: text
+      required: true
+    - name: authorised_by_principal_id
+      type: uuid
+      required: true
+      description: The principal who authorised the movement, recorded for audit.
+    - name: sequence
+      type: integer
+      required: true
+      description: Monotonic within the shift. Preserves order across an offline batch.
+    - name: synced_at
+      type: timestamptz
+      required: false
+  orders.order_line:
+    derivedFrom: OrderLine
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+    - name: variant_id
+      type: uuid
+      required: true
+    - name: performance_id
+      type: uuid
+      required: false
+    - name: lease_id
+      type: text
+      required: false
+      description: Lease the units were drawn from. Absent for uncontended products.
+    - name: seat_ids
+      type: jsonb
+      required: false
+      description: Seated products only. Not available offline.
+    - name: quantity
+      type: integer
+      required: true
+    - name: quoted_unit_price
+      type: numeric(18,4)
+      required: true
+      description: What the client charged, from its local bundle.
+    - name: holder_name
+      type: text
+      required: false
+    - name: data_mask_values
+      type: jsonb
+      required: false
+    - name: server_unit_price
+      type: numeric(18,4)
+      required: true
+      description: What the server computed on ingest.
+    - name: price_variance
+      type: numeric(18,4)
+      required: false
+      description: Server minus quoted. Non-zero means the quoted price was honoured and the difference
+        posted to the variance account.
+    - name: tax_amount
+      type: numeric(18,4)
+      required: true
+    - name: net_amount
+      type: numeric(18,4)
+      required: true
+    - name: gross_amount
+      type: numeric(18,4)
+      required: true
+    - name: entitlement_ids
+      type: jsonb
+      required: false
+    - name: cross_cell_right_ids
+      type: jsonb
+      required: false
+      description: Redemption rights propagated to other cells for this line.
+  orders.payment:
+    derivedFrom: Payment
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: order_id
+      type: text
+      required: true
+    - name: tender
+      type: jsonb
+      required: true
+    - name: amount
+      type: numeric(18,4)
+      required: true
+    - name: change_amount
+      type: numeric(18,4)
+      required: false
+    - name: status
+      type: text
+      required: true
+    - name: provider_name
+      type: text
+      required: false
+    - name: provider_reference
+      type: text
+      required: false
+    - name: last_inquiry_at
+      type: timestamptz
+      required: false
+    - name: recorded_at
+      type: timestamptz
+      required: true
+    - name: synced_at
+      type: timestamptz
+      required: false
+  orders.refund:
+    derivedFrom: Refund
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: order_id
+      type: text
+      required: true
+    - name: amount
+      type: numeric(18,4)
+      required: true
+    - name: applied_percentage
+      type: numeric
+      required: false
+      description: From the venue's time bands, or an approver override.
+    - name: status
+      type: text
+      required: true
+    - name: reason
+      type: text
+      required: false
+    - name: requested_by_principal_id
+      type: uuid
+      required: false
+    - name: secondary_principal_id
+      type: uuid
+      required: false
+    - name: approved_by_principal_id
+      type: uuid
+      required: false
+    - name: ledger_entry_id
+      type: text
+      required: false
+      description: Written before the gateway is called.
+    - name: gateway_reference
+      type: text
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: completed_at
+      type: timestamptz
+      required: false
+  orders.refund_policy:
+    derivedFrom: RefundPolicy
+    columns:
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: self_authorise_limit
+      type: numeric(18,4)
+      required: true
+      description: Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a
+        second authoriser.
+    - name: requires_second_user_above
+      type: numeric(18,4)
+      required: false
+      description: Above this, a second user — cashier OR supervisor — names themselves as audit control.
+        Dual-authorisation, not escalation (2.12.3).
+    - name: requires_approval_above
+      type: numeric(18,4)
+      required: true
+      description: Above this, an ORDER_REFUND_APPROVE holder must approve.
+    - name: time_bands
+      type: jsonb
+      required: false
+      description: Refundable percentage by time before the performance. Evaluated most-specific first.
+    - name: allow_partial
+      type: boolean
+      required: false
+    - name: refund_window_days
+      type: integer
+      required: false
+    - name: variance_threshold
+      type: numeric(18,4)
+      required: false
+      description: Price variance above this is an exception requiring review rather than a routine posting
+        (CF-38). Venue-configured.
+  orders.reservation:
+    derivedFrom: Reservation
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: lines
+      type: jsonb
+      required: false
+    - name: expires_at
+      type: timestamptz
+      required: true
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: converted_order_id
+      type: text
+      required: false
+  orders.sales_order:
+    derivedFrom: Order
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: order_number
+      type: text
+      required: false
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: scope_path
+      type: text
+      required: true
+    - name: channel
+      type: jsonb
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: currency
+      type: char(3)
+      required: true
+    - name: currency_scale
+      type: integer
+      required: true
+    - name: gross_amount
+      type: numeric(18,4)
+      required: true
+    - name: tax_amount
+      type: numeric(18,4)
+      required: true
+    - name: net_amount
+      type: numeric(18,4)
+      required: true
+    - name: refunded_amount
+      type: numeric(18,4)
+      required: false
+    - name: total_price_variance
+      type: numeric(18,4)
+      required: false
+      description: Sum across lines. Zero on a normal order.
+    - name: lines
+      type: jsonb
+      required: true
+    - name: payments
+      type: jsonb
+      required: false
+    - name: principal_id
+      type: uuid
+      required: false
+    - name: workstation_id
+      type: uuid
+      required: false
+    - name: shift_id
+      type: text
+      required: false
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: true
+    - name: synced_at
+      type: timestamptz
+      required: false
+  orders.shift:
+    derivedFrom: Shift
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+      description: Client-generated ULID. Also the idempotency key.
+    - name: workstation_id
+      type: uuid
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: scope_path
+      type: text
+      required: true
+    - name: principal_id
+      type: uuid
+      required: true
+      description: Who opened it. Cash reconciles to a person and a drawer.
+    - name: principal_display_name
+      type: text
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: currency
+      type: char(3)
+      required: true
+    - name: currency_scale
+      type: integer
+      required: true
+    - name: deposit_box_code
+      type: text
+      required: false
+    - name: bag_number
+      type: text
+      required: false
+    - name: opening_float
+      type: numeric(18,4)
+      required: false
+    - name: sales_total
+      type: numeric(18,4)
+      required: false
+    - name: refunds_total
+      type: numeric(18,4)
+      required: false
+    - name: lifts_total
+      type: numeric(18,4)
+      required: false
+    - name: held_lease_count
+      type: integer
+      required: false
+      description: Inventory leases currently held by this workstation. Surfaced so an operator closing
+        a shift can see what will be returned.
+    - name: opened_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+      description: When the device recorded the open. Differs from `openedAt` when offline.
+    - name: suspended_at
+      type: timestamptz
+      required: false
+    - name: closed_at
+      type: timestamptz
+      required: false
+    - name: synced_at
+      type: timestamptz
+      required: false
+      description: Null while the shift has unsynced operations.
+    - name: approvals
+      type: jsonb
+      required: false
+  orders.ticket_transfer:
+    derivedFrom: TicketTransfer
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: order_id
+      type: text
+      required: true
+    - name: ticket_ids
+      type: jsonb
+      required: true
+    - name: from_subject_id
+      type: uuid
+      required: false
+    - name: to_subject_id
+      type: uuid
+      required: false
+      description: Set only on claim. Ownership moves then, not at offer.
+    - name: recipient_address_masked
+      type: text
+      required: false
+    - name: status
+      type: text
+      required: true
+    - name: claim_url
+      type: text
+      required: false
+    - name: offered_at
+      type: timestamptz
+      required: true
+    - name: claimed_at
+      type: timestamptz
+      required: false
+    - name: expires_at
+      type: timestamptz
+      required: true
+      description: An unclaimed transfer expires and the tickets return. A transfer to a mistyped address
+        must not strand a ticket somewhere nobody can reach.

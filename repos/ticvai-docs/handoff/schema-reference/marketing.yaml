@@ -1,0 +1,494 @@
+# marketing — derived from the API contracts, not hand-written
+# Migration: V0015
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: marketing
+migration: V0015
+tableCount: 14
+columnCount: 139
+tables:
+  marketing.campaign:
+    derivedFrom: Campaign
+    columns:
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: channel
+      type: jsonb
+      required: true
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: segment_id
+      type: uuid
+      required: true
+    - name: content
+      type: jsonb
+      required: true
+    - name: trigger
+      type: jsonb
+      required: false
+    - name: scheduled_for
+      type: timestamptz
+      required: false
+    - name: consent_purpose
+      type: jsonb
+      required: false
+    - name: send_window
+      type: jsonb
+      required: false
+      description: Hours during which sending is permitted. A promotional message at 3am is a complaint
+        waiting to happen.
+    - name: id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: is_paused
+      type: boolean
+      required: false
+    - name: created_by_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: launched_at
+      type: timestamptz
+      required: false
+    - name: completed_at
+      type: timestamptz
+      required: false
+  marketing.case:
+    derivedFrom: Case
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: case_number
+      type: text
+      required: true
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: guest_name
+      type: text
+      required: false
+    - name: subject
+      type: text
+      required: true
+    - name: category_id
+      type: uuid
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: priority
+      type: jsonb
+      required: true
+    - name: assigned_to_principal_id
+      type: uuid
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: related_order_id
+      type: text
+      required: false
+    - name: sla_due_at
+      type: timestamptz
+      required: false
+    - name: is_sla_breached
+      type: boolean
+      required: false
+    - name: sla_paused_seconds
+      type: integer
+      required: false
+      description: Accrued only while awaiting the guest. Waiting on an internal team does not pause the
+        clock.
+    - name: escalation_count
+      type: integer
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: resolved_at
+      type: timestamptz
+      required: false
+  marketing.case_message:
+    derivedFrom: CaseMessage
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: body
+      type: text
+      required: true
+    - name: is_internal
+      type: boolean
+      required: true
+    - name: author_kind
+      type: text
+      required: true
+    - name: author_principal_id
+      type: uuid
+      required: false
+    - name: channel
+      type: jsonb
+      required: false
+    - name: attachment_refs
+      type: jsonb
+      required: false
+    - name: recorded_at
+      type: timestamptz
+      required: true
+  marketing.consent_purpose:
+    derivedFrom: ConsentPurposeConfig
+    columns:
+    - name: purpose
+      type: jsonb
+      required: true
+    - name: display_name
+      type: text
+      required: false
+    - name: description
+      type: text
+      required: false
+    - name: channels
+      type: jsonb
+      required: true
+    - name: notice_version
+      type: text
+      required: true
+      description: Current version of the notice. A consent against a superseded version is reported as
+        requiring renewal rather than silently honoured.
+    - name: is_required_for_service
+      type: boolean
+      required: true
+      description: True for transactional. Withdrawing it means the service cannot be delivered, so it
+        is presented differently.
+    - name: expires_after_months
+      type: integer
+      required: false
+  marketing.consent_record:
+    derivedFrom: ConsentRecord
+    columns:
+    - name: purpose
+      type: jsonb
+      required: true
+    - name: decision
+      type: jsonb
+      required: true
+    - name: channels
+      type: jsonb
+      required: false
+      description: Omit to apply to every channel the purpose covers.
+    - name: notice_version
+      type: text
+      required: true
+    - name: source
+      type: jsonb
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: true
+    - name: id
+      type: text
+      required: true
+    - name: subject_id
+      type: uuid
+      required: true
+    - name: recorded_by_principal_id
+      type: uuid
+      required: false
+    - name: superseded_at
+      type: timestamptz
+      required: false
+  marketing.guest_profile:
+    derivedFrom: GuestProfile
+    columns:
+    - name: subject_id
+      type: uuid
+      required: true
+      description: Opaque reference. Personal data lives in the separately erasable store, which is what
+        makes erasure possible against an append-only ledger.
+    - name: display_name
+      type: text
+      required: false
+    - name: email
+      type: text
+      required: false
+    - name: phone
+      type: text
+      required: false
+    - name: preferred_language
+      type: text
+      required: false
+    - name: preferred_channel
+      type: jsonb
+      required: false
+    - name: guest_link_id
+      type: text
+      required: false
+      description: Present where the guest is linked across cells. Marketing acts locally.
+    - name: tags
+      type: jsonb
+      required: false
+    - name: lifetime_value
+      type: numeric(18,4)
+      required: false
+    - name: visit_count
+      type: integer
+      required: false
+    - name: last_visit_at
+      type: timestamptz
+      required: false
+    - name: is_active
+      type: boolean
+      required: true
+  marketing.loyalty_position:
+    derivedFrom: LoyaltyPosition
+    columns:
+    - name: subject_id
+      type: uuid
+      required: true
+    - name: programme_id
+      type: uuid
+      required: true
+    - name: points_balance
+      type: integer
+      required: true
+    - name: lifetime_points
+      type: integer
+      required: false
+    - name: tier_code
+      type: text
+      required: true
+    - name: tier_name
+      type: text
+      required: false
+    - name: points_to_next_tier
+      type: integer
+      required: false
+    - name: next_expiry_points
+      type: integer
+      required: false
+    - name: next_expiry_at
+      type: timestamptz
+      required: false
+  marketing.loyalty_programme:
+    derivedFrom: LoyaltyProgramme
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: points_liability_account_id
+      type: uuid
+      required: false
+      description: Points post here on accrual. They are a liability from the moment they are earned,
+        not from the moment they are spent.
+    - name: earn_rules
+      type: jsonb
+      required: true
+    - name: tiers
+      type: jsonb
+      required: true
+    - name: points_expire_after_months
+      type: integer
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  marketing.message_dispatch:
+    derivedFrom: MessageDispatch
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: subject_id
+      type: uuid
+      required: true
+    - name: campaign_id
+      type: uuid
+      required: false
+    - name: channel
+      type: jsonb
+      required: true
+    - name: template_id
+      type: uuid
+      required: false
+    - name: status
+      type: text
+      required: true
+    - name: failure_reason
+      type: text
+      required: false
+    - name: provider_reference
+      type: text
+      required: false
+    - name: queued_at
+      type: timestamptz
+      required: true
+    - name: delivered_at
+      type: timestamptz
+      required: false
+  marketing.message_template:
+    derivedFrom: MessageTemplate
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: channel
+      type: jsonb
+      required: true
+    - name: subjects
+      type: jsonb
+      required: false
+      description: Per language. Email only.
+    - name: bodies
+      type: jsonb
+      required: true
+      description: Per language, keyed by ISO 639-1 code.
+    - name: merge_fields
+      type: jsonb
+      required: false
+    - name: provider_template_id
+      type: text
+      required: false
+      description: Required for WhatsApp, where templates are pre-approved by the provider.
+  marketing.review:
+    derivedFrom: Review
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: related_order_id
+      type: text
+      required: false
+    - name: rating
+      type: integer
+      required: true
+    - name: body
+      type: varchar(5000)
+      required: false
+    - name: aspects
+      type: jsonb
+      required: false
+      description: Aspect chips — exhibitions, staff, cleanliness, food, value.
+    - name: recorded_at
+      type: timestamptz
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: response
+      type: text
+      required: false
+    - name: response_is_public
+      type: boolean
+      required: false
+    - name: responded_by_principal_id
+      type: uuid
+      required: false
+    - name: opened_case_id
+      type: text
+      required: false
+      description: Case raised automatically where the rating fell below the venue's threshold. Feedback
+        that goes nowhere is worse than no feedback mechanism.
+  marketing.segment:
+    derivedFrom: Segment
+    columns:
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: varchar(1000)
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: match
+      type: text
+      required: false
+    - name: criteria
+      type: jsonb
+      required: true
+    - name: exclude_segment_ids
+      type: jsonb
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: last_evaluated_size
+      type: integer
+      required: false
+    - name: last_evaluated_at
+      type: timestamptz
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+  marketing.segment_criterion:
+    derivedFrom: SegmentCriterion
+    columns:
+    - name: attribute
+      type: text
+      required: true
+      description: Behavioural or profile attribute — visit count, last visit, lifetime value, product
+        purchased, membership tier, venue visited, language.
+    - name: operator
+      type: text
+      required: true
+    - name: value
+      type: text
+      required: false
+    - name: values
+      type: jsonb
+      required: false
+  marketing.suppression:
+    derivedFrom: Suppression
+    columns:
+    - name: channel
+      type: jsonb
+      required: true
+    - name: address
+      type: text
+      required: true
+    - name: reason
+      type: text
+      required: true
+    - name: suppressed_at
+      type: timestamptz
+      required: true
+    - name: suppressed_by_principal_id
+      type: uuid
+      required: false

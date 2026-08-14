@@ -1,0 +1,212 @@
+# games — derived from the API contracts, not hand-written
+# Migration: V0020
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: games
+migration: V0020
+tableCount: 5
+columnCount: 58
+tables:
+  games.card:
+    derivedFrom: GameCard
+    columns:
+    - name: card_code
+      type: text
+      required: true
+    - name: kind
+      type: text
+      required: false
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: credits
+      type: integer
+      required: true
+      description: Bought with money. Buys plays.
+    - name: bonus_credits
+      type: integer
+      required: true
+      description: From a promotion. Typically non-refundable and spent before paid credits.
+    - name: points
+      type: integer
+      required: true
+      description: Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who wins
+        should not simply be able to play more.
+    - name: status
+      type: text
+      required: true
+    - name: blocked_reason
+      type: text
+      required: false
+    - name: transferred_to_card_code
+      type: text
+      required: false
+    - name: last_played_at
+      type: timestamptz
+      required: false
+    - name: issued_at
+      type: timestamptz
+      required: true
+    - name: expires_at
+      type: timestamptz
+      required: false
+  games.game:
+    derivedFrom: Game
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: zone
+      type: text
+      required: false
+    - name: asset_id
+      type: uuid
+      required: false
+      description: The machine. Taken out of service by maintenance, the game stops accepting play rather
+        than swallowing credits.
+    - name: reader_id
+      type: uuid
+      required: false
+    - name: credit_cost
+      type: integer
+      required: true
+    - name: min_points_awarded
+      type: integer
+      required: false
+    - name: max_points_awarded
+      type: integer
+      required: false
+    - name: height_requirement_cm
+      type: integer
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: plays_today
+      type: integer
+      required: false
+    - name: credits_taken_today
+      type: integer
+      required: false
+    - name: points_awarded_today
+      type: integer
+      required: false
+  games.play:
+    derivedFrom: PlayResult
+    columns:
+    - name: play_id
+      type: text
+      required: true
+    - name: card_code
+      type: text
+      required: false
+    - name: game_id
+      type: uuid
+      required: false
+    - name: credits_used
+      type: integer
+      required: true
+    - name: points_awarded
+      type: integer
+      required: true
+    - name: credits_remaining
+      type: integer
+      required: true
+    - name: points_balance
+      type: integer
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+    - name: synced_at
+      type: timestamptz
+      required: false
+  games.prize:
+    derivedFrom: Prize
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: text
+      required: false
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: merchandise_id
+      type: uuid
+      required: false
+      description: Links to retail. Redemption depletes stock through the inventory ledger — a prize wall
+        running out is a stock problem and should look like one.
+    - name: point_cost
+      type: integer
+      required: true
+    - name: on_hand
+      type: integer
+      required: true
+    - name: is_available
+      type: boolean
+      required: false
+    - name: tier
+      type: text
+      required: false
+      description: Small, medium, large, jackpot. Drives prize-wall layout.
+    - name: image_asset_ref
+      type: text
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  games.redemption:
+    derivedFrom: PrizeRedemption
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: redemption_number
+      type: text
+      required: false
+    - name: card_code
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: points_used
+      type: integer
+      required: true
+    - name: points_remaining
+      type: integer
+      required: true
+    - name: stock_movement_ids
+      type: jsonb
+      required: false
+      description: Movements raised in the inventory ledger.
+    - name: issued_by_principal_id
+      type: uuid
+      required: false
+    - name: recorded_at
+      type: timestamptz
+      required: true

@@ -1,0 +1,20 @@
+name: bible-check
+on: [pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bible is present
+        run: |
+          test -f project-bible/overview.md \
+            || { echo "project-bible missing. Run ./update-bible.sh from the workspace root."; exit 1; }
+          echo "Bible synced at $(cat project-bible/.synced-at 2>/dev/null || echo unknown)"
+      - name: Warn if bible was edited in this PR
+        run: |
+          # project-bible/ is a copy of ticvai-docs. An edit here is overwritten
+          # by the next ./update-bible.sh run, so it is flagged rather than lost.
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" 2>/dev/null | grep -q '^project-bible/'; then
+            echo "::warning::project-bible/ was modified. It is a copy of ticvai-docs and"
+            echo "::warning::will be overwritten on the next sync. Change ticvai-docs instead."
+          fi

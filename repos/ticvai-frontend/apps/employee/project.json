@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "employee",
+  "sourceRoot": "apps/employee/src",
+  "projectType": "application",
+  "tags": ["type:app", "platform:react-native"],
+  "targets": {
+    "lint": { "executor": "@nx/eslint:lint" },
+    "test": { "executor": "@nx/vite:test" },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p apps/employee/tsconfig.json --noEmit" }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.{cs,csx}]
+indent_size = 4
+csharp_style_namespace_declarations = file_scoped:error
+csharp_prefer_braces = true:error
+dotnet_style_require_accessibility_modifiers = always:error
+dotnet_diagnostic.CA2007.severity = warning
+dotnet_diagnostic.CA1848.severity = warning
+
+[*.{ts,tsx,js,jsx,json,yml,yaml}]
+indent_size = 2
+
+[*.py]
+indent_size = 4
+max_line_length = 100
+
+[*.{sql,tf,tfvars}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

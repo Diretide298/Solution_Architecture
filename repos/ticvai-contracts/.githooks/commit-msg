@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Validates Conventional Commit format and trailer syntax.
+# Attribution presence is a professional obligation, not a gate — see
+# standards/AI_AUTHORSHIP.md §2.3. We validate format, never enforce presence.
+set -euo pipefail
+
+MSG_FILE="$1"
+SUBJECT=$(head -n1 "$MSG_FILE")
+
+# Allow merge and revert commits through untouched.
+if [[ "$SUBJECT" =~ ^(Merge|Revert) ]]; then
+  exit 0
+fi
+
+PATTERN='^(feat|fix|refactor|perf|test|docs|chore|build|ci)(\([a-z0-9-]+\))?!?: .{1,72}$'
+if [[ ! "$SUBJECT" =~ $PATTERN ]]; then
+  echo "ERROR: commit subject must follow Conventional Commits." >&2
+  echo "  Got:      $SUBJECT" >&2
+  echo "  Expected: <type>(<context>): <subject>" >&2
+  echo "  Types:    feat fix refactor perf test docs chore build ci" >&2
+  exit 1
+fi
+
+# If an attribution trailer is present, check it is well-formed.
+while IFS= read -r line; do
+  if [[ "$line" =~ ^(Assisted-By|Co-Authored-By): ]]; then
+    if [[ ! "$line" =~ ^(Assisted-By|Co-Authored-By):\ .+\ \<.+@.+\>$ ]]; then
+      echo "ERROR: malformed attribution trailer." >&2
+      echo "  Got:      $line" >&2
+      echo "  Expected: Assisted-By: Name <email>" >&2
+      exit 1
+    fi
+  fi
+done < "$MSG_FILE"
+
+exit 0

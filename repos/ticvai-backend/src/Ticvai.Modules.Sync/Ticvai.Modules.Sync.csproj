@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Ticvai.Modules.Sync</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Modules reference the kernel and nothing else. Adding a ProjectReference
+         to another module here will fail Ticvai.ArchitectureTests in CI. -->
+    <ProjectReference Include="../Ticvai.Shared.Kernel/Ticvai.Shared.Kernel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="8.0.5" />
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.16" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+  </ItemGroup>
+</Project>

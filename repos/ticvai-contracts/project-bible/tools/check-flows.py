@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+"""
+Validate user flows against the screens and contracts they claim to use.
+
+Three checks, and the third is the one worth having:
+
+  1. Every screen a flow references exists in a platform file.
+  2. Every operation a flow references exists in the contracts.
+  3. **A step's operations are declared on the screen it runs from.** A flow saying
+     "WEB-006 calls getAvailability" while WEB-006 declares no such call means one of the
+     two is wrong — and until they are compared, nobody finds out which.
+
+Also enforces the branch rule: a flow with no unhappy path describes a demo, not a product.
+
+Run: python3 tools/check-flows.py
+"""
+import sys
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+FLOWS = ROOT / "flows"
+SCREENS = ROOT / "screens"
+CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+if not CONTRACTS.exists():
+    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+
+ERRORS: list[str] = []
+WARNINGS: list[str] = []
+
+
+def load_screens() -> tuple[set[str], dict[str, set[str]]]:
+    ids: set[str] = set()
+    apis: dict[str, set[str]] = {}
+    for f in SCREENS.glob("P*.yaml"):
+        for s in yaml.safe_load(f.read_text())["screens"]:
+            ids.add(s["id"])
+            apis[s["id"]] = {a["operationId"] for a in (s.get("apis") or [])
+                             if a.get("operationId") not in (None, "TODO")}
+    return ids, apis
+
+
+def load_operations() -> set[str]:
+    ops: set[str] = set()
+    if not CONTRACTS.exists():
+        return ops
+    for f in CONTRACTS.rglob("*.yaml"):
+        try:
+            doc = yaml.safe_load(f.read_text())
+        except Exception:
+            continue
+        for item in (doc.get("paths") or {}).values():
+            if isinstance(item, dict):
+                for verb, op in item.items():
+                    if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict):
+                        if oid := op.get("operationId"):
+                            ops.add(oid)
+    return ops
+
+
+def main() -> int:
+    files = sorted(FLOWS.glob("F*.yaml"))
+    if not files:
+        print("no flows found", file=sys.stderr)
+        return 1
+
+    screen_ids, screen_apis = load_screens()
+    ops = load_operations()
+
+    print(f"checking {len(files)} flow(s) against {len(screen_ids)} screens "
+          f"and {len(ops)} operations\n")
+
+    for f in files:
+        doc = yaml.safe_load(f.read_text())
+        name = f.name
+        steps = doc.get("steps", [])
+        branches = doc.get("branches", [])
+
+        if not branches:
+            ERRORS.append(f"{name}: no branches. A flow with only a happy path describes a demo")
+
+        step_screens = set()
+        for st in steps:
+            sid = st.get("screen")
+            step_screens.add(sid)
+            if sid not in screen_ids:
+                ERRORS.append(f"{name}: step {st.get('step')} references unknown screen {sid}")
+                continue
+            for oid in st.get("operations", []) or []:
+                if ops and oid not in ops:
+                    ERRORS.append(f"{name}: step {st.get('step')} references unknown operation '{oid}'")
+                elif oid not in screen_apis.get(sid, set()):
+                    ERRORS.append(
+                        f"{name}: step {st.get('step')} calls '{oid}' from {sid}, "
+                        f"but {sid} does not declare it")
+
+        for b in branches:
+            if (r := b.get("resolvedBy")):
+                if r not in screen_ids and (ops and r not in ops):
+                    WARNINGS.append(f"{name}: branch resolvedBy '{r}' is neither a screen nor an operation")
+            if b.get("at") and not any(s.get("step") == b["at"] for s in steps):
+                ERRORS.append(f"{name}: branch at step {b['at']}, which does not exist")
+
+        entry = (doc.get("trigger") or {}).get("entryScreen")
+        if entry and entry not in screen_ids:
+            ERRORS.append(f"{name}: entryScreen {entry} does not exist")
+
+        off = any(True for _ in [1]) and doc.get("offlineBehaviour")
+        if not off:
+            WARNINGS.append(f"{name}: no offlineBehaviour stated")
+
+        print(f"  {doc['id']}  {doc['name'][:40]:42}{len(steps)} steps, {len(branches)} branches")
+
+    print()
+    for w in WARNINGS:
+        print(f"  WARN  {w}")
+    for e in ERRORS:
+        print(f"  FAIL  {e}")
+    print()
+    if ERRORS:
+        print(f"{len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
+        return 1
+    print(f"PASS — {len(WARNINGS)} warning(s)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

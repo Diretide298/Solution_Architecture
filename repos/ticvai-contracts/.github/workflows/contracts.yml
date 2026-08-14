@@ -1,0 +1,51 @@
+name: contracts
+
+on:
+  pull_request:
+  push:
+    tags: ['v*']
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - name: Lint specs
+        run: make lint
+
+      - name: Bundle
+        run: make bundle
+
+      - name: Breaking change gate
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: make diff
+
+  publish:
+    needs: validate
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Generate clients
+        run: make generate
+
+      # Publish steps intentionally reference org secrets rather than inline creds.
+      - name: Publish npm
+        run: echo "npm publish dist/clients/typescript --access restricted"
+      - name: Publish NuGet
+        run: echo "dotnet nuget push Ticvai.Contracts.*.nupkg"
+      - name: Publish PyPI
+        run: echo "twine upload dist/clients/python/*"

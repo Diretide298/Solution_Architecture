@@ -1,0 +1,43 @@
+# sync — derived from the API contracts, not hand-written
+# Migration: V0001 — DONE
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: sync
+migration: V0001 — DONE
+tableCount: 1
+columnCount: 9
+tables:
+  sync.rejection:
+    derivedFrom: SyncRejection
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: workstation_id
+      type: uuid
+      required: true
+    - name: kind
+      type: text
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+    - name: rejected_at
+      type: timestamptz
+      required: true
+    - name: problem
+      type: jsonb
+      required: true
+    - name: payload
+      type: jsonb
+      required: false
+    - name: resolved_at
+      type: timestamptz
+      required: false
+    - name: resolved_by_principal_id
+      type: uuid
+      required: false

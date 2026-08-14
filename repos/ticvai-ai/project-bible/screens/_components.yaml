@@ -1,0 +1,235 @@
+$id: "ticvai/screens/_components.yaml"
+title: TICVAI shared component library
+
+description: >
+  ## What this is
+
+  **The vocabulary screen definitions draw from.** A `kind` used in any platform file must
+  exist here, and CI fails if it does not.
+
+  The constraint is the point. A screen calling for a `fancyDatePickerV2` either needs it
+  adding here — a deliberate act, reviewed — or is asking for something the design system
+  already has under a different name. Free-text component names are how one product ends up
+  with four date pickers.
+
+  ## Three groups
+
+  - **Regions** — structural slots a template exposes. A screen places components into
+    regions; it does not position them.
+  - **Components** — the primitives. Every one names the states it must handle.
+  - **Patterns** — recurring arrangements worth naming, because getting them subtly
+    different across screens is a real cost.
+
+regions:
+  - id: appHeader
+    description: Logo, title, notifications, account. Tenant-branded on guest surfaces.
+    notes: >
+      Three layout variants on guest surfaces, set per tenant in the White Label Builder
+      (WLB-007). The builder is the only place this varies — do not add a per-screen option.
+
+  - id: bottomNav
+    description: Primary navigation on mobile. Five visible items maximum; the rest overflow.
+    notes: >
+      Guest app items come from tenant configuration. Employee app is fixed —
+      Home, Tasks, Scan, AI, More. The AI tab is why the shell depends on AI-06 (CF-41).
+
+  - id: sideNav
+    description: Persistent left navigation on desktop surfaces.
+
+  - id: contentBody
+    description: The screen's own content. The only region most screens define.
+
+  - id: actionBar
+    description: >
+      Primary and secondary actions, pinned. On POS this is the bottom third of the screen
+      and is reachable one-handed.
+
+  - id: contextPanel
+    description: Right-hand detail panel on split templates. Collapses below the fold on narrow.
+
+  - id: statusStrip
+    description: >
+      Connection state, bundle version, shift state, pending sync count. On every
+      offline-capable surface, and the first thing looked at when something is wrong.
+
+components:
+  - kind: dataTable
+    description: Columnar list with sort, filter and pagination.
+    states: [loading, empty, error, filtered]
+    notes: Cursor pagination, never offset. Offset drifts under concurrent writes.
+
+  - kind: cardList
+    description: Stacked cards. Preferred over a table on touch surfaces.
+    states: [loading, empty, error]
+
+  - kind: detailPanel
+    description: Read-only field group for one record.
+    states: [loading, error, notFound]
+
+  - kind: metricTile
+    description: Single figure with label and optional delta.
+    states: [loading, error, noData]
+    notes: >
+      `noData` is distinct from zero. A tile showing 0 when the source is unavailable is a
+      lie a manager will act on.
+
+  - kind: chart
+    description: Line, bar, pie, gauge. Rendered from a report definition.
+    states: [loading, empty, error, stale]
+    notes: >
+      `stale` is required — reporting reads a lag-tolerant replica, and the screen must be
+      able to say so rather than presenting a figure as current.
+
+  - kind: timeline
+    description: Ordered events with timestamps. Order statements, asset history, audit.
+    states: [loading, empty, error]
+
+  - kind: emptyState
+    description: Illustration, one line of explanation, and the action that resolves it.
+    notes: >
+      An empty state with no action is a dead end. If there is genuinely nothing the user can
+      do, say why rather than showing a shrug.
+
+  - kind: textField
+    states: [default, focused, error, disabled, readOnly]
+  - kind: numberField
+    states: [default, focused, error, disabled]
+    notes: Money fields carry currency and respect the region's scale — OMR is three places.
+  - kind: selectField
+    states: [default, open, error, disabled, loading]
+  - kind: multiSelect
+    states: [default, open, error, disabled]
+  - kind: datePicker
+    states: [default, open, error, disabled]
+    notes: >
+      Date format is a region setting, not a locale guess. A venue in Oman displays
+      dd/MM/yyyy because the region says so.
+  - kind: toggle
+    states: [on, off, disabled]
+  - kind: searchField
+    states: [default, typing, results, noResults]
+  - kind: fileUpload
+    description: Direct-to-storage via a signed URL. Never posts through the API.
+    states: [idle, uploading, processing, complete, error, rejected]
+    notes: >
+      `processing` matters — an upload completes before derivatives are generated, and a
+      screen showing "done" too early produces a broken image.
+  - kind: signaturePad
+    states: [empty, signed, error]
+
+  - kind: primaryButton
+    states: [default, hover, pressed, loading, disabled]
+  - kind: secondaryButton
+    states: [default, hover, pressed, disabled]
+  - kind: destructiveButton
+    states: [default, confirming, loading, disabled]
+    notes: Always requires confirmation. Never the default focus.
+  - kind: iconButton
+    states: [default, hover, pressed, disabled]
+    notes: Requires an accessible label. An icon alone is not a label.
+
+  - kind: banner
+    description: Persistent message at the top of a region.
+    states: [info, success, warning, danger]
+  - kind: toast
+    description: Transient confirmation. Never for errors that need action.
+    states: [info, success, warning]
+  - kind: modal
+    states: [open, closing]
+    notes: >
+      Focus is trapped and returns to the trigger on close. A modal that drops focus to the
+      body strands a keyboard user.
+  - kind: confirmDialog
+    description: Blocking confirmation with a stated consequence.
+    states: [open, loading]
+    notes: >
+      The consequence goes in the body, not the title. "Delete 3 assets in use on the live
+      homepage" is a confirmation; "Are you sure?" is not.
+  - kind: progressIndicator
+    states: [determinate, indeterminate, complete, failed]
+
+  - kind: scanTarget
+    description: Camera viewport for barcode, QR or NFC.
+    states: [ready, scanning, success, denied, hardwareError, permissionDenied]
+    notes: >
+      `denied` is a valid scan with an invalid result and must look different from
+      `hardwareError`. An operator facing a guest needs to know whether to try again or
+      explain something.
+
+  - kind: seatMap
+    description: Rendered seat map with selection.
+    states: [loading, ready, noGeometry, error]
+    notes: >
+      `noGeometry` is real — a map imported from a manifest alone can be sold from a list but
+      not rendered.
+
+  - kind: saleBoard
+    description: Tiled product grid for POS. Pages of tiles from tenant configuration.
+    states: [loading, ready, staleBundle, error]
+
+  - kind: cartPanel
+    description: Line items, totals, tax, discounts applied.
+    states: [empty, populated, priceChanged, error]
+
+  - kind: paymentTerminal
+    description: Payment capture with terminal state.
+    states: [idle, awaitingCard, processing, approved, declined, timeout, unknown]
+    notes: >
+      `unknown` is the important one. A terminal that charged a card and never returned a
+      response is the normal failure, not the exotic one — the screen must offer inquiry, not
+      a retry that double-charges.
+
+  - kind: queuePosition
+    description: Party number, position, estimated call time.
+    states: [waiting, called, expiring, expired]
+
+  - kind: assetTag
+    description: Asset identity with status and criticality.
+    states: [inService, outOfService, maintenance, unknown]
+
+  - kind: consentBlock
+    description: Purpose, notice version, decision, and the date it was given.
+    states: [granted, withdrawn, notAsked, requiresRenewal]
+    notes: >
+      `requiresRenewal` appears when the notice version has moved on. Silently honouring a
+      consent given against a superseded notice is the compliance failure.
+
+  - kind: livePreview
+    description: Device-framed preview of guest-facing configuration.
+    states: [loading, ready, error]
+    notes: Must toggle platform, theme and direction. RTL preview is not optional.
+
+patterns:
+  - id: listDetailSplit
+    description: List left, detail right; stacks to two screens on narrow.
+    components: [dataTable, detailPanel]
+
+  - id: reviewThenPublish
+    description: >
+      Draft, validate, preview, publish — with a diff at the review step. Used by the White
+      Label Builder and by catalogue product lifecycle.
+    components: [detailPanel, banner, livePreview, confirmDialog]
+    notes: The diff is the review. A publish note saying "updated homepage" is not one.
+
+  - id: blindCount
+    description: >
+      Enter a counted figure with the expected value withheld. Variance revealed only after
+      submission.
+    components: [numberField, primaryButton, banner]
+    notes: >
+      Used by shift close-out and stock counts. The withholding is the entire point — a
+      counter who can see the expected figure reconciles to it rather than to the shelf.
+
+  - id: approvalQueue
+    description: Pending items, detail on selection, approve or reject with a mandatory reason.
+    components: [dataTable, detailPanel, primaryButton, destructiveButton, textField]
+    notes: >
+      The approver is never the requester. Enforced server-side; the screen should not offer
+      the action rather than offering it and returning 403.
+
+  - id: offlineQueueIndicator
+    description: Pending operation count with last-sync time and a manual sync action.
+    components: [statusStrip, banner]
+    notes: >
+      Lives in `statusStrip` on every offline-capable surface. A cashier needs to know at a
+      glance whether their last twenty sales have reached the server.

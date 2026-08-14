@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "nJ4311BC2mM=",
+  "success": true,
+  "projectFilePath": "c:\\Users\\Chinmay.Parab\\Desktop\\ticvai\\repos\\ticvai-backend\\src\\Ticvai.ControlPlane\\Ticvai.ControlPlane.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Chinmay.Parab\\.nuget\\packages\\dapper\\2.1.35\\dapper.2.1.35.nupkg.sha512",
+    "C:\\Users\\Chinmay.Parab\\.nuget\\packages\\microsoft.codeanalysis.bannedapianalyzers\\3.3.4\\microsoft.codeanalysis.bannedapianalyzers.3.3.4.nupkg.sha512",
+    "C:\\Users\\Chinmay.Parab\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\Chinmay.Parab\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.2\\microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\Chinmay.Parab\\.nuget\\packages\\npgsql\\8.0.5\\npgsql.8.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}

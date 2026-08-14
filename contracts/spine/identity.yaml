@@ -1,0 +1,1718 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Identity & Authorisation
+  version: 1.0.0
+  x-ticvai-screen-count: 7
+  x-ticvai-tier: spine
+  x-ticvai-module: "17 — Guest Mobile App & Branding (auth) + cross-cutting staff auth"
+  x-ticvai-requirements: 107
+  x-ticvai-capabilities: [C35, C36, C56]
+  x-ticvai-platforms:
+    - "All platforms"
+  description: >
+    ## What this contract covers
+
+    **Defines who is asking, and what they may do.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | 17 — Guest Mobile App & Branding (auth) + cross-cutting staff auth |
+    | **Requirements** | ~107 |
+    | **Capabilities** | C35, C36, C56 |
+    | **Consumed by** | All platforms |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Authentication, session lifecycle and effective-permission resolution.
+
+    Two positions from the Project Direction shape this contract:
+
+    - §3.1.1 Authorisation is user/role-driven. A user logs in from any device and
+      carries their access. Workstation determines presentation, hardware binding,
+      till identity and reporting dimension — never authorisation.
+    - §3.1.3 Single session per user. A second login is REJECTED (409), not
+      auto-terminating the first, because auto-terminate can orphan an open cart
+      or an unclosed cash drawer.
+
+    Clients never compute permissions locally. They consume `effectivePermissions`
+    returned at login and refreshed on demand.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+        description: Resolved per tenant from the Control Plane. Never hardcoded.
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      x-ticvai-consumed-by:
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
+      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Authenticate and open a session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: >
+            Authenticated. When the user holds exactly one role the response is
+            complete. When the user holds several, `requiresRoleSelection` is true
+            and `availableRoles` is populated — the caller must call
+            /auth/select-role before the session becomes usable.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '409':
+          description: >
+            An active session already exists for this principal on another device.
+            Per §3.1.3 the new login is refused. A supervisor with the
+            SESSION_FORCE_LOGOUT permission may terminate the existing session.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429': { $ref: '../shared/common.yaml#/components/responses/TooManyRequests' }
+
+  /auth/select-role:
+    post:
+      operationId: selectRole
+      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Choose a role for a multi-role session
+      description: >
+        Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with
+        several is prompted to choose. Resolves the effective permission set.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [roleId]
+              properties:
+                roleId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Role selected, session usable
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Rotate the access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200':
+          description: Rotated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenPair' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+
+  /auth/logout:
+    post:
+      operationId: logout
+      security:
+        - bearerAuth: []
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      summary: Close the current session
+      responses:
+        '204': { description: Session closed }
+
+  /auth/sessions/{sessionId}/force-logout:
+    post:
+      operationId: forceLogout
+      x-ticvai-permission: SESSION_FORCE_LOGOUT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      summary: Supervisor termination of an abandoned session
+      description: >
+        Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than
+        displaces a second login — an operator who went home still logged in would
+        otherwise be locked out until token expiry.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '204': { description: Session terminated and audited }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /auth/session:
+    get:
+      operationId: getCurrentSession
+      x-ticvai-read-routing: primary
+      security:
+        - bearerAuth: []
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      summary: Current session and effective permissions
+      responses:
+        '200':
+          description: Active session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+
+  /principals:
+    get:
+      operationId: listPrincipals
+      x-ticvai-consumed-by:
+        - "P09 ADM-020 Platform User Directory"
+      x-ticvai-read-routing: replica
+      summary: List principals
+      tags: [administration]
+      x-ticvai-permission: USER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: scopePath
+          in: query
+          schema: { type: string }
+        - name: isActive
+          in: query
+          schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Principals
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Principal' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+    post:
+      operationId: createPrincipal
+      summary: Create a principal
+      tags: [administration]
+      x-ticvai-permission: USER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePrincipalRequest' }
+      responses:
+        '201':
+          description: Created. Has no access until grants are assigned.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Principal' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: Username already in use within this cell
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /principals/{principalId}:
+    parameters:
+      - name: principalId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getPrincipal
+      x-ticvai-consumed-by:
+        - "P10 PTR-003 Profile & Company Details"
+      x-ticvai-read-routing: replica
+      summary: Read a principal
+      tags: [administration]
+      x-ticvai-permission: USER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Principal
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Principal' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    patch:
+      operationId: updatePrincipal
+      summary: Update or deactivate a principal
+      description: >
+        Deactivation invalidates any live session immediately. Additive changes take effect
+        at next login; revocations take effect at once.
+      tags: [administration]
+      x-ticvai-permission: USER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                displayName: { type: string, maxLength: 200 }
+                isActive: { type: boolean }
+                validTo: { type: string, format: date-time, nullable: true }
+                primaryRoleId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Principal' }
+
+  /roles:
+    get:
+      operationId: listRoles
+      x-ticvai-consumed-by:
+        - "P09 ADM-021 Platform Role Management"
+      x-ticvai-read-routing: replica
+      summary: List roles
+      description: >
+        A role is a grouping for permission management — code, name, description. Nothing is
+        predefined; privileges attach through grants.
+      tags: [administration]
+      x-ticvai-permission: ROLE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Roles
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Role' }
+    post:
+      operationId: createRole
+      x-ticvai-consumed-by:
+        - "P09 ADM-021 Platform Role Management"
+      summary: Create a role
+      tags: [administration]
+      x-ticvai-permission: ROLE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name]
+              properties:
+                code: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9_-]+$' }
+                name: { type: string, maxLength: 200 }
+                description: { type: string, maxLength: 500 }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Role' }
+
+  /grants:
+    get:
+      operationId: listGrants
+      x-ticvai-read-routing: replica
+      summary: List grants for a principal or role
+      tags: [administration]
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: principalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: roleId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Grants
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Grant' }
+    post:
+      operationId: createGrant
+      x-ticvai-consumed-by:
+        - "P10 PTR-020 Sub-Agent Management"
+      summary: Assign a grant
+      description: >
+        Resolution is deny-overrides-allow. A DENY at any node suppresses the permission at
+        that node and everything beneath it, and is never overridden by a more specific
+        ALLOW — so a deny is a guarantee rather than a default.
+
+        Wildcard is permitted on DENY only. A wildcard allow is an accident waiting to
+        happen.
+      tags: [administration]
+      x-ticvai-permission: PERMISSION_GRANT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateGrantRequest' }
+      responses:
+        '201':
+          description: Granted. Takes effect at next login unless it is a revocation.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Grant' }
+        '400':
+          description: Wildcard on an ALLOW, or scope outside the caller's own grants
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /grants/{grantId}:
+    parameters:
+      - name: grantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: deleteGrant
+      summary: Remove a grant
+      description: >
+        Removing an ALLOW takes effect at next login. Removing it from a principal with a
+        live session invalidates that session, because a revocation that takes effect
+        eventually is not a revocation.
+      tags: [administration]
+      x-ticvai-permission: PERMISSION_GRANT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '204': { description: Removed }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /permissions/resolve:
+    post:
+      operationId: resolvePermissions
+      summary: Simulate a principal's effective permissions
+      description: >
+        Runs the resolution algorithm without a login. Answers *what would this person
+        actually be able to do* before a grant is saved — which is the only practical way to
+        review a seven-level grant set.
+      tags: [administration]
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [principalId, roleId]
+              properties:
+                principalId: { type: string, format: uuid }
+                roleId: { type: string, format: uuid }
+                atScopePath:
+                  type: string
+                  description: >
+                    Optional. When supplied, returns PERMIT or DENY per permission at that
+                    node rather than the whole effective set.
+      responses:
+        '200':
+          description: Effective set
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [permissionsByScope]
+                properties:
+                  permissionsByScope:
+                    type: array
+                    items:
+                      $ref: '../shared/permissions.yaml#/components/schemas/ScopedPermissions'
+                  suppressedByDeny:
+                    type: array
+                    description: >
+                      Permissions that would have been allowed but for a deny, with the node
+                      that suppressed them. The single most useful thing when a grant set
+                      does not behave as expected.
+                    items:
+                      type: object
+                      properties:
+                        permission: { type: string }
+                        deniedAtScopePath: { type: string }
+
+  # ---------------------------------------------------------------- guest auth
+  /auth/guest/register:
+    post:
+      operationId: registerGuest
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+      summary: Create a guest account
+      description: >
+        Email or mobile. Verification follows via OTP; the account exists but is unverified
+        until then, and an unverified account may browse but not transact.
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterGuestRequest' }
+      responses:
+        '201':
+          description: Created, pending verification
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestSession' }
+        '409':
+          description: >
+            Identifier already registered. Deliberately indistinguishable in timing from
+            success — a registration endpoint that reveals which addresses exist is an
+            account enumeration tool.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /auth/guest/otp:
+    post:
+      operationId: requestGuestOtp
+      summary: Request a one-time code
+      description: >
+        Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source
+        address.
+
+        **The response never reveals whether the identifier exists.** It is the same either
+        way; only the message differs, and only the owner receives it.
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [identifier, channel]
+              properties:
+                identifier: { type: string, maxLength: 256 }
+                channel:
+                  type: string
+                  enum: [whatsapp, sms, email]
+                purpose:
+                  type: string
+                  enum: [login, register, verify, passwordReset, stepUp]
+                  default: login
+      responses:
+        '202':
+          description: Sent if the identifier is deliverable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  expiresInSeconds: { type: integer }
+                  resendAfterSeconds: { type: integer }
+        '429': { $ref: '../shared/common.yaml#/components/responses/TooManyRequests' }
+
+  /auth/guest/otp/verify:
+    post:
+      operationId: verifyGuestOtp
+      summary: Verify a one-time code and issue a session
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [identifier, code]
+              properties:
+                identifier: { type: string }
+                code: { type: string, minLength: 4, maxLength: 10 }
+                deviceId: { type: string }
+      responses:
+        '200':
+          description: Verified
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestSession' }
+        '401':
+          description: >
+            Code invalid or expired. Attempts are counted; the code is invalidated after the
+            configured limit rather than allowing indefinite guessing.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /auth/guest/social:
+    post:
+      operationId: guestSocialLogin
+      summary: Sign in with Apple or Google
+      description: >
+        Where the provider's verified email matches an existing account, the identities are
+        linked rather than a duplicate created. Where it does not, a new account is created —
+        an unverified email from a provider is not proof of ownership.
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider, idToken]
+              properties:
+                provider:
+                  type: string
+                  enum: [apple, google]
+                idToken: { type: string }
+                deviceId: { type: string }
+      responses:
+        '200':
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestSession' }
+        '401':
+          description: Provider token invalid or expired
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /auth/guest/uae-pass:
+    post:
+      operationId: guestUaePassLogin
+      summary: Sign in with a national identity provider
+      description: >
+        OAuth authorisation-code exchange. Returns a verified identity, so an account created
+        this way needs no further verification.
+
+        Government onboarding has lead time and should be started before it becomes the
+        critical path.
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, redirectUri]
+              properties:
+                code: { type: string }
+                redirectUri: { type: string }
+                state: { type: string }
+                deviceId: { type: string }
+      responses:
+        '200':
+          description: Signed in with a verified identity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestSession' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+
+  /auth/guest/session:
+    get:
+      operationId: getGuestSession
+      x-ticvai-read-routing: primary
+      summary: Read the current guest session
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      responses:
+        '200':
+          description: Session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestSession' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+
+    delete:
+      operationId: guestLogout
+      summary: End a guest session
+      description: >
+        Ends this device's session. `allDevices` revokes every session for the subject, which
+        is what a guest reaching for "sign out everywhere" after losing a phone actually
+        wants.
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - name: allDevices
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '204': { description: Ended }
+
+  /auth/guest/link-checkout:
+    post:
+      operationId: linkGuestCheckout
+      summary: Attach a guest checkout to an account
+      description: >
+        A guest who bought without an account, then registered. Orders matching the verified
+        contact detail are attached.
+
+        **Only orders whose contact detail matches the now-verified identifier.** Attaching
+        on an unverified claim would hand someone else's booking history to whoever asked for
+        it.
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderReference]
+              properties:
+                orderReference: { type: string }
+                verificationCode:
+                  type: string
+                  description: From the booking confirmation. Proves possession of the booking.
+      responses:
+        '200':
+          description: Attached
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attachedOrderCount: { type: integer }
+        '403':
+          description: Contact detail on the order does not match the verified identifier
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /auth/guest/account:
+    delete:
+      operationId: deleteGuestAccount
+      summary: Self-service account deletion
+      description: >
+        Raises an erasure request rather than deleting immediately. PII is removed from the
+        erasable store; ledger entries keep their opaque subject reference and stay intact.
+
+        Where the guest is linked across cells, the request fans out (ADR-0010).
+      tags: [guestAuth]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Erasure request raised
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId: { type: string }
+                  estimatedCompletionAt: { type: string, format: date-time }
+        '409':
+          description: >
+            Open orders or an unexpired entitlement exist. Deleting an account with a valid
+            ticket in it strands the guest at a gate.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- staff SSO
+  /auth/sso/providers:
+    get:
+      operationId: listSsoProviders
+      x-ticvai-read-routing: replica
+      summary: Identity providers configured for this tenant
+      description: Called before the login screen renders, so it is unauthenticated.
+      tags: [sso]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      responses:
+        '200':
+          description: Providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SsoProvider' }
+
+  /auth/sso/{providerId}/authorize:
+    parameters:
+      - name: providerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: startSsoAuthorization
+      x-ticvai-read-routing: replica
+      summary: Begin an SSO flow
+      tags: [sso]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      parameters:
+        - name: redirectUri
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Authorization URL and state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorizationUrl: { type: string }
+                  state: { type: string }
+                  expiresAt: { type: string, format: date-time }
+
+  /auth/sso/{providerId}/callback:
+    parameters:
+      - name: providerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: completeSsoAuthorization
+      summary: Exchange an SSO code for a session
+      description: >
+        Group-to-role mapping is applied here. **A group with no mapping grants nothing** —
+        an unmapped group must never fall back to a default role, or the identity provider
+        becomes a way to mint access nobody configured.
+      tags: [sso]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, state]
+              properties:
+                code: { type: string }
+                state: { type: string }
+                workstationId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403':
+          description: >
+            Authenticated, but no group maps to a role in this tenant. The provider proved
+            who they are; it did not grant them anything.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenants/sso-config:
+    get:
+      operationId: getSsoConfig
+      x-ticvai-read-routing: replica
+      summary: Read SSO configuration
+      tags: [sso]
+      x-ticvai-permission: USER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Configuration
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SsoProviderConfig' }
+
+    put:
+      operationId: setSsoConfig
+      summary: Configure an identity provider
+      description: >
+        Per tenant. A tenant's Azure AD is theirs, not TICVAI's, and credentials are stored
+        in the cell key vault rather than returned by this endpoint.
+      tags: [sso]
+      x-ticvai-permission: USER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SsoProviderConfig' }
+      responses:
+        '200':
+          description: Configured
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SsoProviderConfig' }
+        '400':
+          description: Metadata unreachable, or no group mappings supplied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- MFA
+  /auth/mfa/methods:
+    get:
+      operationId: listMfaMethods
+      x-ticvai-read-routing: replica
+      summary: Enrolled MFA methods
+      tags: [mfa]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: principal
+      responses:
+        '200':
+          description: Methods
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/MfaMethod' }
+
+    post:
+      operationId: enrolMfaMethod
+      summary: Enrol an MFA method
+      description: >
+        Returns a secret or challenge to complete enrolment. **The method is not active until
+        verified** — enrolling without verifying would lock the principal out of their own
+        account.
+      tags: [mfa]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: principal
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind]
+              properties:
+                kind: { $ref: '#/components/schemas/MfaKind' }
+                target:
+                  type: string
+                  description: Phone or email for OTP methods.
+      responses:
+        '201':
+          description: Enrolment started, pending verification
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MfaEnrolment' }
+
+  /auth/mfa/methods/{methodId}:
+    parameters:
+      - name: methodId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: verifyMfaEnrolment
+      summary: Complete enrolment
+      tags: [mfa]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: principal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string }
+      responses:
+        '200':
+          description: Active. Recovery codes are returned once and never again
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MfaMethod' }
+        '401':
+          description: Code invalid
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+    delete:
+      operationId: removeMfaMethod
+      summary: Remove an MFA method
+      description: >
+        Refused where it is the only active method and the principal's role requires MFA.
+        Removing the last factor from an account that must have one is not a choice the
+        account holder gets to make.
+      tags: [mfa]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: principal
+      responses:
+        '204': { description: Removed }
+        '409':
+          description: Last remaining method on a role that requires MFA
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /auth/mfa/challenge:
+    post:
+      operationId: createMfaChallenge
+      summary: Step-up authentication for a sensitive action
+      description: >
+        Issues a short-lived token proving a factor was presented just now. Consumed by
+        operations that require it — high-value refunds, ledger approval, permission grants,
+        tenant termination.
+
+        A session that authenticated hours ago is not the same as a person present at the
+        keyboard now, and for those actions the difference matters.
+      tags: [mfa]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: principal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  description: What the step-up is for. Recorded in the audit trail.
+                methodId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Challenge issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challengeId: { type: string }
+                  expiresAt: { type: string, format: date-time }
+
+  /auth/mfa/challenge/{challengeId}/verify:
+    parameters:
+      - name: challengeId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: verifyMfaChallenge
+      summary: Complete a step-up challenge
+      tags: [mfa]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: principal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string }
+      responses:
+        '200':
+          description: Verified. The step-up token is short-lived and single-purpose
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stepUpToken: { type: string }
+                  expiresAt: { type: string, format: date-time }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+
+  # ---------------------------------------------------------------- sessions
+  /auth/sessions:
+    get:
+      operationId: listActiveSessions
+      x-ticvai-read-routing: primary
+      summary: List active sessions
+      description: >
+        Who is logged in, on which workstation, since when. There was previously no way to
+        see this — only to terminate a session someone already knew about.
+      tags: [session]
+      x-ticvai-permission: SESSION_FORCE_LOGOUT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: principalId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Sessions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ActiveSession' }
+
+  /auth/sessions/revoke-all:
+    post:
+      operationId: revokeAllSessions
+      summary: Revoke every session in scope
+      description: >
+        Incident response. Requires step-up authentication and a reason, and is recorded
+        against the acting principal.
+
+        **Open shifts are reported, not silently orphaned.** Revoking a cashier mid-shift
+        leaves cash unreconciled, and whoever pulls this needs to know that before they do.
+      tags: [session]
+      x-ticvai-permission: SESSION_FORCE_LOGOUT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, stepUpToken]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                stepUpToken: { type: string }
+                venueId: { type: string, format: uuid }
+                excludeSelf: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  revokedCount: { type: integer }
+                  openShiftsAffected:
+                    type: array
+                    description: Shifts left open. Cash is unreconciled until someone closes them.
+                    items:
+                      type: object
+                      properties:
+                        shiftId: { type: string }
+                        workstationId: { type: string, format: uuid }
+                        principalId: { type: string, format: uuid }
+        '403':
+          description: Step-up token missing, expired or issued for a different action
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+components:
+  schemas:
+    GuestSession:
+      x-ticvai-persistence: "none — Redis session registry"
+      type: object
+      required: [subjectId, tokens, isVerified, expiresAt]
+      properties:
+        subjectId: { type: string, format: uuid }
+        displayName: { type: string, nullable: true }
+        tokens: { $ref: '#/components/schemas/TokenPair' }
+        isVerified:
+          type: boolean
+          description: >
+            False until an OTP or a verified provider identity confirms ownership. An
+            unverified account may browse but not transact.
+        identityProviders:
+          type: array
+          description: Linked providers. Several may resolve to one account.
+          items:
+            type: string
+            enum: [password, otp, apple, google, uaePass]
+        guestLinkId:
+          type: string
+          nullable: true
+          description: Present where the guest is linked across cells (ADR-0010).
+        homeCellName: { type: string, nullable: true }
+        preferredLanguage: { type: string, nullable: true }
+        expiresAt:
+          type: string
+          format: date-time
+          description: >
+            Longer lived than a staff session. No single-session rule — a guest may be signed
+            in on a phone and a laptop at once.
+
+    RegisterGuestRequest:
+      type: object
+      required: [identifier, channel]
+      properties:
+        identifier:
+          type: string
+          maxLength: 256
+          description: Email address or mobile number in E.164.
+        channel:
+          type: string
+          enum: [email, sms, whatsapp]
+        displayName: { type: string, maxLength: 200 }
+        password:
+          type: string
+          minLength: 8
+          maxLength: 256
+          description: Optional. OTP-only accounts are supported and are the default.
+        preferredLanguage: { type: string, pattern: '^[a-z]{2}$' }
+        consents:
+          type: array
+          description: Consent captured at registration, recorded with the notice version.
+          items:
+            type: object
+            properties:
+              purpose: { type: string }
+              granted: { type: boolean }
+              noticeVersion: { type: string }
+
+    SsoProtocol:
+      type: string
+      enum: [oidc, saml2]
+
+    SsoProvider:
+      x-ticvai-persistence: "identity.sso_provider"
+      type: object
+      required: [id, displayName, protocol]
+      properties:
+        id: { type: string, format: uuid }
+        displayName: { type: string }
+        protocol: { $ref: '#/components/schemas/SsoProtocol' }
+        iconAssetRef: { type: string, nullable: true }
+        isEnforced:
+          type: boolean
+          description: True disables password login for principals covered by this provider.
+
+    SsoGroupMapping:
+      x-ticvai-persistence: "identity.sso_group_mapping"
+      type: object
+      required: [externalGroup, roleId]
+      properties:
+        externalGroup: { type: string }
+        roleId: { type: string, format: uuid }
+        scopePath:
+          type: string
+          description: Scope the mapped role is granted at.
+
+    SsoProviderConfig:
+      x-ticvai-persistence: "identity.sso_provider"
+      type: object
+      required: [id, displayName, protocol, groupMappings]
+      properties:
+        id: { type: string, format: uuid }
+        displayName: { type: string }
+        protocol: { $ref: '#/components/schemas/SsoProtocol' }
+        metadataUrl: { type: string, nullable: true }
+        issuer: { type: string, nullable: true }
+        clientId: { type: string, nullable: true }
+        clientSecretRef:
+          type: string
+          nullable: true
+          description: Key vault reference. The secret itself is never returned.
+        groupMappings:
+          type: array
+          minItems: 1
+          description: >
+            **A group with no mapping grants nothing.** No default role, ever — otherwise the
+            identity provider becomes a way to mint access nobody configured.
+          items: { $ref: '#/components/schemas/SsoGroupMapping' }
+        autoProvisionPrincipals:
+          type: boolean
+          default: false
+          description: Create a principal on first successful sign-in.
+        isEnforced: { type: boolean, default: false }
+        isActive: { type: boolean }
+
+    MfaKind:
+      type: string
+      enum: [totp, smsOtp, emailOtp, biometric, hardwareToken]
+
+    MfaMethod:
+      x-ticvai-persistence: "identity.mfa_method"
+      type: object
+      required: [id, kind, isActive, enrolledAt]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/MfaKind' }
+        label: { type: string, nullable: true }
+        maskedTarget:
+          type: string
+          nullable: true
+          description: Partially masked destination, so a person can tell two methods apart.
+        isActive: { type: boolean }
+        isPrimary: { type: boolean }
+        enrolledAt: { type: string, format: date-time }
+        lastUsedAt: { type: string, format: date-time, nullable: true }
+
+    MfaEnrolment:
+      x-ticvai-persistence: "none — transient"
+      type: object
+      required: [methodId, kind]
+      properties:
+        methodId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/MfaKind' }
+        secret:
+          type: string
+          nullable: true
+          description: TOTP shared secret. Returned once, at enrolment, and never again.
+        qrCodeUri: { type: string, nullable: true }
+        recoveryCodes:
+          type: array
+          description: Returned once on successful verification. Not retrievable afterwards.
+          items: { type: string }
+        expiresAt: { type: string, format: date-time }
+
+    ActiveSession:
+      x-ticvai-persistence: "none — Redis session registry"
+      type: object
+      required: [sessionId, principalId, startedAt, lastSeenAt]
+      properties:
+        sessionId: { type: string }
+        principalId: { type: string, format: uuid }
+        principalName: { type: string }
+        roleId: { type: string, format: uuid, nullable: true }
+        roleName: { type: string, nullable: true }
+        workstationId: { type: string, format: uuid, nullable: true }
+        workstationName: { type: string, nullable: true }
+        venueId: { type: string, format: uuid, nullable: true }
+        ipAddress: { type: string, nullable: true }
+        deviceInfo: { type: string, nullable: true }
+        hasOpenShift:
+          type: boolean
+          description: Revoking this session leaves cash unreconciled.
+        mfaSatisfied: { type: boolean }
+        startedAt: { type: string, format: date-time }
+        lastSeenAt: { type: string, format: date-time }
+
+    Principal:
+      x-ticvai-persistence: "identity.principal"
+      type: object
+      required: [id, username, displayName, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        displayName: { type: string }
+        isActive: { type: boolean }
+        validFrom: { type: string, format: date-time, nullable: true }
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: Past this, resolution returns DENY regardless of grants.
+        primaryRoleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Determines the landing screen when the principal holds several roles and picks
+            one at login.
+        roles:
+          type: array
+          items: { $ref: '#/components/schemas/RoleSummary' }
+        lastLoginAt: { type: string, format: date-time, nullable: true }
+
+    CreatePrincipalRequest:
+      type: object
+      required: [username, displayName]
+      properties:
+        username: { type: string, maxLength: 256 }
+        displayName: { type: string, maxLength: 200 }
+        initialCredential: { type: string, maxLength: 512 }
+        mustChangeCredential: { type: boolean, default: true }
+        validTo: { type: string, format: date-time }
+        roleIds:
+          type: array
+          items: { type: string, format: uuid }
+
+    Role:
+      x-ticvai-persistence: "identity.role"
+      type: object
+      required: [id, code, name]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        description: { type: string }
+        principalCount: { type: integer }
+        grantCount: { type: integer }
+
+    Grant:
+      x-ticvai-persistence: "identity.grant"
+      type: object
+      required: [id, permission, scopePath, effect]
+      properties:
+        id: { type: string, format: uuid }
+        principalId: { type: string, format: uuid, nullable: true }
+        roleId: { type: string, format: uuid, nullable: true }
+        permission:
+          type: string
+          description: From the permission enum. `*` permitted on DENY only.
+        scopePath: { type: string }
+        effect:
+          type: string
+          enum: [ALLOW, DENY]
+        validFrom: { type: string, format: date-time, nullable: true }
+        validTo: { type: string, format: date-time, nullable: true }
+        createdByPrincipalId: { type: string, format: uuid }
+        createdAt: { type: string, format: date-time }
+
+    CreateGrantRequest:
+      type: object
+      required: [permission, scopePath, effect]
+      properties:
+        principalId: { type: string, format: uuid }
+        roleId: { type: string, format: uuid }
+        permission: { type: string }
+        scopePath: { type: string }
+        effect:
+          type: string
+          enum: [ALLOW, DENY]
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+
+    LoginRequest:
+      type: object
+      required: [username, credential, workstationId]
+      properties:
+        username: { type: string, maxLength: 256 }
+        credential:
+          type: string
+          description: Password, card token or RFID token depending on `method`.
+          maxLength: 512
+        method:
+          type: string
+          enum: [password, card, rfid, sso]
+          default: password
+        workstationId:
+          type: string
+          format: uuid
+          description: >
+            Identifies the device. Determines Sale Board, connected hardware,
+            till identity and Access Point inheritance. NOT a permission source.
+        deviceFingerprint: { type: string, maxLength: 256 }
+
+    LoginResponse:
+      x-ticvai-persistence: "none — computed"
+      allOf:
+        - $ref: '#/components/schemas/TokenPair'
+        - type: object
+          required: [requiresRoleSelection]
+          properties:
+            requiresRoleSelection: { type: boolean }
+            availableRoles:
+              type: array
+              items: { $ref: '#/components/schemas/RoleSummary' }
+            session: { $ref: '#/components/schemas/Session' }
+
+    TokenPair:
+      x-ticvai-persistence: "none — transient"
+      type: object
+      required: [accessToken, refreshToken, expiresIn]
+      properties:
+        accessToken:
+          type: string
+          description: JWT carrying `sid`, validated per request against the session registry.
+        refreshToken: { type: string }
+        expiresIn: { type: integer, description: Seconds }
+
+    RoleSummary:
+      x-ticvai-persistence: "none — projection over role"
+      type: object
+      required: [id, code, name]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        isPrimary: { type: boolean }
+
+    Session:
+      type: object
+      required: [sessionId, principalId, roleId, scope, effectivePermissions, saleBoardId]
+      properties:
+        sessionId: { type: string, format: uuid }
+        principalId: { type: string, format: uuid }
+        roleId: { type: string, format: uuid }
+        displayName: { type: string }
+        scope:
+          type: array
+          description: >
+            Scope nodes this session may act within, resolved once at login from
+            the ltree hierarchy with deny-overrides-allow. Clients filter navigation
+            against this — they never compute it.
+          items: { $ref: '../shared/common.yaml#/components/schemas/ScopeRef' }
+        effectivePermissions:
+          allOf:
+            - $ref: '../shared/permissions.yaml#/components/schemas/PermissionSet'
+          description: >
+            Flattened set across all granted scopes, after deny resolution. Convenience for
+            coarse checks. Anything scope-sensitive must use `permissionsByScope`.
+        permissionsByScope:
+          type: array
+          description: >
+            Permissions effective at each granted scope path. Clients filter navigation on
+            this and never compute permissions themselves.
+          items:
+            $ref: '../shared/permissions.yaml#/components/schemas/ScopedPermissions'
+        saleBoardId:
+          type: string
+          format: uuid
+          description: >
+            Landing surface, derived from the WORKSTATION, not the role
+            (12 Aug 2026 §3). Ticketing, F&B or Retail board.
+        workstation: { $ref: '#/components/schemas/WorkstationContext' }
+        openedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+
+    WorkstationContext:
+      type: object
+      required: [id, code, venueId, regionId]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        venueId: { type: string, format: uuid }
+        regionId: { type: string, format: uuid }
+        accessPointId:
+          type: string
+          format: uuid
+          description: Inherited from the workstation, never selected by the operator.
+        devices:
+          type: array
+          items:
+            type: object
+            required: [kind, driver]
+            properties:
+              kind:
+                type: string
+                enum: [receiptPrinter, ticketPrinter, cashDrawer, barcodeScanner, rfidReader, paymentTerminal, customerDisplay]
+              driver: { type: string }
+              identifier: { type: string }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        currencyScale: { type: integer, minimum: 0, maximum: 4 }
+        timezone: { type: string }
+        cellName:
+          type: string
+          description: >
+            The cell serving this workstation's region. One cell per tenant per region
+            (ADR-0014). A client uses this only for diagnostics and telemetry tagging —
+            never for routing, which the Control Plane resolves.
+        deploymentProfile:
+          type: string
+          enum: [terminalLocal, venueEdge, thin]
+          description: >
+            Whether this surface reads catalogue locally (ADR-0013). Determines which flows
+            the client enables offline.
