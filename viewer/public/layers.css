@@ -349,3 +349,20 @@ body[data-layer="backend"] { --layer: #fbbf24; --layer-soft: rgba(251, 191, 36, 
   font-size: 11px;
   line-height: 1.5;
 }
+
+/* ── migrations: the SQL that actually exists ───────────────────── */
+.migration-card {
+  margin-bottom: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--satellite);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+.migration-title { color: var(--text-dim); font-size: 12.5px; }
+.migration-tables { display: flex; flex-wrap: wrap; gap: 0; }
+.migration-tables .nav-pill { font-family: var(--mono); font-size: 11px; }
+.stat-figure { font-size: 17px; font-weight: 600; color: var(--text); }
+.doc-card { margin-top: 22px; max-width: 900px; }
+/* a table already in the database reads as settled; a planned one does not */
+.tree-file.written .tree-file-name { color: var(--text); }

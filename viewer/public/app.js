@@ -27,14 +27,19 @@ const LAYERS = [
   {
     key: 'backend',
     label: 'Backend',
-    hint: 'the database the contracts persist into',
-    modes: [['data', 'Data'], ['routing', 'Routing'], ['audit', 'Audit']],
-    groups: [['modules', 'Schemas'], ['migration', 'Migration']],
+    hint: 'the SQL in backend/, against the schema reference in handoff/',
+    modes: [
+      ['data', 'Data'], ['migrations', 'Migrations'], ['routing', 'Routing'], ['audit', 'Audit'],
+    ],
+    groups: [['modules', 'Schemas'], ['status', 'Status'], ['migration', 'Migration']],
   },
 ];
 
 const layerOf = (key) => LAYERS.find((l) => l.key === key) ?? LAYERS[1];
-const VIEWS = ['graph', 'structure', 'er', 'journey', 'screen', 'apps', 'data', 'routing', 'reader', 'audit'];
+const VIEWS = [
+  'graph', 'structure', 'er', 'journey', 'screen', 'apps',
+  'data', 'migrations', 'routing', 'reader', 'audit',
+];
 
 // ── state ────────────────────────────────────────────────────────────
 const state = {
@@ -165,7 +170,7 @@ async function boot() {
   connectLiveReload();
 
   // the scrolling panes pan like the canvases do
-  for (const id of ['journey-body', 'screen-body', 'apps-body', 'routing-body']) {
+  for (const id of ['journey-body', 'screen-body', 'apps-body', 'routing-body', 'migrations-body']) {
     enableDragScroll($(id));
   }
 
@@ -365,6 +370,7 @@ function setMode(mode) {
   if (mode === 'journey') renderJourney();
   if (mode === 'screen') renderScreen();
   if (mode === 'apps') renderApps();
+  if (mode === 'migrations') renderMigrations();
   if (mode === 'routing') renderRouting();
 }
 
@@ -597,7 +603,10 @@ function renderTableTree() {
 
   const groups = new Map();
   for (const table of tables) {
-    const k = groupBy() === 'migration' ? (table.migration ?? '(no migration)') : table.module;
+    const k =
+      groupBy() === 'migration' ? (table.migration ?? '(no migration)')
+      : groupBy() === 'status' ? (table.ddl ? 'In the database' : 'Planned')
+      : table.module;
     if (!groups.has(k)) groups.set(k, []);
     groups.get(k).push(table);
   }
@@ -610,29 +619,38 @@ function renderTableTree() {
 
   for (const [group, list] of [...groups].sort((a, b) => a[0].localeCompare(b[0]))) {
     const module = byModule.get(group);
+    const written = groupBy() === 'status' ? group === 'In the database' : module?.written;
     const section = el('div', 'tree-group');
     const head = el('div', 'tree-group-head');
     const dot = el('span', 'tree-group-dot');
-    // green where the migration is written, amber where it is only derivable
-    dot.style.background = module?.written ? '#34d399' : '#fbbf24';
+    // green where the SQL exists, amber where the table is still only planned
+    dot.style.background = written ? '#34d399' : '#fbbf24';
     head.append(dot, el('span', null, group));
     head.append(el('span', 'tree-group-count', String(list.length)));
     section.append(head);
-    if (module?.migration) section.append(el('div', 'tree-group-sub', module.migration));
+    if (groupBy() !== 'status' && module?.migration) {
+      section.append(el('div', 'tree-group-sub', module.migration));
+    }
 
     for (const table of list.sort((a, b) => a.name.localeCompare(b.name))) {
-      const row = el('div', 'tree-file');
+      const row = el('div', `tree-file${table.ddl ? ' written' : ''}`);
       row.dataset.id = `table:${table.name}`;
-      row.append(el('span', 'tree-file-name', table.name.split('.').slice(1).join('.') || table.name));
+      const label = groupBy() === 'modules'
+        ? table.name.split('.').slice(1).join('.') || table.name
+        : table.name;
+      row.append(el('span', 'tree-file-name', label));
       row.append(el('span', 'tree-file-count', String(table.columns ?? 0)));
-      row.title = `${table.name}\nfrom ${table.derivedFrom ?? 'nothing declared'}`;
+      row.title =
+        `${table.name}\n` +
+        `${table.ddl ? `created by ${table.ddl.file}` : 'planned — no migration yet'}\n` +
+        `from ${table.derivedFrom ?? table.storageReason ?? 'nothing declared'}`;
       row.onclick = () => selectTable(table.name);
       section.append(row);
     }
     box.append(section);
   }
 
-  const noun = groupBy() === 'migration' ? 'migrations' : 'schemas';
+  const noun = groupBy() === 'migration' ? 'migrations' : groupBy() === 'status' ? 'states' : 'schemas';
   $('file-count').textContent = `${groups.size} ${noun} · ${tables.length} tables`;
   markTreeSelection();
 }
@@ -1002,11 +1020,10 @@ function renderSideNote() {
   } else if (state.layer === 'backend') {
     const s = state.backend?.stats ?? {};
     if (s.tables) {
-      const storageOnly = s.tables - s.linked;
       note.innerHTML =
-        `From <b>${state.backend.file}</b> — ${s.tables} tables, ${s.linked} derived from contract ` +
-        `schemas and ${storageOnly} storage-only. <b>${s.inDdl}</b> of them exist as SQL in ` +
-        `${s.migrationFiles} migrations; the rest are planned.`;
+        `<b>${s.inDdl} tables</b> exist as SQL in <b>backend/</b> across ${s.migrationFiles} ` +
+        `migrations. The other ${s.tables - s.inDdl} come from the schema reference in ` +
+        `<b>${state.backend.file?.split('/')[0]}/</b> — derived from the contracts, not written yet.`;
       note.hidden = false;
     }
   }
@@ -1885,6 +1902,124 @@ function renderData({ focus } = {}) {
     if (focus) data.focus(`table:${focus}`, { zoom: 1 });
     else data.fit();
   };
+}
+
+// ── backend: the migrations ──────────────────────────────────────────
+// backend/ is the database as it actually is; the workbook in handoff/ is the
+// database as it is meant to become. This view is the first of those.
+
+function renderMigrations() {
+  const body = $('migrations-body');
+  const backend = state.backend;
+  const migrations = backend?.migrations;
+  body.innerHTML = '';
+
+  if (!migrations?.files?.length) {
+    body.append(el('p', 'pane-empty', 'No .sql migrations in backend/.'));
+    $('migrations-hint').textContent = '';
+    return;
+  }
+
+  const s = migrations.stats;
+  const planned = (backend.stats.tables ?? 0) - s.tables;
+  $('migrations-hint').textContent =
+    `${s.files} migrations · ${s.tables} tables · ${s.foreignKeys} foreign keys · ` +
+    `${s.policies} policies · ${planned} more tables planned`;
+
+  // ---- what the migrations amount to -----------------------------------
+  const head = el('div', 'journey-head');
+  head.append(el('h2', 'journey-title', 'The database as it stands'));
+  head.append(el('div', 'journey-trigger',
+    `backend/ holds the DDL. ${s.tables} of the ${backend.stats.tables} tables in the schema ` +
+    `reference exist as SQL; the other ${planned} are derived from the contracts and not ` +
+    `written yet. Everything on this page is read from the .sql files, not from the workbook.`));
+  body.append(head);
+
+  const counts = el('div', 'deploy-grid');
+  const stat = (label, value, warn = false) => {
+    if (value == null) return;
+    const cell = el('div', `deploy-cell${warn ? ' warn' : ''}`);
+    cell.append(el('div', 'deploy-label', label));
+    cell.append(el('div', 'deploy-value stat-figure', String(value)));
+    counts.append(cell);
+  };
+  stat('tables', s.tables);
+  stat('foreign keys', s.foreignKeys);
+  stat('composite keys', s.composite);
+  stat('partitioned', s.partitioned);
+  stat('row security forced', `${s.forced} of ${s.rls}`);
+  stat('policies', s.policies);
+  stat('generated columns', s.generated);
+  stat('enum types', s.types);
+  body.append(counts);
+
+  // ---- the files, in the order they apply -------------------------------
+  body.append(el('div', 'journey-section-label', 'migrations, in apply order'));
+  for (const file of migrations.files) {
+    const card = el('div', 'migration-card');
+
+    const top = el('div', 'app-head');
+    top.append(el('span', 'app-name', file.version));
+    top.append(el('span', 'migration-title', file.title));
+    top.append(el('span', 'app-status', `${file.lines} lines`));
+    card.append(top);
+
+    const meta = el('div', 'app-meta');
+    const chip = (label, value) => {
+      if (!value) return;
+      const c = el('span', 'jchip');
+      c.append(el('span', null, label), el('b', null, String(value)));
+      meta.append(c);
+    };
+    chip('tables', file.tables.length);
+    chip('policies', file.policies);
+    chip('row security', file.rlsTables.length);
+    card.append(meta);
+
+    const list = el('div', 'migration-tables');
+    for (const name of file.tables.sort()) {
+      const ddl = migrations.tables[name];
+      const pill = el('button', 'nav-pill', name);
+      const bits = [];
+      if (ddl?.partitionBy) bits.push(`partitioned by ${ddl.partitionBy}`);
+      if (ddl?.partitionOf) bits.push(`partition of ${ddl.partitionOf}`);
+      if (ddl?.rls?.forced) bits.push('row security FORCED');
+      if (ddl?.foreignKeys?.length) bits.push(`${ddl.foreignKeys.length} foreign keys`);
+      pill.title = bits.join(' · ') || name;
+      // only tables the workbook also knows can be opened in the Data view
+      const known = (backend.tables ?? []).some((t) => t.name === name);
+      pill.classList.toggle('unknown', !known);
+      pill.onclick = () => (known ? selectTable(name) : toast(`${name} is not on the workbook's Tables sheet`));
+      list.append(pill);
+    }
+    card.append(list);
+    body.append(card);
+  }
+
+  // ---- the prose that ships beside the SQL ------------------------------
+  for (const doc of backend.docs ?? []) {
+    const card = el('div', 'journey-head doc-card');
+    card.append(el('h2', 'journey-title', doc.title));
+    if (doc.summary) card.append(el('div', 'journey-trigger', doc.summary));
+    card.append(el('div', 'adr-file', doc.file));
+    body.append(card);
+  }
+
+  // 14 tables exist in storage with no contract schema, and that is a decision
+  const storageOnly = (backend.tables ?? []).filter((t) => t.storageOnly);
+  if (storageOnly.length) {
+    body.append(el('div', 'journey-section-label', `storage-only · ${storageOnly.length}`));
+    const list = el('div', 'api-list');
+    for (const table of storageOnly) {
+      const row = el('div', 'api-row');
+      row.append(el('span', 'api-id', table.name));
+      row.append(el('span', 'api-purpose', table.storageReason ?? 'no reason recorded'));
+      row.append(el('span', 'api-contract', table.ddl ? 'written' : 'planned'));
+      row.onclick = () => selectTable(table.name);
+      list.append(row);
+    }
+    body.append(list);
+  }
 }
 
 // ── backend: read and write routing ──────────────────────────────────
@@ -2796,6 +2931,7 @@ function connectLiveReload() {
 
     if (state.mode === 'screen') renderScreen();
     if (state.mode === 'apps') renderApps();
+    if (state.mode === 'migrations') renderMigrations();
     if (state.mode === 'routing') renderRouting();
     if (state.mode === 'journey') renderJourney();
     if (state.mode === 'data') { renderData(); data.resize(); }
@@ -3058,6 +3194,7 @@ function bindUI() {
     else if (e.key === 'w') setMode('screen');
     else if (e.key === 'p') setMode('apps');
     else if (e.key === 'd') setMode('data');
+    else if (e.key === 'v') setMode('migrations');
     else if (e.key === 'o') setMode('routing');
     else if (e.key === 'r') setMode('reader');
     else if (e.key === 'a') setMode('audit');

@@ -26,7 +26,7 @@ resolving against it.
 |---|---|
 | **Frontend** | `screens/`, `flows/`, `frontend/` — Screen · Journey · Apps |
 | **Contracts** | `contracts/` — Graph · Structure · ER · Reader |
-| **Backend** | `backend/` — Data · Routing |
+| **Backend** | `backend/` SQL + `handoff/` reference — Data · Migrations · Routing |
 
 Each layer brings its own views, its own sidebar grouping and its own audit. Adding another —
 services, when there are some — is one entry in the `LAYERS` array in `public/app.js` plus a
@@ -65,8 +65,14 @@ reports any that points at something which does not exist.
 
 ## Backend
 
-Two sources, read together: the **schema reference** `.xlsx` and the **versioned SQL** in
-`backend/`.
+Two sources with different standing, and the layer keeps them apart:
+
+- **`backend/` is the database as it stands** — four versioned `.sql` migrations. 27 tables.
+- **`handoff/TICVAI_Schema_Reference.xlsx` is the database as it is meant to become** — 211
+  tables derived from the API contracts. 184 of them are not written yet.
+
+Green means the SQL exists; amber or blue means it is still only planned. The sidebar's
+**Status** grouping splits the two outright.
 
 The workbook is read directly rather than converted, so the spreadsheet stays the one source of
 truth with no generated copy to drift from it. `lib/xlsx.mjs` is a zip and sheet reader in about
@@ -77,6 +83,11 @@ copy is found and the newest wins** — and a stale one is reported rather than 
 row-level security, generated columns and enum types. It reads the subset of SQL these files use
 and ignores the rest rather than pretending to be a SQL parser. Its table counts agree with
 `tools/check-migrations.py`.
+
+**Migrations** — what `backend/` actually contains: each `.sql` file in apply order, the tables
+it creates, its policies and row-security coverage, and totals for partitioning, composite keys,
+generated columns and enum types. Click any table to open it in the Data view. The 14 storage-only
+tables are listed with the reason each has no contract schema, so the gap reads as a decision.
 
 **Data** — the ER diagram, at two zoom levels.
 
@@ -199,7 +210,7 @@ open page updates itself; no refresh, no restart.
 
 Keys: `Ctrl`/`Cmd`+`K` search · `1` `2` `3` layer · `m` cycle the sidebar grouping · `w` screen ·
 `j` journey · `p` apps · `g` graph · `s` structure · `e` ER · `r` reader · `d` data · `o` routing ·
-`a` audit · `l` local graph of selection.
+`v` migrations · `a` audit · `l` local graph of selection.
 
 ## Layout
 
@@ -230,6 +241,7 @@ Node ids are stable and live in the URL hash, so any operation or schema can be 
   screen files, so they cannot appear until those are converted. 232 inventoried, 102 defined.
 - **`docs/`** — the ADRs and registers are on disk but only ADR-0016 is surfaced, on Routing.
 - **Row-security policies** — the viewer says a table is `FORCED`, not what the 13 policies say.
+- **`UIUX_html/`** — the exported design boards are on disk and nothing reads them.
 
 ## Three things the audit found
 

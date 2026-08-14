@@ -357,8 +357,11 @@ export async function buildBackend(root, contractSchemas = []) {
     });
   }
 
-  // ---- ADRs ---------------------------------------------------------------
+  // ---- prose beside the SQL ----------------------------------------------
+  // an ADR is a numbered decision; everything else is documentation, and the
+  // two belong in different places on screen
   const adrs = [];
+  const docs = [];
   for (const entry of entries) {
     if (!entry.isFile() || !/\.md$/i.test(entry.name)) continue;
     const text = await readFile(path.join(dir, entry.name), 'utf8').catch(() => '');
@@ -369,13 +372,14 @@ export async function buildBackend(root, contractSchemas = []) {
       .filter((p) => p && !p.startsWith('#') && !/^[-=*_\s]+$/.test(p));
     // the status line is metadata; the decision is the paragraph after it
     const decision = paragraphs.find((p) => !/^\*{0,2}status/i.test(p)) ?? paragraphs[0] ?? '';
-    adrs.push({
+    const record = {
       file: `backend/${entry.name}`,
       title: stripMarkdown(heading),
       status: text.match(/\*\*Status:\*\*\s*([^\n*]+)/i)?.[1]?.trim() ?? null,
       summary: stripMarkdown(decision).replace(/\s+/g, ' ').slice(0, 400),
       body: text,
-    });
+    };
+    (/^\d{4}-|ADR-\d/i.test(entry.name) || /^ADR-\d/i.test(record.title) ? adrs : docs).push(record);
   }
 
   if (!workbookName) {
@@ -584,6 +588,7 @@ export async function buildBackend(root, contractSchemas = []) {
     columns,
     scaling,
     adrs,
+    docs,
     migrations,
     notPersisted,
     problems,
