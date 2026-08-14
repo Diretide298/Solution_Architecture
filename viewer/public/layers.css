@@ -29,6 +29,33 @@ body[data-layer="backend"] { --layer: #fbbf24; --layer-soft: rgba(251, 191, 36, 
 }
 .inline-legend { margin-top: 18px; display: flex; flex-direction: column; gap: 3px; }
 
+/* ── drag to pan ────────────────────────────────────────────────── */
+/* The journey track and the wider sheets pan by dragging, like the canvases.
+   Text stays selectable until a drag actually starts. */
+.journey-body,
+.sheet-body { cursor: grab; }
+.journey-body.dragging,
+.sheet-body.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+/* Only the step track should move sideways. The title, chips and notes are
+   prose about the whole flow, so they stay pinned to the left edge. */
+.journey-head,
+.journey-section-label,
+.journey-questions {
+  position: sticky;
+  left: 0;
+}
+
+/* things you can act on keep their own cursor */
+.journey-body .step-card,
+.journey-body .step-op,
+.sheet-body .api-row,
+.sheet-body .route-row,
+.sheet-body .nav-pill,
+.sheet-body .routing-name { cursor: pointer; }
+
 /* ── screen: the layout board ───────────────────────────────────── */
 .screen-board { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 22px; }
 .region-card {

@@ -53,6 +53,10 @@ across screens. Steps run left to right; each carries its screen, the operations
 outcome. **The branches that can derail a step hang underneath it**, coloured by severity
 (`recoverable` → `dataLoss`), with exit states at the end.
 
+A track is wider than any window, so **drag anywhere to pan it** — the title and chips stay
+pinned while the steps move. Movement under a few pixels is still a click, so cards and
+operations open as before. The other sheets pan the same way.
+
 **Apps** — the manifests in `frontend/`: which platforms each app serves, which contracts it
 consumes, and its screens split by wave. Scaffolded apps are green-topped, the rest amber.
 

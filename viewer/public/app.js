@@ -164,6 +164,11 @@ async function boot() {
   bindUI();
   connectLiveReload();
 
+  // the scrolling panes pan like the canvases do
+  for (const id of ['journey-body', 'screen-body', 'apps-body', 'routing-body']) {
+    enableDragScroll($(id));
+  }
+
   // restore from the url so links into a specific node survive a refresh
   const fromHash = decodeURIComponent(location.hash.slice(1));
   if (fromHash && state.nodesById.has(fromHash)) {
@@ -1161,8 +1166,8 @@ async function renderJourney() {
 
   const s = data.stats;
   $('journey-hint').textContent =
-    `${s.flows} flows · ${s.steps} steps · ${s.branches} branches · ` +
-    `${s.screens} screens · ${s.operationsCovered} operations covered`;
+    `${flow.steps.length} steps · ${flow.branches.length} branches · ` +
+    `drag to pan · ${s.flows} flows and ${s.screens} screens in all`;
 
   body.innerHTML = '';
 
@@ -2721,6 +2726,70 @@ function connectLiveReload() {
 
     if (keepSelection && state.nodesById.has(keepSelection)) select(keepSelection, { scroll: false });
   };
+}
+
+// ── drag to pan ──────────────────────────────────────────────────────
+/**
+ * Click and drag to move a scrolling pane, the way the canvas views already
+ * work. A journey track is wider than any window, and reaching for a scrollbar
+ * to read a flow left to right is the wrong gesture for it.
+ *
+ * Everything in these panes is clickable, so a drag has to not become a click:
+ * movement under a few pixels stays a click, anything more suppresses the one
+ * that follows.
+ */
+function enableDragScroll(element) {
+  const THRESHOLD = 4;
+  let start = null;
+  let dragging = false;
+  let suppressClick = false;
+
+  element.addEventListener('mousedown', (event) => {
+    if (event.button !== 0) return;
+    // let controls, links and disclosure triangles behave normally
+    if (event.target.closest('input, select, textarea, button, summary, a')) return;
+    start = { x: event.clientX, y: event.clientY, left: element.scrollLeft, top: element.scrollTop };
+    dragging = false;
+    suppressClick = false;
+  });
+
+  window.addEventListener('mousemove', (event) => {
+    if (!start) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    if (!dragging && Math.hypot(dx, dy) < THRESHOLD) return;
+    dragging = true;
+    element.classList.add('dragging');
+    element.scrollLeft = start.left - dx;
+    element.scrollTop = start.top - dy;
+    event.preventDefault(); // otherwise it turns into a text selection
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!start) return;
+    suppressClick = dragging;
+    start = null;
+    dragging = false;
+    element.classList.remove('dragging');
+  });
+
+  // capture, so the card underneath never sees the click that ended a drag
+  element.addEventListener('click', (event) => {
+    if (!suppressClick) return;
+    suppressClick = false;
+    event.stopPropagation();
+    event.preventDefault();
+  }, true);
+
+  // a wide track with nothing to scroll vertically should take a plain wheel
+  element.addEventListener('wheel', (event) => {
+    if (event.deltaX || event.shiftKey) return; // already horizontal
+    const canScrollDown = element.scrollHeight - element.clientHeight > 1;
+    const canScrollAcross = element.scrollWidth - element.clientWidth > 1;
+    if (canScrollDown || !canScrollAcross) return;
+    element.scrollLeft += event.deltaY;
+    event.preventDefault();
+  }, { passive: false });
 }
 
 let toastTimer;
