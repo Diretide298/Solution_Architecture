@@ -733,7 +733,7 @@ paths:
   # ---------------------------------------------------------------- bundles
   /catalogue/bundles:
     get:
-      operationId: listBundles
+      operationId: listCatalogueBundles
       x-ticvai-read-routing: replica
       summary: List published bundles
       tags: [bundle]

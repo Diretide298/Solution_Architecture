@@ -55,9 +55,9 @@ Nothing here can be resolved by working harder.
 
 | ID | Issue | Closed by | ADR |
 |---|---|---|---|
-| CF-01 | Multi-role login contradiction | 12 Aug §4 — conditional role prompt | [0003](../adr/0003-conditional-role-selection.md) |
-| CF-02 | Session concurrency | Client — single session only | [0004](../adr/0004-single-session.md) |
-| CF-03 | Role vs workstation authorisation | Client — user and role driven, any device | [0002](../adr/0002-user-driven-authorisation.md) |
+| CF-01 | Multi-role login contradiction | 12 Aug §4 — conditional role prompt | [0003](../adr/0003-conditional-role-selection-at-login.md) |
+| CF-02 | Session concurrency | Client — single session only | [0004](../adr/0004-single-session-per-user.md) |
+| CF-03 | Role vs workstation authorisation | Client — user and role driven, any device | [0002](../adr/0002-authorisation-is-user-driven-not-workstation-driven.md) |
 | CF-05 | Four competing role taxonomies | 12 Aug §9 — no predefined roles; 7.1.12 is a seed list | — |
 | CF-07 | Refund authorisation | 2.12.3 — dual-auth below threshold | — |
 | CF-08 | Flying POS | Client — workstation profile, offline-mandatory | — |

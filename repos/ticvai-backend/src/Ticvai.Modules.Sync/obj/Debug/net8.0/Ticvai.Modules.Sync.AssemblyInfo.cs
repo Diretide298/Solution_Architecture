@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ticvai.Modules.Sync")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d474b66905e129194f3c0046d508706414895cd2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f1414ee74f90e75bd9e753bda9d8ae3b4f68c03")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ticvai.Modules.Sync")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ticvai.Modules.Sync")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

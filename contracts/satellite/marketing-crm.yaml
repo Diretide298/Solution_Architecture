@@ -584,6 +584,111 @@ paths:
         '204': { description: Removed }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
+  /guests/{subjectId}/devices:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listGuestDevices
+      summary: A guest's registered devices
+      description: >
+        Here rather than in tenancy. `platform.device` is staff hardware bound to a
+        workstation — printers, readers, turnstiles. A guest's phone is neither owned by the
+        venue nor bound to anything, and it is registered for one reason: to be sent to.
+        That makes it guest engagement.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GuestDevice' }
+
+    post:
+      operationId: registerGuestDevice
+      summary: Register a device for push
+      description: >
+        Called on install and again whenever the provider rotates the token — which happens
+        without warning and without an uninstall. Idempotent on the token, so re-registration
+        updates rather than duplicates.
+
+        **A registered device is not consent to send.** Push still requires a current consent
+        for the purpose; this only records where a message could go.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform, token]
+              properties:
+                platform:
+                  type: string
+                  enum: [ios, android, web]
+                token: { type: string, maxLength: 512 }
+                appVersion: { type: string }
+                osVersion: { type: string }
+                deviceModel: { type: string }
+                locale: { type: string }
+      responses:
+        '200':
+          description: Registered, or an existing registration refreshed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestDevice' }
+
+  /guests/{subjectId}/devices/{deviceId}:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: deviceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: revokeGuestDevice
+      summary: Revoke a device registration
+      description: >
+        Sign-out, uninstall, or a guest removing a device they no longer have. Revoked rather
+        than deleted — a token that starts failing needs a record explaining why, or the same
+        dead token gets retried indefinitely.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      responses:
+        '204': { description: Revoked }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
   # ---------------------------------------------------------------- segments
   /segments:
     get:
@@ -1649,6 +1754,38 @@ components:
               unavailableReason: { type: string, nullable: true }
               note: { type: string, nullable: true }
               addedAt: { type: string, format: date-time }
+
+    GuestDevice:
+      type: object
+      x-ticvai-persistence: "marketing.guest_device"
+      required: [id, subjectId, platform, status, registeredAt]
+      properties:
+        id: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid }
+        platform:
+          type: string
+          enum: [ios, android, web]
+        tokenFingerprint:
+          type: string
+          description: >
+            Hash of the token, not the token. The token itself is write-only — returning it
+            would put a push credential in every response a support agent can read.
+        appVersion: { type: string, nullable: true }
+        osVersion: { type: string, nullable: true }
+        deviceModel: { type: string, nullable: true }
+        locale: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [active, revoked, failed]
+        failureCount:
+          type: integer
+          description: >
+            Consecutive delivery failures. Past the threshold the device is marked failed and
+            stops being targeted — a dead token retried forever is wasted quota and a
+            misleading delivery rate.
+        registeredAt: { type: string, format: date-time }
+        lastSeenAt: { type: string, format: date-time, nullable: true }
+        revokedAt: { type: string, format: date-time, nullable: true }
 
     ConsentPurposeConfig:
       x-ticvai-persistence: "marketing.consent_purpose"

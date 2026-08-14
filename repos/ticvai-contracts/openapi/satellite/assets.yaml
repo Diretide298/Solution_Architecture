@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: TICVAI Digital Asset Management
+  title: TICVAI Digital Media Library
   version: 0.1.0
   x-ticvai-screen-count: 0
   x-ticvai-tier: satellite
@@ -52,6 +52,10 @@ info:
     Every `assetRef` appearing anywhere else in the platform — banners, product images,
     splash screens, work-order photographs, incident evidence — resolves here.
 
+    **Named media, not assets.** `maintenance` owns `asset` — a ride, a chiller, a vehicle.
+    In a venue "asset" means physical plant, and two contracts both claiming `/assets` with
+    the same operation ids is a codegen collision waiting to happen. This one is `/media`.
+
     Positions this encodes:
 
     - **Assets are referenced, never embedded.** A contract carries `assetRef`, and this
@@ -83,9 +87,9 @@ tags:
   - name: rights
 
 paths:
-  /assets:
+  /media:
     get:
-      operationId: searchAssets
+      operationId: searchMedia
       x-ticvai-read-routing: replica
       summary: Search the asset library
       description: >
@@ -99,7 +103,7 @@ paths:
       parameters:
         - name: kind
           in: query
-          schema: { $ref: '#/components/schemas/AssetKind' }
+          schema: { $ref: '#/components/schemas/MediaKind' }
         - name: tag
           in: query
           schema: { type: string }
@@ -133,17 +137,17 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/Asset' }
+                        items: { $ref: '#/components/schemas/MediaAsset' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
-  /assets/{assetId}:
+  /media/{mediaId}:
     parameters:
-      - name: assetId
+      - name: mediaId
         in: path
         required: true
         schema: { type: string, format: uuid }
     get:
-      operationId: getAsset
+      operationId: getMediaAsset
       x-ticvai-read-routing: replica
       summary: Read an asset with derivatives and usage
       description: >
@@ -159,11 +163,11 @@ paths:
           description: Asset
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AssetDetail' }
+              schema: { $ref: '#/components/schemas/MediaAssetDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
     patch:
-      operationId: updateAsset
+      operationId: updateMediaAsset
       summary: Amend metadata, tags or rights
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
@@ -192,16 +196,16 @@ paths:
                 collectionIds:
                   type: array
                   items: { type: string, format: uuid }
-                rights: { $ref: '#/components/schemas/AssetRights' }
+                rights: { $ref: '#/components/schemas/MediaRights' }
       responses:
         '200':
           description: Updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Asset' }
+              schema: { $ref: '#/components/schemas/MediaAsset' }
 
     delete:
-      operationId: deleteAsset
+      operationId: deleteMediaAsset
       summary: Delete an asset
       description: >
         **Refused while the asset is referenced.** The response names every reference so the
@@ -218,16 +222,16 @@ paths:
           description: Asset is in use. Every reference is listed
           content:
             application/problem+json:
-              schema: { $ref: '#/components/schemas/AssetInUseProblem' }
+              schema: { $ref: '#/components/schemas/MediaInUseProblem' }
 
-  /assets/{assetId}/replace:
+  /media/{mediaId}/replace:
     parameters:
-      - name: assetId
+      - name: mediaId
         in: path
         required: true
         schema: { type: string, format: uuid }
     post:
-      operationId: replaceAsset
+      operationId: replaceMediaAsset
       summary: Replace the file behind an asset
       description: >
         The reference is stable, so every surface using it updates at once. This is how a
@@ -256,14 +260,14 @@ paths:
           description: Replaced, with affected surfaces reported
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AssetReplaceResult' }
+              schema: { $ref: '#/components/schemas/MediaReplaceResult' }
         '409':
           description: Replacement is a different kind — an image cannot replace a document
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /assets/uploads:
+  /media/uploads:
     post:
       operationId: createUpload
       summary: Request a signed upload URL
@@ -271,7 +275,7 @@ paths:
         Uploads go **direct to object storage**, not through this API. Large media passing
         through an application tier is latency, memory and a timeout waiting to happen.
 
-        Confirm with `POST /assets/uploads/{id}/complete` once the transfer finishes.
+        Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes.
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -305,7 +309,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /assets/uploads/{uploadId}/complete:
+  /media/uploads/{uploadId}/complete:
     parameters:
       - name: uploadId
         in: path
@@ -342,20 +346,20 @@ paths:
                 collectionIds:
                   type: array
                   items: { type: string, format: uuid }
-                rights: { $ref: '#/components/schemas/AssetRights' }
+                rights: { $ref: '#/components/schemas/MediaRights' }
       responses:
         '201':
           description: Asset created. Derivatives may still be generating
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Asset' }
+              schema: { $ref: '#/components/schemas/MediaAsset' }
         '409':
           description: Upload incomplete, checksum mismatch, or the file failed scanning
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /assets/collections:
+  /media/collections:
     get:
       operationId: listCollections
       x-ticvai-read-routing: replica
@@ -405,7 +409,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Collection' }
 
-  /assets/rights-expiring:
+  /media/rights-expiring:
     get:
       operationId: getExpiringRights
       x-ticvai-read-routing: replica
@@ -429,7 +433,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/ExpiringAsset' }
+                items: { $ref: '#/components/schemas/ExpiringMedia' }
 
 components:
   schemas:
@@ -438,15 +442,15 @@ components:
       type: object
       additionalProperties: { type: string }
 
-    AssetKind:
+    MediaKind:
       type: string
       enum: [image, video, audio, document, vector, font, archive]
 
-    AssetStatus:
+    MediaStatus:
       type: string
       enum: [processing, ready, quarantined, failed, archived]
 
-    AssetRights:
+    MediaRights:
       x-ticvai-persistence: "none — embedded in asset"
       type: object
       description: >
@@ -468,14 +472,14 @@ components:
         attributionRequired: { type: boolean, default: false }
         attributionText: { type: string, nullable: true }
 
-    Asset:
-      x-ticvai-persistence: "assets.asset"
+    MediaAsset:
+      x-ticvai-persistence: "assets.media_asset"
       type: object
       required: [id, kind, status, filename, contentType, sizeBytes, referenceCount, createdAt]
       properties:
         id: { type: string, format: uuid }
-        kind: { $ref: '#/components/schemas/AssetKind' }
-        status: { $ref: '#/components/schemas/AssetStatus' }
+        kind: { $ref: '#/components/schemas/MediaKind' }
+        status: { $ref: '#/components/schemas/MediaStatus' }
         filename: { type: string }
         contentType: { type: string }
         sizeBytes: { type: integer }
@@ -499,16 +503,16 @@ components:
           type: integer
           description: >
             How many surfaces reference this asset. Non-zero refuses deletion.
-        rights: { $ref: '#/components/schemas/AssetRights' }
+        rights: { $ref: '#/components/schemas/MediaRights' }
         isRightsExpired: { type: boolean }
         version: { type: integer }
         uploadedByPrincipalId: { type: string, format: uuid }
         createdAt: { type: string, format: date-time }
 
-    AssetDetail:
-      x-ticvai-persistence: "assets.asset"
+    MediaAssetDetail:
+      x-ticvai-persistence: "assets.media_asset"
       allOf:
-        - $ref: '#/components/schemas/Asset'
+        - $ref: '#/components/schemas/MediaAsset'
         - type: object
           properties:
             derivatives:
@@ -527,7 +531,7 @@ components:
             usage:
               type: array
               description: Every place this asset is referenced.
-              items: { $ref: '#/components/schemas/AssetUsage' }
+              items: { $ref: '#/components/schemas/MediaUsage' }
             collections:
               type: array
               items:
@@ -544,8 +548,8 @@ components:
                   replacedAt: { type: string, format: date-time }
                   replacedByPrincipalId: { type: string, format: uuid }
 
-    AssetUsage:
-      x-ticvai-persistence: "assets.asset_usage"
+    MediaUsage:
+      x-ticvai-persistence: "assets.media_usage"
       type: object
       required: [surface, referenceId]
       properties:
@@ -570,7 +574,7 @@ components:
           type: boolean
           description: True where the referencing surface is published to guests.
 
-    AssetInUseProblem:
+    MediaInUseProblem:
       x-ticvai-persistence: "none — error shape"
       allOf:
         - $ref: '../shared/common.yaml#/components/schemas/Problem'
@@ -579,14 +583,14 @@ components:
             referenceCount: { type: integer }
             usage:
               type: array
-              items: { $ref: '#/components/schemas/AssetUsage' }
+              items: { $ref: '#/components/schemas/MediaUsage' }
 
-    AssetReplaceResult:
+    MediaReplaceResult:
       x-ticvai-persistence: "none — computed"
       type: object
       required: [asset, affectedSurfaces]
       properties:
-        asset: { $ref: '#/components/schemas/Asset' }
+        asset: { $ref: '#/components/schemas/MediaAsset' }
         affectedSurfaces:
           type: integer
           description: How many surfaces now show the new file.
@@ -596,7 +600,7 @@ components:
         derivativesRegenerating: { type: boolean }
 
     UploadTicket:
-      x-ticvai-persistence: "assets.upload"
+      x-ticvai-persistence: "assets.media_upload"
       type: object
       required: [uploadId, uploadUrl, method, expiresAt]
       properties:
@@ -614,7 +618,7 @@ components:
         expiresAt: { type: string, format: date-time }
 
     Collection:
-      x-ticvai-persistence: "assets.collection"
+      x-ticvai-persistence: "assets.media_collection"
       type: object
       required: [id, name, assetCount]
       properties:
@@ -626,7 +630,7 @@ components:
         assetCount: { type: integer }
         coverAssetId: { type: string, format: uuid, nullable: true }
 
-    ExpiringAsset:
+    ExpiringMedia:
       x-ticvai-persistence: "none — computed"
       type: object
       required: [assetId, filename, validTo, isExpired, isInUse]
