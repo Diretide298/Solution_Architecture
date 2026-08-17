@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI — accept your invite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <body class="auth-page">
+    <main class="auth-card">
+      <div class="brand auth-brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">TICVAI</span>
+        <span class="brand-sub">contract graph</span>
+      </div>
+
+      <!-- Three states, one at a time: checking the link, the form, and the
+           refusal. Never a form over an invalid link — choosing a password and
+           only then being told the link is dead is a small cruelty. -->
+      <section id="checking" class="auth-state">
+        <p class="auth-note">Checking your invite…</p>
+      </section>
+
+      <section id="refused" class="auth-state" hidden>
+        <h1 class="auth-title">That link does not work</h1>
+        <p class="auth-note" id="refused-why"></p>
+        <p class="auth-note">
+          Ask whoever invited you for another. An invite works once, and expires
+          after seven days.
+        </p>
+      </section>
+
+      <section id="form" class="auth-state" hidden>
+        <h1 class="auth-title">Set up your account</h1>
+        <p class="auth-note">
+          This invite is for <b id="invite-email"></b>, as
+          <span id="invite-role"></span>. The address is fixed by whoever
+          invited you and cannot be changed here.
+        </p>
+
+        <label class="auth-label" for="name">Your name</label>
+        <input id="name" class="auth-input" type="text" autocomplete="name"
+               placeholder="How your verdicts will be signed" />
+
+        <label class="auth-label" for="password">Password</label>
+        <input id="password" class="auth-input" type="password"
+               autocomplete="new-password" placeholder="At least 12 characters" />
+
+        <label class="auth-label" for="confirm">Password again</label>
+        <input id="confirm" class="auth-input" type="password" autocomplete="new-password" />
+
+        <p class="auth-error" id="error" hidden></p>
+
+        <button id="submit" class="auth-button" type="button">Create my account</button>
+        <p class="auth-note auth-fine">
+          Long beats complicated. Three or four unrelated words are easier to
+          remember and harder to guess than <code>Passw0rd!</code>
+        </p>
+      </section>
+
+      <section id="done" class="auth-state" hidden>
+        <h1 class="auth-title">You are in</h1>
+        <p class="auth-note">
+          Signed in as <b id="done-email"></b>. You can record verdicts on
+          operations, tables, screens and boards.
+        </p>
+        <a class="auth-button" href="/">Open the viewer</a>
+      </section>
+    </main>
+
+    <script type="module">
+      import { checkInvite, redeemInvite } from '/validation.js';
+
+      const $ = (id) => document.getElementById(id);
+      const show = (which) => {
+        for (const id of ['checking', 'refused', 'form', 'done']) {
+          $(id).hidden = id !== which;
+        }
+      };
+
+      // The token rides in the fragment, not the query, so it is never sent to
+      // the server in a request line and never lands in an access log.
+      const token = decodeURIComponent(location.hash.slice(1));
+
+      if (!token) {
+        $('refused-why').textContent = 'This link has no invite in it.';
+        show('refused');
+      } else {
+        try {
+          const invite = await checkInvite(token);
+          $('invite-email').textContent = invite.email;
+          $('invite-role').textContent = invite.role;
+          show('form');
+          $('name').focus();
+        } catch (error) {
+          $('refused-why').textContent = error.message;
+          show('refused');
+        }
+      }
+
+      const fail = (message) => {
+        $('error').textContent = message;
+        $('error').hidden = false;
+      };
+
+      const submit = async () => {
+        $('error').hidden = true;
+        const password = $('password').value;
+        if (password !== $('confirm').value) return fail('Those two passwords are not the same.');
+        if (password.length < 12) return fail('A password needs at least 12 characters.');
+
+        $('submit').disabled = true;
+        $('submit').textContent = 'Creating…';
+        try {
+          const result = await redeemInvite(token, $('name').value, password);
+          $('done-email').textContent = result.email;
+          show('done');
+        } catch (error) {
+          fail(error.message);
+          $('submit').disabled = false;
+          $('submit').textContent = 'Create my account';
+        }
+      };
+
+      $('submit').onclick = submit;
+      for (const id of ['name', 'password', 'confirm']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+      }
+    </script>
+  </body>
+</html>

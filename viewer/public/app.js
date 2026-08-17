@@ -3,6 +3,7 @@ import { StructureTree, kindColor } from './structure.js';
 import { BoxDiagram } from './boxdiagram.js';
 import { StateMachine } from './statemachine.js';
 import { installTips, tip, tipFor, GLOSSARY } from './tips.js';
+import * as auth from './validation.js';
 
 // ── layers ───────────────────────────────────────────────────────────
 // The three parts of the system, and the views that belong to each. Adding a
@@ -477,6 +478,7 @@ async function boot() {
   bindUI();
   connectLiveReload();
   bindSections();
+  bindAccountUI();
   // delegated, so everything rendered from here on carries its tips without
   // being wired up individually
   installTips();
@@ -2685,6 +2687,8 @@ function renderBoardPage(board) {
     body.append(row);
   }
 
+  body.append(auth.verdictBlock('board', board.id, board.name));
+
   const others = boards().filter((b) => b.id !== board.id);
   if (others.length) {
     body.append(el('div', 'journey-section-label', 'other boards'));
@@ -3012,6 +3016,8 @@ function renderScreen() {
     body.append(box);
   }
   if (screen.notes) body.append(el('div', 'journey-questions', screen.notes));
+
+  body.append(auth.verdictBlock('screen', screen.id, `${screen.id} ${screen.name}`));
 
   markTreeSelection();
   renderSidePane();
@@ -5396,6 +5402,8 @@ function renderTableLinks() {
       pane.append(row);
     }
   }
+
+  pane.append(auth.verdictBlock('table', table.name));
 }
 
 function sectionHead(title, count) {
@@ -5554,6 +5562,15 @@ async function renderReader(node, { scroll = true } = {}) {
   if (node.type === 'operation') head.append(el('div', 'reader-path', `${node.method} ${node.path}`));
   if (node.description) {
     head.append(el('div', 'reader-desc', node.description.trim()));
+  }
+
+  // An operation is one of the four things a person signs off. Schemas and
+  // params are parts of one, not artefacts in their own right, so they get no
+  // verdict of their own — a verdict on every node would be noise, not rigour.
+  const validation = $('reader-validation');
+  validation.innerHTML = '';
+  if (node.type === 'operation') {
+    validation.append(auth.verdictBlock('operation', node.name, `${node.method} ${node.path}`));
   }
 
   // metadata badges
@@ -6232,6 +6249,175 @@ function bindSections() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
+// ── accounts ────────────────────────────────────────────────────────
+// The viewer reads without one. An account is needed to write a verdict,
+// because a verdict is only worth having if it says who gave it.
+
+function openAccountPanel() {
+  $('account-panel').hidden = false;
+  renderAccountPanel();
+  const first = auth.account() ? $('invite-email-input') : $('signin-email');
+  first?.focus();
+}
+
+function closeAccountPanel() {
+  $('account-panel').hidden = true;
+}
+
+function renderAccountPanel() {
+  const who = auth.account();
+  const reachable = auth.reachable();
+
+  $('account-offline').hidden = reachable;
+  $('account-signin').hidden = Boolean(who) || !reachable;
+  $('account-signed').hidden = !who;
+  $('account-title').textContent = who ? 'Your account' : 'Sign in';
+
+  if (who) {
+    $('account-email').textContent = who.email;
+    $('account-role-note').textContent = who.role === 'admin' ? ', an admin' : '';
+    $('account-admin').hidden = who.role !== 'admin';
+    if (who.role === 'admin') renderInviteList();
+  }
+}
+
+/** The initials in the topbar, and what the button says it is for. */
+function renderAccountButton() {
+  const who = auth.account();
+  const badge = $('account-initials');
+  const button = $('account-toggle');
+  if (!badge || !button) return;
+
+  if (!who) {
+    badge.textContent = '·';
+    button.classList.remove('signed-in');
+    button.title = auth.reachable()
+      ? 'Sign in to record verdicts'
+      : 'The validation service is not running';
+    return;
+  }
+  const source = (who.name || who.email).trim();
+  const initials = source.includes(' ')
+    ? source.split(/\s+/).slice(0, 2).map((w) => w[0]).join('')
+    : source.slice(0, 2);
+  badge.textContent = initials.toUpperCase();
+  button.classList.add('signed-in');
+  button.title = `${who.email} — ${who.role}`;
+}
+
+async function renderInviteList() {
+  const box = $('invite-list');
+  if (!box) return;
+  box.innerHTML = '';
+  let invites = [];
+  try {
+    ({ invites } = await auth.listInvites());
+  } catch {
+    box.append(el('p', 'pane-note', 'Could not read the invites.'));
+    return;
+  }
+  if (!invites.length) {
+    box.append(el('p', 'pane-note', 'Nobody has been invited yet.'));
+    return;
+  }
+  for (const invite of invites) {
+    const row = el('div', `invite-row-item ${invite.state}`);
+    row.append(el('span', 'invite-state', invite.state));
+    row.append(el('span', 'invite-who', invite.email));
+    row.append(el('span', 'invite-role', invite.role));
+    if (invite.state === 'open') {
+      const revoke = el('button', 'chip invite-revoke', 'Withdraw');
+      revoke.type = 'button';
+      revoke.onclick = async () => {
+        revoke.disabled = true;
+        try { await auth.revokeInvite(invite.id); } catch { /* the list will show it */ }
+        renderInviteList();
+      };
+      row.append(revoke);
+    }
+    box.append(row);
+  }
+}
+
+function bindAccountUI() {
+  $('account-toggle').onclick = () =>
+    ($('account-panel').hidden ? openAccountPanel() : closeAccountPanel());
+  $('account-panel').onclick = (e) => { if (e.target === $('account-panel')) closeAccountPanel(); };
+  // a verdict block asking for a sign-in
+  document.addEventListener('ticvai:signin', openAccountPanel);
+
+  const signInError = (message) => {
+    $('signin-error').textContent = message;
+    $('signin-error').hidden = false;
+  };
+
+  const doSignIn = async () => {
+    $('signin-error').hidden = true;
+    $('signin-submit').disabled = true;
+    $('signin-submit').textContent = 'Signing in…';
+    try {
+      await auth.signIn($('signin-email').value.trim(), $('signin-password').value);
+      $('signin-password').value = '';
+      closeAccountPanel();
+    } catch (error) {
+      signInError(error.message);
+    } finally {
+      $('signin-submit').disabled = false;
+      $('signin-submit').textContent = 'Sign in';
+    }
+  };
+
+  $('signin-submit').onclick = doSignIn;
+  for (const id of ['signin-email', 'signin-password']) {
+    $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') doSignIn(); });
+  }
+
+  $('signout').onclick = async () => {
+    await auth.signOut();
+    closeAccountPanel();
+  };
+
+  $('invite-create').onclick = async () => {
+    $('invite-error').hidden = true;
+    $('invite-result').hidden = true;
+    const email = $('invite-email-input').value.trim();
+    const role = $('invite-role-input').value;
+    $('invite-create').disabled = true;
+    try {
+      const invite = await auth.createInvite(email, role);
+      // An absolute link, because it is about to be pasted somewhere else.
+      $('invite-link').value = `${location.origin}${invite.link}`;
+      $('invite-result').hidden = false;
+      $('invite-email-input').value = '';
+      renderInviteList();
+    } catch (error) {
+      $('invite-error').textContent = error.message;
+      $('invite-error').hidden = false;
+    } finally {
+      $('invite-create').disabled = false;
+    }
+  };
+
+  $('invite-copy').onclick = async () => {
+    $('invite-link').select();
+    try {
+      await navigator.clipboard.writeText($('invite-link').value);
+      $('invite-copy').textContent = 'Copied';
+      setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 1400);
+    } catch {
+      // clipboard permission refused — the text is selected, so Ctrl+C works
+      $('invite-copy').textContent = 'Press Ctrl+C';
+      setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 2200);
+    }
+  };
+
+  auth.onAuthChange(() => {
+    renderAccountButton();
+    if (!$('account-panel').hidden) renderAccountPanel();
+  });
+  auth.refreshSession();
+}
+
 function bindUI() {
   // the layer and mode bars are rebuilt on every switch, so they wire
   // themselves in renderLayers / renderModes rather than here
@@ -6466,7 +6652,18 @@ function bindUI() {
       return;
     }
 
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    // Single letters pick a view, so they must not fire while someone is
+    // writing. TEXTAREA belongs here as much as INPUT: without it, typing the
+    // "e" of a word in the verdict note jumped to the ER view and took the
+    // focus with it, losing the rest of the sentence. contenteditable is
+    // included for the same reason, before something here becomes one.
+    const target = e.target;
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'SELECT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable
+    ) return;
 
     // 1 / 2 / 3 pick the layer, in the order they appear in the bar
     const layerIndex = Number(e.key) - 1;

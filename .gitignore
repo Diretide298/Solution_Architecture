@@ -5,9 +5,10 @@
 **/bin/
 node_modules/
 
-# Screenshots taken while debugging the viewer. The manual's figures live in
-# viewer/manual/shots and are kept, because manual.html renders them.
-viewer/shot-*.png
+# Screenshots taken while debugging the viewer, wherever they land. The
+# manual's figures live in viewer/manual/shots and are kept, because
+# manual.html renders them.
+shot-*.png
 
 # Local scratch
 *.log
