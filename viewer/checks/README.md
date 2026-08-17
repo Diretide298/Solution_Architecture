@@ -17,6 +17,19 @@ on an empty database.
 |---|---|
 | `paging-check.mjs` | the boot payload is split and compressed, every held-back field comes back from `/api/detail`, and the long list is built a group and a page at a time without losing a row |
 | `contract-trace-check.mjs` | a schema names the tables it is stored as, an operation names the tables it reaches, and an operation the lineage never resolved says so rather than reading as "touches nothing" |
+| `signoff-check.mjs` | the overview counts against the whole population rather than what was judged, unreviewed artefacts sort first, and a row leads to the artefact — including the three kinds that had no deep link until it needed one |
+
+`signoff-check.mjs` **records four real verdicts** against real artefacts, because
+checking the join against a fake population would check nothing. Point the service
+at a scratch store before running it —
+
+```
+TICVAI_DB=/tmp/scratch.db python -m uvicorn api.main:app --port 8787
+```
+
+— or undo it afterwards with `python -m api.cli forget harness.admin@softlabsgroup.com --yes`.
+Do one or the other. Left alone, the first thing the sign-off page shows is four
+things already approved by nobody in particular.
 
 Both check on a **cold tab** — one navigation, no visiting another layer first. The parts
 these views read arrive after the layer is already drawn, which is exactly where a block

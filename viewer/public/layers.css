@@ -1294,6 +1294,82 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
 .admin-bar-right { display: flex; align-items: center; gap: 12px; }
 .admin-who { font-size: 12px; color: var(--text-faint); }
 .admin-main { max-width: 940px; margin: 0 auto; padding: 22px 18px 60px; }
+
+/* ── sign-off overview ──────────────────────────────────────────────── */
+/* Four cards, one per kind of thing a verdict is about. The bar fills from
+   empty rather than showing a percentage, because at 654 operations a single
+   verdict is 0.15% and a number that never moves says less than a bar that
+   does. Whatever is left of the bar is what nobody has looked at. */
+.signoff-grid {
+  display: grid; gap: 10px; margin-top: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.signoff-card {
+  text-align: left; font: inherit; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg-raised); padding: 12px 13px;
+}
+.signoff-card:hover { border-color: var(--text-faint); }
+.signoff-card.active { border-color: var(--accent); background: var(--bg-hover); }
+.signoff-card-label {
+  font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text-faint);
+}
+.signoff-card-count {
+  font-size: 19px; color: var(--text); margin: 5px 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+.signoff-bar {
+  display: flex; height: 5px; border-radius: 3px; overflow: hidden;
+  background: var(--bg-panel); border: 1px solid var(--border);
+}
+.signoff-bar-part.approved { background: var(--ok, #4ade80); }
+.signoff-bar-part.rejected { background: #f87171; }
+.signoff-bar-part[class~="needs-work"] { background: var(--warning, #fbbf24); }
+.signoff-card-legend { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.signoff-legend-item {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums;
+}
+
+.signoff-controls {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.signoff-filter { flex: 1 1 200px; min-width: 0; }
+.signoff-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: var(--text-dim); cursor: pointer;
+}
+
+/* An anchor rather than a button: a row is a link into the viewer, and a
+   reviewer working through a list wants to open several in tabs. */
+.signoff-row {
+  display: grid; gap: 12px; align-items: center; text-decoration: none;
+  grid-template-columns: 104px minmax(0, 1fr) 130px 160px;
+  padding: 7px 4px; border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.signoff-row:hover { background: var(--bg-hover); }
+.signoff-row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.signoff-row-name { color: var(--text); font-size: 12.5px; }
+.signoff-row-detail {
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.signoff-row-group { font-size: 11px; color: var(--text-faint); }
+.signoff-row-who {
+  display: flex; flex-direction: column; gap: 2px;
+  font-size: 11px; text-align: right; justify-self: end;
+}
+.signoff-row-when { color: var(--text-faint); font-size: 10px; }
+
+@media (max-width: 760px) {
+  /* The reviewer and the module are the first things to go: on a phone the
+     verdict and the name are the whole point, and the rest is a tap away. */
+  .signoff-row { grid-template-columns: 92px minmax(0, 1fr); }
+  .signoff-row-group, .signoff-row-who { display: none; }
+}
 .admin-panel {
   border: 1px solid var(--border); border-radius: 9px;
   background: var(--bg-panel);

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI — sign-off</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">TICVAI</span>
+        <span class="brand-sub">sign-off</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <!-- The four kinds are the four things a verdict can be about, and the
+           order is the order somebody reviewing a delivery goes in: what the
+           API offers, what it stores, what a person sees, what it was drawn
+           as. -->
+      <section class="admin-panel">
+        <h1 class="admin-heading">What has been signed off</h1>
+        <p class="auth-note" id="overall">Reading…</p>
+        <div class="signoff-grid" id="totals"></div>
+      </section>
+
+      <section class="admin-panel">
+        <div class="signoff-controls">
+          <div class="seg" id="kind-tabs"></div>
+          <input id="filter" class="auth-input signoff-filter" type="text"
+                 placeholder="filter by name, reviewer or note" />
+          <label class="signoff-toggle">
+            <input type="checkbox" id="only-open" />
+            <span>only what still needs a verdict</span>
+          </label>
+        </div>
+        <p class="auth-error" id="error" hidden></p>
+        <div id="rows"></div>
+        <p class="pane-note" id="listing-note"></p>
+      </section>
+    </main>
+
+    <script type="module" src="/signoff.js"></script>
+  </body>
+</html>

@@ -464,7 +464,10 @@ async function boot() {
   // arrive here rather than as a reload.
   window.addEventListener('hashchange', () => {
     const id = decodeURIComponent(location.hash.slice(1));
-    if (id && id !== state.selectedId && state.nodesById.has(id)) select(id);
+    if (!id) return;
+    if (id !== state.selectedId && state.nodesById.has(id)) select(id);
+    // a screen, table or board link followed while the app is already open
+    else if (!state.nodesById.has(id)) openArtefactHash(id);
   });
 
   // handy for debugging layouts from the console
@@ -505,6 +508,8 @@ async function boot() {
   if (fromHash && state.nodesById.has(fromHash)) {
     select(fromHash);
     setMode(state.mode === 'graph' ? 'reader' : state.mode);
+  } else if (fromHash && (await openArtefactHash(fromHash))) {
+    // handled — a screen, table or board rather than a contract node
   } else {
     setMode('graph');
   }
@@ -512,6 +517,61 @@ async function boot() {
   // The layer the app opens on never went through setLayer, so nothing has
   // asked for its parts yet.
   hydrateLayer();
+}
+
+/**
+ * A deep link to one of the three artefacts that are not contract nodes.
+ *
+ * An operation is a node in the index and has always been linkable by its id.
+ * A screen, a table and a design board are not — they live in state the hash
+ * never carried, so the only way to reach one was to click through to it. That
+ * was tolerable while nothing outside the app needed to point at them, and
+ * stopped being so the moment the validation overview wanted to say "this
+ * table is the one still unreviewed" and link to it.
+ *
+ *   #screen:WEB-001   #table:fnb.fnb_order   #board:P01
+ *
+ * The prefixes are the ones the app already uses for the same three things in
+ * currentSideId(), and none can collide with a node id — those are `op:`,
+ * `schema:`, `file:`, `perm:` and the rest, all of which are tried first.
+ *
+ * Returns false for anything it does not recognise, so the caller can fall
+ * back rather than land on a blank view.
+ */
+async function openArtefactHash(hash) {
+  const split = hash.indexOf(':');
+  if (split < 0) return false;
+  const kind = hash.slice(0, split);
+  const id = hash.slice(split + 1);
+  if (!id) return false;
+
+  // The layer's own parts have to be in hand before anything can be said about
+  // whether the artefact exists, so this waits rather than guessing.
+  if (kind === 'screen' || kind === 'board') {
+    await ensureParts(LAYER_PARTS.frontend, 'frontend');
+    setLayer('frontend');
+    if (kind === 'board') {
+      if (!boards().some((b) => b.id === id)) return false;
+      selectBoard(id);
+    } else {
+      if (!state.journeys?.screens?.some((s) => s.id === id)) return false;
+      state.boardId = null;
+      state.screenId = id;
+      setMode('screen');
+    }
+    return true;
+  }
+
+  if (kind === 'table') {
+    await ensureParts(LAYER_PARTS.backend, 'backend');
+    if (!state.backend?.tables?.some((t) => t.name === id)) return false;
+    setLayer('backend');
+    selectTable(id);
+    setMode('data');
+    return true;
+  }
+
+  return false;
 }
 
 // ── layer switching ──────────────────────────────────────────────────

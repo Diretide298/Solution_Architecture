@@ -93,6 +93,7 @@ A target is `operation`, `table`, `screen` or `board`. A verdict is `approved`,
 | variable | default | |
 |---|---|---|
 | `TICVAI_DB` | `api/ticvai.db` | where the store lives |
+
 | `TICVAI_DOMAIN` | `softlabsgroup.com` | the only domain that may hold an account |
 | `TICVAI_SECURE_COOKIE` | unset | set to `1` when served over https |
 
@@ -100,6 +101,31 @@ The session cookie is `HttpOnly` and `SameSite=Lax`. It is deliberately *not*
 `Secure` by default, because the viewer runs over plain http on a workstation
 and the cookie would never be sent. Set `TICVAI_SECURE_COOKIE=1` the moment
 this is served over https.
+
+**`TICVAI_DB` is the one to watch.** It is read at import, so a value left set
+in a shell silently sends every account and verdict somewhere else, and the
+service gives no sign of it — `/api/health` will happily report five accounts
+while `api/ticvai.db` has none. It has already happened once here: a test run
+set it to a temp file, and the admin account made against that service went
+into the temp file rather than the store. `adopt` below is what got it back.
+
+## Housekeeping
+
+```
+python -m api.cli list                          # accounts and open invites
+python -m api.cli admin you@softlabsgroup.com   # the first account, if there is none
+python -m api.cli adopt you@softlabsgroup.com --source other.db --yes
+python -m api.cli forget harness@softlabsgroup.com --yes
+```
+
+`adopt` copies one account out of another store — the stored hash moves across
+unchanged, so the password stays the one they chose. Sessions and verdicts are
+left behind on purpose.
+
+`forget` deletes every verdict by one account. Verdicts are append-only
+otherwise, and this is the deliberate exception: it takes an **account**, not
+an artefact, so it can undo a harness run against a real store and cannot be
+used to tidy away an inconvenient opinion.
 
 ## Tested
 

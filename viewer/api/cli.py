@@ -14,7 +14,9 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import sqlite3
 import sys
+from pathlib import Path
 
 from . import db, security
 
@@ -99,6 +101,76 @@ def show(args) -> None:
         print(f"  {i['role']:<9} {i['email']}  expires {i['expires_at']}")
 
 
+def forget(args) -> None:
+    """Remove every verdict recorded by one account.
+
+    Verdicts are append-only on purpose: a sign-off you can quietly revise is
+    not a sign-off, and the history of how something got to `approved` is the
+    part worth keeping. This is the one exception, and it is deliberately
+    narrow — it takes an account, not an artefact, so it can undo a harness run
+    and cannot be used to tidy away an inconvenient opinion. A person's
+    verdicts stay until the person is removed.
+    """
+    db.init()
+    account = db.one("SELECT id, email FROM account WHERE email = ?", (args.email,))
+    if not account:
+        print(f"No account for {args.email}.")
+        return
+    rows = db.one(
+        "SELECT COUNT(*) AS n FROM verdict WHERE account_id = ?", (account["id"],))["n"]
+    if not rows:
+        print(f"{args.email} has recorded no verdicts.")
+        return
+    if not args.yes:
+        print(f"{rows} verdict(s) by {args.email} would be deleted. Pass --yes to do it.")
+        return
+    db.write("DELETE FROM verdict WHERE account_id = ?", (account["id"],))
+    print(f"Deleted {rows} verdict(s) by {args.email}.")
+
+
+def adopt(args) -> None:
+    """Copy one account out of another store, password and all.
+
+    For the case where the service was started against a throwaway database —
+    a test run, a `TICVAI_DB` left set in a shell — and the account somebody
+    actually made ended up in it. The stored hash moves across unchanged, so
+    the password stays the one they chose and is never seen by anything here.
+
+    Nothing else comes with it. Sessions are left behind deliberately: a
+    session is a claim about a browser, and it should be made again against
+    the store that is now answering. Verdicts are left behind because a verdict
+    recorded against a test store was almost certainly a test.
+    """
+    src_path = Path(args.source)
+    if not src_path.exists():
+        print(f"No database at {src_path}.")
+        return
+
+    src = sqlite3.connect(src_path)
+    src.row_factory = sqlite3.Row
+    row = src.execute(
+        "SELECT * FROM account WHERE email_folded = ?", (db.fold(args.email),)).fetchone()
+    if row is None:
+        print(f"{args.email} is not in {src_path}.")
+        return
+
+    db.init()
+    if db.one("SELECT id FROM account WHERE email_folded = ?", (db.fold(args.email),)):
+        print(f"{args.email} is already here. Nothing to do.")
+        return
+
+    if not args.yes:
+        print(f"Would copy {row['email']} ({row['role']}) from {src_path}. Pass --yes to do it.")
+        return
+
+    columns = ["email", "email_folded", "name", "password_hash", "role", "active", "created_at"]
+    db.write(
+        f"INSERT INTO account ({','.join(columns)}) VALUES ({','.join('?' * len(columns))})",
+        tuple(row[c] for c in columns),
+    )
+    print(f"Copied {row['email']} ({row['role']}). Their password is unchanged; sign in again.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="api.cli", description=__doc__)
     subs = parser.add_subparsers(required=True, dest="command")
@@ -117,6 +189,17 @@ def main() -> None:
 
     p = subs.add_parser("list", help="show accounts and open invites")
     p.set_defaults(func=show)
+
+    p = subs.add_parser("forget", help="delete every verdict by one account — for undoing a harness run")
+    p.add_argument("email")
+    p.add_argument("--yes", action="store_true", help="actually delete them")
+    p.set_defaults(func=forget)
+
+    p = subs.add_parser("adopt", help="copy one account out of another store, password and all")
+    p.add_argument("email")
+    p.add_argument("--source", required=True, help="path to the other .db")
+    p.add_argument("--yes", action="store_true", help="actually copy it")
+    p.set_defaults(func=adopt)
 
     args = parser.parse_args()
     args.func(args)
