@@ -1,0 +1,66 @@
+# Rota assignment — state model
+# Contract: workforce.RotaStatus
+# Checked by tools/check-states.py.
+
+entity: Rota assignment
+contract: workforce
+enum: RotaStatus
+owner: workforce
+initial:
+- planned
+terminal:
+- cancelled
+- completed
+- noShow
+transitions:
+- from: planned
+  to: published
+  operation: createRotaAssignment
+  trigger: operation
+  guard: Visible to the person rostered. **Until published it is a plan, not a commitment**
+- from: published
+  to: confirmed
+  operation: updateRotaAssignment
+  trigger: operation
+  guard: The person acknowledged it
+- from: published
+  to: swapPending
+  operation: requestShiftSwap
+  trigger: operation
+  guard: A swap was asked for. Both parties, then the supervisor
+- from: swapPending
+  to: published
+  operation: requestShiftSwap
+  trigger: operation
+  guard: Swap rejected or withdrawn — the original assignment stands
+  isReversal: true
+- from: swapPending
+  to: cancelled
+  operation: updateRotaAssignment
+  trigger: operation
+  guard: Swap approved. A new assignment replaces this one
+- from: confirmed
+  to: completed
+  trigger: cascade
+  guard: A clock-out matched the assignment
+- from: confirmed
+  to: noShow
+  trigger: timer
+  guard: '**Nobody clocked in.** The gap between the rota and attendance, which is the whole operational
+    value of having both'
+- from: published
+  to: noShow
+  trigger: timer
+  guard: Never confirmed and never attended
+- from: planned
+  to: cancelled
+  operation: updateRotaAssignment
+  trigger: operation
+  guard: Removed before publication
+- from: published
+  to: cancelled
+  operation: updateRotaAssignment
+  trigger: operation
+  guard: Cancelled after publication. The person is told
+notes: '`noShow` is computed rather than set. An operator cannot forget to mark it, which is the point
+  — a venue with only a rota believes it is fully staffed every day.'

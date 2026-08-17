@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
   version: 0.1.0
-  x-ticvai-screen-count: 1
+  x-ticvai-screen-count: 12
   x-ticvai-tier: satellite
   x-ticvai-module: "8 — Unified Operations Dashboard  ·  cross-cutting"
   x-ticvai-requirements: 332
@@ -105,6 +105,15 @@ paths:
   /reports:
     get:
       operationId: listReports
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
       x-ticvai-read-routing: analytical
       summary: List available report definitions
       description: >
@@ -142,6 +151,15 @@ paths:
 
     post:
       operationId: createReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
       summary: Create a custom report definition
       description: >
         The self-service builder. A definition names its data source, columns, filters,
@@ -186,6 +204,15 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
       x-ticvai-read-routing: analytical
       summary: Read a report definition
       tags: [catalogue]
@@ -203,6 +230,15 @@ paths:
 
     put:
       operationId: updateReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
       summary: Publish a new version of a definition
       description: >
         Definitions are versioned. Historic executions keep the version they ran against, so
@@ -226,6 +262,15 @@ paths:
 
     delete:
       operationId: deleteReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
       summary: Retire a report definition
       description: >
         Retired rather than deleted where executions or schedules reference it. History must
@@ -282,6 +327,11 @@ paths:
       operationId: runReport
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
       summary: Run a report
@@ -618,6 +668,8 @@ paths:
   /dashboards:
     get:
       operationId: listDashboards
+      x-ticvai-consumed-by:
+        - "P09 ADM-031 Security & Compliance Dashboard"
       x-ticvai-read-routing: analytical
       summary: List dashboards
       tags: [dashboard]
@@ -636,6 +688,8 @@ paths:
 
     post:
       operationId: createDashboard
+      x-ticvai-consumed-by:
+        - "P09 ADM-031 Security & Compliance Dashboard"
       x-ticvai-config-scope: tenant
       summary: Create a dashboard
       description: >
@@ -674,6 +728,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getDashboard
+      x-ticvai-consumed-by:
+        - "P09 ADM-031 Security & Compliance Dashboard"
       x-ticvai-read-routing: analytical
       summary: Read a dashboard with tile data
       tags: [dashboard]
@@ -696,6 +752,8 @@ paths:
 
     put:
       operationId: updateDashboard
+      x-ticvai-consumed-by:
+        - "P09 ADM-031 Security & Compliance Dashboard"
       x-ticvai-config-scope: tenant
       summary: Update a dashboard
       tags: [dashboard]
@@ -719,8 +777,27 @@ paths:
   /reports/ask:
     post:
       operationId: askReportingQuestion
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-ai-capability: naturalLanguageQuery
       summary: Natural-language reporting query
       description: >
+        **This is an AI capability and is governed as one.** It resolves its provider through
+        `ai.provider`, respects `ai.policy` including the masking list, and writes an
+        `ai.interaction` with its prompt, response, model, tokens and cost — the same audit
+        trail as the assistant (8.3.55–8.3.57).
+
+        Distinct from `sendAiMessage`, which retrieves from documents. **This generates a
+        query against the analytical replica and returns it**, so a finance user can check
+        the number rather than trust it.
+
         AI-57, Phase 1. Queries data that already exists, so it works from day one — unlike
         forecasting, which needs history.
 
@@ -769,6 +846,15 @@ paths:
         schema: { type: string }
     post:
       operationId: saveNaturalLanguageQuery
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
       summary: Save a natural-language answer as a report definition
       description: >
         Turns a one-off question into something schedulable. The generated query becomes the

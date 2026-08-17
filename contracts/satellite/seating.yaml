@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 5
+  x-ticvai-screen-count: 10
   x-ticvai-tier: satellite
   x-ticvai-module: "19 — Seat Management & Venue Mapping"
   x-ticvai-requirements: 112
@@ -178,8 +178,6 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getSeatMap
-      x-ticvai-consumed-by:
-        - "P02 GST-049 Interactive Seat Selection"
       x-ticvai-read-routing: replica
       summary: Read a seat map with its structure
       description: >
@@ -660,9 +658,14 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getSeatAvailability
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-007 Seat Map Selection"
         - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-read-routing: primary
       summary: Seat status for a performance
       description: >
@@ -707,8 +710,8 @@ paths:
   /seat-holds:
     post:
       operationId: createSeatHold
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-007 Seat Map Selection"
         - "P04 POS-004 Sell — Seat Map"
       summary: Hold specific seats
       description: >
@@ -755,6 +758,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getSeatHold
+      x-ticvai-consumed-by:
+        - "P04 POS-004 Sell — Seat Map"
       x-ticvai-read-routing: primary
       summary: Read a hold
       tags: [hold]
@@ -772,6 +777,9 @@ paths:
 
     delete:
       operationId: releaseSeatHold
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P04 POS-004 Sell — Seat Map"
       summary: Release a hold
       description: Releases buffered neighbours alongside the held seats.
       tags: [hold]
@@ -791,8 +799,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: extendSeatHold
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-007 Seat Map Selection"
         - "P04 POS-004 Sell — Seat Map"
       summary: Extend a hold
       description: >
@@ -821,6 +829,8 @@ paths:
   /seat-blocks:
     get:
       operationId: listSeatBlocks
+      x-ticvai-consumed-by:
+        - "P10 PTR-009 Group / Bulk Booking"
       x-ticvai-read-routing: primary   # a released block that still reads as blocked strands sellable seats
       summary: List seat blocks
       description: >
@@ -856,6 +866,8 @@ paths:
 
     post:
       operationId: createSeatBlock
+      x-ticvai-consumed-by:
+        - "P10 PTR-009 Group / Bulk Booking"
       summary: Block seats from sale
       tags: [block]
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -889,6 +901,8 @@ paths:
         schema: { type: string, format: uuid }
     delete:
       operationId: releaseSeatBlock
+      x-ticvai-consumed-by:
+        - "P10 PTR-009 Group / Bulk Booking"
       summary: Release a block back to sale
       tags: [block]
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -1011,6 +1025,14 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: recommendSeats
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
       summary: Recommend seats for a party
       description: >
         Best available, best value, closest to stage, or accessible with companions.

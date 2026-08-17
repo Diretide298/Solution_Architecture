@@ -1,0 +1,100 @@
+# F17 — A guest buys merchandise and collects later
+#
+# 4.4.7 was contracted on 14 August and never walked through. The last branch is the
+# one that decides whether the feature is worth having.
+#
+# Validated by tools/check-flows.py.
+
+id: F17
+name: A guest buys merchandise and collects later
+actor: guest
+capability: C06
+wave: 2
+frequency: daily
+criticality: revenue
+platforms:
+- P04 Venue POS
+- P02 Guest App
+- P08 Venue Management
+offlineBehaviour: The sale is offline-capable; the collection is not. **A retail sale completes on the
+  device and journals**; shop-and-drop needs the server to know where the bag is.
+trigger:
+  description: A guest buys something at a shop and does not want to carry it around the park all day
+    (4.4.7).
+  entryScreen: POS-002
+  entryPoints:
+  - At a shop till
+  - In the guest app
+  - Kiosk
+steps:
+- step: 1
+  screen: POS-002
+  action: Cashier scans the merchandise
+  operations:
+  - listMerchandise
+  - lookupMerchandise
+  outcome: Stock at this outlet, not the venue
+- step: 2
+  screen: POS-005
+  action: Guest pays
+  operations:
+  - createPayment
+  outcome: Stock decrements
+- step: 3
+  screen: BO-048
+  action: Bag is dropped and tagged
+  operations:
+  - listMerchandise
+  outcome: '**A reference the guest can present**, not a receipt they will lose'
+- step: 4
+  screen: GST-026
+  action: Guest tracks it in the app
+  operations:
+  - listMerchandise
+  outcome: Where it is, and until when
+- step: 5
+  screen: BO-048
+  action: Collected on the way out
+  operations:
+  - listMerchandise
+  outcome: Signed for
+branches:
+- at: 1
+  condition: Out of stock at this outlet but available at another
+  behaviour: '**The outlet gates the sale, not the venue** (14 August). It can be transferred, which
+    takes time the guest does not have, or sold from the other outlet for collection there.'
+  severity: recoverable
+  resolvedBy: Cashier
+- at: 2
+  condition: Guest wants it added to an existing ticket QR
+  behaviour: '`appendEntitlementToMedia` — one code, not a second wristband (CF-58).'
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 3
+  condition: Guest loses the reference
+  behaviour: Lookup by order or by the ticket QR. **A bag nobody can claim is a bag the venue stores
+    forever.**
+  severity: recoverable
+  resolvedBy: Staff
+- at: 5
+  condition: Guest leaves without collecting
+  behaviour: Becomes lost property after the stated window. **Distinct from unsold stock** — it is paid
+    for and belongs to someone.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 5
+  condition: The shop is closed when the guest leaves
+  behaviour: '**The failure that makes shop-and-drop worse than carrying it.** Collection must be at
+    an exit point with different hours from the shop, which is a venue operations decision.'
+  severity: requiresStaff
+  resolvedBy: Venue manager
+exitStates:
+- state: completed
+  description: Bought, dropped, collected
+- state: deferred
+  description: Uncollected, held
+- state: escalated
+  description: Lost property
+openQuestions:
+- Where collection happens and what hours it keeps. A shop-and-drop that can only be collected from
+  the shop that sold it, during shop hours, is worse than carrying the bag.

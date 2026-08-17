@@ -12,7 +12,7 @@ platform:
   name: Guest Kiosk — Self-Service
   surface: guestFacing
   runtime: reactWeb
-  app: guest
+  app: guest-app
   appStatus: scaffolded
   offlineCapable: false
   packages:
@@ -30,6 +30,13 @@ platform:
     releaseCadence: monthly, out of hours
   screenCount: 14
   wireframeBoard: wireframes/P05 Guest Kiosk.dc.html
+  designReferences:
+  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    note: Kiosk is white-labelled like the guest surfaces, not TICVAI-branded like the POS (14 August).
+  operator: guest
+  directions:
+  - ltr
+  - rtl
 screens:
 - id: KSK-001
   name: Attract Loop
@@ -58,12 +65,13 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/attract-loop
-    component: apps/guest/src/routes/sell/AttractLoopDetail.tsx
+    component: apps/guest-app/src/routes/sell/AttractLoopDetail.tsx
     status: notStarted
 - id: KSK-002
   name: Language Select
@@ -84,23 +92,30 @@ screens:
     error: Defaults to the venue language and continues
     offline: Not available
   navigation:
-    exitTo: []
+    exitTo:
+    - KSK-003
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/language-select
-    component: apps/guest/src/routes/sell/LanguageSelectDetail.tsx
+    component: apps/guest-app/src/routes/sell/LanguageSelectDetail.tsx
     status: notStarted
   apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
   - operationId: getTenantConfig
     contract: white-label
-    purpose: From the flow it appears in
+    purpose: Full working configuration
     trigger: onLoad
 - id: KSK-003
   name: What are you buying
@@ -128,17 +143,18 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-003
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/what-are-you-buying
-    component: apps/guest/src/routes/sell/WhatAreYouBuyingDetail.tsx
+    component: apps/guest-app/src/routes/sell/WhatAreYouBuyingDetail.tsx
     status: notStarted
   apis:
   - operationId: listProducts
     contract: catalogue
-    purpose: From the flow it appears in
+    purpose: List products
     trigger: onLoad
 - id: KSK-004
   name: Choose tickets
@@ -159,27 +175,30 @@ screens:
     error: Pricing unavailable
     offline: Not available
   navigation:
-    exitTo: []
+    exitTo:
+    - KSK-005
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/choose-tickets
-    component: apps/guest/src/routes/sell/ChooseTicketsDetail.tsx
+    component: apps/guest-app/src/routes/sell/ChooseTicketsDetail.tsx
     status: notStarted
   apis:
-  - operationId: listProductVariants
-    contract: catalogue
-    purpose: From the flow it appears in
-    trigger: onLoad
   - operationId: getAvailability
     contract: catalogue
-    purpose: From the flow it appears in
+    purpose: Live remaining capacity
+    trigger: onLoad
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: List generated variants
     trigger: onLoad
 - id: KSK-005
   name: Choose a session
@@ -200,27 +219,30 @@ screens:
     error: Availability unavailable. Selection is blocked — overselling is worse than waiting
     offline: Not available
   navigation:
-    exitTo: []
+    exitTo:
+    - KSK-006
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/choose-a-session
-    component: apps/guest/src/routes/sell/ChooseASessionDetail.tsx
+    component: apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx
     status: notStarted
   apis:
-  - operationId: getAvailability
-    contract: catalogue
-    purpose: From the flow it appears in
-    trigger: onLoad
   - operationId: acquireLease
     contract: catalogue
-    purpose: From the flow it appears in
+    purpose: Acquire an inventory lease
+    trigger: onAction
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Live remaining capacity
     trigger: onLoad
 - id: KSK-006
   name: Review
@@ -241,24 +263,39 @@ screens:
     error: Pricing failed. The guest is not asked to pay an amount nobody computed
     offline: Not available
   navigation:
-    exitTo: []
+    exitTo:
+    - KSK-007
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/review
-    component: apps/guest/src/routes/sell/ReviewDetail.tsx
+    component: apps/guest-app/src/routes/sell/ReviewDetail.tsx
     status: notStarted
   apis:
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
+    trigger: onLoad
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions
-    purpose: From the flow it appears in
-    trigger: onLoad
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
 - id: KSK-007
   name: Payment
   module: Sell
@@ -279,24 +316,27 @@ screens:
       possible
     offline: Not available. **Card only, and card needs the acquirer**
   navigation:
-    exitTo: []
+    exitTo:
+    - KSK-009
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/payment
-    component: apps/guest/src/routes/sell/PaymentDetail.tsx
+    component: apps/guest-app/src/routes/sell/PaymentDetail.tsx
     status: notStarted
   apis:
   - operationId: createPayment
     contract: orders
-    purpose: From the flow it appears in
-    trigger: onLoad
+    purpose: Take a payment against an order
+    trigger: onAction
 - id: KSK-009
   name: Ticket issued
   module: Sell
@@ -322,17 +362,22 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-009
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/ticket-issued
-    component: apps/guest/src/routes/sell/TicketIssuedDetail.tsx
+    component: apps/guest-app/src/routes/sell/TicketIssuedDetail.tsx
     status: notStarted
   apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   - operationId: getOrder
     contract: orders
-    purpose: From the flow it appears in
+    purpose: Read an order
     trigger: onLoad
 - id: KSK-011
   name: Collect a booking
@@ -359,18 +404,14 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/collect-a-booking
-    component: apps/guest/src/routes/sell/CollectABookingDetail.tsx
+    component: apps/guest-app/src/routes/sell/CollectABookingDetail.tsx
     status: notStarted
-  apis:
-  - operationId: lookupTicket
-    contract: access
-    purpose: From the flow it appears in
-    trigger: onLoad
 - id: KSK-012
   name: Booking found
   module: Sell
@@ -396,18 +437,19 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/booking-found
-    component: apps/guest/src/routes/sell/BookingFoundDetail.tsx
+    component: apps/guest-app/src/routes/sell/BookingFoundDetail.tsx
     status: notStarted
   apis:
-  - operationId: getOrder
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: From the flow it appears in
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
 - id: KSK-008
   name: Payment unresolved
   module: Sell
@@ -434,18 +476,14 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/payment-unresolved
-    component: apps/guest/src/routes/sell/PaymentUnresolvedDetail.tsx
+    component: apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx
     status: notStarted
-  apis:
-  - operationId: inquirePaymentStatus
-    contract: orders
-    purpose: From the flow it appears in
-    trigger: onLoad
 - id: KSK-010
   name: Print failure
   module: Sell
@@ -473,18 +511,19 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/print-failure
-    component: apps/guest/src/routes/sell/PrintFailureDetail.tsx
+    component: apps/guest-app/src/routes/sell/PrintFailureDetail.tsx
     status: notStarted
   apis:
-  - operationId: reprintOrder
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: From the flow it appears in
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
 - id: KSK-013
   name: Call staff
   module: Sell
@@ -510,12 +549,13 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/call-staff
-    component: apps/guest/src/routes/sell/CallStaffDetail.tsx
+    component: apps/guest-app/src/routes/sell/CallStaffDetail.tsx
     status: notStarted
 - id: KSK-014
   name: Out of service
@@ -543,10 +583,11 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-014
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: guest
+    app: guest-app
     route: /sell/out-of-service
-    component: apps/guest/src/routes/sell/OutOfServiceDetail.tsx
+    component: apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx
     status: notStarted

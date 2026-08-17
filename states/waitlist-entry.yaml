@@ -1,0 +1,57 @@
+# Waitlist entry — state model
+# Contract: catalogue.WaitlistStatus
+# Checked by tools/check-states.py.
+
+entity: Waitlist entry
+contract: catalogue
+enum: WaitlistStatus
+owner: catalogue
+initial:
+- waiting
+terminal:
+- converted
+- expired
+- left
+transitions:
+- from: waiting
+  to: offered
+  operation: offerWaitlistCapacity
+  trigger: operation
+  guard: '**Capacity appeared and this guest is at the front.** Held for a stated window — notifying
+    everyone at once produces a race the fastest guest wins and the rest resent'
+- from: offered
+  to: converted
+  trigger: cascade
+  guard: They bought it. The entry closes
+- from: offered
+  to: waiting
+  trigger: timer
+  guard: '**The window passed and the offer moved to the next person.** They keep their place rather
+    than losing it, because being asleep is not declining'
+  isReversal: true
+- from: offered
+  to: left
+  operation: leaveWaitlist
+  trigger: operation
+  guard: Declined explicitly
+- from: waiting
+  to: left
+  operation: leaveWaitlist
+  trigger: operation
+  guard: No longer interested
+- from: waiting
+  to: expired
+  trigger: timer
+  guard: '**The performance happened.** A waitlist for a session that has run is dead, and nobody should
+    be notified about it'
+- from: offered
+  to: expired
+  trigger: timer
+  guard: The performance happened while an offer was open
+notes: '**`offered` returns to `waiting`, not to a terminal state.** A guest who missed one offer stays
+  in the queue and keeps their position — losing your place because you were asleep is the behaviour
+  that makes people stop joining waitlists.
+
+
+  `left` and `expired` are distinct: one is a decision, one is the session running. Only the first should
+  suppress future marketing.'

@@ -20,7 +20,7 @@ platform:
   - ltr
   - rtl
   screenCount: 29
-  app: web-b2c
+  app: guest-web
   appStatus: scaffolded
   packages:
   - design-tokens
@@ -36,6 +36,10 @@ platform:
     networkAssumption: public internet, unmanaged
     releaseCadence: continuous
   wireframeBoard: wireframes/P01 Guest Web.dc.html
+  designReferences:
+  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    note: White Label Builder boards 1 and 2 — brand, app structure, homepage, content and publishing.
+  operator: guest
 screens:
 - id: WEB-001
   name: Home / Landing
@@ -71,20 +75,21 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-001
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   apis:
-  - operationId: getTenantConfig
-    purpose: Branding, navigation and homepage section order
-    trigger: onLoad
-    contract: white-label
   - operationId: getTenantAppStatus
     purpose: Maintenance check before rendering anything
     trigger: onLoad
     contract: white-label
-  - operationId: listProducts
-    purpose: Featured products per homepage section
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
     trigger: onLoad
+  - operationId: listProducts
     contract: catalogue
+    purpose: List products
+    trigger: onLoad
   navigation:
     isEntryPoint: true
     exitTo:
@@ -95,9 +100,9 @@ screens:
   accessibility:
     focusOrder: Skip link, then first section heading. Not the carousel.
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /discovery-and-browse/home-landing
-    component: apps/web-b2c/src/routes/discovery-and-browse/HomeLandingDashboard.tsx
+    component: apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx
     status: notStarted
 - id: WEB-002
   name: Event & Attraction Listing
@@ -127,16 +132,8 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-002
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
-  apis:
-  - operationId: listProducts
-    purpose: Paged, filtered product list
-    trigger: onLoad
-    contract: catalogue
-  - operationId: listEvents
-    purpose: Date and category filter options
-    trigger: onLoad
-    contract: catalogue
   navigation:
     entryFrom:
     - WEB-001
@@ -144,14 +141,14 @@ screens:
     exitTo:
     - WEB-004
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /discovery-and-browse/event-and-attraction-listing
-    component: apps/web-b2c/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx
+    component: apps/guest-web/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx
     status: notStarted
 - id: WEB-003
   name: Search Results
   module: Discovery & Browse
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find something when the guest does not know what it is called.
   wave: 1
   layout:
     template: list
@@ -161,17 +158,19 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Results stream in; facets render first
+    empty: '**No results is a real answer.** Offers what is on rather than an empty page, because a
+      guest who searched for a closed attraction still came to buy something'
+    error: Search unavailable. Falls back to browsing the catalogue
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-003
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /discovery-and-browse/search-results
-    component: apps/web-b2c/src/routes/discovery-and-browse/SearchResultsList.tsx
+    component: apps/guest-web/src/routes/discovery-and-browse/SearchResultsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -179,6 +178,7 @@ screens:
     exitTo:
     - WEB-004
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-004
   name: Event / Attraction Detail
   module: Discovery & Browse
@@ -207,16 +207,8 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-004
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
-  apis:
-  - operationId: getProduct
-    purpose: Description, images, terms
-    trigger: onLoad
-    contract: catalogue
-  - operationId: listPerformances
-    purpose: Next available dates for the calendar preview
-    trigger: onLoad
-    contract: catalogue
   navigation:
     entryFrom:
     - WEB-001
@@ -225,10 +217,19 @@ screens:
     exitTo:
     - WEB-005
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /discovery-and-browse/event-attraction-detail
-    component: apps/web-b2c/src/routes/discovery-and-browse/EventAttractionDetail.tsx
+    component: apps/guest-web/src/routes/discovery-and-browse/EventAttractionDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getProduct
+    contract: catalogue
+    purpose: Read a product
+    trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
 - id: WEB-005
   name: Ticket Type Selection
   module: Booking & Selection
@@ -257,16 +258,8 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-005
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C80
-  apis:
-  - operationId: listProductVariants
-    purpose: Ticket types with prices
-    trigger: onLoad
-    contract: catalogue
-  - operationId: evaluatePromotions
-    purpose: Live pricing as quantities change
-    trigger: onAction
-    contract: promotions
   navigation:
     entryFrom:
     - WEB-004
@@ -274,10 +267,19 @@ screens:
     - WEB-006
     - WEB-010
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /booking-and-selection/ticket-type-selection
-    component: apps/web-b2c/src/routes/booking-and-selection/TicketTypeSelectionForm.tsx
+    component: apps/guest-web/src/routes/booking-and-selection/TicketTypeSelectionForm.tsx
     status: notStarted
+  apis:
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: List generated variants
+    trigger: onLoad
 - id: WEB-006
   name: Date & Session Selection
   module: Booking & Selection
@@ -305,12 +307,8 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-006
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C81
-  apis:
-  - operationId: getAvailability
-    purpose: Per-performance remaining capacity
-    trigger: onLoad
-    contract: catalogue
   navigation:
     entryFrom:
     - WEB-005
@@ -321,10 +319,15 @@ screens:
   notes: Availability is read live and never cached beyond a few seconds. A guest selecting a session
     that filled while they were reading is a worse outcome than a slightly slower screen.
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /booking-and-selection/date-and-session-selection
-    component: apps/web-b2c/src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx
+    component: apps/guest-web/src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx
     status: notStarted
+  apis:
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Live remaining capacity
+    trigger: onLoad
 - id: WEB-007
   name: Seat Map Selection
   module: Booking & Selection
@@ -355,20 +358,8 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-007
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C51
-  apis:
-  - operationId: getSeatAvailability
-    purpose: Seat status for the chosen performance
-    trigger: onLoad
-    contract: seating
-  - operationId: createSeatHold
-    purpose: Hold on selection, before payment
-    trigger: onAction
-    contract: seating
-  - operationId: extendSeatHold
-    purpose: Extend while the guest is still paying
-    trigger: onAction
-    contract: seating
   navigation:
     entryFrom:
     - WEB-006
@@ -377,14 +368,23 @@ screens:
   notes: 'A map with no geometry falls back to category and best-available selection. Availability returns
     renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.'
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /booking-and-selection/seat-map-selection
-    component: apps/web-b2c/src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx
+    component: apps/guest-web/src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx
     status: notStarted
+  apis:
+  - operationId: createSeatHold
+    contract: seating
+    purpose: Hold specific seats
+    trigger: onAction
+  - operationId: getSeatAvailability
+    contract: seating
+    purpose: Seat status for a performance
+    trigger: onLoad
 - id: WEB-008
   name: Add-ons & Upsell
   module: Booking & Selection
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See add-ons & upsell for this venue.
   wave: 2
   layout:
     template: detail
@@ -393,31 +393,28 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Upsells resolve after the cart is priced
+    empty: No add-ons for this product — the step is skipped entirely rather than shown empty
+    error: Upsells unavailable. **The purchase continues** — a failed upsell must never block a sale
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-008
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C86
-  apis:
-  - operationId: getUpsellSuggestions
-    contract: promotions
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /booking-and-selection/add-ons-and-upsell
-    component: apps/web-b2c/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx
+    component: apps/guest-web/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-009
   name: Wishlist
   module: Booking & Selection
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
     template: detail
@@ -426,12 +423,13 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Saved items load
+    empty: Nothing saved — explains what the list is for
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-009
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   apis:
   - operationId: getWishlist
@@ -446,12 +444,29 @@ screens:
     purpose: Remove a saved item
     trigger: onAction
     contract: marketing-crm
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
   notes: Withdrawn products stay in the list marked unavailable. A guest who saved something and finds
-    it silently gone assumes the feature is broken.
+    it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations
+    on 17 August, not from a requirement.
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /booking-and-selection/wishlist
-    component: apps/web-b2c/src/routes/booking-and-selection/WishlistDetail.tsx
+    component: apps/guest-web/src/routes/booking-and-selection/WishlistDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -486,16 +501,45 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-010
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   apis:
-  - operationId: evaluatePromotions
-    purpose: Final pricing with any coupon applied
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
     trigger: onLoad
-    contract: promotions
-  - operationId: getCouponCode
-    purpose: Validate a coupon before applying
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
     trigger: onAction
+  - operationId: updateCartLine
+    contract: orders
+    purpose: Change a quantity
+    trigger: onAction
+  - operationId: removeCartLine
+    contract: orders
+    purpose: Take something out
+    trigger: onAction
+  - operationId: extendCart
+    contract: orders
+    purpose: Give the guest more time
+    trigger: onAction
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
+  - operationId: abandonCart
+    contract: orders
+    purpose: Empty it deliberately
+    trigger: onAction
+  - operationId: evaluatePromotions
     contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  - operationId: getCouponCode
+    contract: promotions
+    purpose: Look up a code
+    trigger: onLoad
   navigation:
     entryFrom:
     - WEB-005
@@ -505,9 +549,9 @@ screens:
     exitTo:
     - WEB-011
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /cart-and-checkout/shopping-cart
-    component: apps/web-b2c/src/routes/cart-and-checkout/ShoppingCartDetail.tsx
+    component: apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx
     status: notStarted
 - id: WEB-011
   name: Guest Details & Attendee Forms
@@ -544,16 +588,45 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-011
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C03
   apis:
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
   - operationId: getGuestProfile
-    purpose: Prefill for a signed-in guest
-    trigger: onLoad
     contract: marketing-crm
+    purpose: Read a guest profile
+    trigger: onLoad
   - operationId: listConsentPurposes
-    purpose: Which consents to present, with current notice versions
-    trigger: onLoad
     contract: marketing-crm
+    purpose: Configured consent purposes
+    trigger: onLoad
   navigation:
     entryFrom:
     - WEB-010
@@ -563,9 +636,9 @@ screens:
     focusOrder: First empty field, not the top of the form.
     announcements: Validation errors announced on blur, not on every keystroke.
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /cart-and-checkout/guest-details-and-attendee-forms
-    component: apps/web-b2c/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
+    component: apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
     status: notStarted
 - id: WEB-012
   name: Checkout — Payment
@@ -593,20 +666,21 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-012
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C04
   apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   - operationId: createOrder
-    purpose: Create the order before payment
-    trigger: onAction
     contract: orders
+    purpose: Create an order
+    trigger: onAction
   - operationId: createPayment
-    purpose: Capture payment
-    trigger: onAction
     contract: orders
-  - operationId: inquirePaymentStatus
-    purpose: Resolve an unknown terminal outcome
+    purpose: Take a payment against an order
     trigger: onAction
-    contract: orders
   navigation:
     entryFrom:
     - WEB-011
@@ -618,9 +692,9 @@ screens:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /cart-and-checkout/checkout-payment
-    component: apps/web-b2c/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
+    component: apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
     status: notStarted
 - id: WEB-013
   name: Order Confirmation
@@ -648,16 +722,21 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-013
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C03
   apis:
-  - operationId: getOrder
-    purpose: Confirmed order with entitlements
-    trigger: onLoad
+  - operationId: transferOrderTickets
     contract: orders
-  - operationId: reprintOrder
-    purpose: Resend to email, wallet or messaging
+    purpose: Transfer tickets to another guest
     trigger: onAction
+  - operationId: getOrder
     contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
   navigation:
     entryFrom:
     - WEB-012
@@ -665,14 +744,14 @@ screens:
     - WEB-001
     - WEB-018
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /cart-and-checkout/order-confirmation
-    component: apps/web-b2c/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
+    component: apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
     status: notStarted
 - id: WEB-014
   name: Payment Link Landing
   module: Cart & Checkout
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Take the money, and be unambiguous about whether it worked.
   wave: 2
   layout:
     template: detail
@@ -681,31 +760,39 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Resolving the payment link
+    empty: —
+    error: '**Link expired, already paid, or cancelled — each says which.** A guest following a link
+      from an email needs to know whether they are late or whether it worked'
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-014
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C04
   apis:
-  - operationId: createPayment
+  - operationId: getCart
     contract: orders
-    purpose: from page inventory
+    purpose: The cart, priced and checked, right now
     trigger: onLoad
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /cart-and-checkout/payment-link-landing
-    component: apps/web-b2c/src/routes/cart-and-checkout/PaymentLinkLandingDetail.tsx
+    component: apps/guest-web/src/routes/cart-and-checkout/PaymentLinkLandingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-015
   name: Virtual Waiting Room
   module: High-Demand Access
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting
+    room.
   wave: 2
   layout:
     template: detail
@@ -714,28 +801,32 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Position in the queue, updating
+    empty: —
+    error: '**Lost the queue position.** The worst failure on this screen: it re-queues rather than
+      silently admitting, and says so, because a guest who thinks they lost their place will open a
+      second tab and make it worse'
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-015
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   openQuestions:
   - CF-48 — Q2 Virtual Waiting Room. Edge infrastructure, not the Q1 queue contract. Build-or-buy decision
     outstanding with Dinesh and Qossai.
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /high-demand-access/virtual-waiting-room
-    component: apps/web-b2c/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx
+    component: apps/guest-web/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-016
   name: Login / Register
   module: Account & Self-Service
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Get a guest into the app, fast, on a device that may be shared.
   wave: 1
   layout:
     template: list
@@ -745,31 +836,117 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Checking the session
+    empty: —
+    error: Sign-in failed. Wrong password reads differently from an unavailable identity provider
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-016
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C36
   apis:
   - operationId: registerGuest
     contract: identity
     purpose: from page inventory
     trigger: onLoad
+  - operationId: completeSsoAuthorization
+    contract: identity
+    purpose: Exchange an SSO code for a session
+    trigger: onAction
+  - operationId: enrolMfaMethod
+    contract: identity
+    purpose: Enrol an MFA method
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: guestLogout
+    contract: identity
+    purpose: End a guest session
+    trigger: onAction
+  - operationId: guestSocialLogin
+    contract: identity
+    purpose: Sign in with Apple or Google
+    trigger: onAction
+  - operationId: guestUaePassLogin
+    contract: identity
+    purpose: Sign in with a national identity provider
+    trigger: onAction
+  - operationId: linkGuestCheckout
+    contract: identity
+    purpose: Attach a guest checkout to an account
+    trigger: onAction
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: login
+    contract: identity
+    purpose: Authenticate and open a session
+    trigger: onAction
+  - operationId: logout
+    contract: identity
+    purpose: Close the current session
+    trigger: onAction
+  - operationId: refreshToken
+    contract: identity
+    purpose: Rotate the access token
+    trigger: onAction
+  - operationId: removeMfaMethod
+    contract: identity
+    purpose: Remove an MFA method
+    trigger: onAction
+  - operationId: requestGuestOtp
+    contract: identity
+    purpose: Request a one-time code
+    trigger: onAction
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose a role for a multi-role session
+    trigger: onAction
+  - operationId: startSsoAuthorization
+    contract: identity
+    purpose: Begin an SSO flow
+    trigger: onLoad
+  - operationId: verifyGuestOtp
+    contract: identity
+    purpose: Verify a one-time code and issue a session
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Complete a step-up challenge
+    trigger: onAction
+  - operationId: verifyMfaEnrolment
+    contract: identity
+    purpose: Complete enrolment
+    trigger: onAction
+  - operationId: claimCart
+    contract: orders
+    purpose: Attach an anonymous cart to a guest
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /account-and-self-service/login-register
-    component: apps/web-b2c/src/routes/account-and-self-service/LoginRegisterList.tsx
+    component: apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-017
   name: My Account Dashboard
   module: Account & Self-Service
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
     template: dashboard
@@ -779,31 +956,57 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Tiles skeleton
+    empty: A new account with no orders — offers what to do next
+    error: Partial. Each tile fails independently
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-017
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C36
   apis:
-  - operationId: getGuestProfile
+  - operationId: addToWishlist
     contract: marketing-crm
-    purpose: from page inventory
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
     trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /account-and-self-service/my-account-dashboard
-    component: apps/web-b2c/src/routes/account-and-self-service/MyAccountDashboard.tsx
+    component: apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find my tickets for this venue.
   wave: 1
   layout:
     template: detail
@@ -812,23 +1015,25 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Tickets load
+    empty: No tickets — distinguishes never bought from all past
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-018
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C09
-  notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards.
+  notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
   apis:
-  - operationId: listOrders
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: from page inventory
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /account-and-self-service/my-tickets
-    component: apps/web-b2c/src/routes/account-and-self-service/MyTicketsDetail.tsx
+    component: apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -837,7 +1042,7 @@ screens:
 - id: WEB-019
   name: Order History
   module: Account & Self-Service
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find order history for this venue.
   wave: 1
   layout:
     template: list
@@ -847,35 +1052,33 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Orders, newest first
+    empty: No orders yet
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-019
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C34
   apis:
-  - operationId: listOrders
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: from page inventory
-    trigger: onLoad
-  - operationId: getOrderStatement
-    contract: orders
-    purpose: from page inventory
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /account-and-self-service/order-history
-    component: apps/web-b2c/src/routes/account-and-self-service/OrderHistoryList.tsx
+    component: apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-020
   name: Profile & Preferences
   module: Account & Self-Service
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Change how profile behaves here, and see which level the current value came from.
   wave: 1
   layout:
     template: detail
@@ -884,27 +1087,50 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Profile and consents
+    empty: —
+    error: '**Save failed and the form keeps what was typed.** A consent change that silently did not
+      save is a compliance failure, so the screen states it rather than showing success'
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-020
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C36
-  notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks.
+  notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement.
   apis:
-  - operationId: updateGuestProfile
-    contract: marketing-crm
-    purpose: from page inventory
-    trigger: onLoad
   - operationId: recordConsent
     contract: marketing-crm
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /account-and-self-service/profile-and-preferences
-    component: apps/web-b2c/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx
+    component: apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -913,7 +1139,7 @@ screens:
 - id: WEB-021
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See wallet & gift cards for this venue.
   wave: 2
   layout:
     template: detail
@@ -922,26 +1148,18 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Balance and gift cards
+    empty: No wallet — offers to top up
+    error: Balance unavailable. **Spending is blocked** rather than attempted against an unknown balance
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-021
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C21
-  apis:
-  - operationId: getWallet
-    contract: retail
-    purpose: from page inventory
-    trigger: onLoad
-  - operationId: getGiftCard
-    contract: retail
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /membership-loyalty-and-value/wallet-and-gift-cards
-    component: apps/web-b2c/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -949,10 +1167,11 @@ screens:
     exitTo:
     - WEB-023
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-022
   name: Membership Plans
   module: Membership, Loyalty & Value
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Membership Plans — the screen a person opens when they need to deal with membership plans.
   wave: 2
   layout:
     template: detail
@@ -961,17 +1180,18 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Plans load
+    empty: No memberships on sale at this venue
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-022
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C31
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /membership-loyalty-and-value/membership-plans
-    component: apps/web-b2c/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -979,10 +1199,11 @@ screens:
     exitTo:
     - WEB-023
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-023
   name: Membership Management
   module: Membership, Loyalty & Value
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Work with membership management for this venue.
   wave: 2
   layout:
     template: form
@@ -992,31 +1213,33 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Membership and its benefits
+    empty: —
+    error: Could not load. Cancellation and renewal are both blocked
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-023
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C31
   apis:
-  - operationId: modifyOrder
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: from page inventory
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /membership-loyalty-and-value/membership-management
-    component: apps/web-b2c/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-024
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See loyalty & rewards for this venue.
   wave: 3
   layout:
     template: detail
@@ -1025,22 +1248,47 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Points and rewards
+    empty: No points yet — explains how they accrue
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-024
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C93
   apis:
-  - operationId: getGuestLoyalty
+  - operationId: addToWishlist
     contract: marketing-crm
-    purpose: from page inventory
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
     trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /membership-loyalty-and-value/loyalty-and-rewards
-    component: apps/web-b2c/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1048,10 +1296,11 @@ screens:
     exitTo:
     - WEB-023
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-025
   name: Help Centre / FAQ
   module: Engagement & Support
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Answer a question without needing a person.
   wave: 1
   layout:
     template: detail
@@ -1060,23 +1309,25 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Articles load
+    empty: No articles — offers contact instead of an empty help centre
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-025
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C105
-  notes: Same content the AI concierge grounds on. One source, two surfaces.
+  notes: Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the
+    screen name and its operations on 17 August, not from a requirement.
   apis:
-  - operationId: listFaqs
+  - operationId: getTenantAppStatus
     contract: white-label
-    purpose: from page inventory
+    purpose: App status and recent changes
     trigger: onLoad
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /engagement-and-support/help-centre-faq
-    component: apps/web-b2c/src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
+    component: apps/guest-web/src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1087,7 +1338,7 @@ screens:
 - id: WEB-026
   name: Survey & Feedback
   module: Engagement & Support
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Work with survey & feedback for this venue.
   wave: 3
   layout:
     template: detail
@@ -1096,12 +1347,13 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Survey loads
+    empty: —
+    error: Could not submit. **The answers are kept** and retried
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-026
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C33
   apis:
   - operationId: submitReview
@@ -1109,9 +1361,9 @@ screens:
     purpose: from page inventory
     trigger: onLoad
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /engagement-and-support/survey-and-feedback
-    component: apps/web-b2c/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx
+    component: apps/guest-web/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1119,10 +1371,11 @@ screens:
     exitTo:
     - WEB-028
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-027
   name: Newsletter Subscription
   module: Engagement & Support
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Record newsletter subscription for this venue.
   wave: 2
   layout:
     template: detail
@@ -1131,22 +1384,48 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: —
+    empty: —
+    error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
+      the guest believes happened and did not is worse than a visible failure
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-027
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C59
   apis:
   - operationId: recordConsent
     contract: marketing-crm
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /engagement-and-support/newsletter-subscription
-    component: apps/web-b2c/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx
+    component: apps/guest-web/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1154,10 +1433,11 @@ screens:
     exitTo:
     - WEB-028
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-028
   name: Contact & Venue Information
   module: Engagement & Support
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find contact & venue information for this venue.
   wave: 1
   layout:
     template: form
@@ -1167,31 +1447,33 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Venue details
+    empty: —
+    error: Could not load. Falls back to the tenant contact details from the cached config
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-028
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C105
   apis:
-  - operationId: listContentPages
+  - operationId: getTenantAppStatus
     contract: white-label
-    purpose: from page inventory
+    purpose: App status and recent changes
     trigger: onLoad
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /engagement-and-support/contact-and-venue-information
-    component: apps/web-b2c/src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx
+    component: apps/guest-web/src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - WEB-001
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-029
   name: Error / Sold Out / Maintenance
   module: System States
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
     template: detail
@@ -1200,24 +1482,27 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: —
+    empty: —
+    error: '**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable
+      — three different things a guest must not confuse, because only one means come back later'
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-029
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C57
   notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's
-    failure, not ours.
+    failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from
+    a requirement.
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
     purpose: from page inventory
     trigger: onLoad
   implementation:
-    app: web-b2c
+    app: guest-web
     route: /system-states/error-sold-out-maintenance
-    component: apps/web-b2c/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx
+    component: apps/guest-web/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:

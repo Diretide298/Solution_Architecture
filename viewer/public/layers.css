@@ -1222,6 +1222,19 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
 .invite-role { color: var(--text-faint); font-size: 11px; }
 
 /* ── the standalone auth pages ─────────────────────────────────────── */
+/* ── the pages that are not the app shell ───────────────────────────── */
+/* styles.css puts `overflow: hidden` on html and body, which is right for the
+   viewer: it is a fixed shell whose panes scroll individually, and a document
+   that scrolled underneath them would be a second scrollbar with nothing in
+   it. Every standalone page loads the same stylesheet and inherited that, so
+   anything past the fold was simply unreachable — no scrollbar, no wheel, no
+   keyboard. The admin page ran out of room first, being the longest.
+
+   Body is already `height: 100%` from that rule, so giving it `overflow-y:
+   auto` makes it the scroll container. That leaves the sticky header sticky,
+   which a scrolling wrapper inside it would not. */
+.auth-page, .admin-page { height: 100%; overflow-y: auto; overflow-x: hidden; }
+
 .auth-page {
   display: grid; place-items: start center;
   min-height: 100vh; padding: 8vh 16px 40px;
@@ -1283,7 +1296,7 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
    Its own page rather than a panel in the viewer: managing people is a
    different job from reading contracts, and it wants room for a table. */
 
-.admin-page { background: var(--bg); min-height: 100vh; }
+.admin-page { background: var(--bg); }
 .admin-bar {
   display: flex; align-items: center; justify-content: space-between;
   gap: 14px; padding: 10px 18px;

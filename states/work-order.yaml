@@ -9,8 +9,9 @@ owner: maintenance
 initial:
 - open
 terminal:
-- verified
 - cancelled
+- closed
+- verified
 offlineReachable:
 - inProgress
 - paused
@@ -23,27 +24,27 @@ transitions:
   guard: Technician assigned
 - from: assigned
   to: inProgress
-  operation: updateWorkOrder
+  operation: startWorkOrder
   trigger: operation
   guard: Work started
 - from: inProgress
   to: paused
-  operation: updateWorkOrder
+  operation: pauseWorkOrder
   trigger: operation
   guard: Interrupted
 - from: paused
   to: inProgress
-  operation: updateWorkOrder
+  operation: resumeWorkOrder
   trigger: operation
   guard: Resumed
 - from: inProgress
   to: awaitingParts
-  operation: updateWorkOrder
+  operation: pauseWorkOrder
   trigger: operation
   guard: Blocked on a part. Distinct from paused — one is a person, the other is supply
 - from: awaitingParts
   to: inProgress
-  operation: updateWorkOrder
+  operation: resumeWorkOrder
   trigger: operation
   guard: Part received
 - from: inProgress
@@ -78,5 +79,42 @@ transitions:
   operation: cancelWorkOrder
   trigger: operation
   guard: No longer required
+- from: assigned
+  to: assigned
+  operation: acceptWorkOrder
+  trigger: operation
+  guard: '**The assignee takes the job.** Distinct from being assigned — the gap between the two is
+    where a job sits unread on a phone in a locker'
+- from: assigned
+  to: open
+  operation: rejectWorkOrder
+  trigger: operation
+  guard: Declined with a reason. **Returns to the pool rather than cancelling** — the job still needs
+    doing
+  isReversal: true
+- from: verified
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: Administratively closed. Distinct from completing or verifying
+  requiresApproval: true
+- from: completed
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: Closed without verification where the outcome makes verification moot
+  requiresApproval: true
+- from: open
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: '**Overtaken by events** — asset replaced, fault not reproducible, area closed. A work order
+    that can only end by being completed stays open forever when the answer is "never mind"'
+  requiresApproval: true
 notes: '`verified` is terminal and `completed` is not. A safety-critical asset returning to service
-  on the word of the person who worked on it is the failure this separation prevents.'
+  on the word of the person who worked on it is the failure this separation prevents.
+
+
+  **`updateWorkOrder` used to do six jobs.** Assign, start, pause, resume, block on parts and reopen
+  were all one PATCH, so the state model could not say which operation caused which move and neither
+  could an audit. Seven named operations replaced it on 17 August (CF-71).'

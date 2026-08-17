@@ -76,13 +76,13 @@ not stay in step.
 | SSO configuration | A tenant's directory is theirs |
 | Consent purposes and notices | **Consent is a controller-level legal act**, and the controller is the tenant. This is what makes cross-venue entitlements lawful (CF-31) |
 | Licensing and subscription | A commercial contract with the tenant |
-| Loyalty and membership schemes | A membership sold at one venue and honoured at another cannot have per-venue earning rules without the guest holding several balances |
+| Loyalty and membership schemes | A membership sold at one venue and honoured at another cannot have per-venue earning rules without the guest-app holding several balances |
 | Security policy — password, MFA, session, lockout | A venue that can lower its own MFA is a hole in the tenant's posture |
 | Notification templates and sender identity | Brand. **Which events fire is venue** — a venue with no F&B sends no order-ready messages |
 | Report definitions | So figures are comparable. **Scheduling and recipients are venue** |
 | Languages offered | Brand. Date format is regional |
 | B2B contracts, credit limits, net rates | Agreed with the tenant. **Allocation per venue** |
-| Guest profile and segments | One profile per guest per tenant |
+| Guest profile and segments | One profile per guest-app per tenant |
 | Suppliers and purchase approval | One commercial relationship |
 
 ### Venue — everything else
@@ -140,7 +140,7 @@ correctly: forty workstations configured individually is forty things that drift
 with a master profile; F&B and kitchen configuration belongs at venue.
 
 **Settled earlier and not reopened here:** currency and money to region (ADR-0008, and Allam's
-three-decimal confirmation), ledger and settlement to region, brand and guest app to tenant
+three-decimal confirmation), ledger and settlement to region, brand and guest-app app to tenant
 (ADR-0006), identity and consent and licensing to tenant.
 
 **Accepted by the client on 14 August:** all twenty categories in

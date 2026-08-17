@@ -16,7 +16,7 @@ definitions. Written to be picked up in Claude Design rather than to be admired 
 **Three visual languages exist and nobody has reconciled them.**
 
 That is not a criticism of any one of them — each is coherent, and the split between a light
-guest surface and a dark employee surface is a legitimate decision that many operators make
+guest-app surface and a dark venue-staff-app surface is a legitimate decision that many operators make
 deliberately. The problem is that no document says it *is* a decision, so three teams will
 implement three systems and the fourth surface will pick whichever it saw last.
 
@@ -25,7 +25,7 @@ implement three systems and the fourth surface will pick whichever it saw last.
 
 | | |
 |---|---|
-| **One token set, three themes** | Light guest · dark staff · light POS |
+| **One token set, three themes** | Light guest-app · dark staff · light POS |
 | Shared | Type scale, spacing, radii, component anatomy, status vocabulary |
 | Themed | Surface, ink, accent ramps only |
 
@@ -48,7 +48,7 @@ Matching it means a review meeting runs the way the client already runs one.
 
 ## What the references already settle
 
-**The employee bottom nav is Home · Tasks · Scan · AI · More**, with Scan as a raised centre
+**The venue-staff-app bottom nav is Home · Tasks · Scan · AI · More**, with Scan as a raised centre
 action. That is CF-41 in a picture: the AI tab is in the shell, and the shell cannot ship
 without deciding what sits behind it.
 
@@ -64,7 +64,7 @@ one-off, and it must toggle platform, theme and direction — RTL preview is not
 
 ## Board plan — 32 boards
 
-316 screens at ten to a board. **The order is by what unblocks build, not by platform number.**
+364 screens at ten to a board. **The order is by what unblocks build, not by platform number.**
 
 ### Exists as a reference — 11 boards
 
@@ -96,7 +96,7 @@ token set, which is a different and smaller job.
 | **Guest Kiosk** | ? | ? | **Not even inventoried.** White-label, guest-facing |
 | **Staff Scanner** | ? | ? | **Not inventoried, and Wave 1** |
 
-**The scanner is the one to worry about.** It is a Wave 1 surface with no inventory, no screen
+**The venue-scanner is the one to worry about.** It is a Wave 1 surface with no inventory, no screen
 definitions and no design, and it is the surface where offline behaviour matters most.
 
 ---
@@ -174,7 +174,7 @@ contradict all of them.
 
 | | Screen | Fields |
 |---|---|---|
-| BO-002 | Queue Configuration | Name · attraction · capacity per call · guest join toggle · redemption window |
+| BO-002 | Queue Configuration | Name · attraction · capacity per call · guest-app join toggle · redemption window |
 | BO-003 | Queue Integration Setup | Source · endpoint · credential ref · interval · enabled |
 | WEB-011 | Guest Details | Full name · email · mobile · consent |
 | POS-001 | Begin Shift | Denomination count · notes |
@@ -197,7 +197,7 @@ states are identical**, and `unknown` — a card charged with no response — is
 on all five.
 
 **Design once as a component with platform variants**, not five screens. The differences are
-real but narrow: POS adds cash tendering and change, partner adds charge-to-account, guest
+real but narrow: POS adds cash tendering and change, partner adds charge-to-account, guest-app
 surfaces add wallet. Everything else is the same, including the failure that matters.
 
 ### 2. Shift open and close — one counter, two directions
@@ -250,7 +250,7 @@ now.
 
 `WEB-011` · `ACC-002`
 
-Name, contact, consent. Accreditation adds documents and a photo, guest checkout adds attendee
+Name, contact, consent. Accreditation adds documents and a photo, guest-app checkout adds attendee
 repetition.
 
 **One field group with an extension slot.** Consent in particular must be the same component
@@ -263,8 +263,8 @@ against a superseded notice is the compliance failure.
 
 **`BO-004` Manual Wait Time Entry.** Above — operational, not configuration.
 
-**`POS-005` and the guest payment screens must stay separable at build time** even though they
-share a design. POS is offline-capable and the guest surfaces are not: cash completes locally
+**`POS-005` and the guest-app payment screens must stay separable at build time** even though they
+share a design. POS is offline-capable and the guest-app surfaces are not: cash completes locally
 and journals, card does not, because an offline card approval the acquirer never saw is a sale
 that vanishes at settlement. **One design, two offline contracts.**
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 20
+  x-ticvai-screen-count: 40
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales"
   x-ticvai-requirements: 343
@@ -112,18 +112,424 @@ tags:
   - name: sync
 
 paths:
+  /carts:
+    post:
+      operationId: createCart
+      summary: Start a cart
+      description: >
+        **A cart holds leases; an order holds money.** Different lifetimes, different failure
+        modes, and merging them is why this contract did not exist until 17 August — `createOrder`
+        takes a whole basket at once, which is correct for a till and cannot be resumed on
+        another device.
+
+        Created against a guest subject where one is known, or an anonymous token where it is
+        not. **The token is what lets a guest browse before signing in** and keep their cart when
+        they do (2.1.31).
+
+        **POS does not use this.** A till builds its sale locally and submits atomically, because
+        it works offline and does not need a resumable cart. Same order contract, different
+        channel.
+      tags: [cart]
+      x-ticvai-permission: null   # a guest session, or anonymous before one exists
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [venueId, channel]
+              properties:
+                venueId: { type: string, format: uuid }
+                channel: { $ref: '#/components/schemas/SalesChannel' }
+                subjectId: { type: string, format: uuid, nullable: true }
+                locale: { type: string }
+      responses:
+        '201':
+          description: Started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cart' }
+
+  /carts/{cartId}:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCart
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-014 Payment Link Landing"
+        - "P02 GST-032 AI Concierge – Chat"
+        - "P02 GST-041 Checkout Entry"
+        - "P02 GST-053 Build Your Own Itinerary"
+        - "P05 KSK-006 Review"
+        - "P10 PTR-010 Cart & Quote"
+      summary: The cart, priced and checked, right now
+      description: >
+        2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about the
+        future and the future moves. Availability, promotions and lease expiry are all live.
+
+        Returns the conflicts (2.9.5) and the leases with their remaining time, so the interface
+        can say *"your seats are held for 6 minutes"* rather than discovering it at checkout.
+      tags: [cart]
+      x-ticvai-permission: null   # the cart's own token or the guest who owns it
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: The cart
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cart' }
+        '410':
+          description: >
+            Expired. **Distinct from not found** — a guest returning to a link needs to know
+            their cart existed and lapsed, not that it never was.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+    delete:
+      operationId: abandonCart
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+      summary: Empty it deliberately
+      description: >
+        **Releases every lease immediately** rather than waiting for expiry. A guest who has
+        decided not to buy should not hold capacity for another twenty minutes.
+
+        Distinct from expiry: this is a decision, and the recovery campaign must not chase
+        someone who said no (22.3.6).
+      tags: [cart]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '204':
+          description: Abandoned and leases released
+
+  /carts/{cartId}/lines:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: addCartLine
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-032 AI Concierge – Chat"
+        - "P02 GST-048 Upsell / Cross-Sell"
+        - "P02 GST-050 Resource Booking – Cabana"
+        - "P02 GST-053 Build Your Own Itinerary"
+        - "P05 KSK-006 Review"
+        - "P10 PTR-010 Cart & Quote"
+      summary: Add something
+      description: >
+        2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A
+        capacity-bound product added to a cart reserves capacity for a configured window, and a
+        cart held in a browser cannot reserve anything.
+
+        **Refused rather than added where capacity has gone.** A line added optimistically and
+        removed at checkout is a guest who thinks they bought something.
+
+        Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:00 already
+        in the cart and karting at 13:00 being added is a prompt, not a refusal, because a party
+        of four may legitimately split.
+      tags: [cart]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AddCartLineRequest' }
+      responses:
+        '200':
+          description: Added, and the cart re-priced
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cart' }
+        '409':
+          description: >
+            No capacity, or the product is not sellable on this channel. **The reason is
+            specific** — sold out for this session reads differently from sold out for the day.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /carts/{cartId}/lines/{lineId}:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: lineId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateCartLine
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P10 PTR-010 Cart & Quote"
+      summary: Change a quantity
+      description: >
+        Increasing extends the lease and may fail on capacity; decreasing releases part of it.
+        **Releasing immediately matters** — a guest reducing from six to two should return four
+        seats to sale now, not in twenty minutes.
+      tags: [cart]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cart' }
+        '409':
+          description: Not enough capacity to increase
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+    delete:
+      operationId: removeCartLine
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P10 PTR-010 Cart & Quote"
+      summary: Take something out
+      description: Releases its lease immediately.
+      tags: [cart]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Removed, and the cart re-priced
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cart' }
+
+  /carts/{cartId}/extend:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: extendCart
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+      summary: Give the guest more time
+      description: >
+        Extends every lease in the cart. **Capped, and the cap is configuration** — an
+        indefinitely extendable hold is capacity permanently removed from sale by someone who
+        left the tab open.
+
+        Offered once, typically, and the interface should say it is the last extension rather
+        than letting a guest discover the cap by hitting it.
+      tags: [cart]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Extended
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cart' }
+        '409':
+          description: Extension cap reached, or a lease could not be extended because the capacity has gone
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /carts/{cartId}/claim:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: claimCart
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+      summary: Attach an anonymous cart to a guest
+      description: >
+        2.1.31. **The operation that makes cross-channel work.** A guest who built a cart
+        anonymously and then signs in keeps it; a guest who signs in on a laptop finds the cart
+        they started on their phone.
+
+        Where the guest already has a cart, the two **merge rather than one replacing the
+        other** — losing a cart at the moment of signing in is the worst possible time to lose
+        one. Lines that cannot be re-leased are reported rather than dropped silently.
+      tags: [cart]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Claimed, and merged where the guest already had one
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CartMergeResult' }
+
+  /carts/{cartId}/checkout:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: checkoutCart
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-014 Payment Link Landing"
+        - "P02 GST-032 AI Concierge – Chat"
+        - "P02 GST-041 Checkout Entry"
+        - "P05 KSK-006 Review"
+        - "P10 PTR-010 Cart & Quote"
+      summary: Turn the cart into an order
+      description: >
+        **Transfers the leases to the order rather than releasing and re-acquiring them.**
+        Releasing first would let another guest take the capacity between the two calls, which
+        is the failure that makes a checkout feel unreliable at exactly the wrong moment.
+
+        The cart is retained, not deleted — a checkout that fails at payment must be resumable,
+        and a guest whose card was declined should still have their seats.
+
+        **One cart, one order, one receipt** across ticketing, F&B and retail (14 August).
+      tags: [cart]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subjectId: { type: string, format: uuid }
+                attendees:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+      responses:
+        '201':
+          description: An order, pending payment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '409':
+          description: >
+            A lease expired between the last read and checkout. **Names which line**, so the
+            guest loses one thing rather than the cart.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /carts/abandoned:
+    get:
+      operationId: listAbandonedCarts
+      summary: Carts that lapsed without checking out
+      description: >
+        22.3.6 and 2.6.45. Feeds recovery campaigns.
+
+        **Excludes carts abandoned deliberately.** A guest who emptied their cart said no, and
+        chasing them is the difference between a reminder and a nuisance.
+      tags: [cart]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: since
+          in: query
+          schema: { type: string, format: date-time }
+        - name: minValue
+          in: query
+          description: Recovery is worth more on a large cart than a small one.
+          schema: { type: number }
+      responses:
+        '200':
+          description: Abandoned carts
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AbandonedCart' }
+
   /orders:
     get:
       operationId: listOrders
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-018 My Tickets"
-        - "P01 WEB-019 Order History"
-        - "P02 GST-019 Order History (Wallet)"
+        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
         - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-read-routing: replica
       summary: List orders
       tags: [order]
@@ -170,11 +576,26 @@ paths:
 
     post:
       operationId: createOrder
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
-        - "P02 GST-009 Review & Payment"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-004 Sell — Seat Map"
+        - "P04 POS-005 Payment"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Create an order
       description: >
         The client submits lines with the prices it quoted from its local bundle. **The
@@ -225,11 +646,24 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getOrder
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-013 Order Confirmation"
-        - "P02 GST-010 Booking Confirmation"
-        - "P05 KSK-009 Ticket issued"
-        - "P05 KSK-012 Booking found"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-read-routing: primary
       summary: Read an order
       tags: [order]
@@ -255,6 +689,21 @@ paths:
       operationId: holdOrder
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Park a sale and free the till
       description: >
         The guest has gone to fetch a wallet, or wants to add something after checking with
@@ -310,7 +759,22 @@ paths:
     post:
       operationId: resumeOrder
       x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Bring a parked sale back to a till
       description: >
         Any till, not only the one that parked it — the cashier who took it may be on a break.
@@ -347,6 +811,21 @@ paths:
       operationId: applyManualDiscount
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Apply a discount a cashier chose
       description: >
         Distinct from a promotion, which is a rule the platform evaluates. This is a person
@@ -393,6 +872,23 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: voidOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Void an order
       description: >
         Only before settlement and only within the same shift. After that it is a refund —
@@ -435,6 +931,23 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: listOrderRefunds
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-read-routing: replica
       summary: List refunds against an order
       tags: [refund]
@@ -453,6 +966,23 @@ paths:
 
     post:
       operationId: createRefund
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Refund an order, wholly or in part
       description: >
         **Not offline-capable.** A refund touches the gateway and the ledger; both need the
@@ -504,6 +1034,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: approveRefund
+      x-ticvai-consumed-by:
+        - "P08 BO-004 Manual Wait Time Entry"
       summary: Approve a refund held for approval
       tags: [refund]
       x-ticvai-permission: ORDER_REFUND_APPROVE
@@ -592,6 +1124,9 @@ paths:
   /refund-requests:
     post:
       operationId: createRefundRequest
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P08 BO-028 Refund Approval Queue"
       security:
         - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -603,7 +1138,8 @@ paths:
         **The order must belong to the authenticated subject.** A request against another
         guest's order is rejected with 403, not queued for someone to notice later.
       tags: [refund]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -649,7 +1185,10 @@ paths:
     get:
       operationId: getRefundPolicy
       x-ticvai-consumed-by:
+        - "P06 EMP-030 Venue map"
         - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-062 Venue Profile"
+        - "P08 BO-065 Venue Configuration"
       x-ticvai-read-routing: replica
       summary: Read a venue's refund policy
       description: >
@@ -669,6 +1208,11 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: setRefundPolicy
+      x-ticvai-consumed-by:
+        - "P06 EMP-030 Venue map"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-062 Venue Profile"
+        - "P08 BO-065 Venue Configuration"
       x-ticvai-config-scope: venue
       summary: Set a venue's refund policy
       tags: [policy]
@@ -694,12 +1238,13 @@ paths:
   /payments:
     post:
       operationId: createPayment
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
-        - "P01 WEB-014 Payment Link Landing"
-        - "P02 GST-033 AI Concierge – Contextual Help"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
-        - "P05 KSK-007 Payment"
+        - "P06 EMP-035 Payment on device"
+        - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
       summary: Take a payment against an order
       description: >
@@ -744,10 +1289,12 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: inquirePaymentStatus
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
         - "P04 POS-005 Payment"
-        - "P05 KSK-008 Payment unresolved"
+        - "P06 EMP-035 Payment on device"
+        - "P08 BO-024 Payment Exceptions"
+        - "P10 PTR-012 Checkout / Credit Purchase"
       summary: Ask the provider what actually happened
       description: >
         The recovery path (12 Aug §12). A terminal charged the card and the response never
@@ -784,6 +1331,9 @@ paths:
       operationId: addTip
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+        - "P06 EMP-035 Payment on device"
+        - "P08 BO-024 Payment Exceptions"
+        - "P10 PTR-012 Checkout / Credit Purchase"
       summary: Record a tip against a payment
       description: >
         A separate operation rather than a line on the order, because a tip is not revenue —
@@ -841,6 +1391,11 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: capturePayment
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+        - "P06 EMP-035 Payment on device"
+        - "P08 BO-024 Payment Exceptions"
+        - "P10 PTR-012 Checkout / Credit Purchase"
       summary: Capture a previously authorised payment
       tags: [payment]
       x-ticvai-permission: ORDER_CREATE
@@ -898,6 +1453,9 @@ paths:
   /sync/orders:
     post:
       operationId: syncOrders
+      x-ticvai-consumed-by:
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P07 SCN-014 Sync & reconciliation"
       summary: Replay orders recorded offline
       description: >
         Ordered batch, processed in `sequence` order, stopping at the first entry that
@@ -935,6 +1493,7 @@ paths:
     get:
       operationId: listSyncRejections
       x-ticvai-consumed-by:
+        - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-014 Sync & reconciliation"
       x-ticvai-read-routing: replica
       summary: Entries the server refused
@@ -975,7 +1534,22 @@ paths:
     post:
       operationId: modifyOrder
       x-ticvai-consumed-by:
-        - "P01 WEB-023 Membership Management"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Add or remove lines on an existing order
       description: >
         Adding a line charges the difference; removing one refunds it under the venue's refund
@@ -1019,6 +1593,9 @@ paths:
       operationId: getMediaEntitlements
       x-ticvai-consumed-by:
         - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       summary: What is already on this media
       description: >
         Scanned at a counter before adding something. Shows what the guest holds so a cashier
@@ -1041,6 +1618,9 @@ paths:
       operationId: appendEntitlementToMedia
       x-ticvai-consumed-by:
         - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       summary: Add something to a ticket the guest already holds
       description: >
         A guest arrives, buys admission, and an hour later wants a locker. They scan the QR
@@ -1098,6 +1678,23 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: exchangeOrderLines
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Exchange lines for different products or dates
       description: >
         A date change, a tier upgrade, a different performance. **Settles only the
@@ -1138,6 +1735,23 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: rescheduleOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       summary: Move an order to another performance
       description: >
         The common case of an exchange, and worth its own operation because it is what a call
@@ -1188,9 +1802,23 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: reprintOrder
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-013 Order Confirmation"
-        - "P05 KSK-010 Print failure"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
       summary: Reprint or resend tickets
       description: >
@@ -1243,6 +1871,24 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: transferOrderTickets
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P01 WEB-013 Order Confirmation"
+        - "P01 WEB-018 My Tickets"
+        - "P01 WEB-019 Order History"
+        - "P01 WEB-023 Membership Management"
+        - "P02 GST-008 Tickets & Add-ons"
+        - "P02 GST-009 Review & Payment"
+        - "P02 GST-010 Booking Confirmation"
+        - "P02 GST-012 My Tickets"
+        - "P02 GST-013 Ticket Details"
+        - "P02 GST-014 Ticket Transfer"
+        - "P02 GST-019 Order History (Wallet)"
+        - "P02 GST-045 Ticket Delivery & Sharing"
+        - "P02 GST-055 Dynamic QR Ticket"
+        - "P05 KSK-009 Ticket issued"
+        - "P05 KSK-010 Print failure"
+        - "P05 KSK-012 Booking found"
       summary: Transfer tickets to another guest
       description: >
         Per-ticket, not whole-order — a family splitting tickets between two phones is the
@@ -1252,7 +1898,8 @@ paths:
         transfer to a mistyped address expires rather than stranding the ticket somewhere
         nobody can reach.
       tags: [order]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1304,9 +1951,12 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: claimTicketTransfer
+      x-ticvai-consumed-by:
+        - "P02 GST-014 Ticket Transfer"
       summary: Claim transferred tickets
       tags: [order]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1345,8 +1995,22 @@ paths:
     get:
       operationId: getOrderStatement
       x-ticvai-consumed-by:
-        - "P01 WEB-019 Order History"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-014 Ticket lookup"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-051 Purchase Orders"
+        - "P08 BO-070 Work Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-005 Inventory & Allocation View"
+        - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-read-routing: primary
       summary: Full financial history of an order
       description: >
@@ -1368,8 +2032,6 @@ paths:
   /reservations:
     get:
       operationId: listReservations
-      x-ticvai-consumed-by:
-        - "P02 GST-016 My Reservations"
       x-ticvai-read-routing: replica
       summary: List reservations
       tags: [reservation]
@@ -1437,8 +2099,6 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getReservation
-      x-ticvai-consumed-by:
-        - "P02 GST-017 Reservation Details"
       x-ticvai-read-routing: primary
       summary: Read a reservation
       tags: [reservation]
@@ -1534,6 +2194,10 @@ paths:
 
     put:
       operationId: setB2bCreditLimit
+      x-ticvai-consumed-by:
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-013 Credit Limit & Balance"
       summary: Set a partner credit limit
       description: >
         Reducing a limit below the amount already used is permitted — it stops further
@@ -1573,6 +2237,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: overrideCreditLimit
+      x-ticvai-consumed-by:
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-013 Credit Limit & Balance"
       summary: Authorise an order beyond the credit limit
       description: >
         Supervisor override for a single order (2.7.39). Records the authorising principal,
@@ -1770,6 +2438,48 @@ components:
               reason: { type: string }
               expiresAt: { type: string, format: date-time, nullable: true }
 
+    EntitlementStatus:
+      type: string
+      description: >
+        **What the storage layer holds, and what a guest is shown.** `MediaEntitlements` carried
+        only `isValid` and a reason string — a boolean cannot distinguish a ticket that was used
+        from one that expired, was refunded, or was transferred to somebody else, and those are
+        four different conversations at a gate.
+
+        Added 17 August. `states/entitlement.yaml` had modelled these six since 14 August and
+        the contract had no enum behind it, which the state checker reported correctly for three
+        days.
+      enum:
+        - issued
+        - partiallyConsumed
+        - fullyConsumed
+        - expired
+        - cancelled
+        - surrendered
+
+    EntitlementSummary:
+      type: object
+      x-ticvai-persistence: "catalogue.entitlement_template"
+      description: >
+        One entitlement on a piece of media, as a guest or a steward sees it.
+      required: [entitlementId, status]
+      properties:
+        entitlementId: { type: string, format: uuid }
+        productName: { type: string }
+        status: { $ref: '#/components/schemas/EntitlementStatus' }
+        entriesAllowed: { type: integer, nullable: true }
+        entriesUsed: { type: integer }
+        lastUsedAt: { type: string, format: date-time, nullable: true }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+        transferredToSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Set where `surrendered`. **A guest whose ticket is gone should be told who has it**,
+            not shown an invalid pass with no explanation.
+
     MediaEntitlements:
       type: object
       x-ticvai-persistence: "none — projection over entitlement and scan history"
@@ -1799,8 +2509,21 @@ components:
                 enum: [admission, locker, fnb, retail, parking, rental, experience, membership]
               orderId: { type: string }
               addedAt: { type: string, format: date-time }
-              isRedeemed: { type: boolean }
+              status:
+                allOf:
+                  - $ref: '#/components/schemas/EntitlementStatus'
+                description: >
+                  **Replaced `isRedeemed` on 17 August.** A boolean could not distinguish a
+                  ticket that was used from one that expired, was refunded, or was transferred —
+                  four different conversations at a gate, and the steward could see only "not
+                  valid".
+              entriesUsed: { type: integer }
+              entriesAllowed: { type: integer, nullable: true }
               redeemedAt: { type: string, format: date-time, nullable: true }
+              transferredToSubjectId:
+                type: string
+                format: uuid
+                nullable: true
               validTo: { type: string, format: date-time, nullable: true }
 
     AppendEntitlementRequest:
@@ -2025,6 +2748,171 @@ components:
               type: array
               items: { type: string }
               description: Redemption rights propagated to other cells for this line.
+
+    CartStatus:
+      type: string
+      enum: [active, expiring, expired, abandoned, checkedOut]
+
+    CartLine:
+      type: object
+      x-ticvai-persistence: "orders.cart_line"
+      required: [id, variantId, quantity]
+      properties:
+        id: { type: string, format: uuid }
+        variantId: { type: string, format: uuid }
+        productName: { type: string, readOnly: true }
+        quantity: { type: integer, minimum: 1 }
+        performanceId: { type: string, format: uuid, nullable: true }
+        seatIds:
+          type: array
+          items: { type: string, format: uuid }
+        unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        leaseId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The capacity held for this line. **Null for a product with no capacity** — a
+            t-shirt needs stock, not a lease.
+        leaseExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            Shown to the guest. *"Your seats are held for 6 minutes"* is better than discovering
+            it at checkout.
+        isAvailable:
+          type: boolean
+          readOnly: true
+          description: >
+            Re-checked on every read. **A line can become unavailable while the cart sits** —
+            a lease expiring is not the same as the product selling out, and both land here.
+
+    CartConflict:
+      type: object
+      x-ticvai-persistence: "none — computed on read"
+      description: >
+        2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a
+        refusal** — a party of four may legitimately split, and refusing would be wrong more
+        often than right.
+      properties:
+        kind: { type: string, enum: [overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite] }
+        lineIds:
+          type: array
+          items: { type: string, format: uuid }
+        message: { type: string }
+        isBlocking:
+          type: boolean
+          description: >
+            Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to
+            cannot be sold.
+
+    Cart:
+      type: object
+      x-ticvai-persistence: "orders.cart"
+      required: [id, venueId, channel, status, lines]
+      properties:
+        id: { type: string, format: uuid }
+        token:
+          type: string
+          readOnly: true
+          description: >
+            **How an anonymous guest returns to their cart**, including from a recovery email.
+            Rotated on claim, so a link shared before signing in does not reach the account
+            after.
+        venueId: { type: string, format: uuid }
+        channel: { $ref: '#/components/schemas/SalesChannel' }
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null while anonymous. Set by `claimCart`.
+        status: { $ref: '#/components/schemas/CartStatus' }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/CartLine' }
+        conflicts:
+          type: array
+          items: { $ref: '#/components/schemas/CartConflict' }
+        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        discountTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        appliedPromotionIds:
+          type: array
+          description: >
+            **Re-evaluated on every read.** A promotion that expired while the cart sat must not
+            still be applied at checkout, and a promotion that became applicable should be.
+          items: { type: string, format: uuid }
+        expiresAt:
+          type: string
+          format: date-time
+          description: The earliest lease expiry in the cart, or the cart's own window where it holds none.
+        extensionsUsed: { type: integer, readOnly: true }
+        maxExtensions: { type: integer, readOnly: true }
+        locale: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    AddCartLineRequest:
+      type: object
+      x-ticvai-persistence: "none — request only"
+      required: [variantId, quantity]
+      properties:
+        variantId: { type: string, format: uuid }
+        quantity: { type: integer, minimum: 1 }
+        performanceId: { type: string, format: uuid }
+        seatIds:
+          type: array
+          items: { type: string, format: uuid }
+        parentLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            For an add-on attaching to a ticket already in the cart. **Removing the parent
+            removes the child** — a locker with no admission is not a sale.
+        attributes:
+          type: object
+          additionalProperties: true
+
+    CartMergeResult:
+      type: object
+      x-ticvai-persistence: "none — computed"
+      required: [cart]
+      properties:
+        cart: { $ref: '#/components/schemas/Cart' }
+        mergedLineCount: { type: integer }
+        droppedLines:
+          type: array
+          description: >
+            **Reported, never silent.** Lines that could not be re-leased on merge are named, so
+            a guest signing in is told what they lost rather than discovering it at checkout.
+          items:
+            type: object
+            properties:
+              productName: { type: string }
+              reason: { type: string, enum: [noCapacity, expired, notSellableOnChannel, duplicate] }
+
+    AbandonedCart:
+      type: object
+      x-ticvai-persistence: "none — a projection of orders.cart"
+      properties:
+        cartId: { type: string, format: uuid }
+        token: { type: string }
+        subjectId: { type: string, format: uuid, nullable: true }
+        hasContactPoint:
+          type: boolean
+          description: >
+            **An anonymous cart with no email cannot be recovered.** Worth counting, because it
+            sizes what a sign-in prompt earlier in the journey would be worth.
+        venueId: { type: string, format: uuid }
+        lineCount: { type: integer }
+        value: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        topProductName: { type: string }
+        abandonedAt: { type: string, format: date-time }
+        remindersSent: { type: integer }
 
     Order:
       x-ticvai-persistence: "orders.sales_order + orders.order_line"

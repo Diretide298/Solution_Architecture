@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Finance & Ledger
   version: 0.1.0
-  x-ticvai-screen-count: 2
+  x-ticvai-screen-count: 45
   x-ticvai-tier: spine
   x-ticvai-module: "5 — F&B & Guest Management (accounting and revenue recognition)"
   x-ticvai-requirements: 327
@@ -115,6 +115,8 @@ paths:
   /accounts:
     get:
       operationId: listAccounts
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       x-ticvai-read-routing: replica
       summary: List the chart of accounts
       tags: [accounts]
@@ -152,6 +154,8 @@ paths:
 
     post:
       operationId: createAccount
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       summary: Create an account
       description: >
         Accounts may be created natively or mapped to a chart maintained externally in the
@@ -190,6 +194,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getAccount
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       x-ticvai-read-routing: replica
       summary: Read an account
       tags: [accounts]
@@ -206,6 +212,8 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
       operationId: updateAccount
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       summary: Rename, remap or deactivate an account
       description: >
         The code is immutable once entries exist. Deactivation prevents new postings and
@@ -241,6 +249,8 @@ paths:
   /account-mappings:
     get:
       operationId: listAccountMappings
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
       x-ticvai-read-routing: replica
       summary: Which account each transaction type posts to
       description: >
@@ -261,6 +271,8 @@ paths:
                 items: { $ref: '#/components/schemas/AccountMapping' }
     put:
       operationId: setAccountMappings
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
       x-ticvai-config-scope: region
       summary: Set posting mappings
       tags: [accounts]
@@ -298,6 +310,8 @@ paths:
   /cost-centers:
     get:
       operationId: listCostCenters
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       x-ticvai-read-routing: replica
       summary: List cost centres
       tags: [accounts]
@@ -323,6 +337,8 @@ paths:
                         items: { $ref: '#/components/schemas/CostCenter' }
     post:
       operationId: createCostCenter
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       summary: Create a cost centre
       tags: [accounts]
       x-ticvai-permission: ACCOUNT_CONFIGURE
@@ -354,6 +370,8 @@ paths:
   /tax-codes:
     get:
       operationId: listTaxCodes
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
       x-ticvai-read-routing: replica
       summary: List tax codes
       tags: [tax]
@@ -382,6 +400,8 @@ paths:
                         items: { $ref: '#/components/schemas/TaxCode' }
     post:
       operationId: createTaxCode
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
       summary: Create a tax code
       description: >
         Supports compound tax — a code may apply on top of another code's result rather than
@@ -419,6 +439,8 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateTaxCode
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
       summary: Amend a tax code
       description: >
         Rate changes are versioned with an effective date, never applied retrospectively.
@@ -450,6 +472,8 @@ paths:
   /tax-exemptions:
     get:
       operationId: listTaxExemptions
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
       x-ticvai-read-routing: replica
       summary: List tax exemptions
       description: Exemption by account, product class or channel — diplomatic, export, B2B.
@@ -468,6 +492,8 @@ paths:
                 items: { $ref: '#/components/schemas/TaxExemption' }
     post:
       operationId: createTaxExemption
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
       summary: Grant a tax exemption
       tags: [tax]
       x-ticvai-permission: TAX_CONFIGURE
@@ -521,6 +547,8 @@ paths:
   /recognition-schedules:
     get:
       operationId: listRecognitionSchedules
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       x-ticvai-read-routing: replica
       summary: List revenue recognition schedules
       tags: [recognition]
@@ -546,6 +574,8 @@ paths:
                         items: { $ref: '#/components/schemas/RecognitionSchedule' }
     post:
       operationId: createRecognitionSchedule
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       summary: Define how a product class recognises revenue
       tags: [recognition]
       x-ticvai-permission: ACCOUNT_CONFIGURE
@@ -569,6 +599,8 @@ paths:
   /deferred-revenue:
     get:
       operationId: getDeferredRevenue
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       x-ticvai-read-routing: analytical
       summary: Deferred revenue balance and ageing
       description: >
@@ -597,6 +629,8 @@ paths:
   /recognition/run:
     post:
       operationId: runRecognition
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       summary: Recognise earned revenue for a period
       description: >
         Moves earned amounts from deferred revenue to recognised revenue: redemptions since
@@ -641,6 +675,8 @@ paths:
   /journal-entries:
     get:
       operationId: listJournalEntries
+      x-ticvai-consumed-by:
+        - "P08 BO-089 Journal Entries"
       x-ticvai-read-routing: replica
       summary: List journal entries
       tags: [journal]
@@ -676,6 +712,8 @@ paths:
 
     post:
       operationId: createJournalEntry
+      x-ticvai-consumed-by:
+        - "P08 BO-089 Journal Entries"
       summary: Post a manual journal voucher
       description: >
         Created in `draft`. A finance user posts it; a finance manager or director approves
@@ -721,6 +759,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getJournalEntry
+      x-ticvai-consumed-by:
+        - "P08 BO-089 Journal Entries"
       x-ticvai-read-routing: replica
       summary: Read a journal entry
       tags: [journal]
@@ -744,6 +784,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: approveJournalEntry
+      x-ticvai-consumed-by:
+        - "P08 BO-089 Journal Entries"
       summary: Approve a journal entry and post it
       description: >
         The approver may not be the poster. Segregation of duties is enforced here, not
@@ -783,6 +825,8 @@ paths:
         schema: { type: string }
     post:
       operationId: rejectJournal
+      x-ticvai-consumed-by:
+        - "P08 BO-089 Journal Entries"
       summary: Reject a journal awaiting approval
       description: >
         Returns it to draft with comments. Approval existed and rejection did not, which left a preparer whose entry could be approved and never refused.
@@ -819,6 +863,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: reverseJournalEntry
+      x-ticvai-consumed-by:
+        - "P08 BO-089 Journal Entries"
       summary: Reverse a posted entry
       description: >
         Creates a mirror-image entry referencing the original. **The original is never
@@ -860,6 +906,8 @@ paths:
   /fx-rates:
     get:
       operationId: listFxRates
+      x-ticvai-consumed-by:
+        - "P08 BO-077 FX Rates & Variances"
       summary: The rates in force
       description: >
         **Policy, settled 14 August: every transaction is stored in the base currency of the
@@ -900,6 +948,8 @@ paths:
 
     put:
       operationId: setFxRate
+      x-ticvai-consumed-by:
+        - "P08 BO-077 FX Rates & Variances"
       x-ticvai-config-scope: region
       summary: Set a rate
       description: >
@@ -940,6 +990,8 @@ paths:
   /fx/foreign-tender:
     get:
       operationId: getForeignTenderReport
+      x-ticvai-consumed-by:
+        - "P08 BO-008 Product Detail & Variants"
       summary: What was taken in which currency
       description: >
         Per cashier, per shift, per currency: the foreign amount taken, the rate applied, and
@@ -1031,6 +1083,8 @@ paths:
   /fx/revaluation:
     post:
       operationId: runFxRevaluation
+      x-ticvai-consumed-by:
+        - "P08 BO-008 Product Detail & Variants"
       summary: Revalue monetary balances at close
       description: >
         Restates open inter-entity obligations and any foreign-denominated balance at the
@@ -1070,6 +1124,8 @@ paths:
   /ledger/entries:
     get:
       operationId: listLedgerEntries
+      x-ticvai-consumed-by:
+        - "P08 BO-043 Daily Reconciliation"
       x-ticvai-read-routing: analytical
       summary: Query the ledger
       tags: [ledger]
@@ -1119,6 +1175,9 @@ paths:
   /ledger/trial-balance:
     get:
       operationId: getTrialBalance
+      x-ticvai-consumed-by:
+        - "P08 BO-043 Daily Reconciliation"
+        - "P08 BO-090 Period Close"
       x-ticvai-read-routing: analytical
       summary: Trial balance for a period
       tags: [ledger]
@@ -1145,6 +1204,8 @@ paths:
   /price-variances:
     get:
       operationId: listPriceVariances
+      x-ticvai-consumed-by:
+        - "P08 BO-077 FX Rates & Variances"
       x-ticvai-read-routing: replica
       summary: List price variances
       description: >
@@ -1199,6 +1260,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: reviewPriceVariance
+      x-ticvai-consumed-by:
+        - "P08 BO-077 FX Rates & Variances"
       summary: Record a review decision on an exception variance
       tags: [variance]
       x-ticvai-permission: LEDGER_APPROVE
@@ -1231,6 +1294,8 @@ paths:
     get:
       operationId: listSettlements
       x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-read-routing: analytical
       summary: List settlement batches
@@ -1264,6 +1329,10 @@ paths:
 
     post:
       operationId: ingestSettlementFile
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P08 BO-043 Daily Reconciliation"
+        - "P10 PTR-014 Settlement & Payment History"
       summary: Ingest a provider settlement file
       description: >
         Step one of five: ingest, parse, match, classify, auto-resolve. Monthly and
@@ -1307,6 +1376,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getSettlement
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P08 BO-043 Daily Reconciliation"
+        - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-read-routing: analytical
       summary: Settlement detail with match results
       tags: [settlement]
@@ -1330,6 +1403,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listSettlementExceptions
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P08 BO-043 Daily Reconciliation"
+        - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-read-routing: analytical
       summary: Unmatched or mismatched settlement lines
       description: >
@@ -1359,6 +1436,10 @@ paths:
 
     post:
       operationId: resolveSettlementException
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P08 BO-043 Daily Reconciliation"
+        - "P10 PTR-014 Settlement & Payment History"
       summary: Resolve a settlement exception
       tags: [settlement]
       x-ticvai-permission: SETTLEMENT_RECONCILE
@@ -1392,6 +1473,8 @@ paths:
   /legal-entities:
     get:
       operationId: listLegalEntities
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       x-ticvai-read-routing: replica
       summary: List legal entities
       description: >
@@ -1412,6 +1495,8 @@ paths:
                 items: { $ref: '#/components/schemas/LegalEntity' }
     post:
       operationId: createLegalEntity
+      x-ticvai-consumed-by:
+        - "P08 BO-074 Chart of Accounts"
       summary: Create a legal entity
       tags: [fiscal]
       x-ticvai-permission: ACCOUNT_CONFIGURE
@@ -1435,6 +1520,8 @@ paths:
   /fiscal-periods:
     get:
       operationId: listFiscalPeriods
+      x-ticvai-consumed-by:
+        - "P08 BO-090 Period Close"
       x-ticvai-read-routing: replica
       summary: List fiscal periods
       tags: [fiscal]
@@ -1466,6 +1553,8 @@ paths:
         schema: { type: string }
     post:
       operationId: beginPeriodClose
+      x-ticvai-consumed-by:
+        - "P08 BO-090 Period Close"
       summary: Begin closing a period
       description: >
         **Postings to the period stop here**, before reconciliation starts. Without this step the balance moves while it is being counted, and the two never agree.
@@ -1493,6 +1582,8 @@ paths:
         schema: { type: string }
     post:
       operationId: abandonPeriodClose
+      x-ticvai-consumed-by:
+        - "P08 BO-090 Period Close"
       summary: Abandon a close in progress
       description: >
         An exception was found that needs the period open again. Postings resume.
@@ -1529,6 +1620,8 @@ paths:
         schema: { type: string }
     post:
       operationId: reopenPeriod
+      x-ticvai-consumed-by:
+        - "P08 BO-090 Period Close"
       summary: Reopen a closed period
       description: >
         **Rare and heavily controlled.** Reopening restates figures somebody has already reported, so it requires an approver who is not the requester and records why.
@@ -1566,6 +1659,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: closeFiscalPeriod
+      x-ticvai-consumed-by:
+        - "P08 BO-090 Period Close"
       summary: Close a period and lock postings
       description: >
         Runs the close checks and, if they pass, locks the period. Nothing may post to a
@@ -1609,6 +1704,15 @@ paths:
   /reports/financial:
     get:
       operationId: getFinancialReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
       x-ticvai-read-routing: analytical
       summary: P&L, balance sheet or cash flow
       description: >

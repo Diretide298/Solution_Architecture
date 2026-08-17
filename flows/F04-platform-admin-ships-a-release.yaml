@@ -47,11 +47,13 @@ branches:
   severity: requiresStaff
   behaviour: Named in the plan, not merely counted. A one-way door should be identified before it is
     walked through — promotion may still proceed, but knowingly.
+  resolvedBy: Duty manager
 - at: 2
   condition: The plan predicts a long lock on a partitioned table
   severity: recoverable
   behaviour: Surfaced as a warning with the affected cells. This is the output the plan step exists
     to produce.
+  resolvedBy: Automatic
 - at: 3
   condition: The plan has gone stale
   severity: recoverable

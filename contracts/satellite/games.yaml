@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Games & Redemption
   version: 0.1.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 7
   x-ticvai-tier: satellite
   x-ticvai-module: "9 — Games & F&B Integration"
   x-ticvai-requirements: 25
@@ -85,6 +85,8 @@ paths:
   /game-cards:
     post:
       operationId: issueGameCard
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
       summary: Issue or activate a game card
       description: >
         Physical cards are pre-printed and activated at sale; digital cards live in the guest
@@ -121,13 +123,16 @@ paths:
         schema: { type: string }
     get:
       operationId: getGameCard
+      x-ticvai-consumed-by:
+        - "P02 GST-026 Retail / Merchandise"
       x-ticvai-read-routing: primary
       summary: Read a card's balances
       description: >
         The reader path. Offline-capable so a machine can validate a card during a network
         blip — the balance may be stale, which is why spend is reconciled on sync.
       tags: [card]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -151,6 +156,8 @@ paths:
         schema: { type: string }
     post:
       operationId: loadGameCredits
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
       summary: Load credits onto a card
       description: >
         Creates a liability, not revenue. Recognition happens as credits are played, or as
@@ -234,6 +241,8 @@ paths:
   /games:
     get:
       operationId: listGames
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
       x-ticvai-read-routing: replica
       summary: List games
       tags: [game]
@@ -290,6 +299,8 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateGame
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
       summary: Amend a game
       description: >
         Changing credit cost or payout mid-session is refused where plays are in flight — a
@@ -323,6 +334,8 @@ paths:
   /game-plays:
     post:
       operationId: recordGamePlay
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
       summary: Record a play
       description: >
         Posted by the machine's card reader. Deducts credits and awards points in one
@@ -333,7 +346,8 @@ paths:
         deduplicated on the play ID; a play against an exhausted balance is reported for
         reconciliation rather than silently accepted.
       tags: [play]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -364,13 +378,16 @@ paths:
   /game-plays/sync:
     post:
       operationId: syncGamePlays
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
       summary: Replay plays recorded offline
       description: >
         Ordered batch per reader, idempotent on the play ID. Plays that would overdraw a card
         are reported as divergences rather than rejected outright — the guest already played,
         and the record should say so.
       tags: [play]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append

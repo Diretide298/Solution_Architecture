@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Cross-Cell
   version: 0.1.0
-  x-ticvai-screen-count: 1
+  x-ticvai-screen-count: 5
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — multi-region"
   x-ticvai-capabilities: [C56, C37]
@@ -173,6 +173,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getGuestLink
+      x-ticvai-consumed-by:
+        - "P02 GST-015 Memberships"
       x-ticvai-read-routing: replica
       security:
         - serviceAuth: []
@@ -281,6 +283,8 @@ paths:
   /redemption-rights:
     post:
       operationId: propagateRedemptionRight
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       security:
         - serviceAuth: []
       x-ticvai-auth: service
@@ -326,6 +330,7 @@ paths:
       operationId: getRedemptionRight
       x-ticvai-consumed-by:
         - "P07 SCN-011 Delegated right"
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-read-routing: replica
       summary: Read a redemption right
       tags: [redemption]
@@ -371,6 +376,9 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: consumeRedemptionRight
+      x-ticvai-consumed-by:
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-011 Delegated right"
       summary: Consume entries against a right, locally authoritative
       description: >
         Called by the consuming cell when a gate admits. **Authoritative locally** — it does
@@ -414,6 +422,8 @@ paths:
   /redemption-rights/reconcile:
     post:
       operationId: reconcileRedemptions
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       security:
         - serviceAuth: []
       x-ticvai-auth: service

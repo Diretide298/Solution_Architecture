@@ -1,5 +1,8 @@
 # Platforms and deployment
 
+> Naming and ownership are in [`platforms-and-apps.md`](platforms-and-apps.md). This page is
+> where each runs and how it ships.
+
 **Twelve platforms. Six frontend apps. Four apps do not exist.**
 
 Named so the thing says what it *is* before what it is *for* — audience and form factor
@@ -8,18 +11,18 @@ you say in a standup; the full name is what you put in a document.
 
 | | Short | Purpose | Audience | Form factor | App | Scaffolded |
 |---|---|---|---|---|---|---|
-| P01 | **Guest Web** | Storefront | guest | web | `web-b2c` | yes |
-| P02 | **Guest App** | Mobile | guest | mobileApp | `guest` | yes |
-| P03 | **Guest Kiosk** | Self-Service | guest | kiosk | `guest` | yes |
-| P04 | **Staff POS** | Terminal and Tablet | staff | posTerminal | `pos` | yes |
-| P06 | **Staff App** | Operations | staff | mobileApp | `employee` | yes |
-| P07 | **Staff Scanner** | Access Control | staff | handheld | `scanner` | yes |
-| P08 | **Staff Web** | Venue Back Office | staff | web | `backoffice` | yes |
-| P09 | **Admin Web** | Platform Console | platformAdmin | web | `platform-admin` | **no** |
-| P10 | **Partner Web** | Reseller Portal | partner | web | `partner-portal` | **no** |
-| P11 | **Public Web** | Accreditation | public | web | `accreditation` | **no** |
-| P12 | **Staff Web** | Support Console | staff | web | `support-console` | **no** |
-| P13 | **Staff Web** | White-Label CMS | staff | web | `backoffice` | yes |
+| P01 | **Guest Web** | Storefront | guest-app | web | `guest-web` | yes |
+| P02 | **Guest App** | Mobile | guest-app | mobileApp | `guest-app` | yes |
+| P03 | **Guest Kiosk** | Self-Service | guest-app | kiosk | `guest-app` | yes |
+| P04 | **Staff POS** | Terminal and Tablet | staff | posTerminal | `venue-pos` | yes |
+| P06 | **Staff App** | Operations | staff | mobileApp | `venue-staff-app` | yes |
+| P07 | **Staff Scanner** | Access Control | staff | handheld | `venue-scanner` | yes |
+| P08 | **Staff Web** | Venue Back Office | staff | web | `venue-management-web` | yes |
+| P09 | **Admin Web** | Platform Console | platformAdmin | web | `ticvai-web` | **no** |
+| P10 | **Partner Web** | Reseller Portal | partner | web | `partner-web` | **no** |
+| P11 | **Public Web** | Accreditation | public | web | `accreditation-web` | **no** |
+| P12 | **Staff Web** | Support Console | staff | web | `venue-support-web` | **no** |
+| P13 | **Staff Web** | White-Label CMS | staff | web | `venue-management-web` | yes |
 
 ## Where it runs and how it ships
 
@@ -76,7 +79,7 @@ you say in a standup; the full name is what you put in a document.
 
 ## What the form factor changes
 
-**`mobileApp` on a guest surface means store review.** P02 ships under the tenant's own
+**`mobileApp` on a guest-app surface means store review.** P02 ships under the tenant's own
 developer account (ADR-0006), so a fix is a release rather than a deploy. Every `buildTime`
 field in the White Label Builder exists because of that one row.
 
@@ -95,15 +98,15 @@ changes weekly breaks weekly.
 provisions cells. A console living inside a cell could not create the first one.
 
 **Branding follows audience, not platform.** Confirmed 14 August: staff surfaces carry TICVAI
-branding; guest surfaces are white-label. **Guest Kiosk is the case that makes the rule
-clear** — it is venue hardware but a guest uses it, so it is white-labelled like the website
+branding; guest-app surfaces are white-label. **Guest Kiosk is the case that makes the rule
+clear** — it is venue hardware but a guest-app uses it, so it is white-labelled like the website
 rather than branded like the POS beside it.
 
 ## The gap
 
-**73 screens assigned to four apps that do not exist** — platform-admin (36), partner-portal
-(21), support-console (8), accreditation (8).
+**73 screens assigned to four apps that do not exist** — ticvai-web (36), partner-web
+(21), venue-support-web (8), accreditation-web (8).
 
-**Guest Kiosk and Staff Scanner are not even inventoried.** No count, no screens. The scanner
+**Guest Kiosk and Staff Scanner are not even inventoried.** No count, no screens. The venue-scanner
 is a Wave 1 surface.
 

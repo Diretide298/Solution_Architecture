@@ -19,7 +19,7 @@ platform:
   - ltr
   - rtl
   screenCount: 62
-  app: guest
+  app: guest-app
   appStatus: scaffolded
   packages:
   - design-tokens
@@ -36,11 +36,15 @@ platform:
     networkAssumption: mobile data, intermittent
     releaseCadence: fortnightly, gated by review
   wireframeBoard: wireframes/P02 Guest App.dc.html
+  designReferences:
+  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    note: White Label Builder — the guest app is what the builder configures.
+  operator: guest
 screens:
 - id: GST-001
   name: Home – Default
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
     template: dashboard
@@ -50,28 +54,36 @@ screens:
       - kind: metricTile
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-001
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /catalogue, local` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/home-default
-    component: apps/guest/src/routes/general/HomeDefaultDashboard.tsx
+    component: apps/guest-app/src/routes/general/HomeDefaultDashboard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
     inferred: true
+  apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-002
   name: Explore Categories
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find explore categories for this venue.
   wave: 1
   layout:
     template: list
@@ -81,29 +93,32 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-002
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /catalogue` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/explore-categories
-    component: apps/guest/src/routes/general/ExploreCategoriesList.tsx
+    component: apps/guest-app/src/routes/general/ExploreCategoriesList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-003
   name: Attractions List
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
     template: list
@@ -113,32 +128,30 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-003
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
-  apis:
-  - operationId: listProducts
-    contract: catalogue
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/attractions-list
-    component: apps/guest/src/routes/general/AttractionsList.tsx
+    component: apps/guest-app/src/routes/general/AttractionsList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-004
   name: Attraction Details
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See attraction details for this venue.
   wave: 1
   layout:
     template: detail
@@ -148,32 +161,30 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-004
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
-  apis:
-  - operationId: getProduct
-    contract: catalogue
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/attraction-details
-    component: apps/guest/src/routes/general/AttractionDetailsDetail.tsx
+    component: apps/guest-app/src/routes/general/AttractionDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-005
   name: What's On
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find what's on for this venue.
   wave: 1
   layout:
     template: list
@@ -183,32 +194,30 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-005
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C84
-  apis:
-  - operationId: listEvents
-    contract: catalogue
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/whats-on
-    component: apps/guest/src/routes/general/WhatsOnList.tsx
+    component: apps/guest-app/src/routes/general/WhatsOnList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-006
   name: Event / Exhibition Details
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See event / exhibition details for this venue.
   wave: 1
   layout:
     template: detail
@@ -218,32 +227,30 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-006
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C84
-  apis:
-  - operationId: getEvent
-    contract: catalogue
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/event-exhibition-details
-    component: apps/guest/src/routes/general/EventExhibitionDetailsDetail.tsx
+    component: apps/guest-app/src/routes/general/EventExhibitionDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-007
   name: Select Date & Time
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See select date & time for this venue.
   wave: 1
   layout:
     template: detail
@@ -253,30 +260,33 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-007
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /performances, POST /leases` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/select-date-and-time
-    component: apps/guest/src/routes/general/SelectDateAndTimeDetail.tsx
+    component: apps/guest-app/src/routes/general/SelectDateAndTimeDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-008
   name: Tickets & Add-ons
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find tickets & add-ons for this venue.
   wave: 1
   layout:
     template: list
@@ -286,29 +296,37 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-008
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `local` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/tickets-and-add-ons
-    component: apps/guest/src/routes/general/TicketsAndAddOnsList.tsx
+    component: apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-009
   name: Review & Payment
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Take the money, and be unambiguous about whether it worked.
   wave: 1
   layout:
     template: form
@@ -318,32 +336,36 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Terminal or gateway state, shown plainly
+    empty: —
+    error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
+      retries, and nothing is issued until it resolves'
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-009
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C47
   apis:
-  - operationId: createOrder
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: from page inventory
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
-    app: guest
+    app: guest-app
     route: /general/review-and-payment
-    component: apps/guest/src/routes/general/ReviewAndPaymentForm.tsx
+    component: apps/guest-app/src/routes/general/ReviewAndPaymentForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-010
   name: Booking Confirmation
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Confirm it worked, and give them what they need to prove it.
   wave: 1
   layout:
     template: detail
@@ -353,32 +375,35 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-010
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   apis:
-  - operationId: getOrder
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: from page inventory
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
-    app: guest
+    app: guest-app
     route: /general/booking-confirmation
-    component: apps/guest/src/routes/general/BookingConfirmationDetail.tsx
+    component: apps/guest-app/src/routes/general/BookingConfirmationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-011
   name: Wallet Overview
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
     template: dashboard
@@ -388,29 +413,33 @@ screens:
       - kind: metricTile
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Terminal or gateway state, shown plainly
+    empty: —
+    error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
+      retries, and nothing is issued until it resolves'
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-011
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C37
   openQuestions:
   - Inventory cites `GET /wallet` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/wallet-overview
-    component: apps/guest/src/routes/general/WalletOverviewDashboard.tsx
+    component: apps/guest-app/src/routes/general/WalletOverviewDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-012
   name: My Tickets
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find my tickets for this venue.
   wave: 1
   layout:
     template: list
@@ -420,29 +449,37 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-012
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /tickets` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/my-tickets
-    component: apps/guest/src/routes/general/MyTicketsList.tsx
+    component: apps/guest-app/src/routes/general/MyTicketsList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-013
   name: Ticket Details
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find ticket details for this venue.
   wave: 1
   layout:
     template: detail
@@ -452,29 +489,37 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-013
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /tickets/{id}` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/ticket-details
-    component: apps/guest/src/routes/general/TicketDetailsDetail.tsx
+    component: apps/guest-app/src/routes/general/TicketDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-014
   name: Ticket Transfer
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Work with ticket transfer for this venue.
   wave: 2
   layout:
     template: detail
@@ -484,30 +529,42 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-014
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `POST /tickets/{id}/transfer` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/ticket-transfer
-    component: apps/guest/src/routes/general/TicketTransferDetail.tsx
+    component: apps/guest-app/src/routes/general/TicketTransferDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  - operationId: claimTicketTransfer
+    contract: orders
+    purpose: Claim transferred tickets
+    trigger: onAction
 - id: GST-015
   name: Memberships
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find memberships for this venue.
   wave: 2
   layout:
     template: detail
@@ -517,29 +574,44 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-015
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C03
   openQuestions:
   - Inventory cites `GET /memberships` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/memberships
-    component: apps/guest/src/routes/general/MembershipsDetail.tsx
+    component: apps/guest-app/src/routes/general/MembershipsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - ADM-003
+    fromFlows: true
+  apis:
+  - operationId: getGuestLink
+    contract: cross-cell
+    purpose: Read a guest link
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-016
   name: My Reservations
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find my reservations for this venue.
   wave: 2
   layout:
     template: detail
@@ -549,32 +621,30 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-016
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
-  apis:
-  - operationId: listReservations
-    contract: orders
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/my-reservations
-    component: apps/guest/src/routes/general/MyReservationsDetail.tsx
+    component: apps/guest-app/src/routes/general/MyReservationsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-017
   name: Reservation Details
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See reservation details for this venue.
   wave: 2
   layout:
     template: detail
@@ -584,32 +654,30 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-017
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
-  apis:
-  - operationId: getReservation
-    contract: orders
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/reservation-details
-    component: apps/guest/src/routes/general/ReservationDetailsDetail.tsx
+    component: apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-018
   name: Add to Calendar / Reminders
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find add to calendar / reminders for this venue.
   wave: 3
   layout:
     template: detail
@@ -619,29 +687,32 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-018
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `local` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/add-to-calendar-reminders
-    component: apps/guest/src/routes/general/AddToCalendarRemindersDetail.tsx
+    component: apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-019
   name: Order History (Wallet)
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find order history (wallet) for this venue.
   wave: 2
   layout:
     template: dashboard
@@ -651,32 +722,36 @@ screens:
       - kind: metricTile
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Terminal or gateway state, shown plainly
+    empty: —
+    error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
+      retries, and nothing is issued until it resolves'
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-019
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C21
   apis:
-  - operationId: listOrders
+  - operationId: transferOrderTickets
     contract: orders
-    purpose: from page inventory
-    trigger: onLoad
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
-    app: guest
+    app: guest-app
     route: /general/order-history-wallet
-    component: apps/guest/src/routes/general/OrderHistoryWalletDashboard.tsx
+    component: apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-020
   name: Saved Items / Wishlist
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
     template: list
@@ -686,29 +761,61 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-020
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C58
   openQuestions:
   - Inventory cites `GET /wishlist` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/saved-items-wishlist
-    component: apps/guest/src/routes/general/SavedItemsWishlistList.tsx
+    component: apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  apis:
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-021
   name: Interactive Map
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See where things are in relation to each other.
   wave: 2
   layout:
     template: canvas
@@ -717,29 +824,32 @@ screens:
       components:
       - kind: scanTarget
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-021
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C39
   openQuestions:
   - Inventory cites `GET /venue-map` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/interactive-map
-    component: apps/guest/src/routes/general/InteractiveMapCanvas.tsx
+    component: apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-022
   name: Attraction Wait Times
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See attraction wait times for this venue.
   wave: 3
   layout:
     template: detail
@@ -749,29 +859,40 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-022
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C82
   openQuestions:
   - Inventory cites `GET /queue/wait-times` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/attraction-wait-times
-    component: apps/guest/src/routes/general/AttractionWaitTimesDetail.tsx
+    component: apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - GST-059
+    fromFlows: true
+  apis:
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-023
   name: Virtual Queue / Join Queue
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
     template: detail
@@ -781,28 +902,39 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-023
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C82
   apis:
   - operationId: joinQueue
     contract: queue
     purpose: from page inventory
     trigger: onLoad
+  - operationId: getQueueEntry
+    contract: queue
+    purpose: Read a queue entry
+    trigger: onLoad
+  - operationId: leaveQueue
+    contract: queue
+    purpose: Leave a queue
+    trigger: onAction
   implementation:
-    app: guest
+    app: guest-app
     route: /general/virtual-queue-join-queue
-    component: apps/guest/src/routes/general/VirtualQueueJoinQueueDetail.tsx
+    component: apps/guest-app/src/routes/general/VirtualQueueJoinQueueDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-024
   name: F&B – Browse & Order
   module: TODO
@@ -816,13 +948,14 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-024
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C05
   apis:
   - operationId: listDiningOutlets
@@ -841,12 +974,21 @@ screens:
     contract: fnb
     purpose: Place the order
     trigger: onLoad
+  - operationId: getGuestOrderStatus
+    contract: fnb
+    purpose: Track an order
+    trigger: onLoad
+  - operationId: listDeliveryLocations
+    contract: fnb
+    purpose: Where an order can be delivered
+    trigger: onLoad
   notes: The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
-    or a seat uses the same claimLocationSession as a table (4.6.26).
+    or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen
+    pattern on 17 August, not individually considered.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/fandb-browse-and-order
-    component: apps/guest/src/routes/general/FandbBrowseAndOrderList.tsx
+    component: apps/guest-app/src/routes/general/FandbBrowseAndOrderList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -865,13 +1007,14 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-025
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C05
   apis:
   - operationId: getGuestOrderStatus
@@ -882,12 +1025,17 @@ screens:
     contract: fnb
     purpose: Everything ordered at this location this sitting
     trigger: onLoad
+  - operationId: claimTableSession
+    contract: fnb
+    purpose: Identify which table a guest is sitting at
+    trigger: onAction
   notes: Nine states from 4.6.35. Collected and delivered are distinct from served — a counter handover,
-    a runner delivery and a server putting a plate down are three different events.
+    a runner delivery and a server putting a plate down are three different events. States derived from
+    the screen pattern on 17 August, not individually considered.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/fandb-order-tracking
-    component: apps/guest/src/routes/general/FandbOrderTrackingDetail.tsx
+    component: apps/guest-app/src/routes/general/FandbOrderTrackingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -896,7 +1044,7 @@ screens:
 - id: GST-026
   name: Retail / Merchandise
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find retail / merchandise for this venue.
   wave: 2
   layout:
     template: detail
@@ -906,30 +1054,46 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-026
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C08
   openQuestions:
   - Inventory cites `GET /products?kind=retail` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/retail-merchandise
-    component: apps/guest/src/routes/general/RetailMerchandiseDetail.tsx
+    component: apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - BO-048
+    - BO-069
+    fromFlows: true
+  apis:
+  - operationId: getGameCard
+    contract: games
+    purpose: Read a card's balances
+    trigger: onLoad
+  - operationId: listMerchandise
+    contract: retail
+    purpose: List merchandise
+    trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-027
   name: Parking – Reserve & Pay
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Take the money, and be unambiguous about whether it worked.
   wave: 3
   layout:
     template: detail
@@ -939,30 +1103,43 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Terminal or gateway state, shown plainly
+    empty: —
+    error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
+      retries, and nothing is issued until it resolves'
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-027
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C23
   openQuestions:
   - Inventory cites `POST /parking-reservations` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/parking-reserve-and-pay
-    component: apps/guest/src/routes/general/ParkingReserveAndPayDetail.tsx
+    component: apps/guest-app/src/routes/general/ParkingReserveAndPayDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: createParkingEntitlement
+    contract: access
+    purpose: A guest bought parking
+    trigger: onAction
+  - operationId: updateParkingEntitlement
+    contract: access
+    purpose: Change the plate, or revoke
+    trigger: onAction
 - id: GST-028
   name: Parking – Reservation Confirmed
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Confirm it worked, and give them what they need to prove it.
   wave: 3
   layout:
     template: detail
@@ -972,30 +1149,33 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-028
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C23
   openQuestions:
   - Inventory cites `GET /parking-reservations/{id}` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/parking-reservation-confirmed
-    component: apps/guest/src/routes/general/ParkingReservationConfirmedDetail.tsx
+    component: apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-029
   name: Venue Info & Services
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See venue info & services for this venue.
   wave: 2
   layout:
     template: detail
@@ -1005,66 +1185,84 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-029
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C17
   openQuestions:
   - Inventory cites `GET /venue-info` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/venue-info-and-services
-    component: apps/guest/src/routes/general/VenueInfoAndServicesDetail.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - GST-001
-    inferred: true
-- id: GST-030
-  name: In-Venue Notifications
-  module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
-  wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-      - kind: primaryButton
-  states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
-  wireframe:
-    status: drafted
-    board: wireframes/P02 Guest App.dc.html#gst-030
-  capability: C61
-  openQuestions:
-  - Inventory cites `GET /notifications` — no matching operation. Written before the contracts existed.
-  implementation:
-    app: guest
-    route: /general/in-venue-notifications
-    component: apps/guest/src/routes/general/InVenueNotificationsDetail.tsx
+    component: apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
   apis:
+  - operationId: listDiningOutlets
+    contract: fnb
+    purpose: Where a guest can eat, right now
+    trigger: onLoad
+  - operationId: listDeliveryLocations
+    contract: fnb
+    purpose: Where an order can be delivered
+    trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+- id: GST-030
+  name: In-Venue Notifications
+  module: TODO
+  purpose: Work with in-venue notifications for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
+  wireframe:
+    status: drafted
+    board: wireframes/P02 Guest App.dc.html#gst-030
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  capability: C61
+  openQuestions:
+  - Inventory cites `GET /notifications` — no matching operation. Written before the contracts existed.
+  implementation:
+    app: guest-app
+    route: /general/in-venue-notifications
+    component: apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - GST-001
+    inferred: true
+    exitTo:
+    - GST-031
+    fromFlows: true
+  apis:
   - operationId: claimLocationSession
     contract: fnb
     purpose: From the flow it appears in
     trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-031
   name: AI Concierge – Home
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
     template: dashboard
@@ -1074,34 +1272,40 @@ screens:
       - kind: metricTile
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-031
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-02
   openQuestions:
   - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/ai-concierge-home
-    component: apps/guest/src/routes/general/AiConciergeHomeDashboard.tsx
+    component: apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - GST-032
+    fromFlows: true
   apis:
   - operationId: getGuestMenu
     contract: fnb
     purpose: From the flow it appears in
     trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-032
   name: AI Concierge – Chat
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Add ai concierge – chat for this venue.
   wave: 2
   layout:
     template: detail
@@ -1111,34 +1315,56 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-032
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-02
   openQuestions:
   - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/ai-concierge-chat
-    component: apps/guest/src/routes/general/AiConciergeChatDetail.tsx
+    component: apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - GST-033
+    fromFlows: true
   apis:
   - operationId: createGuestFnbOrder
     contract: fnb
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getGuestOrderStatus
+    contract: fnb
+    purpose: Track an order
+    trigger: onLoad
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
+    trigger: onLoad
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-033
   name: AI Concierge – Contextual Help
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Answer a question without needing a person.
   wave: 2
   layout:
     template: detail
@@ -1148,34 +1374,40 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-033
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-02
   openQuestions:
   - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/ai-concierge-contextual-help
-    component: apps/guest/src/routes/general/AiConciergeContextualHelpDetail.tsx
+    component: apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - BO-020
+    fromFlows: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
   apis:
   - operationId: createPayment
     contract: orders
-    purpose: From the flow it appears in
-    trigger: onLoad
+    purpose: Take a payment against an order
+    trigger: onAction
 - id: GST-034
   name: Lost & Found
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See lost & found for this venue.
   wave: 2
   layout:
     template: detail
@@ -1185,35 +1417,41 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-034
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C18
   openQuestions:
   - Inventory cites `POST /lost-found/reports` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/lost-and-found
-    component: apps/guest/src/routes/general/LostAndFoundDetail.tsx
+    component: apps/guest-app/src/routes/general/LostAndFoundDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - BO-021
+    fromFlows: true
   apis:
   - operationId: getGuestOrderStatus
     contract: fnb
     purpose: From the flow it appears in
     trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-035
   name: Feedback & Ratings
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Work with feedback & ratings for this venue.
   wave: 3
   layout:
     template: list
@@ -1223,13 +1461,14 @@ screens:
       - kind: searchField
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-035
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C62
   apis:
   - operationId: submitReview
@@ -1237,18 +1476,20 @@ screens:
     purpose: from page inventory
     trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/feedback-and-ratings
-    component: apps/guest/src/routes/general/FeedbackAndRatingsList.tsx
+    component: apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-036
   name: Loyalty & Rewards
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find loyalty & rewards for this venue.
   wave: 3
   layout:
     template: detail
@@ -1258,29 +1499,32 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-036
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C64
   openQuestions:
   - Inventory cites `GET /loyalty` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/loyalty-and-rewards
-    component: apps/guest/src/routes/general/LoyaltyAndRewardsDetail.tsx
+    component: apps/guest-app/src/routes/general/LoyaltyAndRewardsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-037
   name: Offers & Promotions
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find offers & promotions for this venue.
   wave: 2
   layout:
     template: detail
@@ -1290,29 +1534,32 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-037
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C86
   openQuestions:
   - Inventory cites `GET /offers` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/offers-and-promotions
-    component: apps/guest/src/routes/general/OffersAndPromotionsDetail.tsx
+    component: apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-038
   name: Digital Companion Mode
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See digital companion mode for this venue.
   wave: 3
   layout:
     template: detail
@@ -1322,32 +1569,35 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-038
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C105
   apis:
-  - operationId: getFeatureToggles
+  - operationId: getTenantAppStatus
     contract: white-label
-    purpose: from page inventory
+    purpose: App status and recent changes
     trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/digital-companion-mode
-    component: apps/guest/src/routes/general/DigitalCompanionModeDetail.tsx
+    component: apps/guest-app/src/routes/general/DigitalCompanionModeDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-039
   name: Profile
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: What we hold about a guest, and what they can change.
   wave: 1
   layout:
     template: dashboard
@@ -1357,29 +1607,37 @@ screens:
       - kind: metricTile
       - kind: cardList
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-039
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C58
   openQuestions:
   - Inventory cites `GET /guests/me` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/profile
-    component: apps/guest/src/routes/general/ProfileDashboard.tsx
+    component: apps/guest-app/src/routes/general/ProfileDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
 - id: GST-040
   name: Help & Support
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Answer a question without needing a person.
   wave: 2
   layout:
     template: detail
@@ -1389,29 +1647,32 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-040
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C17
   openQuestions:
   - Inventory cites `GET /support` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/help-and-support
-    component: apps/guest/src/routes/general/HelpAndSupportDetail.tsx
+    component: apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-041
   name: Checkout Entry
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Take the money, and be unambiguous about whether it worked.
   wave: 1
   layout:
     template: form
@@ -1421,29 +1682,42 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Terminal or gateway state, shown plainly
+    empty: —
+    error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
+      retries, and nothing is issued until it resolves'
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-041
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C56
   openQuestions:
   - Inventory cites `—` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/checkout-entry
-    component: apps/guest/src/routes/general/CheckoutEntryForm.tsx
+    component: apps/guest-app/src/routes/general/CheckoutEntryForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
+    trigger: onLoad
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
 - id: GST-042
   name: Simple Registration & OTP
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Work with simple registration & otp for this venue.
   wave: 1
   layout:
     template: detail
@@ -1453,32 +1727,116 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-042
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C56
   apis:
   - operationId: requestGuestOtp
     contract: identity
     purpose: from page inventory
     trigger: onLoad
+  - operationId: completeSsoAuthorization
+    contract: identity
+    purpose: Exchange an SSO code for a session
+    trigger: onAction
+  - operationId: enrolMfaMethod
+    contract: identity
+    purpose: Enrol an MFA method
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: guestLogout
+    contract: identity
+    purpose: End a guest session
+    trigger: onAction
+  - operationId: guestSocialLogin
+    contract: identity
+    purpose: Sign in with Apple or Google
+    trigger: onAction
+  - operationId: guestUaePassLogin
+    contract: identity
+    purpose: Sign in with a national identity provider
+    trigger: onAction
+  - operationId: linkGuestCheckout
+    contract: identity
+    purpose: Attach a guest checkout to an account
+    trigger: onAction
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: login
+    contract: identity
+    purpose: Authenticate and open a session
+    trigger: onAction
+  - operationId: logout
+    contract: identity
+    purpose: Close the current session
+    trigger: onAction
+  - operationId: refreshToken
+    contract: identity
+    purpose: Rotate the access token
+    trigger: onAction
+  - operationId: registerGuest
+    contract: identity
+    purpose: Create a guest account
+    trigger: onAction
+  - operationId: removeMfaMethod
+    contract: identity
+    purpose: Remove an MFA method
+    trigger: onAction
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose a role for a multi-role session
+    trigger: onAction
+  - operationId: startSsoAuthorization
+    contract: identity
+    purpose: Begin an SSO flow
+    trigger: onLoad
+  - operationId: verifyGuestOtp
+    contract: identity
+    purpose: Verify a one-time code and issue a session
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Complete a step-up challenge
+    trigger: onAction
+  - operationId: verifyMfaEnrolment
+    contract: identity
+    purpose: Complete enrolment
+    trigger: onAction
   implementation:
-    app: guest
+    app: guest-app
     route: /general/simple-registration-and-otp
-    component: apps/guest/src/routes/general/SimpleRegistrationAndOtpDetail.tsx
+    component: apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-043
   name: Arabic / RTL Experience
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Arabic / RTL Experience — the screen a person opens when they need to deal with arabic /
+    rtl experience.
   wave: 1
   layout:
     template: detail
@@ -1488,29 +1846,32 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-043
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C57
   openQuestions:
   - Inventory cites `—` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/arabic-rtl-experience
-    component: apps/guest/src/routes/general/ArabicRtlExperienceDetail.tsx
+    component: apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-044
   name: Multi-Currency & Pricing
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find multi-currency & pricing for this venue.
   wave: 2
   layout:
     template: detail
@@ -1520,29 +1881,32 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-044
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C107
   openQuestions:
   - Inventory cites `GET /currencies` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/multi-currency-and-pricing
-    component: apps/guest/src/routes/general/MultiCurrencyAndPricingDetail.tsx
+    component: apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-045
   name: Ticket Delivery & Sharing
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find ticket delivery & sharing for this venue.
   wave: 2
   layout:
     template: detail
@@ -1552,30 +1916,38 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-045
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `POST /tickets/{id}/share` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/ticket-delivery-and-sharing
-    component: apps/guest/src/routes/general/TicketDeliveryAndSharingDetail.tsx
+    component: apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-046
   name: Branded Queue / Waiting Room
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find branded queue / waiting room for this venue.
   wave: 1
   layout:
     template: detail
@@ -1585,29 +1957,37 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-046
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C98
   openQuestions:
   - Inventory cites `GET /waiting-room` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/branded-queue-waiting-room
-    component: apps/guest/src/routes/general/BrandedQueueWaitingRoomDetail.tsx
+    component: apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  apis:
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-047
   name: Maintenance Page
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
     template: detail
@@ -1617,13 +1997,14 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-047
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C57
   apis:
   - operationId: getTenantAppStatus
@@ -1631,18 +2012,20 @@ screens:
     purpose: from page inventory
     trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/maintenance-page
-    component: apps/guest/src/routes/general/MaintenancePageDetail.tsx
+    component: apps/guest-app/src/routes/general/MaintenancePageDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-048
   name: Upsell / Cross-Sell
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See upsell / cross-sell for this venue.
   wave: 2
   layout:
     template: detail
@@ -1652,29 +2035,37 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-048
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C88
   openQuestions:
   - Inventory cites `GET /recommendations` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/upsell-cross-sell
-    component: apps/guest/src/routes/general/UpsellCrossSellDetail.tsx
+    component: apps/guest-app/src/routes/general/UpsellCrossSellDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
 - id: GST-049
   name: Interactive Seat Selection
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See interactive seat selection for this venue.
   wave: 2
   layout:
     template: canvas
@@ -1683,32 +2074,30 @@ screens:
       components:
       - kind: scanTarget
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-049
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C53
-  apis:
-  - operationId: getSeatMap
-    contract: seating
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/interactive-seat-selection
-    component: apps/guest/src/routes/general/InteractiveSeatSelectionCanvas.tsx
+    component: apps/guest-app/src/routes/general/InteractiveSeatSelectionCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-050
   name: Resource Booking – Cabana
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find resource booking – cabana for this venue.
   wave: 3
   layout:
     template: detail
@@ -1718,30 +2107,38 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-050
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C78
   openQuestions:
   - Inventory cites `POST /resource-bookings` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/resource-booking-cabana
-    component: apps/guest/src/routes/general/ResourceBookingCabanaDetail.tsx
+    component: apps/guest-app/src/routes/general/ResourceBookingCabanaDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
 - id: GST-051
   name: Plan Your Adventure – Start
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find plan your adventure – start for this venue.
   wave: 3
   layout:
     template: detail
@@ -1751,29 +2148,37 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-051
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-35
   openQuestions:
   - Inventory cites `POST /ai/itinerary` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/plan-your-adventure-start
-    component: apps/guest/src/routes/general/PlanYourAdventureStartDetail.tsx
+    component: apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
 - id: GST-052
   name: Suggested Itineraries
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find suggested itineraries for this venue.
   wave: 3
   layout:
     template: detail
@@ -1783,30 +2188,33 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-052
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-35
   openQuestions:
   - Inventory cites `GET /itineraries/suggested` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/suggested-itineraries
-    component: apps/guest/src/routes/general/SuggestedItinerariesDetail.tsx
+    component: apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-053
   name: Build Your Own Itinerary
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find build your own itinerary for this venue.
   wave: 3
   layout:
     template: detail
@@ -1816,29 +2224,41 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-053
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `POST /itineraries` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/build-your-own-itinerary
-    component: apps/guest/src/routes/general/BuildYourOwnItineraryDetail.tsx
+    component: apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
+    trigger: onLoad
 - id: GST-054
   name: AI Optimized Itinerary
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Work with ai optimized itinerary for this venue.
   wave: 3
   layout:
     template: detail
@@ -1848,30 +2268,33 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-054
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-35
   openQuestions:
   - Inventory cites `POST /ai/itinerary/optimise` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/ai-optimized-itinerary
-    component: apps/guest/src/routes/general/AiOptimizedItineraryDetail.tsx
+    component: apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-055
   name: Dynamic QR Ticket
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find dynamic qr ticket for this venue.
   wave: 1
   layout:
     template: canvas
@@ -1880,30 +2303,38 @@ screens:
       components:
       - kind: scanTarget
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Availability is live, never cached
+    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-055
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C09
   openQuestions:
   - Inventory cites `GET /tickets/{id}/dynamic-qr` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/dynamic-qr-ticket
-    component: apps/guest/src/routes/general/DynamicQrTicketCanvas.tsx
+    component: apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-056
   name: Bundle Package
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See bundle package for this venue.
   wave: 2
   layout:
     template: detail
@@ -1913,32 +2344,30 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-056
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C87
-  apis:
-  - operationId: getBundle
-    contract: promotions
-    purpose: from page inventory
-    trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/bundle-package
-    component: apps/guest/src/routes/general/BundlePackageDetail.tsx
+    component: apps/guest-app/src/routes/general/BundlePackageDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-057
   name: Accessibility Information
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Find accessibility information for this venue.
   wave: 2
   layout:
     template: form
@@ -1948,29 +2377,32 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-057
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C17
   openQuestions:
   - Inventory cites `GET /accessibility` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/accessibility-information
-    component: apps/guest/src/routes/general/AccessibilityInformationForm.tsx
+    component: apps/guest-app/src/routes/general/AccessibilityInformationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-058
   name: Resource Availability (Cabana)
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See resource availability (cabana) for this venue.
   wave: 3
   layout:
     template: detail
@@ -1980,30 +2412,33 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-058
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C78
   openQuestions:
   - Inventory cites `GET /resources/availability` — no matching operation. Written before the contracts
     existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/resource-availability-cabana
-    component: apps/guest/src/routes/general/ResourceAvailabilityCabanaDetail.tsx
+    component: apps/guest-app/src/routes/general/ResourceAvailabilityCabanaDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-059
   name: Plan My Day – In Progress
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: See plan my day – in progress for this venue.
   wave: 3
   layout:
     template: detail
@@ -2013,29 +2448,40 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-059
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /itineraries/{id}` — no matching operation. Written before the contracts existed.
   implementation:
-    app: guest
+    app: guest-app
     route: /general/plan-my-day-in-progress
-    component: apps/guest/src/routes/general/PlanMyDayInProgressDetail.tsx
+    component: apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+    exitTo:
+    - BO-005
+    fromFlows: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
 - id: GST-060
   name: Maintenance / Upgrade Page
   module: TODO
-  purpose: TODO — one sentence, what the guest came here to do
+  purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
     template: detail
@@ -2045,13 +2491,14 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
-    offline: TODO — the guest app caches tickets; most other reads need a network
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
+    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-060
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C57
   apis:
   - operationId: getTenantAppStatus
@@ -2059,14 +2506,16 @@ screens:
     purpose: from page inventory
     trigger: onLoad
   implementation:
-    app: guest
+    app: guest-app
     route: /general/maintenance-upgrade-page
-    component: apps/guest/src/routes/general/MaintenanceUpgradePageDetail.tsx
+    component: apps/guest-app/src/routes/general/MaintenanceUpgradePageDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - GST-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-061
   name: Menu Item Detail
   module: In-Venue Experience
@@ -2099,11 +2548,12 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-061
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August.
   implementation:
-    app: guest
+    app: guest-app
     route: /in-venue-experience/menu-item-detail
-    component: apps/guest/src/routes/in-venue-experience/MenuItemDetail.tsx
+    component: apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2115,11 +2565,6 @@ screens:
   purpose: Collect shopping left earlier, using the ticket rather than a receipt.
   capability: C21
   wave: 3
-  apis:
-  - operationId: lookupShopAndDrop
-    contract: retail
-    purpose: Find goods awaiting collection
-    trigger: onLoad
   layout:
     template: list
     regions:
@@ -2137,11 +2582,12 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-062
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
   implementation:
-    app: guest
+    app: guest-app
     route: /in-venue-experience/shop-and-drop-collection
-    component: apps/guest/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+    component: apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
     status: notStarted
   navigation:
     entryFrom:

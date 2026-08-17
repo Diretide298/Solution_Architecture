@@ -1,0 +1,98 @@
+# venue-pos — operated by venue · staff on posTerminal
+# Serves: P04 Venue POS — Terminal and Tablet
+# Derived from screens/*.yaml. Do not hand-edit.
+
+app: venue-pos
+operator: venue
+audience: staff
+formFactor: posTerminal
+status: scaffolded
+runtime: reactNativeTablet
+offlineCapable: true
+directions:
+- ltr
+- rtl
+platforms:
+- P04 Venue POS — Terminal and Tablet
+servesMultiplePlatforms: false
+packages:
+- design-tokens
+- ui
+- api-client
+- offline-core
+contracts:
+- approvals
+- assets
+- catalogue
+- finance
+- orders
+- promotions
+- reporting
+- retail
+- seating
+- shift
+screenCount: 10
+byWave:
+  wave1: 7
+  wave2: 3
+screens:
+- id: POS-001
+  name: Begin Shift
+  route: /shift/begin-shift
+  component: apps/venue-pos/src/routes/shift/BeginShiftWizard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-002
+  name: Sell — Ticket Catalogue
+  route: /sell/sell-ticket-catalogue
+  component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-003
+  name: Sell — Timed Entry
+  route: /sell/sell-timed-entry
+  component: apps/venue-pos/src/routes/sell/SellTimedEntryForm.tsx
+  wave: 1
+  status: notStarted
+- id: POS-005
+  name: Payment
+  route: /payment/payment
+  component: apps/venue-pos/src/routes/payment/PaymentForm.tsx
+  wave: 1
+  status: notStarted
+- id: POS-006
+  name: Held Orders
+  route: /sell/held-orders
+  component: apps/venue-pos/src/routes/sell/HeldOrdersList.tsx
+  wave: 1
+  status: notStarted
+- id: POS-007
+  name: Close Shift
+  route: /shift/close-shift
+  component: apps/venue-pos/src/routes/shift/CloseShiftWizard.tsx
+  wave: 1
+  status: notStarted
+- id: POS-010
+  name: Add to Existing Ticket
+  route: /sell/add-to-existing-ticket
+  component: apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx
+  wave: 1
+  status: notStarted
+- id: POS-004
+  name: Sell — Seat Map
+  route: /sell/sell-seat-map
+  component: apps/venue-pos/src/routes/sell/SellSeatMapCanvas.tsx
+  wave: 2
+  status: notStarted
+- id: POS-008
+  name: Reports
+  route: /reports/reports
+  component: apps/venue-pos/src/routes/reports/ReportsDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: POS-009
+  name: Staff Roster
+  route: /shift/staff-roster
+  component: apps/venue-pos/src/routes/shift/StaffRosterList.tsx
+  wave: 2
+  status: notStarted

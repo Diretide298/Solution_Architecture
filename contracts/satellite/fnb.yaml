@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 9
+  x-ticvai-screen-count: 28
   x-ticvai-tier: satellite
   x-ticvai-module: "7 — F&B POS  ·  5 — F&B & Guest Management (service)"
   x-ticvai-requirements: 151
@@ -111,6 +111,149 @@ paths:
   # guest token. `diningAndFnb` is a module a tenant can switch on in the White Label
   # Builder, and until now there was nothing behind it.
 
+  /table-reservations:
+    get:
+      operationId: listTableReservations
+      summary: Bookings for a service period
+      description: >
+        5.1.1. **Live table state alongside the bookings**, because a host needs to know what is
+        booked and what is actually free, and those differ all evening.
+      tags: [fnb]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - name: outletId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: date
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TableReservation' }
+
+    post:
+      operationId: createTableReservation
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      summary: Book a table in advance
+      description: >
+        4.9.13. **Distinct from `claimTableSession`**, which identifies a table a guest is
+        already sitting at. This is a booking with a time, a party size and nobody present.
+
+        **Does not name a specific table by default.** A host seats a party on the night, and
+        committing table 7 at booking time means every later booking is refused against a
+        constraint that did not need to exist. A table may be named where a guest asked for one.
+      tags: [fnb]
+      x-ticvai-permission: null   # a guest may book their own; staff book with FNB_OPERATE
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TableReservation' }
+      responses:
+        '201':
+          description: Booked
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableReservation' }
+        '409':
+          description: >
+            No cover available for that party size at that time. **The reason names the
+            constraint** — a party of eight refused when a party of two would fit is a different
+            answer from the outlet being full.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /table-reservations/{reservationId}:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateTableReservation
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      summary: Change or cancel a booking
+      description: >
+        Party size, time, or cancelled. **A reduced party size releases cover immediately** —
+        four seats returned at 18:00 can be sold for the same evening.
+      tags: [fnb]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TableReservation' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableReservation' }
+
+  /table-reservations/{reservationId}/seat:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: seatTableReservation
+      summary: The party arrived and has been sat down
+      description: >
+        **Where the booking becomes a visit.** The host names the actual table now, and a table
+        session opens against it — which is the moment `claimTableSession` and this contract meet.
+
+        A party seated at a different size from the booking is recorded as such. A booking for
+        six that arrives as four is a cover a restaurant could have sold.
+      tags: [fnb]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriteWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tableIds]
+              properties:
+                tableIds:
+                  type: array
+                  minItems: 1
+                  items: { type: string, format: uuid }
+                actualPartySize: { type: integer }
+      responses:
+        '200':
+          description: Seated, and a table visit opened
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TableReservation' }
+
   /venues/{venueId}/dining:
     parameters:
       - name: venueId
@@ -121,6 +264,11 @@ paths:
       operationId: listDiningOutlets
       x-ticvai-consumed-by:
         - "P02 GST-024 F&B – Browse & Order"
+        - "P02 GST-029 Venue Info & Services"
+        - "P06 EMP-030 Venue map"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-062 Venue Profile"
+        - "P08 BO-065 Venue Configuration"
       summary: Where a guest can eat, right now
       description: >
         The dining list in the guest app. Returns outlets that are **open now**, not every
@@ -130,7 +278,8 @@ paths:
         service restaurant, a counter that takes app orders for collection, and a bar that
         does neither are all normal.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -167,6 +316,7 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-061 Menu Item Detail"
+        - "P08 BO-044 F&B Outlets"
       summary: The menu a guest sees
       description: >
         The menu in force **at this moment** — breakfast at nine, lunch at one. The staff
@@ -178,7 +328,8 @@ paths:
 
         Allergens are always present. Omitting them is not an option a tenant gets to choose.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -214,6 +365,13 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listDeliveryLocations
+      x-ticvai-consumed-by:
+        - "P02 GST-024 F&B – Browse & Order"
+        - "P02 GST-029 Venue Info & Services"
+        - "P06 EMP-030 Venue map"
+        - "P08 BO-003 Queue Integration Setup"
+        - "P08 BO-062 Venue Profile"
+        - "P08 BO-065 Venue Configuration"
       summary: Where an order can be delivered
       description: >
         4.6.26 — tables, seats, cabanas or designated locations. A venue runs several kinds at
@@ -223,7 +381,8 @@ paths:
         They are one concept because a runner needs one instruction, and a guest needs one
         way to say where they are.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -268,7 +427,8 @@ paths:
         Codes rotate. A static code photographed once lets someone order to a cabana they are
         not at, from outside the venue.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -373,6 +533,8 @@ paths:
   /table-sessions:
     post:
       operationId: claimTableSession
+      x-ticvai-consumed-by:
+        - "P02 GST-025 F&B – Order Tracking"
       summary: Identify which table a guest is sitting at
       description: >
         Scanning the QR code on a table. This is the step that makes ordering to a table
@@ -385,7 +547,8 @@ paths:
         The code is short-lived and rotates. A static table code photographed once lets
         someone order to a table they are not at, from outside the venue.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -437,7 +600,8 @@ paths:
         Payment is required before the kitchen sees it, unless the outlet runs a tab — a
         kitchen that cooks on an unpaid guest order is a kitchen giving food away.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -479,8 +643,11 @@ paths:
     get:
       operationId: getGuestOrderStatus
       x-ticvai-consumed-by:
+        - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-025 F&B – Order Tracking"
+        - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-034 Lost & Found"
+        - "P08 BO-021 Order Search"
       summary: Track an order
       description: >
         Received, preparing, ready, served. Fed by the kitchen ticket status the KDS already
@@ -490,7 +657,8 @@ paths:
         **Read from the primary.** A guest refreshing to see whether their food is ready is
         the wrong place for replica lag.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -522,7 +690,8 @@ paths:
         server. One bill — a guest who ordered a starter from a server and a dessert from
         their phone has one meal, not two.
       tags: [guestOrdering]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -542,6 +711,9 @@ paths:
   /menus:
     get:
       operationId: listMenus
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-read-routing: replica
       summary: List menus
       description: >
@@ -578,6 +750,9 @@ paths:
 
     post:
       operationId: createMenu
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-config-scope: venue
       summary: Create a menu
       tags: [menu]
@@ -608,6 +783,9 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getMenu
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-read-routing: replica
       summary: Read a menu with sections and items
       tags: [menu]
@@ -624,6 +802,9 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
       operationId: updateMenu
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-config-scope: venue
       summary: Amend a menu
       tags: [menu]
@@ -657,6 +838,9 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setMenuSections
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-config-scope: venue
       summary: Set menu sections and their item ordering
       description: >
@@ -783,6 +967,8 @@ paths:
   /fnb-orders:
     get:
       operationId: listFnbOrders
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
       x-ticvai-read-routing: replica
       summary: List F&B orders
       tags: [order]
@@ -818,6 +1004,8 @@ paths:
 
     post:
       operationId: createFnbOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
       summary: Place an F&B order
       description: >
         Quick service pays immediately; table service attaches to a visit and pays at close.
@@ -907,6 +1095,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: cancelFnbOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
       summary: Cancel an order
       description: >
         Before acceptance this is a refusal and needs no approval. **After acceptance the
@@ -956,6 +1146,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getFnbOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
       x-ticvai-read-routing: replica
       summary: Read an F&B order
       tags: [order]
@@ -973,6 +1165,8 @@ paths:
 
     patch:
       operationId: amendFnbOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
       summary: Amend an order before it is prepared
       description: >
         Once a line is `preparing`, amendment is refused — the kitchen has started. Removing
@@ -1016,6 +1210,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getTableMap
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-routing: replica
       summary: Table map with live state
       description: >
@@ -1036,6 +1232,8 @@ paths:
 
     put:
       operationId: setTableLayout
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-config-scope: venue
       summary: Configure the table layout
       tags: [table]
@@ -1351,6 +1549,9 @@ paths:
   /kitchen/tickets:
     get:
       operationId: listKitchenTickets
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
+        - "P08 BO-046 Kitchen Display"
       x-ticvai-read-routing: replica
       summary: Kitchen ticket queue
       description: >
@@ -1388,6 +1589,7 @@ paths:
       operationId: setKitchenTicketStatus
       x-ticvai-consumed-by:
         - "P08 BO-020 Timed Entry Rules"
+        - "P08 BO-046 Kitchen Display"
       summary: Advance a kitchen ticket
       description: >
         Called by the KDS or a fallback screen. Status flows back to the guest app order
@@ -1429,6 +1631,9 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: prioritiseKitchenTicket
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
+        - "P08 BO-046 Kitchen Display"
       summary: Move a ticket up the queue
       description: >
         Supervisor override, and the mechanism behind Fast Pass order prioritisation
@@ -1461,6 +1666,9 @@ paths:
   /kitchen/stations:
     get:
       operationId: listKitchenStations
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
+        - "P08 BO-046 Kitchen Display"
       x-ticvai-read-routing: replica
       summary: List preparation stations and their routing
       tags: [kitchen]
@@ -1478,6 +1686,9 @@ paths:
                 items: { $ref: '#/components/schemas/KitchenStation' }
     put:
       operationId: setKitchenStations
+      x-ticvai-consumed-by:
+        - "P08 BO-020 Timed Entry Rules"
+        - "P08 BO-046 Kitchen Display"
       summary: Configure stations and item routing
       tags: [kitchen]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1567,6 +1778,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: recordWaste
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: Record waste
       description: >
         Depletes stock without a sale. Also the ground truth for waste prediction, so the
@@ -1615,6 +1828,44 @@ paths:
 
 components:
   schemas:
+    TableReservationStatus:
+      type: string
+      enum: [booked, confirmed, seated, completed, cancelled, noShow]
+
+    TableReservation:
+      type: object
+      x-ticvai-persistence: "fnb.table_reservation"
+      required: [outletId, startsAt, partySize]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        outletId: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid, nullable: true }
+        guestName: { type: string }
+        contactPoint: { type: string }
+        partySize: { type: integer, minimum: 1 }
+        startsAt: { type: string, format: date-time }
+        durationMinutes:
+          type: integer
+          description: >
+            **How long the cover is held.** An outlet turning tables twice an evening needs this
+            to be real, or the second sitting cannot be booked.
+        tableIds:
+          type: array
+          description: >
+            Usually empty until seating. **Committing a specific table at booking time refuses
+            later bookings against a constraint that did not need to exist.**
+          items: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/TableReservationStatus' }
+        groupId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 5.1.2. Several bookings managed as one party across adjacent tables.
+        notes: { type: string, description: Allergies, occasion, accessibility. }
+        actualPartySize: { type: integer, nullable: true, readOnly: true }
+        tableVisitId: { type: string, format: uuid, nullable: true, readOnly: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+
     GuestOrderingMethod:
       x-ticvai-persistence: "none — enum"
       type: string

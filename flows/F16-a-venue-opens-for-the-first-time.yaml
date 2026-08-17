@@ -1,0 +1,109 @@
+# F16 — A venue opens for the first time
+#
+# Nothing else in the platform can happen until this does, and it had no flow.
+#
+# Validated by tools/check-flows.py.
+
+id: F16
+name: A venue opens for the first time
+actor: platformAdmin
+capability: C51
+wave: 1
+frequency: rare
+criticality: operational
+platforms:
+- P09 TICVAI Web
+- P08 Venue Management
+offlineBehaviour: Not offline. Provisioning reaches the Control Plane by definition.
+trigger:
+  description: A tenant has signed and a venue must exist before anyone can configure or sell anything.
+  entryScreen: ADM-005
+  entryPoints:
+  - New tenant signed
+  - Existing tenant adds a venue
+steps:
+- step: 1
+  screen: ADM-005
+  action: Creates the tenant
+  operations:
+  - listTenants
+  - createTenant
+  outcome: A tenant with no venues yet
+- step: 2
+  screen: ADM-012
+  action: Provisions or assigns a cell
+  operations:
+  - provisionCell
+  - listTenantCells
+  outcome: '**Region decides the cell** — data residency is not a preference (ADR-0001)'
+- step: 3
+  screen: ADM-006
+  action: Builds the scope tree
+  operations:
+  - listScopeNodes
+  - createScopeNode
+  outcome: Region, venue, department. **Venue is the configuration floor** (ADR-0018)
+- step: 4
+  screen: ADM-007
+  action: Enables the modules the tenant bought
+  operations:
+  - getTenantLicences
+  - setSubscription
+  outcome: A venue with no F&B does not get F&B screens
+- step: 5
+  screen: BO-074
+  action: Finance sets the chart of accounts
+  operations:
+  - listAccounts
+  - createAccount
+  outcome: '**Before the first sale.** Every sale posts somewhere'
+- step: 6
+  screen: BO-075
+  action: Maps products to accounts
+  operations:
+  - listAccountMappings
+  - setAccountMappings
+  outcome: Or everything lands in suspense
+- step: 7
+  screen: ADM-020
+  action: Creates the first venue manager
+  operations:
+  - listPrincipals
+  - createPrincipal
+  outcome: Who then does everything else
+branches:
+- at: 2
+  condition: The region has no cell and residency forbids an existing one
+  behaviour: A new cell is provisioned, which takes time and money. **The commercial decision is upstream
+    of the technical one** — a venue in a new jurisdiction is a new cost line.
+  severity: requiresStaff
+  resolvedBy: Platform admin + commercial
+- at: 3
+  condition: The scope tree is built wrongly
+  behaviour: Correctable, but `cascade_scope_path` rewrites every descendant and **RLS starts answering
+    a different question**. The riskiest routine operation in the platform.
+  severity: recoverable
+  resolvedBy: Platform admin
+- at: 4
+  condition: A module is enabled that the tenant did not buy
+  behaviour: Licensing catches it at use rather than at configuration. **Degrade, never stop** (CF-61)
+    — a gate refusing entry over a licence is worse than running unlicensed.
+  severity: recoverable
+  resolvedBy: Billing
+- at: 5
+  condition: No chart of accounts
+  behaviour: '**Blocks the first sale**, and it is the failure a venue discovers on opening morning
+    rather than in setup.'
+  severity: abandonsFlow
+  resolvedBy: Finance
+- at: 7
+  condition: The first manager cannot sign in
+  behaviour: SSO not configured, or the identity provider unreachable. There is no second path in —
+    **this is why a break-glass local account exists**.
+  severity: requiresStaff
+  resolvedBy: Platform admin
+exitStates:
+- state: completed
+  description: Venue exists, configured, and someone can sign in
+- state: deferred
+  description: Awaiting a cell in a new region

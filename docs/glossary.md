@@ -15,7 +15,7 @@ Sources: client-supplied reference definitions · MoM decisions 30 Jul – 12 Au
 
 | Term | Definition | Never say |
 |---|---|---|
-| **Event** | A named happening that has one or more Performances. Carries the identity a guest recognises | Show, Occasion |
+| **Event** | A named happening that has one or more Performances. Carries the identity a guest-app recognises | Show, Occasion |
 | **Performance** | A dated, timed instance of an Event. The thing capacity attaches to | Showtime, Session, Slot |
 | **Product** | A sellable thing. May be a ticket, membership, F&B item, retail item, rental or bundle | Item, SKU, Article |
 | **Component** | A constituent part of a Product's definition | Element, Part |
@@ -90,4 +90,4 @@ Conflating these is the most common modelling failure in ticketing systems.
 
 ## Adding a term
 
-PR to this page, reviewed by Architecture. A term used in code that is not here is a review finding. Update the forbidden-synonym table in [setup/naming-and-style](setup/naming-and-style.md) in the same PR.
+PR to this page, reviewed by Architecture. A term used in code that is not here is a review finding. Update the forbidden-synonym table in setup/naming-and-style in the same PR.

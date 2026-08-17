@@ -153,6 +153,27 @@
    "module": "17 \u2014 Guest Mobile App & Branding (builder)",
    "title": "TICVAI White Label Builder",
    "tip": "## What this contract covers **How a tenant configures their branded guest app. A CMS plus an app builder.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 17 \u2014 Guest Mobile App & Branding (builder) | | **Requirements** | ~107 | | **Capabilities** | C57, C105, C106 | | **Consumed by** | P13 White-Label CMS \u00b7 P08 Venue Back Office | ## How to read this file **This file is a contract"
+  },
+  "approvals": {
+   "tier": "spine",
+   "operations": 13,
+   "module": "11 \u2014 Approval Workflows and Governance",
+   "title": "TICVAI \u2014 Approvals",
+   "tip": "One approval mechanism, not five. Refund thresholds, shift variance, release promotion and manual discount were four bespoke implementations; a fifth was about to be written for AI. Approval records an authorisation and never performs the action."
+  },
+  "ai": {
+   "tier": "satellite",
+   "operations": 22,
+   "module": "8 \u2014 Unified Operations Dashboard (AI)",
+   "title": "TICVAI \u2014 AI",
+   "tip": "Retrieval and inference over data the platform already holds. Nothing here needs a trained model \u2014 forecasting, fraud, dynamic pricing and recommendation are parked until there is a season of history. Two stores: Postgres for metadata, Qdrant for embeddings."
+  },
+  "workforce": {
+   "tier": "satellite",
+   "operations": 11,
+   "module": "18 \u2014 Employee Mobile App (workforce)",
+   "title": "TICVAI \u2014 Workforce",
+   "tip": "Rota, attendance and announcements \u2014 the three things the employee app needs that nothing owned. A rota assignment is not a shift: a shift is a cash session, and most people on a rota never touch a till."
   }
  },
  "modules": {
@@ -239,6 +260,14 @@
   "whitelabel": {
    "tables": 13,
    "tip": "Tenant branding and module enablement. One app, one store listing, per ADR-0006."
+  },
+  "approvals": {
+   "tables": 6,
+   "tip": "The shared approval object. Four rules are not configurable: a requester never approves their own request, a rejection carries a reason, a completed record is immutable, and approval authorises without executing."
+  },
+  "workforce": {
+   "tables": 5,
+   "tip": "Who is expected where, who actually turned up, and what staff have been told. The gap between the first two is the operational value of having both."
   }
  },
  "tables": {
@@ -1134,10 +1163,6 @@
    "columns": 4,
    "tip": "Derived from white-label.FeatureToggle."
   },
-  "whitelabel.homepage_section_section": {
-   "columns": 7,
-   "tip": "Derived from white-label.HomepageLayout.sections[]."
-  },
   "whitelabel.module_enablement": {
    "columns": 4,
    "tip": "Derived from white-label.ModuleEnablement."
@@ -1145,10 +1170,6 @@
   "whitelabel.navigation_item": {
    "columns": 1,
    "tip": "Derived from white-label.NavigationConfig."
-  },
-  "whitelabel.navigation_item_item": {
-   "columns": 6,
-   "tip": "Derived from white-label.NavigationConfig.items[]."
   },
   "whitelabel.policy": {
    "columns": 7,
@@ -1161,128 +1182,340 @@
   "whitelabel.tenant_config": {
    "columns": 14,
    "tip": "Derived from white-label.TenantConfig."
+  },
+  "approvals.request": {
+   "columns": 0,
+   "tip": "One request per action needing authorisation. The subject is a reference, never a copy \u2014 a copy goes stale between raising and deciding"
+  },
+  "approvals.decision": {
+   "columns": 0,
+   "tip": "Every decision at every level. Immutable once complete \u2014 an approval is evidence"
+  },
+  "approvals.matrix": {
+   "columns": 0,
+   "tip": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under"
+  },
+  "approvals.rule": {
+   "columns": 0,
+   "tip": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another"
+  },
+  "approvals.delegation": {
+   "columns": 0,
+   "tip": "Standing in for an approver. Always time-bounded, and never lets a delegate approve what the delegator raised"
+  },
+  "approvals.escalation": {
+   "columns": 0,
+   "tip": "Who was asked, when, and why it moved up. The original approver stays in the record"
+  },
+  "ai.chunk_ref": {
+   "columns": 0,
+   "tip": "Maps a Qdrant point id back to its document and scope. **The join between the two stores**"
+  },
+  "ai.conversation": {
+   "columns": 0,
+   "tip": "A thread, scoped to a principal and a module"
+  },
+  "ai.index_entry": {
+   "columns": 0,
+   "tip": "Maps a source row to its Qdrant point ids, so a deletion in Postgres can be followed into the vector store. **Nothing cascades between the two**"
+  },
+  "ai.index_job": {
+   "columns": 0,
+   "tip": "A build in flight. recordsFailed is the number to watch \u2014 a source failing on 3% of rows is a search missing 3% of answers"
+  },
+  "ai.index_source": {
+   "columns": 0,
+   "tip": "One declaration per indexed table. The owning service does not know it exists \u2014 the AI service consumes the event that service already publishes"
+  },
+  "ai.interaction": {
+   "columns": 0,
+   "tip": "The audit record. **Retention is unresolved (CF-64)** \u2014 a prompt may carry personal data"
+  },
+  "ai.knowledge_collection": {
+   "columns": 0,
+   "tip": "Metadata only. **One collection per tenant \u2014 isolation is partition-level, never a filter**"
+  },
+  "ai.knowledge_document": {
+   "columns": 0,
+   "tip": "Source, status and chunk count. The text and its vectors live in Qdrant"
+  },
+  "ai.message": {
+   "columns": 0,
+   "tip": "Prompt and response with sources, provider, model, tokens and latency"
+  },
+  "ai.policy": {
+   "columns": 0,
+   "tip": "What the assistant may do, which roles may use it, what is masked. Resolves tenant then venue (ADR-0018)"
+  },
+  "ai.proposed_action": {
+   "columns": 0,
+   "tip": "A draft the assistant produced and a person must approve. Nothing executes from here"
+  },
+  "ai.provider": {
+   "columns": 0,
+   "tip": "Configured providers, models and failover order. Credentials are a vault reference, never a key"
+  },
+  "qdrant:tenant_{id}_catalogue": {
+   "columns": 0,
+   "tip": "Product, membership and pass descriptions, embedded for semantic search (8.4.39)"
+  },
+  "qdrant:tenant_{id}_knowledge": {
+   "columns": 0,
+   "tip": "One collection per tenant. Chunk text, its embedding, and the payload that carries scope_path"
+  },
+  "control.release": {
+   "columns": 0,
+   "tip": "a shipped version. Promoted through dev, staging and production; superseded by a later one"
+  },
+  "games.credit_ledger": {
+   "columns": 0,
+   "tip": "credits bought, played and won. The arcade equivalent of a wallet"
+  },
+  "identity.guest_session": {
+   "columns": 0,
+   "tip": "a guest session. Separate from staff \u2014 different lifetime, different auth"
+  },
+  "identity.mfa_challenge": {
+   "columns": 0,
+   "tip": "an issued MFA challenge and its outcome"
+  },
+  "identity.otp_challenge": {
+   "columns": 0,
+   "tip": "a one-time code sent to a guest contact point"
+  },
+  "identity.session": {
+   "columns": 0,
+   "tip": "a staff session, carrying the workstation and the selected role"
+  },
+  "inventory.stock_level": {
+   "columns": 0,
+   "tip": "quantity on hand per item per location. **Gates the sale at outlet level** (14 August)"
+  },
+  "marketing.message_delivery": {
+   "columns": 0,
+   "tip": "one row per recipient per send. Delivery, bounce and engagement"
+  },
+  "orders.cash_count_line": {
+   "columns": 0,
+   "tip": "a denomination and a count from a blind till count"
+  },
+  "orders.credit_override": {
+   "columns": 0,
+   "tip": "a manual override of a partner credit limit, recorded with who and why. Second table on a marker the deriver only read the first half of"
+  },
+  "reporting.report_field": {
+   "columns": 0,
+   "tip": "the fields a report definition may use. Retrievable, so a report can be found by what it answers"
+  },
+  "whitelabel.homepage_section": {
+   "columns": 7,
+   "tip": "Derived from white-label.HomepageLayout.sections[]."
+  },
+  "maintenance.work_order_attachment": {
+   "columns": 0,
+   "tip": "Photo, video, document, note or signature against a work order. Evidence, not decoration \u2014 captured offline and queued"
+  },
+  "workforce.announcement": {
+   "columns": 0,
+   "tip": "Targeted by venue, department or role. `emergency` is not a louder `operational`"
+  },
+  "workforce.announcement_receipt": {
+   "columns": 0,
+   "tip": "Delivered and acknowledged, per principal. **The outstanding list is the roll call**"
+  },
+  "workforce.attendance": {
+   "columns": 0,
+   "tip": "Who actually turned up. **occurredAt and recordedAt are both kept** \u2014 a steward clocking in offline is not late because the sync was"
+  },
+  "workforce.rota_assignment": {
+   "columns": 0,
+   "tip": "A person expected somewhere at a time. **Not a shift** \u2014 a shift is a cash session, and most people on a rota never touch a till"
+  },
+  "workforce.shift_swap": {
+   "columns": 0,
+   "tip": "Both parties agree before the supervisor sees it. Routed through approvals rather than a second mechanism"
+  },
+  "promotions.bundle_choice_group": {
+   "columns": 0,
+   "tip": "Pick n from a set. The bundle price does not move with the choice (ADR-0019) \u2014 the allocation does"
+  },
+  "platform.audit_read": {
+   "columns": 0,
+   "tip": "**PII reads only.** Who looked at a passport number is the question a regulator asks, and auditing every read produces a log nobody can search"
+  },
+  "platform.audit_record": {
+   "columns": 0,
+   "tip": "One row per write. Who, what, when, from where, under which permission, and the before and after. **occurredAt and recordedAt are both kept** \u2014 an offline action happened when it happened"
+  },
+  "catalogue.donation_campaign": {
+   "columns": 0,
+   "tip": "Fixed, free or round-up. **Posts to a liability account, not revenue** \u2014 money collected for a charity is not the venue\u2019s to recognise"
+  },
+  "catalogue.waitlist_entry": {
+   "columns": 0,
+   "tip": "Who asked to be told when a sold-out session frees up. **Not a queue** \u2014 a queue is people standing at a ride"
+  },
+  "fnb.table_reservation": {
+   "columns": 0,
+   "tip": "A booking with a time and a party size. Distinct from a table session, which is a guest already sitting down"
+  },
+  "orders.cart": {
+   "columns": 0,
+   "tip": "A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on something"
+  },
+  "orders.cart_line": {
+   "columns": 0,
+   "tip": "One line, with the lease that holds its capacity. Null lease for a product with no capacity"
+  },
+  "orders.donation_line": {
+   "columns": 0,
+   "tip": "A donation within a transaction. A line, not a flag, because one transaction may give to several campaigns"
+  },
+  "access.parking_entitlement": {
+   "columns": 0,
+   "tip": "A guest bought parking. Carries the plate where the mode is plateWhitelist \u2014 **personal data**, since a plate identifies a person"
+  },
+  "access.parking_facility": {
+   "columns": 0,
+   "tip": "A car park and its integration mode. Three modes, and the mode decides what happens at sale (CF-52)"
+  },
+  "control.partner_agreement": {
+   "columns": 0,
+   "tip": "Net rate or commission, credit terms, validity. **Versioned** \u2014 an order placed last week used last week\u2019s rate"
   }
  },
  "platforms": {
   "P01": {
    "name": "Guest Web \u2014 Storefront",
    "short": "Guest Web",
+   "operator": "guest",
    "audience": "guest",
    "formFactor": "web",
-   "app": "web-b2c",
+   "app": "guest-web",
    "screens": 29,
    "offline": false,
-   "tip": "Guest Web \u2014 Storefront. guest on web, app `web-b2c`."
+   "tip": "Guest Web \u2014 Storefront. Operated by guest, guest on web, app `guest-web`."
   },
   "P02": {
    "name": "Guest App \u2014 Mobile",
    "short": "Guest App",
+   "operator": "guest",
    "audience": "guest",
    "formFactor": "mobileApp",
-   "app": "guest",
+   "app": "guest-app",
    "screens": 62,
    "offline": true,
-   "tip": "Guest App \u2014 Mobile. guest on mobileApp, app `guest`. Offline-capable: it must work with no network."
+   "tip": "Guest App \u2014 Mobile. Operated by guest, guest on mobileApp, app `guest-app`. Offline-capable: it must work with no network."
   },
   "P04": {
-   "name": "Staff POS \u2014 Terminal and Tablet",
-   "short": "Staff POS",
+   "name": "Venue POS \u2014 Terminal and Tablet",
+   "short": "Venue POS",
+   "operator": "venue",
    "audience": "staff",
    "formFactor": "posTerminal",
-   "app": "pos",
+   "app": "venue-pos",
    "screens": 10,
    "offline": true,
-   "tip": "Staff POS \u2014 Terminal and Tablet. staff on posTerminal, app `pos`. Offline-capable: it must work with no network."
+   "tip": "Venue POS \u2014 Terminal and Tablet. Operated by venue, staff on posTerminal, app `venue-pos`. Offline-capable: it must work with no network."
   },
   "P05": {
    "name": "Guest Kiosk \u2014 Self-Service",
    "short": "Guest Kiosk",
+   "operator": "guest",
    "audience": "guest",
    "formFactor": "kiosk",
-   "app": "guest",
+   "app": "guest-app",
    "screens": 14,
    "offline": false,
-   "tip": "Guest Kiosk \u2014 Self-Service. guest on kiosk, app `guest`."
+   "tip": "Guest Kiosk \u2014 Self-Service. Operated by guest, guest on kiosk, app `guest-app`."
   },
   "P06": {
-   "name": "Staff App \u2014 Operations",
-   "short": "Staff App",
+   "name": "Venue Staff App \u2014 Operations",
+   "short": "Venue Staff App",
+   "operator": "venue",
    "audience": "staff",
    "formFactor": "mobileApp",
-   "app": "employee",
+   "app": "venue-staff-app",
    "screens": 50,
    "offline": true,
-   "tip": "Staff App \u2014 Operations. staff on mobileApp, app `employee`. Offline-capable: it must work with no network."
+   "tip": "Venue Staff App \u2014 Operations. Operated by venue, staff on mobileApp, app `venue-staff-app`. Offline-capable: it must work with no network."
   },
   "P07": {
-   "name": "Staff Scanner \u2014 Access Control",
-   "short": "Staff Scanner",
+   "name": "Venue Scanner \u2014 Access Control",
+   "short": "Venue Scanner",
+   "operator": "venue",
    "audience": "staff",
    "formFactor": "handheld",
-   "app": "scanner",
+   "app": "venue-scanner",
    "screens": 16,
    "offline": true,
-   "tip": "Staff Scanner \u2014 Access Control. staff on handheld, app `scanner`. Offline-capable: it must work with no network."
+   "tip": "Venue Scanner \u2014 Access Control. Operated by venue, staff on handheld, app `venue-scanner`. Offline-capable: it must work with no network."
   },
   "P08": {
-   "name": "Staff Web \u2014 Venue Back Office",
-   "short": "Staff Web",
+   "name": "Venue Management \u2014 Back Office",
+   "short": "Venue Management",
+   "operator": "venue",
    "audience": "staff",
    "formFactor": "web",
-   "app": "backoffice",
+   "app": "venue-management-web",
    "screens": 73,
    "offline": false,
-   "tip": "Staff Web \u2014 Venue Back Office. staff on web, app `backoffice`."
+   "tip": "Venue Management \u2014 Back Office. Operated by venue, staff on web, app `venue-management-web`."
   },
   "P09": {
-   "name": "Admin Web \u2014 Platform Console",
-   "short": "Admin Web",
+   "name": "TICVAI Web \u2014 Platform Console",
+   "short": "TICVAI Web",
+   "operator": "ticvai",
    "audience": "platformAdmin",
    "formFactor": "web",
-   "app": "platform-admin",
+   "app": "ticvai-web",
    "screens": 36,
    "offline": false,
-   "tip": "Admin Web \u2014 Platform Console. platformAdmin on web, app `platform-admin`."
+   "tip": "TICVAI Web \u2014 Platform Console. Operated by ticvai, platformAdmin on web, app `ticvai-web`."
   },
   "P10": {
    "name": "Partner Web \u2014 Reseller Portal",
    "short": "Partner Web",
+   "operator": "partner",
    "audience": "partner",
    "formFactor": "web",
-   "app": "partner-portal",
+   "app": "partner-web",
    "screens": 21,
    "offline": false,
-   "tip": "Partner Web \u2014 Reseller Portal. partner on web, app `partner-portal`."
+   "tip": "Partner Web \u2014 Reseller Portal. Operated by partner, partner on web, app `partner-web`."
   },
   "P11": {
-   "name": "Public Web \u2014 Accreditation",
-   "short": "Public Web",
+   "name": "Accreditation Web \u2014 Applications",
+   "short": "Accreditation Web",
+   "operator": "public",
    "audience": "public",
    "formFactor": "web",
-   "app": "accreditation",
+   "app": "accreditation-web",
    "screens": 8,
    "offline": false,
-   "tip": "Public Web \u2014 Accreditation. public on web, app `accreditation`."
+   "tip": "Accreditation Web \u2014 Applications. Operated by public, public on web, app `accreditation-web`."
   },
   "P12": {
-   "name": "Staff Web \u2014 Support Console",
-   "short": "Staff Web",
+   "name": "Venue Support \u2014 Agent Console",
+   "short": "Venue Support",
+   "operator": "venue",
    "audience": "staff",
    "formFactor": "web",
-   "app": "support-console",
+   "app": "venue-support-web",
    "screens": 8,
    "offline": false,
-   "tip": "Staff Web \u2014 Support Console. staff on web, app `support-console`."
+   "tip": "Venue Support \u2014 Agent Console. Operated by venue, staff on web, app `venue-support-web`."
   },
   "P13": {
-   "name": "Staff Web \u2014 White-Label CMS",
-   "short": "Staff Web",
+   "name": "Venue CMS \u2014 White Label",
+   "short": "Venue CMS",
+   "operator": "venue",
    "audience": "staff",
    "formFactor": "web",
-   "app": "backoffice",
+   "app": "venue-management-web",
    "screens": 20,
    "offline": false,
-   "tip": "Staff Web \u2014 White-Label CMS. staff on web, app `backoffice`."
+   "tip": "Venue CMS \u2014 White Label. Operated by venue, staff on web, app `venue-management-web`."
   }
  },
  "adrs": {
@@ -1357,6 +1590,10 @@
   "0018": {
    "title": "\u2014 Configuration scope",
    "tip": "**Configuration resolves up the scope tree. Nearest ancestor wins. There are three levels.**"
+  },
+  "0019": {
+   "title": "A dynamic bundle has a fixed price and a variable allocation",
+   "tip": "The guest picks; the total does not move. Allocation across the chosen components is proportional to list price at sale and frozen on the order line."
   }
  },
  "validators": {
@@ -1412,6 +1649,12 @@
   },
   "relationships.csv": {
    "tip": "406 table relationships with an edge_kind: ambient points at a hub and says nothing about this table, child means this row belongs to that row, reference is a real relationship."
+  },
+  "audit-register": {
+   "tip": "Every write operation is auditable. The register says what is recorded by default and which subset needs more \u2014 money, access, PII, permissions, AI, approvals and configuration."
+  },
+  "notification-catalogue": {
+   "tip": "Event to audience to channel to consent. The three silences are decisions, listed so a reader can tell decided-against from forgotten."
   }
  },
  "terms": {
@@ -1450,6 +1693,15 @@
   },
   "wave": {
    "tip": "1 is the first release, 2 follows. A Wave 1 surface cannot wait on a Wave 2 dependency, which is what CF-41 and the Accreditation workshop are about."
+  },
+  "approval matrix": {
+   "tip": "Rules resolving up the scope tree \u2014 tenant default, region override, venue override. First match wins, and a venue may tighten a threshold and never loosen one."
+  },
+  "segregation of duties": {
+   "tip": "A requester may never approve their own request, and delegation does not create a way around it."
+  },
+  "rota assignment": {
+   "tip": "A person expected somewhere at a time. Distinct from a shift, which is a cash session tied to a workstation."
   }
  },
  "flows": {
@@ -1508,6 +1760,111 @@
    "steps": 8,
    "branches": 7,
    "tip": "A member of venue staff arrives for a shift and works through it on their phone."
+  },
+  "F09": {
+   "name": "Event is cancelled and refunded",
+   "actor": "venueManager",
+   "steps": 5,
+   "branches": 8,
+   "tip": "A performance is cancelled \u2014 weather, a technical failure, an artist. Every ticket sold for it needs handling, and the guests need telling before they travel."
+  },
+  "F10": {
+   "name": "Partner books, uses and settles",
+   "actor": "partner",
+   "steps": 6,
+   "branches": 7,
+   "tip": "A tour operator books a block, distributes vouchers to their customers, those customers arrive over weeks, and at month end the two businesses reconcile."
+  },
+  "F11": {
+   "name": "Guest orders food to a lounger",
+   "actor": "guest",
+   "steps": 7,
+   "branches": 7,
+   "tip": "A guest on a sunbed opens the app, scans the QR on their lounger, orders, and a runner brings it. Described in detail by the client on 14 August."
+  },
+  "F12": {
+   "name": "Asset fails and closes a queue",
+   "actor": "technician",
+   "steps": 5,
+   "branches": 7,
+   "tip": "A ride stops. A technician is dispatched, works on it, and it returns to service \u2014 or does not. The guest app must stop advertising a queue for a ride nobody can board."
+  },
+  "F13": {
+   "name": "Month end closes",
+   "actor": "financeController",
+   "steps": 6,
+   "branches": 7,
+   "tip": "The month has ended and the books must be closed before anyone reports on them."
+  },
+  "F14": {
+   "name": "A discount needs a manager",
+   "actor": "cashier",
+   "steps": 5,
+   "branches": 6,
+   "tip": "A cashier applies a discount larger than their own authority, with a guest standing at the counter."
+  },
+  "F15": {
+   "name": "A part is needed and ordered",
+   "actor": "technician",
+   "steps": 5,
+   "branches": 7,
+   "tip": "A technician opens a machine, finds the fault, and the part is not on the shelf."
+  },
+  "F16": {
+   "name": "A venue opens for the first time",
+   "actor": "platformAdmin",
+   "steps": 7,
+   "branches": 5,
+   "tip": "A tenant has signed and a venue must exist before anyone can configure or sell anything."
+  },
+  "F17": {
+   "name": "A guest buys merchandise and collects later",
+   "actor": "guest",
+   "steps": 5,
+   "branches": 5,
+   "tip": "A guest buys something at a shop and does not want to carry it around the park all day (4.4.7)."
+  },
+  "F18": {
+   "name": "A guest plays an arcade game",
+   "actor": "guest",
+   "steps": 4,
+   "branches": 4,
+   "tip": "A guest taps a game card on a machine and plays."
+  },
+  "F19": {
+   "name": "A membership works in another country",
+   "actor": "guest",
+   "steps": 5,
+   "branches": 6,
+   "tip": "A guest bought an annual pass in Dubai and arrives at a venue in Abu Dhabi, in a different cell because data residency put it there."
+  },
+  "F20": {
+   "name": "A manager asks a question and gets an answer",
+   "actor": "venueManager",
+   "steps": 3,
+   "branches": 6,
+   "tip": "A venue manager wants to know something the platform knows and does not want to find the report."
+  },
+  "F21": {
+   "name": "A ride queue fills and a guest is redirected",
+   "actor": "guest",
+   "steps": 5,
+   "branches": 6,
+   "tip": "A guest opens the app to decide what to do next, and the ride they wanted has an hour's wait."
+  },
+  "F22": {
+   "name": "A tenant rebrands their app",
+   "actor": "venueManager",
+   "steps": 6,
+   "branches": 6,
+   "tip": "A venue changes its logo, colours and homepage, and it must reach the website and the app without a release."
+  },
+  "F23": {
+   "name": "A contractor gets a badge and uses it",
+   "actor": "contractor",
+   "steps": 5,
+   "branches": 6,
+   "tip": "A contractor needs access to a plant room for a week, and a steward at a service gate must be able to check it."
   }
  }
 }

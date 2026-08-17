@@ -56,12 +56,12 @@ Type key: **LLM** generative/conversational · **ML** predictive/statistical ·
 | ID | Application | Purpose | Module / Domain | Refs | Type | Wave |
 |---|---|---|---|---|---|---|
 | AI-01 | **Platform Conversational Assistant** | Natural-language assistance across every module; multilingual; tenant-, venue- and role-specific configuration | Unified Ops / AI Engine | 8.4.1–8.4.9 | LLM | 2 |
-| AI-02 | **Guest AI Concierge** | Itinerary help, venue info, purchase assistance in the guest app | Guest Mobile App | 19.2.72; 10 Aug §4.2 | LLM | 2 |
+| AI-02 | **Guest AI Concierge** | Itinerary help, venue info, purchase assistance in the guest-app app | Guest Mobile App | 19.2.72; 10 Aug §4.2 | LLM | 2 |
 | AI-03 | **Omnichannel AI Chatbot** | FAQs, purchases, recommendations across WhatsApp, web chat, app chat, Messenger, Instagram, email, SMS — with live-agent handover preserving context | Marketing & CRM | 22.8.4, 22.8.5; 19.2.68; 12 Aug §10 | LLM | 2 |
 | AI-04 | **Kiosk AI Assistant** | Guides guests through selection, promotions, FAQs, checkout | Ticketing Sales | 2.1.28 | LLM | 3 |
 | AI-05 | **POS AI Assistant** | Cashier queries — promo code lookup, refund process, theme switching | POS *(MoM only)* | 03 Aug §65 | LLM | 2 |
 | AI-06 | **Employee Assistant + Voice** | Voice-driven operational queries, work-order assistance, knowledge base | Employee Mobile App | 18.10.1–18.10.5 | LLM | 2 |
-| AI-07 | **Call Centre Agent Assist** | Live upsell/cross-sell prompts from guest profile during a call | Ticketing Sales | 2.8.3 | LLM | 3 |
+| AI-07 | **Call Centre Agent Assist** | Live upsell/cross-sell prompts from guest-app profile during a call | Ticketing Sales | 2.8.3 | LLM | 3 |
 | AI-08 | **AI Financial Assistant** | Natural-language reporting for accountants and finance managers | Finance *(MoM only)* | 12 Aug §22 | LLM | 3 |
 
 > AI-01 is the substrate for AI-02, AI-04, AI-05, AI-06 and AI-08. Build the assistant
@@ -106,7 +106,7 @@ Type key: **LLM** generative/conversational · **ML** predictive/statistical ·
 | AI-30 | **Pricing Recommendations** | Recommend adjustments from demand forecasts, occupancy, sales performance, seasonality, holidays, weather; suggest pricing per seat category | Ticketing Sales / Catalogue | 2.9.18, 1.4.27 | ML+OPT | 3 |
 | AI-31 | **B2B Allocation Optimisation** | Optimise inventory and quota allocation across partners by sales performance, demand and unused allocation | Ticketing Sales / B2B | 2.7.54 | OPT | 3 |
 | AI-32 | **Schedule Optimisation** | Optimise resource schedules automatically; propose alternatives for conflicts; simulate scenarios | Ticketing Catalogue / Resource Mgmt | 1.2.56–1.2.58 | OPT | 3 |
-| AI-33 | **Send-Time Optimisation** | Determine optimal communication time per guest from engagement, location, language and behaviour | Marketing & CRM | 22.3.19, 22.9.16 | ML | 3 |
+| AI-33 | **Send-Time Optimisation** | Determine optimal communication time per guest-app from engagement, location, language and behaviour | Marketing & CRM | 22.3.19, 22.9.16 | ML | 3 |
 | AI-34 | **Offer Optimisation** | Recommend discounts, promotions, rewards and bundles maximising conversion within business constraints | Marketing & CRM | 22.3.20, 3.6.40 | OPT | 3 |
 
 ### 2.5 Recommendation & Personalisation — 9
@@ -114,9 +114,9 @@ Type key: **LLM** generative/conversational · **ML** predictive/statistical ·
 | ID | Application | Purpose | Module / Domain | Refs | Type | Wave |
 |---|---|---|---|---|---|---|
 | AI-35 | **Product Recommendation Engine** | Personalised ticket, membership, attraction, event and package recommendations; next-best-offer; checkout recommendations | Unified Ops | 8.6.1–8.6.36 (36) | ML | 2 |
-| AI-36 | **Upsell & Cross-Sell Engine** | Recommendations during booking and checkout from cart contents, guest profile and context; **synchronised across B2C, B2B, app, POS, kiosk, call centre, API, membership, loyalty, wallet** | Admission / Sales / Bundles | 3.7.5, 3.7.9, 3.7.12, 2.1.22, 4.4.30, 1.1.33–1.1.35 | ML | 2 |
+| AI-36 | **Upsell & Cross-Sell Engine** | Recommendations during booking and checkout from cart contents, guest-app profile and context; **synchronised across B2C, B2B, app, POS, kiosk, call centre, API, membership, loyalty, wallet** | Admission / Sales / Bundles | 3.7.5, 3.7.9, 3.7.12, 2.1.22, 4.4.30, 1.1.33–1.1.35 | ML | 2 |
 | AI-37 | **Bundle Recommendations** | Recommend bundle combinations from historical sales, behaviour, demographics, seasonality and attraction popularity | Admission / Bundles | 3.5.13, 4.1.14, 4.1.15 | ML | 3 |
-| AI-38 | **Next Best Action** | Recommend the next action, offer, campaign, membership, reward or product per guest | Marketing & CRM / Loyalty | 22.2.24, 5.4.23, 5.4.33 | ML | 3 |
+| AI-38 | **Next Best Action** | Recommend the next action, offer, campaign, membership, reward or product per guest-app | Marketing & CRM / Loyalty | 22.2.24, 5.4.23, 5.4.33 | ML | 3 |
 | AI-39 | **Seat Recommendations** | Best seat, best value, closest-to-stage, family seating, accessibility, seat upgrade; interactive selection assistant | Seat Management | 21.10.1–21.10.6, 21.5.22 | ML | 2 |
 | AI-40 | **Membership Upgrade Recommendations** | Analyse profile, purchase history, visit frequency, spend and loyalty to recommend upgrades and renewals | Ticketing Sales / Membership | 2.14.18, 3.7.8 | ML | 3 |
 | AI-41 | **Loyalty Reward Recommendations** | Personalised rewards, campaigns, offers, challenges and achievements | F&B & Guest / Marketing | 5.4.21, 22.6.18, 22.6.19 | ML | 3 |
@@ -171,7 +171,7 @@ Not features. Preconditions. **No AI application in §2.1–2.9 may ship before 
 | AI-63 | **Explainability & Confidence** | Provide reasoning and confidence indicators with AI output | Unified Ops | 8.1.5 | **1** |
 | AI-64 | **AI Audit Trail** | History of AI-generated actions, decisions, executions and the user decisions taken against them | Unified Ops | 8.1.6, 8.3.58–8.3.60 | **1** |
 | AI-65 | **AI Usage Analytics** | Reporting on AI usage and outcomes; underpins per-tenant cost attribution | Unified Ops | 8.1.7 | **1** |
-| AI-66 | **AI Consent Controls** | Tenant admin control over use of guest data in recommendations, personalisation, segmentation and prediction; guest-level consent for AI processing | Marketing & CRM / Consent | 22.13.9, 22.13.19 | **1** |
+| AI-66 | **AI Consent Controls** | Tenant admin control over use of guest-app data in recommendations, personalisation, segmentation and prediction; guest-level consent for AI processing | Marketing & CRM / Consent | 22.13.9, 22.13.19 | **1** |
 
 ### 2.11 Exposure — 1
 
@@ -195,7 +195,7 @@ Apply to every entry above. Derived from the matrix, MoM decisions and the Proje
 | 6 | **No application ships without an eval baseline**, regression-gated in CI | Hallucination in a pricing or refund path is a financial defect |
 | 7 | **Anything affecting price, refund, entitlement or financial state is recommendation-only** until a human approves | AI-62 |
 | 8 | **PII scrubbed on ingress and egress**, with audit trail | 10 Aug §4.2 |
-| 9 | **Guest data use in AI is consent-gated** at tenant and guest level | AI-66 |
+| 9 | **Guest data use in AI is consent-gated** at tenant and guest-app level | AI-66 |
 
 ---
 
@@ -220,7 +220,7 @@ Apply to every entry above. Derived from the matrix, MoM decisions and the Proje
 | Matrix requirements covered | 1,827 (57.4%) | **2,186 (68.7%)** |
 
 Remaining uncovered after this register: **998 requirements (31.3%)** — concentrated in
-finance and ledger (225), seat management non-AI (92), guest authentication (81),
+finance and ledger (225), seat management non-AI (92), guest-app authentication (81),
 marketing non-AI (257), developer platform (92), subscription non-AI (52), resource
 management non-AI (73), and product lifecycle and resale (49).
 

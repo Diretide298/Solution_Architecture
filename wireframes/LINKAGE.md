@@ -1,6 +1,6 @@
 # How the boards link to everything else
 
-The boards are 347 screens of design intent. The definitions are the same 347 in YAML. **They
+The boards are 364 screens of design intent. The definitions are the same 347 in YAML. **They
 resolve to each other in both directions, and a checker keeps them that way.**
 
 ## The chain
@@ -22,7 +22,7 @@ lives in `AccessService`, reads `access_point`, `admission_profile`, `blacklist`
 | Screen → board | `wireframe.board` on every screen: `wireframes/<file>#<id>` |
 | Platform → board | `platform.wireframeBoard` |
 | Board → screen | The anchor `id` on each frame, matched by id |
-| Screen → operations | `apis[].operationId`, validated against 654 |
+| Screen → operations | `apis[].operationId`, validated against 689 |
 | Operation → tables | `handoff/api-data-lineage.json` |
 | Screen → everything | **`handoff/screen-index.json`** — the join, pre-computed |
 
@@ -32,7 +32,7 @@ One entry per screen, keyed by id. For a design tool this is the only file neede
 
 ```json
 "SCN-004": {
-  "name": "Admitted", "platform": "P07", "app": "scanner",
+  "name": "Admitted", "platform": "P07", "app": "venue-scanner",
   "route": "/access/admitted",
   "board": "wireframes/P07 Staff Scanner.dc.html#scn-004",
   "operations": ["validateAccess"],
@@ -62,6 +62,24 @@ empty arrays rather than guessing.
 
 Verified by breaking it deliberately: pointing `SCN-004` at `#scn-999` fails with the reason,
 and restoring it passes.
+
+## Board to board
+
+| | |
+|---|---|
+| Index → every board | 12 of 12 |
+| **Every board → index** | **12 of 12** — added 14 August; there was no way home |
+| Board → board | 5 links, on P11, P12 and P13 |
+
+The five cross-board links are board-level **"Reaches other platforms"** panels rather than
+per-screen jumps, and they are now recorded on the platform as `reachesOtherPlatforms` so the
+definitions say what the boards say. `check-wireframes.py` resolves each one to a file and an
+anchor.
+
+**Nine boards have no outbound cross-link, and that is correct.** A guest-app never reaches a
+back-office screen, and a cashier never reaches the platform console. Where a jump is real it
+is drawn — the accreditation-web portal reaching `SCN-003` is the one worth knowing, because it
+means a steward scans an accreditation-web credential on the same handheld as a guest-app ticket.
 
 ## When a board is regenerated
 

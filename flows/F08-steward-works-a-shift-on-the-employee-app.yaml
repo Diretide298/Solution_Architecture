@@ -40,7 +40,9 @@ steps:
 - step: 3
   screen: EMP-048
   action: Works the opening checklist
-  operations: []
+  operations:
+  - listInspectionTemplates
+  - submitInspection
   outcome: What must be true before the venue opens
 - step: 4
   screen: EMP-003
@@ -52,18 +54,23 @@ steps:
 - step: 5
   screen: EMP-004
   action: Works the task list
-  operations: []
+  operations:
+  - listWorkOrders
+  - acceptWorkOrder
   outcome: Assigned and available work
 - step: 6
   screen: EMP-005
   action: Completes a task
   operations:
+  - startWorkOrder
   - completeWorkOrder
   outcome: With findings, not just a tick
 - step: 7
   screen: EMP-007
   action: Writes handover notes
-  operations: []
+  operations:
+  - listAnnouncements
+  - publishAnnouncement
   outcome: What the next shift needs to know
 - step: 8
   screen: EMP-009
@@ -121,6 +128,6 @@ exitStates:
 - state: escalated
   description: Incident raised and referred
 openQuestions:
-- '**A task has no contract.** `listTasks`, `updateTask` and `createHandoverNote` do not exist in 642
-  operations, and the employee app is fifty screens built around them. Steps 4 to 7 below name no operation
-  for that reason. Raised as CF-71.'
+- '**CF-71 closed 17 August.** A task in this app is a work order — 18.2.x is Work Order Inbox, Accept,
+  Reject, Start, Pause. Seven lifecycle operations were added to `maintenance` and rota, attendance
+  and announcements went to a new `workforce` contract.'

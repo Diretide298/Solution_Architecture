@@ -3,7 +3,7 @@
 **No migrations are written. This is deliberate, as of 14 August.**
 
 The schema reference workbook (`handoff/TICVAI_Schema_Reference.xlsx`) is the working artefact
-while the design settles — 232 tables, 1,983 columns, derived from the contracts and regenerated
+while the design settles — 278 tables, 1,983 columns, derived from the contracts and regenerated
 whenever they change. Writing DDL against a design that is still moving produces migrations that
 have to be rewritten, and a forward-only migration cannot be rewritten.
 

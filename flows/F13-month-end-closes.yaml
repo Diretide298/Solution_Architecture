@@ -1,0 +1,117 @@
+# F13 — Month end closes
+#
+# The flow that touches the most contracts without a guest anywhere in it. Written
+# second among the finance flows because everything else posts into it.
+#
+# Validated by tools/check-flows.py.
+
+id: F13
+name: Month end closes
+actor: financeController
+capability: C21
+wave: 2
+frequency: monthly
+criticality: financial
+platforms:
+- P08 Venue Management
+offlineBehaviour: Not offline. A period close reads every posting in the month and writes a balance;
+  a cell that cannot reach its primary must not begin one.
+trigger:
+  description: The month has ended and the books must be closed before anyone reports on them.
+  entryScreen: BO-090
+  entryPoints:
+  - Calendar
+  - Finance controller initiates
+  - Group deadline
+steps:
+- step: 1
+  screen: BO-090
+  action: Opens the period and sees what is blocking
+  operations:
+  - listFiscalPeriods
+  - getTrialBalance
+  outcome: Unposted journals, open shifts, unreconciled settlements — each named
+- step: 2
+  screen: BO-040
+  action: Clears outstanding shift variances
+  operations:
+  - listShifts
+  - acceptShiftVariance
+  outcome: A shift left open in the period blocks the close
+- step: 3
+  screen: BO-089
+  action: Posts the remaining journals
+  operations:
+  - listJournalEntries
+  - approveJournalEntry
+  outcome: Accruals, adjustments, corrections
+- step: 4
+  screen: BO-090
+  action: Begins the close
+  operations:
+  - beginPeriodClose
+  outcome: The period stops accepting postings. **Sales continue** — the period is a ledger boundary,
+    not a trading one
+- step: 5
+  screen: BO-090
+  action: Reviews the trial balance
+  operations:
+  - getTrialBalance
+  outcome: It balances, or the close does not proceed
+- step: 6
+  screen: BO-090
+  action: Closes
+  operations:
+  - closeFiscalPeriod
+  outcome: Locked. Later corrections post to the next period with a reference
+branches:
+- at: 1
+  condition: An open shift in the period
+  behaviour: '**The close blocks.** A shift with an uncounted drawer is a cash figure nobody has confirmed,
+    and closing over it books a number that will change.'
+  severity: requiresStaff
+  resolvedBy: Venue manager
+- at: 1
+  condition: A settlement exception is unresolved
+  behaviour: Blocks. The gateway says one figure and the ledger says another, and closing picks one
+    arbitrarily.
+  severity: requiresStaff
+  resolvedBy: Finance
+- at: 3
+  condition: A journal needs approval and the approver is away
+  behaviour: '`approvals` delegation. **This is why delegation is time-bounded** — a month end waiting
+    on someone on leave is the case it exists for.'
+  severity: recoverable
+  resolvedBy: Delegate
+- at: 4
+  condition: A sale arrives after the period began closing
+  behaviour: Posts to the next period automatically with a reference to the date. **It is not rejected**
+    — a guest buying a ticket does not care that finance is closing.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 5
+  condition: The trial balance does not balance
+  behaviour: '**Stops.** The close is abandoned, the period reopens for posting, and the difference
+    is investigated. Closing an unbalanced period moves the problem rather than solving it.'
+  severity: abandonsFlow
+  resolvedBy: Finance controller
+- at: 6
+  condition: A correction is needed after closing
+  behaviour: '`reopenPeriod`, which requires approval and is recorded. **Or a reversal in the current
+    period**, which is usually right — reopening a closed period invalidates every report already issued
+    from it.'
+  severity: requiresStaff
+  resolvedBy: Finance controller
+- at: 2
+  condition: FX revaluation is pending
+  behaviour: Inter-entity obligations in a foreign currency must be revalued before the balance means
+    anything.
+  severity: recoverable
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Period closed and locked
+- state: deferred
+  description: Close abandoned, period reopened for correction
+- state: escalated
+  description: Unbalanced and referred

@@ -18,6 +18,8 @@ transitions:
   to: ready
   trigger: job
   guard: Derivatives generated and the virus scan passed
+  emits:
+  - assets.documentIndexed
 - from: processing
   to: quarantined
   trigger: job

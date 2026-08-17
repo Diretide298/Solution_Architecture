@@ -1,0 +1,1273 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — AI
+  version: 1.0.0
+  x-ticvai-screen-count: 5
+  x-ticvai-module: "8 — Unified Operations Dashboard (AI)"
+  x-ticvai-tier: satellite
+  description: >
+    **Retrieval and inference over data the platform already holds. Nothing here needs a trained
+    model.**
+
+    Scope was set on 14 August. Forecasting, fraud detection, dynamic pricing and recommendation
+    all require operating history that does not exist before go-live, and a model trained on
+    nothing predicts nothing. Those 194 requirements are parked with their front ends, back ends
+    and tables buildable and their engines deferred.
+
+    What is left is the part that works on day one because it reads what is already there: a
+    conversational assistant grounded in the tenant's own catalogue and configuration (8.4.38
+    names RAG outright), semantic search across products and documents (8.4.39), configuration
+    assistance that walks an admin through creating a product (CF-57, the client's stated first
+    priority), map and layout generation from an uploaded plan, and the governance that makes
+    all of it auditable.
+
+    ## Four rules this contract enforces
+
+    **No provider SDK in capability code.** `AiProvider` is configuration. OpenAI, Gemini,
+    Claude and a local model are interchangeable at the operation level (8.4.21–8.4.25), and
+    failover between them is a platform concern rather than a caller's (8.4.26).
+
+    **Tenant isolation is partition-level, never filter-level.** A knowledge collection belongs
+    to one tenant. **A forgotten filter is a cross-tenant breach; a missing collection is a loud
+    failure**, and the second is the one to design for.
+
+    **Read-only against the transactional core.** An AI capability must never become a
+    permission bypass. Retrieval runs as the calling principal and returns only what that
+    principal could have read directly. An assistant that can see more than its user is a
+    privilege escalation with a friendly interface.
+
+    **Nothing acts without approval.** The assistant drafts a product, a promotion or a pricing
+    rule and a person applies it (8.3.61–8.3.66). Financial and pricing actions require approval
+    before execution, and that is enforced here rather than assumed downstream.
+
+    ## What is deliberately absent
+
+    No training, no fine-tuning, no model registry. Providers are called, not trained. When the
+    parked capabilities arrive they will need all three, and adding them then is cheaper than
+    carrying an unused abstraction now.
+  contact:
+    name: TICVAI Platform
+servers:
+  - url: https://api.{region}.ticvai.com/ai/v1
+    variables:
+      region:
+        default: ae
+security:
+  - bearerAuth: []
+tags:
+  - name: assist
+    description: Conversational assistance, grounded in the tenant's own data
+  - name: retrieval
+    description: Semantic search and the collections it searches
+  - name: generate
+    description: Draft a configuration a person then reviews
+  - name: governance
+    description: Logging, approval, explainability and cost
+  - name: config
+    description: Providers, models and policy
+paths:
+
+  /conversations:
+    get:
+      operationId: listAiConversations
+      x-ticvai-consumed-by:
+        - "P06 EMP-019 AI assistant — home"
+        - "P06 EMP-020 AI assistant — answer"
+      summary: A principal's conversation history
+      description: >
+        8.4.30. Retained because an assistant with no memory of yesterday is a search box, and
+        because the governance requirements need the history to exist (8.3.59).
+      tags: [assist]
+      x-ticvai-permission: AI_USE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AiConversation' }
+
+    post:
+      operationId: createAiConversation
+      x-ticvai-consumed-by:
+        - "P06 EMP-019 AI assistant — home"
+        - "P06 EMP-020 AI assistant — answer"
+      summary: Open a conversation
+      description: >
+        Scoped to a module and a role, because the same question means different things to a
+        cashier and a finance controller (8.4.6). The scope is taken from the session, never
+        from the request — an assistant that accepts the venue it should answer about is an
+        assistant that can be asked about someone else's.
+      tags: [assist]
+      x-ticvai-permission: AI_USE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [module]
+              properties:
+                module:
+                  type: string
+                  description: Which part of the platform the conversation is about (8.4.1).
+                locale:
+                  type: string
+                  description: 8.4.3. Multilingual, and Arabic is not an afterthought here.
+      responses:
+        '201':
+          description: Opened
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiConversation' }
+
+  /conversations/{conversationId}/messages:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: sendAiMessage
+      x-ticvai-consumed-by:
+        - "P06 EMP-019 AI assistant — home"
+        - "P06 EMP-020 AI assistant — answer"
+      summary: Ask
+      description: >
+        **The central operation.** Natural language in, a grounded answer out, with its sources
+        (8.4.2, 8.4.10, 8.4.38).
+
+        Retrieval runs **as the calling principal**. The assistant can see exactly what that
+        person could have read directly and nothing more — no service account, no elevated
+        query. This is the difference between an assistant and a privilege escalation with a
+        friendly interface.
+
+        Every response carries a trace id, the model and provider that produced it, token
+        counts and its sources. Not for the user's benefit: for cost attribution and for the
+        grounding audit that 8.3.70 requires.
+
+        **Where the answer proposes an action, it is a draft.** The response carries a
+        `proposedAction` the caller may apply through the owning contract, and applying it is a
+        separate, permissioned, audited step (8.3.61–8.3.64).
+      tags: [assist]
+      x-ticvai-permission: AI_USE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string, minLength: 1, maxLength: 8000 }
+                collectionIds:
+                  type: array
+                  description: >
+                    Restrict retrieval to named collections. Absent means every collection the
+                    principal may read.
+                  items: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Answered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiMessage' }
+        '429':
+          description: >
+            Usage limit reached for this tenant or principal (8.3.76). The limit is a cost
+            control, and the message says which limit rather than failing opaquely.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '503':
+          description: >
+            Every configured provider failed. **Reported rather than retried indefinitely** —
+            an assistant that hangs is worse than one that says it cannot answer.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /search:
+    post:
+      operationId: semanticSearch
+      x-ticvai-consumed-by:
+        - "P06 EMP-040 Knowledge base"
+        - "P06 EMP-041 Training"
+      summary: Search meaning, not words
+      description: >
+        8.4.39. Across products, tickets, memberships, documents and knowledge collections.
+
+        Separate from the conversational path because most of the time a person wants a list
+        and not a paragraph, and generating prose to answer "which annual passes do we sell"
+        costs tokens to produce something worse than a table.
+
+        Results are scoped to the principal, and each carries the collection it came from so a
+        wrong answer can be traced to a wrong document rather than blamed on the model.
+      tags: [retrieval]
+      x-ticvai-permission: AI_USE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query: { type: string, minLength: 2, maxLength: 500 }
+                kinds:
+                  type: array
+                  items:
+                    type: string
+                    enum: [product, entitlement, membership, document, knowledge, faq, report]
+                limit: { type: integer, default: 20, maximum: 100 }
+      responses:
+        '200':
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SearchResult' }
+
+  /collections:
+    get:
+      operationId: listKnowledgeCollections
+      summary: Collections available to this tenant
+      description: >
+        **A collection belongs to exactly one tenant.** Isolation is partition-level, never a
+        filter on a shared index — a forgotten filter is a cross-tenant breach, and a missing
+        collection is a loud failure. Only the second is recoverable.
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/KnowledgeCollection' }
+
+    post:
+      operationId: createKnowledgeCollection
+      summary: Create a collection
+      description: >
+        Approved enterprise knowledge sources (8.4.38) — operating procedures, policies, product
+        notes. **Named sources, not the open web.**
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/KnowledgeCollection' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KnowledgeCollection' }
+
+  /collections/{collectionId}/documents:
+    parameters:
+      - name: collectionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: ingestKnowledgeDocument
+      summary: Add a document
+      description: >
+        8.4.11. Chunked and embedded asynchronously — `status` moves through `processing`
+        before `indexed`, and **a document that says "added" while still processing is a
+        document a user will search for and not find**.
+
+        Documents carry the scope they may be retrieved at. A venue operating procedure is not
+        an answer to a question about another venue.
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/KnowledgeDocument' }
+      responses:
+        '202':
+          description: Accepted for indexing
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KnowledgeDocument' }
+
+  /generate/configuration:
+    post:
+      operationId: generateConfiguration
+      summary: Draft a configuration from a description
+      description: >
+        **The client's stated first priority (CF-57).** An admin says what they want and the
+        assistant asks the questions that narrow it — admission or timed entry, which venue,
+        which price list — then produces a draft (8.4.7, 8.4.13, 8.4.31–8.4.37, 8.8.10–8.8.14).
+
+        Covers products, memberships, passes, promotions, discount rules, pricing calendars,
+        seating zones and operating hours.
+
+        **It drafts. It does not create.** The response is a payload for the owning contract's
+        create operation, and a person applies it there under their own permission. That
+        separation is why an assistant with broad reach is safe: it can propose anything and
+        commit nothing.
+      tags: [generate]
+      x-ticvai-permission: AI_USE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, description]
+              properties:
+                kind:
+                  type: string
+                  enum: [product, membership, pass, promotion, discountRule, pricingCalendar,
+                         seatingZone, operatingHours, campaign]
+                description: { type: string, minLength: 5, maxLength: 4000 }
+                conversationId:
+                  type: string
+                  format: uuid
+                  description: Where the clarifying questions were asked and answered.
+      responses:
+        '200':
+          description: A draft, plus what it needed to guess
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GeneratedConfiguration' }
+
+  /generate/venue-layout:
+    post:
+      operationId: generateVenueLayout
+      summary: Draft a seat map from an uploaded plan
+      description: >
+        Raised by Chinmay on 14 August as the near-term use case that needs no history: a venue
+        uploads a plan image and a schema, and the platform proposes the seat map, categories
+        and the ticket configuration that follows.
+
+        **A draft into the seat-map import pipeline**, which already has a preview step for
+        exactly this reason — a manifest somebody made is always wrong the first time in a way
+        only a person looking at it will notice. The generated layout enters at `previewReady`
+        and a human commits it.
+      tags: [generate]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [venueId, planAssetId]
+              properties:
+                venueId: { type: string, format: uuid }
+                planAssetId:
+                  type: string
+                  format: uuid
+                  description: The uploaded plan image, in the media store.
+                schemaAssetId:
+                  type: string
+                  format: uuid
+                  description: A manifest or schema file where one exists.
+                notes: { type: string, maxLength: 2000 }
+      responses:
+        '202':
+          description: >
+            An import job at `previewReady`. Nothing is written to the seat map until a person
+            commits it.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LayoutDraft' }
+        '422':
+          description: The plan could not be interpreted. The reason is specific enough to act on
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /interactions:
+    get:
+      operationId: listAiInteractions
+      x-ticvai-consumed-by:
+        - "P08 BO-068 Audit Log"
+        - "P09 ADM-004 Platform Audit Log"
+      summary: Every prompt, response and action
+      description: >
+        8.1.2, 8.1.3, 8.3.55–8.3.57. The audit trail, and the reason it is a first-class
+        operation rather than a log file: **8.1.6 requires a history of AI actions and the user
+        decisions taken against them**, and a log nobody can query is not an audit trail.
+
+        Carries the prompt, the response, the provider and model, token counts, cost, latency,
+        the sources retrieved and whether a proposed action was applied or rejected. **The
+        rejection is the interesting record** — an assistant whose suggestions are refused nine
+        times in ten is a measurable problem.
+      tags: [governance]
+      x-ticvai-permission: AI_AUDIT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: principalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: outcome
+          in: query
+          schema: { type: string, enum: [answered, refused, applied, rejected, failed] }
+        - name: from
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Interactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AiInteraction' }
+
+  /proposed-actions:
+    get:
+      operationId: listProposedActions
+      summary: What the assistant has proposed and nobody has decided
+      description: >
+        8.3.61–8.3.66. Pricing, promotional, operational and financial proposals wait here for
+        approval, and multi-level approval is supported because a pricing change and a discount
+        rule do not carry the same authority.
+      tags: [governance]
+      x-ticvai-permission: AI_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Awaiting a decision
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProposedAction' }
+
+  /proposed-actions/{actionId}/decide:
+    parameters:
+      - name: actionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: decideProposedAction
+      summary: Approve or reject a proposal
+      description: >
+        **Approval is recorded here; execution happens in the owning contract under the
+        approver's own permission.** This operation does not apply the change.
+
+        That separation matters: an approval endpoint that also executes would let a person
+        approve something they could not themselves do, and the whole control depends on them
+        being the same person.
+
+        A rejection carries a reason. It is the only signal that the assistant is proposing
+        badly, and without it a bad model degrades silently.
+      tags: [governance]
+      x-ticvai-permission: AI_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [approve, reject] }
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Decided
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProposedAction' }
+        '403':
+          description: >
+            The approver may not authorise this kind of action, or is the principal who
+            prompted it.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /usage:
+    get:
+      operationId: getAiUsage
+      summary: Usage, cost and performance
+      description: >
+        8.1.7, 8.3.81–8.3.83. Tokens, cost and latency by tenant, venue, principal, provider and
+        capability.
+
+        **Cost attribution is the reason every response carries a token count.** An AI feature
+        with no cost signal is a bill nobody predicted, and the first month is when it matters.
+      tags: [governance]
+      x-ticvai-permission: AI_AUDIT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: groupBy
+          in: query
+          schema: { type: string, enum: [tenant, venue, principal, provider, capability, day] }
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiUsageReport' }
+
+  /providers:
+    get:
+      operationId: listAiProviders
+      summary: Configured providers and their order
+      description: >
+        8.4.21–8.4.26. OpenAI, Gemini, Claude and a local model, several at once, with failover.
+
+        **Order is configuration, not code.** A capability names what it needs — a model that
+        reasons, a model that embeds — and the platform resolves which provider serves it. That
+        is what makes "no provider SDK in capability code" enforceable rather than aspirational.
+      tags: [config]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-config-scope: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AiProvider' }
+
+    put:
+      operationId: setAiProvider
+      summary: Configure a provider
+      description: >
+        **Region-scoped, because inference is a data transfer.** ADR-0009: a prompt containing
+        guest data leaves the jurisdiction the moment it reaches a provider hosted elsewhere,
+        and which providers a region may use is a residency decision rather than a preference.
+
+        Credentials are a key-vault reference, never the key.
+      tags: [config]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-config-scope: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AiProvider' }
+      responses:
+        '200':
+          description: Configured
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiProvider' }
+
+  /policy:
+    get:
+      operationId: getAiPolicy
+      summary: What the assistant may do here
+      description: >
+        8.3.72–8.3.80. Which capabilities are enabled, which roles may use them, what is masked
+        before it reaches a provider, and the usage ceiling.
+      tags: [config]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiPolicy' }
+
+    put:
+      operationId: setAiPolicy
+      summary: Set the policy
+      description: >
+        **Tenant sets the default; a venue may narrow it and never widen it** (8.4.4 and 8.4.5,
+        adjacent requirements asking for both, which is ADR-0018's inheritance rule stated by
+        the matrix itself).
+
+        Masking is the part to get right. `maskedFields` names what is redacted before a prompt
+        leaves the platform, and it defaults to every field in the `pii` schema — **a default
+        that fails closed, because a masking list somebody forgot to fill in should send
+        nothing rather than everything.**
+      tags: [config]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AiPolicy' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiPolicy' }
+
+  /index-sources:
+    get:
+      operationId: listIndexSources
+      summary: What is indexed, and how current it is
+      description: >
+        **A source is declared once here, not implemented in twenty-two services.**
+
+        The alternative — every service calling the AI service when its content changes — makes
+        AI a dependency of the catalogue, the CMS, maintenance and marketing, and a failure in
+        indexing then becomes a failure in publishing a product. That is backwards: **retrieval
+        is downstream of the business, and downstream failures must not propagate upstream.**
+
+        Instead each source names the domain event that already exists. `catalogue.product` is
+        reindexed when `catalogue.productPublished` is published, and the catalogue never learns
+        that AI exists.
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Sources with their freshness
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IndexSource' }
+
+    put:
+      operationId: setIndexSource
+      summary: Declare a source indexed
+      description: >
+        Names the table, the fields that carry retrievable text, the collection it lands in and
+        the event that invalidates it.
+
+        **`textFields` is the important one.** Indexing an entire row embeds ids, timestamps and
+        foreign keys as though they were meaning, and a search for "annual pass" then matches a
+        UUID. Only the fields a person would read are embedded; the rest becomes payload used
+        for filtering.
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/IndexSource' }
+      responses:
+        '200':
+          description: Declared
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IndexSource' }
+
+  /index-sources/{sourceId}/reindex:
+    parameters:
+      - name: sourceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: reindexSource
+      summary: Rebuild a source
+      description: >
+        Needed for three reasons and worth naming them: the embedding model changed, the
+        `textFields` changed, or incremental indexing drifted and nobody knows why.
+
+        **Builds into a shadow collection and swaps on completion.** Reindexing in place leaves
+        the assistant answering from a half-built index, which is worse than answering from a
+        stale one — a stale answer is wrong in a knowable way.
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  enum: [embeddingModelChanged, fieldsChanged, driftSuspected, initialBuild]
+      responses:
+        '202':
+          description: Rebuilding
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IndexJob' }
+        '409':
+          description: Already rebuilding
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /index-sources/{sourceId}/entries/{entryId}:
+    parameters:
+      - name: sourceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: removeIndexEntry
+      summary: Remove one record from the index
+      description: >
+        **The erasure path.** When a subject is erased (`pii.erase_subject`) or a page is
+        unpublished, its vectors must go too — a knowledge base that keeps answering from a
+        deleted document is a deletion that did not happen.
+
+        Deleting from Postgres does not delete from Qdrant. Nothing cascades between the two
+        stores, which is why this operation exists rather than being implied.
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '204':
+          description: Removed from both stores
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /index-jobs:
+    get:
+      operationId: listIndexJobs
+      summary: Indexing in flight and recently finished
+      description: >
+        Progress, failures and the count of records an index could not embed. **A source that
+        silently fails on 3% of its rows is a search that silently misses 3% of the answers.**
+      tags: [retrieval]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IndexJob' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AiProviderKind:
+      type: string
+      enum: [openai, gemini, anthropic, azureOpenai, localLlm]
+
+    AiCapability:
+      type: string
+      description: >
+        What a capability needs, not which provider serves it. This indirection is what makes
+        "no provider SDK in capability code" enforceable.
+      enum: [chat, embedding, vision, rerank]
+
+    AiProvider:
+      type: object
+      x-ticvai-persistence: "ai.provider"
+      required: [kind, capability, priority, isActive]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        kind: { $ref: '#/components/schemas/AiProviderKind' }
+        capability: { $ref: '#/components/schemas/AiCapability' }
+        model: { type: string }
+        priority:
+          type: integer
+          description: Failover order (8.4.26). Lower is tried first.
+        credentialRef:
+          type: string
+          description: >
+            A key-vault reference, never the key. A key typed into a form ends up in a
+            screenshot.
+        endpoint: { type: string, nullable: true }
+        residency:
+          type: string
+          description: >
+            Where inference physically happens. **A prompt reaching a provider hosted elsewhere
+            is a cross-border transfer** (ADR-0009), and this field is what makes that
+            auditable rather than assumed.
+        maxTokens: { type: integer }
+        isActive: { type: boolean }
+
+    AiPolicy:
+      type: object
+      x-ticvai-persistence: "ai.policy"
+      required: [scopeLevel, enabledCapabilities]
+      properties:
+        scopeLevel:
+          type: string
+          enum: [tenant, venue]
+          description: Tenant sets the default; a venue may narrow it and never widen it.
+        enabledCapabilities:
+          type: array
+          items:
+            type: string
+            enum: [assist, search, generateConfiguration, generateLayout, summarise, explain]
+        allowedRoleIds:
+          type: array
+          items: { type: string, format: uuid }
+        maskedFields:
+          type: array
+          description: >
+            Redacted before a prompt leaves the platform (8.3.73). **Defaults to every field in
+            the pii schema** — a masking list nobody filled in should send nothing rather than
+            everything.
+          items: { type: string }
+        requiresApprovalFor:
+          type: array
+          description: 8.3.61–8.3.64. Nothing in this list executes without a decision.
+          items:
+            type: string
+            enum: [pricing, promotion, operational, financial, configuration]
+        monthlyTokenCeiling: { type: integer, nullable: true }
+        retainInteractionsDays:
+          type: integer
+          description: >
+            How long prompts and responses are kept. **Unresolved — CF-64.** Prompts may carry
+            personal data, so this is a retention decision nobody has made.
+
+    AiConversation:
+      type: object
+      x-ticvai-persistence: "ai.conversation"
+      required: [id, principalId, module, startedAt]
+      properties:
+        id: { type: string, format: uuid }
+        principalId: { type: string, format: uuid }
+        scopePath: { type: string }
+        module: { type: string }
+        locale: { type: string }
+        messageCount: { type: integer }
+        startedAt: { type: string, format: date-time }
+        lastMessageAt: { type: string, format: date-time }
+
+    AiSource:
+      type: object
+      x-ticvai-persistence: "none — embedded in the interaction"
+      description: >
+        What the answer was grounded in (8.3.70). **An answer with no sources is a guess**, and
+        the interface should show it as one.
+      properties:
+        kind: { type: string, enum: [document, product, entitlement, report, record] }
+        id: { type: string }
+        title: { type: string }
+        collectionId: { type: string, format: uuid, nullable: true }
+        excerpt: { type: string }
+        relevance: { type: number }
+
+    AiMessage:
+      type: object
+      x-ticvai-persistence: "ai.message"
+      required: [id, conversationId, role, content, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        conversationId: { type: string, format: uuid }
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        sources:
+          type: array
+          items: { $ref: '#/components/schemas/AiSource' }
+        confidence:
+          type: number
+          nullable: true
+          description: >
+            8.1.5, 8.3.67. **Nullable on purpose** — a provider that does not report confidence
+            must yield null rather than an invented number, and an interface showing 0.9 because
+            the code defaulted it is worse than showing nothing.
+        rationale:
+          type: string
+          nullable: true
+          description: 8.3.68, 8.3.69.
+        proposedAction:
+          allOf:
+            - $ref: '#/components/schemas/ProposedAction'
+          nullable: true
+          description: Present where the answer suggests a change. **A draft, never applied here.**
+        traceId: { type: string }
+        provider: { $ref: '#/components/schemas/AiProviderKind' }
+        model: { type: string }
+        promptTokens: { type: integer }
+        completionTokens: { type: integer }
+        latencyMs: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    ProposedAction:
+      type: object
+      x-ticvai-persistence: "ai.proposed_action"
+      required: [id, kind, targetContract, targetOperation, payload, status]
+      properties:
+        id: { type: string, format: uuid }
+        interactionId: { type: string, format: uuid }
+        kind:
+          type: string
+          enum: [pricing, promotion, operational, financial, configuration]
+        targetContract:
+          type: string
+          description: Which contract would perform it. The assistant never performs it itself.
+        targetOperation: { type: string }
+        payload:
+          type: object
+          additionalProperties: true
+          description: The request body a person would submit, ready to review.
+        summary: { type: string }
+        status:
+          type: string
+          enum: [proposed, approved, rejected, applied, expired]
+        approvalLevel:
+          type: integer
+          description: 8.3.65. Multi-level, because a discount and a pricing change differ in authority.
+        decidedByPrincipalId: { type: string, format: uuid, nullable: true }
+        decisionReason:
+          type: string
+          nullable: true
+          description: >
+            Required on rejection. **The only signal the assistant is proposing badly**, and
+            without it a poor model degrades silently.
+        proposedAt: { type: string, format: date-time }
+        decidedAt: { type: string, format: date-time, nullable: true }
+
+    AiInteraction:
+      type: object
+      x-ticvai-persistence: "ai.interaction"
+      required: [id, principalId, capability, outcome, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        conversationId: { type: string, format: uuid, nullable: true }
+        principalId: { type: string, format: uuid }
+        scopePath: { type: string }
+        capability: { type: string }
+        prompt: { type: string }
+        response: { type: string }
+        sources:
+          type: array
+          items: { $ref: '#/components/schemas/AiSource' }
+        outcome: { type: string, enum: [answered, refused, applied, rejected, failed] }
+        refusalReason: { type: string, nullable: true }
+        provider: { $ref: '#/components/schemas/AiProviderKind' }
+        model: { type: string }
+        promptTokens: { type: integer }
+        completionTokens: { type: integer }
+        costMinor: { type: integer, description: In the region's base currency, minor units }
+        latencyMs: { type: integer }
+        maskedFieldCount:
+          type: integer
+          description: How many fields were redacted. Zero on a prompt touching guest data is a defect.
+        traceId: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    IndexSource:
+      type: object
+      x-ticvai-persistence: "ai.index_source"
+      description: >
+        One declaration per indexed table. **The service that owns the table does not know this
+        exists** — the AI service consumes the domain event the owner already publishes.
+      required: [table, textFields, collection, scopeLevel]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        table:
+          type: string
+          description: Schema-qualified, e.g. `whitelabel.content_page`.
+        contract:
+          type: string
+          description: Which contract owns it, for tracing back.
+        textFields:
+          type: array
+          minItems: 1
+          description: >
+            The fields a person would read. **Only these are embedded** — indexing a whole row
+            embeds ids and timestamps as though they were meaning, and a search for "annual
+            pass" then matches a UUID.
+          items: { type: string }
+        payloadFields:
+          type: array
+          description: >
+            Carried alongside the vector for filtering, not embedded. Always includes
+            `scope_path` — **the vector store has no row-level security, so scope travels in
+            the payload or it does not travel at all.**
+          items: { type: string }
+        collection:
+          type: string
+          description: Which Qdrant collection it lands in.
+        scopeLevel: { type: string, enum: [tenant, region, venue] }
+        invalidatedBy:
+          type: array
+          description: >
+            Domain events that make an entry stale. `catalogue.product` names
+            `catalogue.productPublished`, and the catalogue never learns AI exists.
+          items: { type: string }
+        chunkStrategy:
+          type: string
+          enum: [wholeRecord, paragraph, fixedTokens, section]
+          description: >
+            `wholeRecord` for a product description, `section` for a policy or an operating
+            procedure. A 40-page document embedded as one vector retrieves as one thing and
+            answers nothing precisely.
+        isActive: { type: boolean }
+        entryCount: { type: integer, readOnly: true }
+        lastIndexedAt: { type: string, format: date-time, readOnly: true, nullable: true }
+        staleCount:
+          type: integer
+          readOnly: true
+          description: Records changed since their last embedding. Non-zero for long is drift.
+
+    IndexJob:
+      type: object
+      x-ticvai-persistence: "ai.index_job"
+      required: [id, sourceId, status, startedAt]
+      properties:
+        id: { type: string, format: uuid }
+        sourceId: { type: string, format: uuid }
+        kind: { type: string, enum: [full, incremental, removal] }
+        reason: { type: string }
+        status:
+          type: string
+          enum: [queued, building, verifying, swapping, complete, failed]
+        recordsTotal: { type: integer }
+        recordsEmbedded: { type: integer }
+        recordsFailed:
+          type: integer
+          description: >
+            **The number to watch.** A source silently failing on 3% of its rows is a search
+            silently missing 3% of the answers, and nothing else in the system will say so.
+        failureSample:
+          type: array
+          items: { type: string }
+        shadowCollection:
+          type: string
+          nullable: true
+          description: >
+            A full rebuild writes here and swaps on completion. Reindexing in place leaves the
+            assistant answering from a half-built index.
+        embeddingModel: { type: string }
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    KnowledgeCollection:
+      type: object
+      x-ticvai-persistence: "ai.knowledge_collection"
+      required: [name, scopeLevel]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        name: { type: string }
+        description: { type: string }
+        scopeLevel: { type: string, enum: [tenant, region, venue] }
+        scopePath: { type: string, readOnly: true }
+        documentCount: { type: integer, readOnly: true }
+        embeddingModel:
+          type: string
+          readOnly: true
+          description: >
+            Recorded because **changing it invalidates every embedding in the collection**, and
+            a collection silently searched with mismatched vectors returns plausible nonsense.
+        isActive: { type: boolean }
+
+    KnowledgeDocument:
+      type: object
+      x-ticvai-persistence: "ai.knowledge_document"
+      required: [title, sourceAssetId]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        collectionId: { type: string, format: uuid, readOnly: true }
+        title: { type: string }
+        sourceAssetId: { type: string, format: uuid }
+        mimeType: { type: string }
+        status:
+          type: string
+          enum: [processing, indexed, failed, superseded]
+          readOnly: true
+        chunkCount: { type: integer, readOnly: true }
+        failureReason: { type: string, nullable: true, readOnly: true }
+        indexedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
+    SearchResult:
+      type: object
+      x-ticvai-persistence: "none — computed"
+      properties:
+        kind: { type: string }
+        id: { type: string }
+        title: { type: string }
+        excerpt: { type: string }
+        relevance: { type: number }
+        collectionId: { type: string, format: uuid, nullable: true }
+        scopePath: { type: string }
+
+    GeneratedConfiguration:
+      type: object
+      x-ticvai-persistence: "none — a draft, applied through the owning contract"
+      required: [kind, targetContract, targetOperation, payload]
+      properties:
+        kind: { type: string }
+        targetContract: { type: string }
+        targetOperation: { type: string }
+        payload:
+          type: object
+          additionalProperties: true
+        assumptions:
+          type: array
+          description: >
+            **What it had to guess.** An admin reviewing a draft needs to know which fields came
+            from what they said and which the assistant chose, or they approve a decision they
+            did not make.
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              value: { type: string }
+              reason: { type: string }
+        clarificationsNeeded:
+          type: array
+          description: What it could not resolve and should ask about.
+          items: { type: string }
+        confidence: { type: number, nullable: true }
+        traceId: { type: string }
+
+    LayoutDraft:
+      type: object
+      x-ticvai-persistence: "none — becomes a seating import job"
+      required: [importJobId, status]
+      properties:
+        importJobId:
+          type: string
+          format: uuid
+          description: >
+            Enters the seat-map import pipeline at `previewReady`. Nothing is written until a
+            person commits it.
+        status: { type: string, enum: [parsing, previewReady, failed] }
+        seatCount: { type: integer }
+        sectionCount: { type: integer }
+        categoriesProposed:
+          type: array
+          items: { type: string }
+        unresolved:
+          type: array
+          description: Regions of the plan it could not interpret, named so a person can fix them.
+          items: { type: string }
+        traceId: { type: string }
+
+    AiUsageReport:
+      type: object
+      x-ticvai-persistence: "none — aggregated from ai.interaction"
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        groupBy: { type: string }
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: string }
+              interactions: { type: integer }
+              promptTokens: { type: integer }
+              completionTokens: { type: integer }
+              costMinor: { type: integer }
+              p95LatencyMs: { type: integer }
+              refusalRate: { type: number }
+              rejectionRate:
+                type: number
+                description: >
+                  Proposals a person refused. **The number that says whether the assistant is
+                  worth having**, and the one nobody thinks to measure.

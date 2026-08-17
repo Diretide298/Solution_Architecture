@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 4
+  x-ticvai-screen-count: 13
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -106,6 +106,10 @@ paths:
   /merchandise:
     get:
       operationId: listMerchandise
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-048 Retail Products"
       x-ticvai-read-routing: replica
       summary: List merchandise
       description: >
@@ -148,6 +152,8 @@ paths:
 
     post:
       operationId: createMerchandise
+      x-ticvai-consumed-by:
+        - "P08 BO-048 Retail Products"
       summary: Create a merchandise item
       description: >
         Links a sellable catalogue variant to an inventory item. That link is what makes a
@@ -186,6 +192,8 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateMerchandise
+      x-ticvai-consumed-by:
+        - "P08 BO-048 Retail Products"
       summary: Amend a merchandise item
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -216,6 +224,10 @@ paths:
   /merchandise/lookup:
     get:
       operationId: lookupMerchandise
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-048 Retail Products"
       x-ticvai-read-routing: primary
       summary: Price and stock check by barcode
       description: >
@@ -254,6 +266,8 @@ paths:
   /retail-sales:
     get:
       operationId: listRetailSales
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       x-ticvai-read-routing: replica
       summary: List retail sales
       tags: [sale]
@@ -292,6 +306,8 @@ paths:
 
     post:
       operationId: createRetailSale
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       summary: Sell merchandise
       description: >
         **Not offline-capable.** Stock depletes in real time and a specific unit cannot be
@@ -336,6 +352,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getRetailSale
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       x-ticvai-read-routing: replica
       summary: Read a retail sale
       description: >
@@ -357,6 +375,8 @@ paths:
   /retail-sales/lookup:
     get:
       operationId: lookupRetailSale
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       x-ticvai-read-routing: replica
       summary: Find a sale from a receipt
       description: >
@@ -538,6 +558,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getReturnPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-routing: replica
       summary: Read the retail return policy
       description: >
@@ -558,6 +580,8 @@ paths:
 
     put:
       operationId: setReturnPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-config-scope: venue
       summary: Set the retail return policy
       tags: [return]
@@ -588,8 +612,6 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getWallet
-      x-ticvai-consumed-by:
-        - "P01 WEB-021 Wallet & Gift Cards"
       x-ticvai-read-routing: primary
       summary: Read a guest wallet
       description: >
@@ -773,8 +795,6 @@ paths:
         schema: { type: string }
     get:
       operationId: getGiftCard
-      x-ticvai-consumed-by:
-        - "P01 WEB-021 Wallet & Gift Cards"
       x-ticvai-read-routing: primary   # bearer instrument. Stale balance is double-spend
       summary: Check a gift card balance
       tags: [giftCard]
@@ -835,6 +855,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getOutletStock
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-routing: primary
       summary: Stock across an outlet
       description: >
@@ -936,8 +958,6 @@ paths:
   /shop-and-drop/lookup:
     get:
       operationId: lookupShopAndDrop
-      x-ticvai-consumed-by:
-        - "P02 GST-062 Shop & Drop Collection"
       summary: Find a guest's dropped goods
       description: >
         Scanned at the collection point. Accepts the entitlement, the drop reference, or the
@@ -1027,6 +1047,9 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reserveMerchandise
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: Reserve an item for collection
       description: >
         A guest who cannot carry a purchase around a venue collects it on the way out. The

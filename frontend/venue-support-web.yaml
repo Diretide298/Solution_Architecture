@@ -1,0 +1,79 @@
+# venue-support-web — operated by venue · staff on web
+# Serves: P12 Venue Support — Agent Console
+# Derived from screens/*.yaml. Do not hand-edit.
+
+app: venue-support-web
+operator: venue
+audience: staff
+formFactor: web
+status: not scaffolded
+runtime: reactWeb
+offlineCapable: false
+directions:
+- ltr
+- rtl
+platforms:
+- P12 Venue Support — Agent Console
+servesMultiplePlatforms: false
+packages:
+- design-tokens
+- ui
+- api-client
+contracts:
+- finance
+- identity
+- marketing-crm
+- reporting
+- white-label
+screenCount: 8
+byWave:
+  wave3: 8
+screens:
+- id: SUP-001
+  name: Agent Login
+  route: /general/agent-login
+  component: apps/venue-support-web/src/routes/general/AgentLoginList.tsx
+  wave: 3
+  status: notStarted
+- id: SUP-002
+  name: Agent Dashboard
+  route: /general/agent-dashboard
+  component: apps/venue-support-web/src/routes/general/AgentDashboard.tsx
+  wave: 3
+  status: notStarted
+- id: SUP-003
+  name: Availability & Routing Settings
+  route: /general/availability-and-routing-settings
+  component: apps/venue-support-web/src/routes/general/AvailabilityAndRoutingSettingsForm.tsx
+  wave: 3
+  status: notStarted
+- id: SUP-004
+  name: Conversation Queue
+  route: /general/conversation-queue
+  component: apps/venue-support-web/src/routes/general/ConversationQueueList.tsx
+  wave: 3
+  status: notStarted
+- id: SUP-005
+  name: Live Chat Workspace
+  route: /general/live-chat-workspace
+  component: apps/venue-support-web/src/routes/general/LiveChatWorkspaceDetail.tsx
+  wave: 3
+  status: notStarted
+- id: SUP-006
+  name: Knowledge Base Search
+  route: /general/knowledge-base-search
+  component: apps/venue-support-web/src/routes/general/KnowledgeBaseSearchList.tsx
+  wave: 3
+  status: notStarted
+- id: SUP-007
+  name: Canned Response Management
+  route: /general/canned-response-management
+  component: apps/venue-support-web/src/routes/general/CannedResponseManagementForm.tsx
+  wave: 3
+  status: notStarted
+- id: SUP-008
+  name: Agent Performance & SLA View
+  route: /general/agent-performance-and-sla-view
+  component: apps/venue-support-web/src/routes/general/AgentPerformanceAndSlaViewDashboard.tsx
+  wave: 3
+  status: notStarted

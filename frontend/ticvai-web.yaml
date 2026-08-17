@@ -1,0 +1,250 @@
+# ticvai-web — operated by ticvai · platformAdmin on web
+# Serves: P09 TICVAI Web — Platform Console
+# Derived from screens/*.yaml. Do not hand-edit.
+
+app: ticvai-web
+operator: ticvai
+audience: platformAdmin
+formFactor: web
+status: not scaffolded
+runtime: reactWeb
+offlineCapable: false
+directions:
+- ltr
+- rtl
+platforms:
+- P09 TICVAI Web — Platform Console
+servesMultiplePlatforms: false
+packages:
+- design-tokens
+- ui
+- api-client
+contracts:
+- ai
+- identity
+- platform-ops
+- reporting
+- subscription
+- white-label
+screenCount: 36
+byWave:
+  wave1: 10
+  wave2: 16
+  wave3: 10
+screens:
+- id: ADM-001
+  name: Platform Login / MFA
+  route: /general/platform-login-mfa
+  component: apps/ticvai-web/src/routes/general/PlatformLoginMfaList.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-002
+  name: Platform Dashboard
+  route: /general/platform-dashboard
+  component: apps/ticvai-web/src/routes/general/PlatformDashboard.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-005
+  name: Tenant Directory
+  route: /general/tenant-directory
+  component: apps/ticvai-web/src/routes/general/TenantDirectoryList.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-006
+  name: Tenant Hierarchy Explorer
+  route: /general/tenant-hierarchy-explorer
+  component: apps/ticvai-web/src/routes/general/TenantHierarchyExplorerList.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-007
+  name: Module & Feature Entitlement
+  route: /general/module-and-feature-entitlement
+  component: apps/ticvai-web/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-008
+  name: Subscription & Plan Management
+  route: /general/subscription-and-plan-management
+  component: apps/ticvai-web/src/routes/general/SubscriptionAndPlanManagementForm.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-012
+  name: Tenant Isolation & Resource Pool
+  route: /general/tenant-isolation-and-resource-pool
+  component: apps/ticvai-web/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-020
+  name: Platform User Directory
+  route: /general/platform-user-directory
+  component: apps/ticvai-web/src/routes/general/PlatformUserDirectoryList.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-021
+  name: Platform Role Management
+  route: /general/platform-role-management
+  component: apps/ticvai-web/src/routes/general/PlatformRoleManagementForm.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-027
+  name: Database Migration Console
+  route: /general/database-migration-console
+  component: apps/ticvai-web/src/routes/general/DatabaseMigrationConsoleDetail.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-003
+  name: Cross-Tenant Health Dashboard
+  route: /general/cross-tenant-health-dashboard
+  component: apps/ticvai-web/src/routes/general/CrossTenantHealthDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-004
+  name: Platform Audit Log
+  route: /general/platform-audit-log
+  component: apps/ticvai-web/src/routes/general/PlatformAuditLogList.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-009
+  name: Tenant Billing & Invoicing
+  route: /general/tenant-billing-and-invoicing
+  component: apps/ticvai-web/src/routes/general/TenantBillingAndInvoicingDetail.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-010
+  name: Usage Metering
+  route: /general/usage-metering
+  component: apps/ticvai-web/src/routes/general/UsageMeteringDetail.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-011
+  name: Licence & Seat Management
+  route: /general/licence-and-seat-management
+  component: apps/ticvai-web/src/routes/general/LicenceAndSeatManagementForm.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-013
+  name: Tenant Performance Monitor
+  route: /general/tenant-performance-monitor
+  component: apps/ticvai-web/src/routes/general/TenantPerformanceMonitorDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-016
+  name: White-Label Branding Management
+  route: /general/white-label-branding-management
+  component: apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-017
+  name: Domain & Certificate Management
+  route: /general/domain-and-certificate-management
+  component: apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-018
+  name: Localisation & Language Pack
+  route: /general/localisation-and-language-pack
+  component: apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-019
+  name: Global Configuration & Defaults
+  route: /general/global-configuration-and-defaults
+  component: apps/ticvai-web/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-022
+  name: Release & Version Management
+  route: /general/release-and-version-management
+  component: apps/ticvai-web/src/routes/general/ReleaseAndVersionManagementForm.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-023
+  name: Staging Promotion & Approval
+  route: /general/staging-promotion-and-approval
+  component: apps/ticvai-web/src/routes/general/StagingPromotionAndApprovalWizard.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-025
+  name: Tenant Upgrade Scheduler
+  route: /general/tenant-upgrade-scheduler
+  component: apps/ticvai-web/src/routes/general/TenantUpgradeSchedulerForm.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-028
+  name: Environment Registry
+  route: /general/environment-registry
+  component: apps/ticvai-web/src/routes/general/EnvironmentRegistryDetail.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-029
+  name: Deployment Monitor
+  route: /general/deployment-monitor
+  component: apps/ticvai-web/src/routes/general/DeploymentMonitorDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-033
+  name: Backup & DR Status
+  route: /general/backup-and-dr-status
+  component: apps/ticvai-web/src/routes/general/BackupAndDrStatusDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: ADM-014
+  name: Auto-Scaling Configuration
+  route: /general/auto-scaling-configuration
+  component: apps/ticvai-web/src/routes/general/AutoScalingConfigurationForm.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-015
+  name: API Rate Limit & Quota Management
+  route: /general/api-rate-limit-and-quota-management
+  component: apps/ticvai-web/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-024
+  name: Release Notification Composer
+  route: /general/release-notification-composer
+  component: apps/ticvai-web/src/routes/general/ReleaseNotificationComposerForm.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-026
+  name: End-of-Support Notice Management
+  route: /general/end-of-support-notice-management
+  component: apps/ticvai-web/src/routes/general/EndOfSupportNoticeManagementForm.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-030
+  name: Infrastructure Sizing & Scaling Policy
+  route: /general/infrastructure-sizing-and-scaling-policy
+  component: apps/ticvai-web/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-031
+  name: Security & Compliance Dashboard
+  route: /general/security-and-compliance-dashboard
+  component: apps/ticvai-web/src/routes/general/SecurityAndComplianceDashboard.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-032
+  name: WAF & Security Policy View
+  route: /general/waf-and-security-policy-view
+  component: apps/ticvai-web/src/routes/general/WafAndSecurityPolicyViewForm.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-034
+  name: Archival Job Monitor
+  route: /general/archival-job-monitor
+  component: apps/ticvai-web/src/routes/general/ArchivalJobMonitorDashboard.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-035
+  name: Support & Escalation Console
+  route: /general/support-and-escalation-console
+  component: apps/ticvai-web/src/routes/general/SupportAndEscalationConsoleDetail.tsx
+  wave: 3
+  status: notStarted
+- id: ADM-036
+  name: Platform Notification Broadcast
+  route: /general/platform-notification-broadcast
+  component: apps/ticvai-web/src/routes/general/PlatformNotificationBroadcastForm.tsx
+  wave: 3
+  status: notStarted

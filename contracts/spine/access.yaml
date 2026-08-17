@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 10
+  x-ticvai-screen-count: 23
   x-ticvai-tier: spine
   x-ticvai-module: "3 — Admission and Access"
   x-ticvai-requirements: 201
@@ -114,9 +114,27 @@ paths:
     post:
       operationId: validateAccess
       x-ticvai-consumed-by:
+        - "P06 EMP-010 Scan — ready"
+        - "P06 EMP-011 Scan — admitted"
+        - "P06 EMP-012 Scan — denied"
+        - "P06 EMP-013 Override"
+        - "P06 EMP-015 Group scan"
+        - "P06 EMP-016 Offline scanning"
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P07 SCN-003 Ready to scan"
         - "P07 SCN-004 Admitted"
         - "P07 SCN-005 Denied"
+        - "P07 SCN-006 Override"
+        - "P07 SCN-007 Group admission"
+        - "P07 SCN-008 Manual entry"
+        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-012 Offline scanning"
+        - "P07 SCN-013 Offline journal"
+        - "P07 SCN-014 Sync & reconciliation"
+        - "P07 SCN-015 Offline package"
+        - "P08 BO-034 Scan Activity"
+        - "P08 BO-035 Override Audit"
+        - "P08 BO-060 Attendance & Footfall"
       summary: Validate media at an access point and admit or deny
       description: >
         The access point is inherited from the session's workstation and is not a request
@@ -155,11 +173,172 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /parking-facilities:
+    get:
+      operationId: listParkingFacilities
+      x-ticvai-consumed-by:
+        - "P08 BO-006 Parking Configuration"
+      summary: Car parks at a venue, and how each integrates
+      description: >
+        3.2.30 and CF-52, settled 14 August. **Three integration modes**, and the mode decides
+        what the platform must do at sale.
+      tags: [access]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Facilities
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ParkingFacility' }
+
+    put:
+      operationId: setParkingFacility
+      x-ticvai-consumed-by:
+        - "P08 BO-006 Parking Configuration"
+      summary: Configure a car park and its integration
+      description: >
+        **The mode is the decision, and the three are not variations of one thing.**
+
+        `none` — TICVAI issues its own QR and security verifies it by eye. No integration, and
+        the guest experience depends on a person.
+
+        `plateWhitelist` — the guest gives a plate at checkout and the platform pushes it to the
+        parking system's whitelist. **The barrier opens without anything being presented**,
+        which is the best experience and the only mode that needs a plate captured at sale.
+
+        `qrHandoff` — TICVAI sends a code the barrier validates. No plate needed, and it fails
+        the way any code fails: a dead phone at a barrier with a queue behind it.
+
+        A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs on the
+        parking system's own POS (14 August).
+      tags: [access]
+      x-ticvai-permission: PARKING_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ParkingFacility' }
+      responses:
+        '200':
+          description: Configured
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParkingFacility' }
+
+  /parking-entitlements:
+    post:
+      operationId: createParkingEntitlement
+      x-ticvai-consumed-by:
+        - "P02 GST-027 Parking – Reserve & Pay"
+      summary: A guest bought parking
+      description: >
+        **Pushes the plate to the parking system where the mode is `plateWhitelist`**, and that
+        push is the operation that was missing — CF-52 settled the direction on 14 August and
+        nothing implemented it.
+
+        Where the push fails the entitlement is still valid. **The guest paid**, and a barrier
+        that will not open is a staffed problem rather than a refund.
+      tags: [access]
+      x-ticvai-permission: null   # created by the order that bought it
+      x-ticvai-auth: service
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ParkingEntitlement' }
+      responses:
+        '201':
+          description: Created, and pushed where the mode requires it
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParkingEntitlement' }
+        '502':
+          description: >
+            **The parking system rejected the push. The entitlement is still created** and
+            flagged, because the guest has paid and the failure is ours to chase.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /parking-entitlements/{entitlementId}:
+    parameters:
+      - name: entitlementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateParkingEntitlement
+      x-ticvai-consumed-by:
+        - "P02 GST-027 Parking – Reserve & Pay"
+      summary: Change the plate, or revoke
+      description: >
+        **A guest changing car is the common case** and it must work after purchase — someone
+        who books parking a month ahead does not know which car they will bring.
+
+        Revocation removes the plate from the whitelist. A refunded parking entitlement whose
+        plate still opens the barrier is a car park giving away spaces.
+      tags: [access]
+      x-ticvai-permission: null
+      x-ticvai-auth: guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ParkingEntitlement' }
+      responses:
+        '200':
+          description: Updated, and re-pushed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParkingEntitlement' }
+
   /access/override:
     post:
       operationId: overrideAccess
       x-ticvai-consumed-by:
+        - "P06 EMP-010 Scan — ready"
+        - "P06 EMP-011 Scan — admitted"
+        - "P06 EMP-012 Scan — denied"
+        - "P06 EMP-013 Override"
+        - "P06 EMP-015 Group scan"
+        - "P06 EMP-016 Offline scanning"
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P07 SCN-003 Ready to scan"
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-005 Denied"
         - "P07 SCN-006 Override"
+        - "P07 SCN-007 Group admission"
+        - "P07 SCN-008 Manual entry"
+        - "P07 SCN-009 Ticket lookup"
+        - "P07 SCN-012 Offline scanning"
+        - "P07 SCN-013 Offline journal"
+        - "P07 SCN-014 Sync & reconciliation"
+        - "P07 SCN-015 Offline package"
+        - "P08 BO-034 Scan Activity"
+        - "P08 BO-035 Override Audit"
+        - "P08 BO-060 Attendance & Footfall"
       summary: Admit against a failed validation
       description: >
         Records the overriding principal, the original denial reason and a mandatory
@@ -209,9 +388,27 @@ paths:
     get:
       operationId: lookupTicket
       x-ticvai-consumed-by:
-        - "P05 KSK-011 Collect a booking"
+        - "P06 EMP-010 Scan — ready"
+        - "P06 EMP-011 Scan — admitted"
+        - "P06 EMP-012 Scan — denied"
+        - "P06 EMP-013 Override"
+        - "P06 EMP-015 Group scan"
+        - "P06 EMP-016 Offline scanning"
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P07 SCN-003 Ready to scan"
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-005 Denied"
+        - "P07 SCN-006 Override"
+        - "P07 SCN-007 Group admission"
         - "P07 SCN-008 Manual entry"
         - "P07 SCN-009 Ticket lookup"
+        - "P07 SCN-012 Offline scanning"
+        - "P07 SCN-013 Offline journal"
+        - "P07 SCN-014 Sync & reconciliation"
+        - "P07 SCN-015 Offline package"
+        - "P08 BO-034 Scan Activity"
+        - "P08 BO-035 Override Audit"
+        - "P08 BO-060 Attendance & Footfall"
       x-ticvai-read-routing: replica
       summary: Read-only validity check without admitting
       description: >
@@ -246,7 +443,28 @@ paths:
     post:
       operationId: syncScans
       x-ticvai-consumed-by:
+        - "P06 EMP-010 Scan — ready"
+        - "P06 EMP-011 Scan — admitted"
+        - "P06 EMP-012 Scan — denied"
+        - "P06 EMP-013 Override"
+        - "P06 EMP-015 Group scan"
+        - "P06 EMP-016 Offline scanning"
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P06 EMP-049 Hand over the journal"
+        - "P07 SCN-003 Ready to scan"
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-005 Denied"
+        - "P07 SCN-006 Override"
+        - "P07 SCN-007 Group admission"
+        - "P07 SCN-008 Manual entry"
+        - "P07 SCN-009 Ticket lookup"
+        - "P07 SCN-012 Offline scanning"
+        - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
+        - "P07 SCN-015 Offline package"
+        - "P08 BO-034 Scan Activity"
+        - "P08 BO-035 Override Audit"
+        - "P08 BO-060 Attendance & Footfall"
       summary: Replay scans recorded offline
       description: >
         Ordered batch. The server processes in `sequence` order and stops at the first
@@ -290,7 +508,28 @@ paths:
     get:
       operationId: listScans
       x-ticvai-consumed-by:
+        - "P06 EMP-010 Scan — ready"
+        - "P06 EMP-011 Scan — admitted"
+        - "P06 EMP-012 Scan — denied"
+        - "P06 EMP-013 Override"
+        - "P06 EMP-015 Group scan"
+        - "P06 EMP-016 Offline scanning"
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P06 EMP-049 Hand over the journal"
+        - "P07 SCN-003 Ready to scan"
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-005 Denied"
+        - "P07 SCN-006 Override"
+        - "P07 SCN-007 Group admission"
+        - "P07 SCN-008 Manual entry"
+        - "P07 SCN-009 Ticket lookup"
+        - "P07 SCN-012 Offline scanning"
         - "P07 SCN-013 Offline journal"
+        - "P07 SCN-014 Sync & reconciliation"
+        - "P07 SCN-015 Offline package"
+        - "P08 BO-034 Scan Activity"
+        - "P08 BO-035 Override Audit"
+        - "P08 BO-060 Attendance & Footfall"
       x-ticvai-read-routing: replica
       summary: List scan events
       tags: [sync]
@@ -335,7 +574,27 @@ paths:
     get:
       operationId: getOfflinePackage
       x-ticvai-consumed-by:
+        - "P06 EMP-010 Scan — ready"
+        - "P06 EMP-011 Scan — admitted"
+        - "P06 EMP-012 Scan — denied"
+        - "P06 EMP-013 Override"
+        - "P06 EMP-015 Group scan"
+        - "P06 EMP-016 Offline scanning"
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P07 SCN-003 Ready to scan"
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-005 Denied"
+        - "P07 SCN-006 Override"
+        - "P07 SCN-007 Group admission"
+        - "P07 SCN-008 Manual entry"
+        - "P07 SCN-009 Ticket lookup"
+        - "P07 SCN-012 Offline scanning"
+        - "P07 SCN-013 Offline journal"
+        - "P07 SCN-014 Sync & reconciliation"
         - "P07 SCN-015 Offline package"
+        - "P08 BO-034 Scan Activity"
+        - "P08 BO-035 Override Audit"
+        - "P08 BO-060 Attendance & Footfall"
       x-ticvai-read-routing: replica
       summary: Entitlement and rule set for offline validation
       description: >
@@ -386,6 +645,7 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
+        - "P08 BO-064 Zones & Areas"
       summary: Set the operating mode of an access point
       description: >
         Podium operation. Changes what the gate does, not who may pass it.
@@ -420,6 +680,9 @@ paths:
       operationId: listAccessPoints
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
+        - "P07 SCN-016 Gate mode"
+        - "P08 BO-006 Parking Configuration"
+        - "P08 BO-064 Zones & Areas"
       x-ticvai-read-routing: replica
       summary: List access points
       tags: [accessPoint]
@@ -449,6 +712,10 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
     post:
       operationId: createAccessPoint
+      x-ticvai-consumed-by:
+        - "P07 SCN-002 Access point & direction"
+        - "P07 SCN-016 Gate mode"
+        - "P08 BO-064 Zones & Areas"
       summary: Create an access point
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -478,6 +745,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getAccessPoint
+      x-ticvai-consumed-by:
+        - "P07 SCN-002 Access point & direction"
+        - "P07 SCN-016 Gate mode"
+        - "P08 BO-064 Zones & Areas"
       x-ticvai-read-routing: replica
       summary: Read an access point
       tags: [accessPoint]
@@ -494,6 +765,11 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
       operationId: updateAccessPoint
+      x-ticvai-consumed-by:
+        - "P07 SCN-002 Access point & direction"
+        - "P07 SCN-016 Gate mode"
+        - "P08 BO-006 Parking Configuration"
+        - "P08 BO-064 Zones & Areas"
       summary: Update an access point
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -530,6 +806,8 @@ paths:
   /admission-profiles:
     get:
       operationId: listAdmissionProfiles
+      x-ticvai-consumed-by:
+        - "P08 BO-032 Admission Profiles"
       x-ticvai-read-routing: replica
       summary: List admission profiles
       description: >
@@ -558,6 +836,8 @@ paths:
                         items: { $ref: '#/components/schemas/AdmissionProfile' }
     post:
       operationId: createAdmissionProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-032 Admission Profiles"
       x-ticvai-config-scope: venue
       summary: Create an admission profile
       tags: [accessPoint]
@@ -587,6 +867,8 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: updateAdmissionProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-032 Admission Profiles"
       x-ticvai-config-scope: venue
       summary: Update an admission profile
       description: >
@@ -615,6 +897,7 @@ paths:
       operationId: listBlacklist
       x-ticvai-consumed-by:
         - "P07 SCN-010 Blacklisted"
+        - "P08 BO-033 Blacklist Management"
       x-ticvai-read-routing: primary   # a removed-too-late blacklist entry admits someone barred
       summary: List blacklisted media
       tags: [accessPoint]
@@ -640,6 +923,9 @@ paths:
                         items: { $ref: '#/components/schemas/BlacklistEntry' }
     post:
       operationId: addBlacklistEntry
+      x-ticvai-consumed-by:
+        - "P07 SCN-010 Blacklisted"
+        - "P08 BO-033 Blacklist Management"
       summary: Blacklist a media code
       description: >
         Denies outright regardless of entitlement state. Included in the offline package so
@@ -677,6 +963,9 @@ paths:
         schema: { type: string }
     delete:
       operationId: removeBlacklistEntry
+      x-ticvai-consumed-by:
+        - "P07 SCN-010 Blacklisted"
+        - "P08 BO-033 Blacklist Management"
       summary: Remove a blacklist entry
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -691,7 +980,27 @@ paths:
     post:
       operationId: validateGroupAccess
       x-ticvai-consumed-by:
+        - "P06 EMP-010 Scan — ready"
+        - "P06 EMP-011 Scan — admitted"
+        - "P06 EMP-012 Scan — denied"
+        - "P06 EMP-013 Override"
+        - "P06 EMP-015 Group scan"
+        - "P06 EMP-016 Offline scanning"
+        - "P06 EMP-017 Sync & reconciliation"
+        - "P07 SCN-003 Ready to scan"
+        - "P07 SCN-004 Admitted"
+        - "P07 SCN-005 Denied"
+        - "P07 SCN-006 Override"
         - "P07 SCN-007 Group admission"
+        - "P07 SCN-008 Manual entry"
+        - "P07 SCN-009 Ticket lookup"
+        - "P07 SCN-012 Offline scanning"
+        - "P07 SCN-013 Offline journal"
+        - "P07 SCN-014 Sync & reconciliation"
+        - "P07 SCN-015 Offline package"
+        - "P08 BO-034 Scan Activity"
+        - "P08 BO-035 Override Audit"
+        - "P08 BO-060 Attendance & Footfall"
       summary: Admit a group on one read
       description: >
         A school party or tour group entering on a single credential. Partial admission is
@@ -746,6 +1055,10 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setAccessPointGeofence
+      x-ticvai-consumed-by:
+        - "P07 SCN-002 Access point & direction"
+        - "P07 SCN-016 Gate mode"
+        - "P08 BO-064 Zones & Areas"
       summary: Set a geofence for handheld validation
       description: >
         Constrains where a handheld may validate for this access point. A roaming scanner used
@@ -798,6 +1111,71 @@ components:
         antiPassbackEnabled: { type: boolean, default: false }
         requiresExitBeforeReentry: { type: boolean, default: false }
         driver: { type: string }
+
+    ParkingIntegrationMode:
+      type: string
+      description: >
+        CF-52, settled 14 August. **Not variations of one thing** — each decides what happens at
+        sale and what a guest presents at the barrier.
+      enum: [none, plateWhitelist, qrHandoff]
+
+    ParkingFacility:
+      type: object
+      x-ticvai-persistence: "access.parking_facility"
+      required: [name, venueId, mode]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        mode: { $ref: '#/components/schemas/ParkingIntegrationMode' }
+        capacity: { type: integer, nullable: true }
+        vendorName: { type: string, nullable: true }
+        endpoint: { type: string, nullable: true }
+        credentialRef:
+          type: string
+          nullable: true
+          description: A vault reference, never the credential.
+        pushLeadMinutes:
+          type: integer
+          nullable: true
+          description: >
+            How far ahead of the visit a plate is pushed. **Too early and the whitelist fills
+            with cars that will not arrive; too late and the guest is at the barrier.**
+        accessPointIds:
+          type: array
+          description: Where the platform validates its own code, in `none` and `qrHandoff` modes.
+          items: { type: string, format: uuid }
+        isActive: { type: boolean }
+
+    ParkingEntitlementStatus:
+      type: string
+      enum: [pending, pushed, pushFailed, active, used, expired, revoked]
+
+    ParkingEntitlement:
+      type: object
+      x-ticvai-persistence: "access.parking_entitlement"
+      required: [facilityId, orderId, validFrom, validTo]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        facilityId: { type: string, format: uuid }
+        orderId: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid, nullable: true }
+        plateNumber:
+          type: string
+          nullable: true
+          description: >
+            Required in `plateWhitelist` mode, meaningless in the others. **Personal data** — a
+            plate identifies a person, so it lives under the same rules as a contact point.
+        plateCountry: { type: string, nullable: true }
+        mediaCode:
+          type: string
+          nullable: true
+          description: The code presented in `none` and `qrHandoff` modes.
+        status: { $ref: '#/components/schemas/ParkingEntitlementStatus' }
+        pushedAt: { type: string, format: date-time, nullable: true }
+        pushFailureReason: { type: string, nullable: true }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
 
     AdmissionProfile:
       x-ticvai-persistence: "access.admission_profile"

@@ -162,7 +162,7 @@ def main() -> int:
     print()
     for n, e in sorted(catalogued.items()):
         # 6. someone publishes it
-        if n not in emitted and not e.get("notes", "").startswith("Published on"):
+        if n not in emitted and "No state model emits this" not in e.get("notes", ""):
             WARNINGS.append(f"{n}: no state model emits this. Either the model is missing, or "
                             "the event is speculative")
         # 7. consumers and idempotency

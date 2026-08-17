@@ -1,0 +1,91 @@
+# F20 — A manager asks a question and gets an answer
+#
+# Covers `ai` and `reporting`, neither of which had a flow. Written around the two
+# things that decide whether an assistant is used twice: sources, and admitting ignorance.
+#
+# Validated by tools/check-flows.py.
+
+id: F20
+name: A manager asks a question and gets an answer
+actor: venueManager
+capability: C57
+wave: 1
+frequency: daily
+criticality: operational
+platforms:
+- P08 Venue Management
+- P06 Venue Staff App
+offlineBehaviour: '**Not available offline.** Retrieval needs the index, and an assistant that answers
+  from a stale cache is worse than one that says it cannot answer.'
+trigger:
+  description: A venue manager wants to know something the platform knows and does not want to find
+    the report.
+  entryScreen: BO-058
+  entryPoints:
+  - Assistant on any screen
+  - Search
+  - A question after a report
+steps:
+- step: 1
+  screen: BO-058
+  action: Asks in plain language
+  operations:
+  - runReport
+  - listReports
+  outcome: Grounded in the tenant’s own data
+- step: 2
+  screen: EMP-020
+  action: The answer arrives with its sources
+  operations:
+  - sendAiMessage
+  outcome: '**An answer with no sources is a guess**, and the interface shows it as one'
+- step: 3
+  screen: BO-058
+  action: Saves it as a report
+  operations:
+  - createReport
+  outcome: A one-off question becomes schedulable
+branches:
+- at: 1
+  condition: The question needs data the manager may not see
+  behaviour: '**Retrieval runs as the caller.** The assistant sees exactly what that person could read
+    directly, so the answer is narrower rather than refused.'
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 2
+  condition: Nothing relevant was retrieved
+  behaviour: '**Says so rather than answering from general knowledge.** A confident answer about a venue
+    the model has never seen is the failure that stops people trusting it.'
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 2
+  condition: The answer proposes a change
+  behaviour: A `proposedAction`, not an applied one. Pricing and financial proposals need approval before
+    execution.
+  severity: requiresStaff
+  resolvedBy: Approver
+- at: 2
+  condition: Every provider is unavailable
+  behaviour: Reported rather than retried indefinitely. **An assistant that hangs is worse than one
+    that says no.**
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 1
+  condition: The question contains guest personal data
+  behaviour: Masked before the prompt leaves the platform. **The masking list fails closed** — an unset
+    list sends nothing rather than everything.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 3
+  condition: The saved report returns different numbers tomorrow
+  behaviour: Expected. It runs against the analytical replica and the data moved. **The generated query
+    is saved, not the answer**, which is why the query is returned in the first place.
+  severity: recoverable
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Answered, sourced, and saved as a report
+- state: deferred
+  description: Proposed a change, awaiting approval
+- state: abandoned
+  description: Nothing to retrieve

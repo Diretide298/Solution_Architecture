@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Till
   version: 1.0.0
-  x-ticvai-screen-count: 6
+  x-ticvai-screen-count: 13
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -100,7 +100,17 @@ paths:
     get:
       operationId: listShifts
       x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
       summary: List shifts
       tags: [shift]
@@ -142,6 +152,16 @@ paths:
       operationId: openShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Open a shift
       description: >
         Fails if another shift is already open on this workstation. Where the venue is
@@ -182,8 +202,16 @@ paths:
       operationId: getCurrentShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
         - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
         - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
       tags: [shift]
@@ -211,6 +239,18 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-read-routing: primary
       summary: Read a shift
       tags: [shift]
@@ -235,6 +275,18 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: approveShiftOpen
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Approve a shift opening outside tolerance
       description: >
         A float that does not match the venue's expected amount holds the shift in
@@ -276,6 +328,18 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: reopenShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Reopen a shift closed in error
       description: >
         A cashier who closed the wrong till, or a count submitted before the drawer was
@@ -329,6 +393,18 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: suspendShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Suspend a shift so another user can log in
       description: >
         The break mechanism. The float and the shift stay intact; the workstation becomes
@@ -370,6 +446,18 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: resumeShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Resume a suspended shift
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
@@ -406,8 +494,17 @@ paths:
     post:
       operationId: closeShift
       x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Blind close-out
       description: >
         The operator submits a counted denomination breakdown. The expected figure is not
@@ -452,7 +549,17 @@ paths:
     post:
       operationId: acceptShiftVariance
       x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Accept an over/short beyond the threshold
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
@@ -491,7 +598,17 @@ paths:
     post:
       operationId: recordNoSale
       x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Open the drawer without a sale
       description: >
         Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
@@ -541,6 +658,18 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: listCashMovements
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-read-routing: primary
       summary: Lifts, adds and the opening float
       tags: [cash]
@@ -560,6 +689,18 @@ paths:
 
     post:
       operationId: createCashMovement
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       summary: Record a cash lift or add
       description: >
         A lift removes cash from an open float mid-shift without closing it — the supervisor

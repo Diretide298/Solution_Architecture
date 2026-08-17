@@ -51,11 +51,13 @@ branches:
   condition: The partner account is suspended
   severity: requiresStaff
   behaviour: Refused with the reason. Suspension is commercial and must not read as a system fault.
+  resolvedBy: Duty manager
 - at: 2
   condition: The B2B channel allocation is exhausted
   severity: recoverable
   behaviour: Shows sold out for this channel while other channels may still have capacity. Correct under
     channel allocation, and worth saying plainly in the portal.
+  resolvedBy: Automatic
 exitStates:
 - state: completed
   description: Order raised on credit, vouchers issued

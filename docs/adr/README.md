@@ -15,7 +15,7 @@ One file per decision: `NNNN-short-title.md`. Format: Context · Decision · Sta
 | [0003](0003-conditional-role-selection-at-login.md) | Conditional role selection at login | Accepted | CF-01 |
 | [0004](0004-single-session-per-user.md) | Single session per user | Accepted | CF-02, CF-28 |
 | [0005](0005-venue-isolation-by-partitioning-not-separate-databases.md) | Venue isolation by partitioning, not separate databases | Accepted | — |
-| [0006](0006-tiered-guest-app-distribution.md) | Tiered guest app distribution | Accepted | CF-13 |
+| [0006](0006-tiered-guest-app-distribution.md) | Tiered guest-app app distribution | Accepted | CF-13 |
 | [0007](0007-hybrid-repository-topology.md) | Hybrid repository topology | Accepted | — |
 | [0008](0008-money-carries-per-region-scale.md) | Money carries per-region scale | Accepted | — |
 | [0009](0009-ai-data-residency.md) | AI data residency — architectural, not storage-location | Accepted | **CF-20** |

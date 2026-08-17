@@ -1,25 +1,25 @@
 # Page inventory
 
-**347 screens. Every one defined.**
+**364 screens. Every one defined.**
 
 Superseded the earlier inventory, which counted 316 and itemised 203 — the difference was
 73 back office screens carried as a number with no list behind them (CF-53), and two
-platforms never counted at all (CF-53, and the kiosk and scanner).
+platforms never counted at all (CF-53, and the kiosk and venue-scanner).
 
 | | Platform | App | Screens |
 |---|---|---|---|
-| P01 | Guest Web — Storefront | `web-b2c` | 29 |
-| P02 | Guest App — Mobile | `guest` | 62 |
-| P04 | Staff POS — Terminal and Tablet | `pos` | 10 |
-| P05 | Guest Kiosk — Self-Service | `guest` | 14 |
-| P06 | Staff App — Operations | `employee` | 50 |
-| P07 | Staff Scanner — Access Control | `scanner` | 16 |
-| P08 | Staff Web — Venue Back Office | `backoffice` | 73 |
-| P09 | Admin Web — Platform Console | `platform-admin` | 36 |
-| P10 | Partner Web — Reseller Portal | `partner-portal` | 21 |
-| P11 | Public Web — Accreditation | `accreditation` | 8 |
-| P12 | Staff Web — Support Console | `support-console` | 8 |
-| P13 | Staff Web — White-Label CMS | `backoffice` | 20 |
+| P01 | Guest Web — Storefront | `guest-web` | 29 |
+| P02 | Guest App — Mobile | `guest-app` | 62 |
+| P04 | Staff POS — Terminal and Tablet | `venue-pos` | 10 |
+| P05 | Guest Kiosk — Self-Service | `guest-app` | 14 |
+| P06 | Staff App — Operations | `venue-staff-app` | 50 |
+| P07 | Staff Scanner — Access Control | `venue-scanner` | 16 |
+| P08 | Staff Web — Venue Back Office | `venue-management-web` | 73 |
+| P09 | Admin Web — Platform Console | `ticvai-web` | 36 |
+| P10 | Partner Web — Reseller Portal | `partner-web` | 21 |
+| P11 | Public Web — Accreditation | `accreditation-web` | 8 |
+| P12 | Staff Web — Support Console | `venue-support-web` | 8 |
+| P13 | Staff Web — White-Label CMS | `venue-management-web` | 20 |
 | | | | **347** |
 
 ## Every screen

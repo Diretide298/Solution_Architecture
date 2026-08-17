@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 9
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -106,6 +106,9 @@ paths:
   /scope-nodes:
     get:
       operationId: listScopeNodes
+      x-ticvai-consumed-by:
+        - "P08 BO-064 Zones & Areas"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
       x-ticvai-read-routing: replica
       summary: List scope nodes visible to the session
       tags: [scope]
@@ -144,6 +147,9 @@ paths:
 
     post:
       operationId: createScopeNode
+      x-ticvai-consumed-by:
+        - "P08 BO-064 Zones & Areas"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
       summary: Create a scope node
       tags: [scope]
       x-ticvai-permission: SCOPE_MANAGE
@@ -178,6 +184,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getScopeNode
+      x-ticvai-consumed-by:
+        - "P08 BO-064 Zones & Areas"
       x-ticvai-read-routing: replica
       summary: Read a scope node
       tags: [scope]
@@ -195,6 +203,8 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
       operationId: updateScopeNode
+      x-ticvai-consumed-by:
+        - "P08 BO-064 Zones & Areas"
       summary: Rename or deactivate a scope node
       description: >
         Deactivating a node causes every permission query at or beneath it to resolve to
@@ -375,6 +385,8 @@ paths:
   /outlets:
     get:
       operationId: listOutlets
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: List outlets
       description: >
         A point of sale within a venue — a shop, a restaurant, a bar, a kiosk cluster. F&B,
@@ -407,6 +419,8 @@ paths:
 
     post:
       operationId: createOutlet
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: Create an outlet
       tags: [workstation]
       x-ticvai-permission: REGION_CONFIGURE
@@ -440,6 +454,8 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateOutlet
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: Amend an outlet
       tags: [workstation]
       x-ticvai-permission: REGION_CONFIGURE
@@ -560,6 +576,9 @@ paths:
   /devices:
     get:
       operationId: listDevices
+      x-ticvai-consumed-by:
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
       x-ticvai-read-routing: replica
       summary: List registered devices
       description: >
@@ -595,6 +614,9 @@ paths:
 
     post:
       operationId: registerDevice
+      x-ticvai-consumed-by:
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
       summary: Register a device
       description: >
         Binds a device to a workstation and names the driver. Drivers are built to open
@@ -638,7 +660,8 @@ paths:
         required device that stops reporting blocks shift open, which is better discovered
         before a queue forms than during one.
       tags: [workstation]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-auth: device
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append

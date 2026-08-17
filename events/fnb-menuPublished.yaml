@@ -1,0 +1,44 @@
+# fnb.menuPublished v1 — published by fnb
+# Checked by tools/check-states.py.
+
+name: fnb.menuPublished
+version: 1
+publisher: fnb
+description: A menu is live at an outlet.
+aggregate: menu
+emittedWhen: Menu published or amended at an outlet
+payload:
+- field: menuId
+  type: uuid
+- field: outletIds
+  type: array
+  notes: A menu may serve several outlets
+- field: venueId
+  type: uuid
+- field: changedItemIds
+  type: array
+- field: allergensChanged
+  type: boolean
+  notes: '**Flagged separately.** An allergen change is a safety change, and a stale index of it is
+    a health risk rather than a search miss'
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Reindex menu items and their allergens
+  idempotencyKey: menuId + publishedAt
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: Menu dimension
+  idempotencyKey: menuId + publishedAt
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: '**The AI consumer is critical here and nowhere else in indexing**, because 4.8.9 requires allergens
+  always present and a guest asking whether something contains nuts must not be answered from yesterday.
+
+
+  No state model emits this: `fnb.menu` has no status enum in the contract. Publishing is a field on
+  the menu rather than a lifecycle, which is defensible for a menu and means the event is emitted by
+  the operation rather than by a transition.'

@@ -8,7 +8,7 @@ Spec-first. Hand-authored here; servers and clients are generated. Never the rev
 |---|---|---|---|
 | `shared/common.yaml` | — | Money, ScopeRef, Problem, pagination, idempotency, consistency token | ADR-0008 |
 | `shared/permissions.yaml` | — | **The permission vocabulary.** Single source for backend authz, frontend nav and AI scoping | permission-resolution spec |
-| `spine/identity.yaml` | **38** | Staff auth, **guest auth (OTP, social, national ID)**, **SSO with group mapping**, **MFA and step-up**, **session administration**, principals, roles, grants, permission simulation | ADR-0002, 0003, 0004 |
+| `spine/identity.yaml` | **38** | Staff auth, **guest-app auth (OTP, social, national ID)**, **SSO with group mapping**, **MFA and step-up**, **session administration**, principals, roles, grants, permission simulation | ADR-0002, 0003, 0004 |
 | `spine/tenancy.yaml` | **15** | Scope hierarchy, region settings, workstation context, **sale boards**, **device registry with heartbeat** | ADR-0001, 0005 |
 | `spine/finance.yaml` | **37** | Chart of accounts, ERP mapping, tax engine with compound tax, revenue recognition, deferred revenue, journals with approval, ledger, trial balance, price variance, settlement, fiscal periods, financial reporting | **12 Aug deep-dive · CF-38** |
 | `spine/orders.yaml` | **31** | Orders, payments with inquiry recovery, refunds with venue policy, **modification, exchange, reschedule, ticket transfer with claim, order statement, B2B credit**, reservations, offline sync | **CF-36, CF-38, ADR-0013** |
@@ -35,7 +35,7 @@ Every operation declares `x-ticvai-permission`, `x-ticvai-scope-level`,
 | `satellite/assets.yaml` | **10** | Media library, signed direct upload, collections, usage tracking, **rights and licence expiry** | Domain 21 · 15 reqs |
 | `satellite/queue.yaml` | **20** | Queues bound to assets, entries with return windows, offline redemption, wait times carrying provenance, **vendor-agnostic inbound feed**, signage boards | Domain 5 · **ADR-0012** |
 | `satellite/reporting.yaml` | **23** | Versioned definitions, execution against the reporting replica, schedules under owner permissions, audited exports, dashboards, **natural-language query returning its generated query** | Cross-cutting · AI-57 |
-| `satellite/retail.yaml` | **23** | Merchandise, price and stock check, sales depleting the inventory ledger, returns with condition, exchanges, guest wallet, gift cards, collection reservations | Domain 6 |
+| `satellite/retail.yaml` | **23** | Merchandise, price and stock check, sales depleting the inventory ledger, returns with condition, exchanges, guest-app wallet, gift cards, collection reservations | Domain 6 |
 | `satellite/seating.yaml` | **29** | Seat maps, manifest + plan import, categories, availability, holds, blocks, seating rules, recommendations | Domain 19 — 112 reqs |
 
 ## Authentication model

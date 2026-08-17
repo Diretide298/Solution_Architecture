@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Digital Media Library
   version: 0.1.0
-  x-ticvai-screen-count: 0
+  x-ticvai-screen-count: 10
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Digital Asset Management"
   x-ticvai-requirements: 15
@@ -90,6 +90,11 @@ paths:
   /media:
     get:
       operationId: searchMedia
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       x-ticvai-read-routing: replica
       summary: Search the asset library
       description: >
@@ -148,6 +153,11 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getMediaAsset
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       x-ticvai-read-routing: replica
       summary: Read an asset with derivatives and usage
       description: >
@@ -168,6 +178,11 @@ paths:
 
     patch:
       operationId: updateMediaAsset
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       summary: Amend metadata, tags or rights
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
@@ -206,6 +221,11 @@ paths:
 
     delete:
       operationId: deleteMediaAsset
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       summary: Delete an asset
       description: >
         **Refused while the asset is referenced.** The response names every reference so the
@@ -232,6 +252,11 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: replaceMediaAsset
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       summary: Replace the file behind an asset
       description: >
         The reference is stable, so every surface using it updates at once. This is how a
@@ -270,6 +295,12 @@ paths:
   /media/uploads:
     post:
       operationId: createUpload
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-002 Brand Kit"
+        - "P13 CMS-010 Media Library"
       summary: Request a signed upload URL
       description: >
         Uploads go **direct to object storage**, not through this API. Large media passing
@@ -317,6 +348,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: completeUpload
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-002 Brand Kit"
+        - "P13 CMS-010 Media Library"
       summary: Confirm an upload and create the asset
       description: >
         Verifies the transfer, reads dimensions and duration, generates derivatives, and
@@ -362,6 +399,11 @@ paths:
   /media/collections:
     get:
       operationId: listCollections
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       x-ticvai-read-routing: replica
       summary: List collections
       description: >
@@ -382,6 +424,11 @@ paths:
 
     post:
       operationId: createCollection
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       summary: Create a collection
       tags: [collection]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
@@ -412,6 +459,11 @@ paths:
   /media/rights-expiring:
     get:
       operationId: getExpiringRights
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-027 Reissue & Media Replacement"
+        - "P13 CMS-010 Media Library"
       x-ticvai-read-routing: replica
       summary: Assets whose licence is expiring or expired
       description: >

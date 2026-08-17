@@ -11,25 +11,25 @@ Every number below is counted from the files in this package, not from memory.
 
 | | | Against |
 |---|---|---|
-| **API operations** | **654** | Every unblocked module. 233 spine, 409 satellite |
-| API schemas | 546 | Across 22 contract files |
+| **API operations** | **707** | Every unblocked module. 246 spine, 443 satellite |
+| API schemas | 546 | Across 26 files |
 | Permissions | 111 | With a resolution spec and 28 test vectors |
-| **Tables designed** | **230** | 2,026 columns. 226 derived from the contracts, 4 PII tables held only in the reference |
+| **Tables designed** | **266** | 2,025 columns. 226 derived from the contracts, 4 PII tables held only in the reference |
 | **Tables written as DDL** | **0** | Deliberate — see below |
 | Screens inventoried | 347 | Across 12 platforms |
 | **Screens defined** | **347** | **All twelve platforms** |
-| Screens with operations declared | 155 | Of 347 |
-| **Screens with states written** | **67** | Of 347 — the honest gap |
-| State models | 39 | Of 39 status enums |
-| Domain events | 16 | Publisher, consumers, idempotency keys |
-| User flows | 12 | Of roughly 60 |
+| Screens with operations declared | 290 | Of 347 |
+| **Screens with states written** | **347** | Of 347 — the honest gap |
+| State models | 41 | Of 40 status enums |
+| Domain events | 25 | Publisher, consumers, idempotency keys |
+| User flows | 15 | Of roughly 60 |
 | ADRs | 18 | |
 | Requirements mapped | 3,184 | Plus 113 on three sheets nobody had counted |
-| **Requirements covered by a contract** | **2,842 (89%)** | |
+| **Requirements covered by a contract** | **2,728 of 2,990 (91%)** | |
 | Configuration levels decided | 321 of 321 | |
-| Validators | 5 | Plus 2 generators |
+| Validators | 6 | Plus 2 generators |
 
-**1,771 files.**
+**1,853 files.**
 
 ---
 
@@ -37,7 +37,7 @@ Every number below is counted from the files in this package, not from memory.
 
 ### Contracts — effectively complete
 
-**654 operations.** Every module that is not waiting on a client workshop has a contract, and
+**689 operations.** Every module that is not waiting on a client workshop has a contract, and
 all of them validate: no duplicate operation ids, no unresolved `$ref`, every operation carries
 the four required extensions, every permission resolves, every GET declares its read routing.
 
@@ -47,8 +47,8 @@ the four required extensions, every permission resolves, every GET declares its 
 |---|---|---|
 | Developer & API Management | 94 | Workshop |
 | Device Management | 60 | Workshop |
-| Accreditation & Credential | 58 | Workshop. **Wave 1's scanner depends on it** |
-| Approval Workflows | 80 | Cross-cutting, implemented in four places, owned by none |
+| Accreditation & Credential | 58 | Workshop. **Wave 1's venue-scanner depends on it** |
+| ~~Approval Workflows~~ | ~~80~~ | **Closed 17 Aug — `approvals.yaml`, 13 operations** |
 | Employee Mobile App | 50 | A surface, so it maps to screens — and P06 has none written |
 
 **212 workshop-blocked, not the ~276 the register claimed until today.** Rentals turned out not
@@ -57,7 +57,7 @@ Management, which is contracted.
 
 ### Database — designed, none written
 
-**230 tables and 2,026 columns exist as a reference, regenerated from the contracts whenever
+**278 tables and 2,025 columns exist as a reference, regenerated from the contracts whenever
 they change. No SQL.**
 
 Six migrations existed and were removed on 14 August. Writing DDL against a design that is
@@ -94,7 +94,7 @@ one that decides whether the read replicas in ADR-0016 help or merely spread the
 That distinction is the one to hold. A screen with a purpose, a route and navigation can be
 drawn; it cannot be built from. The states are where the behaviour lives — loading, empty,
 error, and on offline surfaces the offline state, which is the most important line on the page
-and is `TODO` on all sixteen scanner screens.
+and is `TODO` on all sixteen venue-scanner screens.
 
 167 of the 347 arrived on 14 August, extracted from the wireframe boards. They carry real
 purposes and real navigation because the boards do. They carry no components and no states
@@ -102,7 +102,7 @@ because the boards are pictures, and a picture does not say what happens when th
 
 **9 wireframes are approved** — P04 only. 338 are drafted or not started.
 
-**143 of 642 operations reach a defined screen**, up from 125. The gap is no longer missing
+**143 of 689 operations reach a defined screen**, up from 125. The gap is no longer missing
 screens; it is screens that name no operation.
 
 ### The layers that check each other
@@ -145,7 +145,7 @@ implementation.
 ### Artefact classes still open
 
 From `handoff/artefact-audit.md` — 3,297 requirements classified by the artefact each needs.
-**Four of fifteen classes are closed.**
+**12 of fifteen classes are closed.** `report` and `integration` joined on 17 August — the figure had said four since 14 August and under-counted by 518 requirements.
 
 | Reqs | Class | |
 |---|---|---|
@@ -174,7 +174,7 @@ From `handoff/artefact-audit.md` — 3,297 requirements classified by the artefa
 ### Unowned
 
 **The migration orchestrator, since 30 July.** It now has a contract — 24 operations in
-`platform-ops` — and a console screen, which makes it assignable. Every one of the 230 tables
+`platform-ops` — and a console screen, which makes it assignable. Every one of the 278 tables
 lands through it.
 
 **No AI engineer.** AI-61→66 is a Wave 1 commitment at roughly four weeks.

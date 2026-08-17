@@ -187,6 +187,23 @@ components:
         - DEVICE_CONFIGURE
         - APPROVAL_ACT                # approve, reject, return, request info
         - APPROVAL_DELEGATE
+        - AI_USE
+        - AI_CONFIGURE
+        - AI_APPROVE
+        - AI_AUDIT_VIEW
+        - APPROVAL_VIEW
+        - APPROVAL_REQUEST
+        - APPROVAL_DECIDE
+        - APPROVAL_CONFIGURE
+        - MAINTENANCE_EXECUTE
+        - MAINTENANCE_APPROVE
+        - WORKFORCE_VIEW
+        - WORKFORCE_MANAGE
+        - ATTENDANCE_RECORD
+        - ANNOUNCEMENT_PUBLISH
+        - PARTNER_VIEW
+        - PARTNER_MANAGE
+        - PARKING_CONFIGURE
 
     PermissionSet:
       type: array

@@ -26,6 +26,8 @@ transitions:
   trigger: timer
   guard: Start reached. **The clock is the tenant’s timezone, not the server’s** — a Ramadan banner
     at midnight UTC is not midnight in Dubai
+  emits:
+  - whitelabel.contentPublished
 - from: active
   to: expired
   trigger: timer

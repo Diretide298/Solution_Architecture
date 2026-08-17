@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 6
+  x-ticvai-screen-count: 41
   x-ticvai-tier: satellite
   x-ticvai-module: "17 — Guest Mobile App & Branding (builder)"
   x-ticvai-requirements: 107
@@ -111,10 +111,16 @@ paths:
   /tenant-config:
     get:
       operationId: getTenantConfig
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
-        - "P05 KSK-002 Language Select"
         - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-012 RTL Preview"
+        - "P13 CMS-016 Site Settings"
       x-ticvai-read-routing: replica
       summary: Full working configuration
       description: >
@@ -143,18 +149,32 @@ paths:
   /tenant-config/status:
     get:
       operationId: getTenantAppStatus
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-025 Help Centre / FAQ"
+        - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
+        - "P02 GST-001 Home – Default"
+        - "P02 GST-038 Digital Companion Mode"
         - "P02 GST-047 Maintenance Page"
         - "P02 GST-060 Maintenance / Upgrade Page"
+        - "P05 KSK-002 Language Select"
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-014 Publishing Workflow"
       x-ticvai-read-routing: replica
       summary: App status and recent changes
       description: >
         Also the endpoint the guest app calls to discover a maintenance window, which is why
         it is unauthenticated and cacheable.
       tags: [overview]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-auth: device
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -167,6 +187,13 @@ paths:
 
     put:
       operationId: setMaintenanceMode
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Enable or clear maintenance mode
       description: >
         Renders the branded maintenance screen with an expected-back time. Tenant-branded,
@@ -200,6 +227,14 @@ paths:
   /tenant-config/brand:
     get:
       operationId: getBrandIdentity
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-002 Brand Kit"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: Read brand identity
       tags: [brand]
@@ -216,6 +251,14 @@ paths:
 
     put:
       operationId: setBrandIdentity
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-002 Brand Kit"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Set logo, favicon and splash
       description: >
         Logo and favicon are runtime — they change with a publish. **Splash images are
@@ -248,6 +291,13 @@ paths:
   /tenant-config/app-icons:
     get:
       operationId: getAppIcons
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: Read app icon set
       tags: [brand]
@@ -264,6 +314,13 @@ paths:
 
     put:
       operationId: setAppIcons
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Set app icons
       description: >
         **Build-time.** Icons are baked into the binary, so a change here does not reach
@@ -304,6 +361,14 @@ paths:
   /tenant-config/theme:
     get:
       operationId: getTheme
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-005 Theme Editor"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: Read colour theme
       tags: [theme]
@@ -320,6 +385,14 @@ paths:
 
     put:
       operationId: setTheme
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-005 Theme Editor"
+        - "P13 CMS-006 Component Preview"
       summary: Set colour theme
       description: >
         Runtime. Contrast is checked against WCAG 2.2 AA and a failing pair is refused —
@@ -352,6 +425,13 @@ paths:
   /tenant-config/fonts:
     get:
       operationId: getFonts
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: Read font configuration
       tags: [theme]
@@ -368,6 +448,13 @@ paths:
 
     put:
       operationId: setFonts
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Set fonts
       description: >
         **Every font is a pair — one Latin, one Arabic.** A Latin font selected alone leaves
@@ -401,6 +488,13 @@ paths:
   /tenant-config/header:
     put:
       operationId: setHeader
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Configure the header
       tags: [navigation]
       x-ticvai-permission: TENANT_CONFIGURE
@@ -424,6 +518,13 @@ paths:
   /tenant-config/navigation:
     get:
       operationId: getNavigation
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: Read navigation
       tags: [navigation]
@@ -440,6 +541,13 @@ paths:
 
     put:
       operationId: setNavigation
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Set main and overflow navigation
       description: >
         Items pointing at a disabled module are refused. A navigation entry that leads
@@ -475,6 +583,14 @@ paths:
   /tenant-config/homepage:
     get:
       operationId: getHomepageLayout
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-007 Page Builder"
       x-ticvai-read-routing: replica
       summary: Read homepage layout
       tags: [homepage]
@@ -491,6 +607,14 @@ paths:
 
     put:
       operationId: setHomepageLayout
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-007 Page Builder"
       x-ticvai-config-scope: tenant
       summary: Set homepage section order
       description: >
@@ -523,6 +647,14 @@ paths:
   /tenant-config/banners:
     get:
       operationId: listBanners
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-read-routing: replica
       summary: List banners
       tags: [content]
@@ -552,6 +684,13 @@ paths:
 
     post:
       operationId: createBanner
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Create a banner
       description: >
         Scheduled by date window. A campaign banner set to run through a religious or
@@ -583,6 +722,13 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateBanner
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Amend or activate a banner
       tags: [content]
       x-ticvai-permission: TENANT_CONFIGURE
@@ -611,6 +757,13 @@ paths:
               schema: { $ref: '#/components/schemas/Banner' }
     delete:
       operationId: deleteBanner
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Delete a banner
       tags: [content]
       x-ticvai-permission: TENANT_CONFIGURE
@@ -624,6 +777,14 @@ paths:
   /tenant-config/promo-blocks:
     get:
       operationId: listPromoBlocks
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-read-routing: replica
       summary: List promotional blocks
       tags: [content]
@@ -642,6 +803,13 @@ paths:
 
     post:
       operationId: createPromoBlock
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Create a promotional block
       description: >
         Presentation only. A block may point at a promotion, but it does not create or price
@@ -669,8 +837,14 @@ paths:
   /tenant-config/pages:
     get:
       operationId: listContentPages
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-028 Contact & Venue Information"
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: List custom content pages
       tags: [content]
@@ -700,6 +874,13 @@ paths:
 
     post:
       operationId: createContentPage
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Create a content page
       tags: [content]
       x-ticvai-permission: TENANT_CONFIGURE
@@ -733,6 +914,13 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: updateContentPage
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Amend a content page
       tags: [content]
       x-ticvai-permission: TENANT_CONFIGURE
@@ -752,6 +940,13 @@ paths:
               schema: { $ref: '#/components/schemas/ContentPage' }
     delete:
       operationId: deleteContentPage
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Delete a content page
       description: >
         Refused where the page is referenced by navigation or the homepage. Deleting a linked
@@ -772,9 +967,14 @@ paths:
   /tenant-config/faqs:
     get:
       operationId: listFaqs
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-025 Help Centre / FAQ"
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
         - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: List FAQs
       tags: [content]
@@ -793,6 +993,13 @@ paths:
 
     put:
       operationId: setFaqs
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Set FAQ categories and entries
       description: >
         Also the grounding corpus for the AI concierge, which is why an answer here is
@@ -827,6 +1034,14 @@ paths:
   /tenant-config/policies:
     get:
       operationId: listPolicies
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: List legal policies
       tags: [content]
@@ -851,6 +1066,13 @@ paths:
         schema: { $ref: '#/components/schemas/PolicyKind' }
     put:
       operationId: setPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-config-scope: tenant
       summary: Publish a policy version
       description: >
@@ -896,6 +1118,13 @@ paths:
   /tenant-config/modules:
     get:
       operationId: getModuleEnablement
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: Read module enablement
       description: >
@@ -917,6 +1146,13 @@ paths:
 
     put:
       operationId: setModuleEnablement
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-config-scope: tenant
       summary: Enable or disable modules
       description: >
@@ -964,7 +1200,12 @@ paths:
     get:
       operationId: getFeatureToggles
       x-ticvai-consumed-by:
-        - "P02 GST-038 Digital Companion Mode"
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-read-routing: replica
       summary: Read tenant feature toggles
       tags: [modules]
@@ -983,6 +1224,13 @@ paths:
 
     put:
       operationId: setFeatureToggles
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-config-scope: tenant
       summary: Set feature toggles
       description: >
@@ -1027,7 +1275,13 @@ paths:
     put:
       operationId: setLanguages
       x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
         - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-011 Translations"
       summary: Set enabled languages and default
       description: >
         Enabling a language does not translate existing content. The response reports how
@@ -1069,6 +1323,13 @@ paths:
   /tenant-config/preview:
     post:
       operationId: createPreview
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       summary: Generate a preview link
       description: >
         A short-lived link rendering the working draft as the guest app would, for a chosen
@@ -1105,6 +1366,15 @@ paths:
   /tenant-config/validate:
     post:
       operationId: validateTenantConfig
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-012 RTL Preview"
+        - "P13 CMS-014 Publishing Workflow"
       summary: Validate the working draft
       description: >
         Run before publishing. Reports missing translations, navigation pointing at disabled
@@ -1125,6 +1395,14 @@ paths:
   /tenant-config/publish:
     post:
       operationId: publishTenantConfig
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-014 Publishing Workflow"
       x-ticvai-config-scope: tenant
       summary: Publish the working draft
       description: >
@@ -1170,6 +1448,15 @@ paths:
   /tenant-config/versions:
     get:
       operationId: listConfigVersions
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-015 Version History"
+        - "P13 CMS-020 Change Log"
       x-ticvai-read-routing: replica
       summary: Version history
       tags: [publishing]
@@ -1202,6 +1489,14 @@ paths:
         schema: { type: string }
     post:
       operationId: restoreConfigVersion
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-015 Version History"
       summary: Restore a previous version
       description: >
         Copies the chosen version into the working draft. **It does not publish** — restore
@@ -1230,6 +1525,14 @@ paths:
         schema: { type: string }
     get:
       operationId: diffConfigVersion
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P12 SUP-006 Knowledge Base Search"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-015 Version History"
       x-ticvai-read-routing: replica
       summary: Compare a version against the working draft
       description: >

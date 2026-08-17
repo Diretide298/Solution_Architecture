@@ -15,6 +15,10 @@ Checks:
      specified is the gap this whole exercise was closing.
   4. Every internal and cross-board href resolves — file and anchor both.
   5. The board named by a platform matches its code, so P07's screens do not link to P06.
+  6. Every cross-platform reach a board asserts is recorded on the platform and resolves.
+  7. Every design reference a screen names is a file that exists. A screen citing
+     `Park_POS_dc.html` as a string rather than a path is a citation nobody can follow, which
+     is how a delivered mockup ends up unread.
 
 Run: python3 tools/check-wireframes.py
 """
@@ -88,6 +92,29 @@ def main() -> int:
         orphan = sorted(ids - all_defined)
         if orphan:
             ERRORS.append(f"{n}: draws {len(orphan)} screen(s) with no definition — {orphan[:5]}")
+
+    # 7. cross-platform reach resolves
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text())
+        for r in (doc["platform"].get("reachesOtherPlatforms") or []):
+            tgt, _, anc = r["board"].partition("#")
+            tn = tgt.split("/")[-1]
+            if tn not in files:
+                ERRORS.append(f"{doc['platform']['code']}: reach board '{tn}' missing")
+            elif anc not in anchors[tn]:
+                ERRORS.append(f"{doc['platform']['code']}: reach anchor '#{anc}' not in {tn}")
+
+    # 6. design references resolve
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text())
+        code = doc["platform"]["code"]
+        for ref in (doc["platform"].get("designReferences") or []):
+            if not (ROOT / ref["path"]).exists():
+                ERRORS.append(f"{code}: design reference '{ref['path']}' does not exist")
+        for s in doc["screens"]:
+            dr = (s.get("wireframe") or {}).get("designReference")
+            if dr and not (ROOT / dr).exists():
+                ERRORS.append(f"{s['id']}: designReference '{dr}' does not exist")
 
     # 4. hrefs across every board
     n_href = 0

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 4
+  x-ticvai-screen-count: 15
   x-ticvai-tier: satellite
   x-ticvai-module: "4 — Bundles and Promotions"
   x-ticvai-requirements: 229
@@ -111,6 +111,10 @@ paths:
   /promotions:
     get:
       operationId: listPromotions
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-routing: replica
       summary: List promotions
       tags: [promotion]
@@ -147,6 +151,10 @@ paths:
 
     post:
       operationId: createPromotion
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       summary: Create a promotion
       description: >
         Created in `draft`. A draft promotion never evaluates — publishing is the act that
@@ -183,6 +191,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getPromotion
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-routing: replica
       summary: Read a promotion
       tags: [promotion]
@@ -200,6 +212,10 @@ paths:
 
     patch:
       operationId: updatePromotion
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       summary: Amend a promotion
       description: >
         Amending a live promotion changes behaviour mid-sale. Conditions and discount are
@@ -243,6 +259,10 @@ paths:
         schema: { type: string }
     post:
       operationId: pausePromotion
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       summary: Pause a live promotion
       description: >
         **Carts already priced keep their price.** A guest mid-checkout is not repriced — the discount they were shown is the one they pay.
@@ -279,6 +299,10 @@ paths:
         schema: { type: string }
     post:
       operationId: endPromotion
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       summary: End a promotion early
       description: >
         Distinct from expiry. `expired` means it ran its course; `ended` means somebody decided, and the register should be able to answer which after a bad month.
@@ -315,6 +339,10 @@ paths:
         schema: { type: string }
     post:
       operationId: unschedulePromotion
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       summary: Pull a scheduled promotion before it starts
       description: >
         Returns it to draft. Nothing has priced against it yet, so nothing needs honouring.
@@ -342,6 +370,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: publishPromotion
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       summary: Publish a promotion
       description: >
         Runs conflict analysis first. A promotion that stacks with an existing one to produce
@@ -374,6 +406,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: analysePromotionConflicts
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-routing: replica
       summary: Analyse stacking against live promotions
       description: >
@@ -399,6 +435,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getPromotionUsage
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-routing: analytical
       summary: Redemption count and discount given
       description: >
@@ -420,6 +460,8 @@ paths:
   /coupon-campaigns:
     get:
       operationId: listCouponCampaigns
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-read-routing: replica
       summary: List coupon campaigns
       description: >
@@ -449,6 +491,8 @@ paths:
 
     post:
       operationId: createCouponCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
       summary: Create a coupon campaign
       tags: [coupon]
       x-ticvai-permission: PRICE_CONFIGURE
@@ -477,6 +521,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listCouponCodes
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-read-routing: replica
       summary: List generated codes
       tags: [coupon]
@@ -506,6 +552,8 @@ paths:
 
     post:
       operationId: generateCouponCodes
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
       summary: Generate codes in bulk
       description: >
         Up to fifty thousand at a time. Generation is asynchronous and the batch is exported
@@ -556,8 +604,7 @@ paths:
         schema: { type: string }
     get:
       operationId: getCouponCode
-      x-ticvai-consumed-by:
-        - "P01 WEB-010 Shopping Cart"
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-read-routing: primary   # single-use enforcement. Replica lag permits a second redemption
       summary: Look up a code
       description: >
@@ -819,8 +866,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getBundle
-      x-ticvai-consumed-by:
-        - "P02 GST-056 Bundle Package"
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-read-routing: replica
       summary: Read a bundle with components and allocation
       tags: [bundle]
@@ -1027,8 +1073,6 @@ paths:
   /upsell-suggestions:
     post:
       operationId: getUpsellSuggestions
-      x-ticvai-consumed-by:
-        - "P01 WEB-008 Add-ons & Upsell"
       summary: Suggestions for a cart
       description: >
         Rule-based today. Where the recommendation engine is enabled it augments this rather
@@ -1075,11 +1119,10 @@ paths:
   /promotions/evaluate:
     post:
       operationId: evaluatePromotions
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
-        - "P01 WEB-005 Ticket Type Selection"
-        - "P01 WEB-010 Shopping Cart"
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P05 KSK-006 Review"
+        - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
       summary: Evaluate promotions against a cart
       description: >
@@ -1415,6 +1458,51 @@ components:
       type: string
       enum: [fixed, dynamic, mandatory, optional, promotional]
 
+    BundleChoiceGroup:
+      type: object
+      x-ticvai-persistence: "promotions.bundle_choice_group"
+      description: >
+        **Pick n from a set** (3.5.10). The shape a dynamic bundle needs and `BundleComponent`
+        could not express — it names specific variants, which describes a fixed bundle with
+        swaps.
+
+        The bundle price does not move with the choice (ADR-0019). **The allocation does.**
+      required: [label, choose, options]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        label:
+          type: string
+          description: What the guest is asked. "Choose 3 attractions".
+        choose:
+          type: integer
+          minimum: 1
+          description: How many options the guest picks.
+        allowDuplicates:
+          type: boolean
+          default: false
+          description: >
+            Whether the same option may be picked twice. False for attractions, sometimes true
+            for F&B.
+        options:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [variantId]
+            properties:
+              variantId: { type: string, format: uuid }
+              quantity: { type: integer, default: 1 }
+              isDefault: { type: boolean, default: false }
+        unavailableBehaviour:
+          type: string
+          enum: [hideOption, hideBundle]
+          default: hideOption
+          description: >
+            An option that has sold out for the chosen date is **not offered**. Where the group
+            can no longer be satisfied at all, the bundle itself becomes unavailable —
+            **it is never sold with a component that cannot be delivered**, because a
+            substitution the guest did not choose is a complaint at the gate.
+
     BundleComponent:
       x-ticvai-persistence: "promotions.bundle_component"
       type: object
@@ -1516,8 +1604,15 @@ components:
         price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         components:
           type: array
-          minItems: 2
+          minItems: 0
           items: { $ref: '#/components/schemas/BundleComponent' }
+        choiceGroups:
+          type: array
+          description: >
+            Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at
+            once — a family pass with fixed parking and two groups the guest chooses from.
+            **The bundle price does not move with the choice** (ADR-0019).
+          items: { $ref: '#/components/schemas/BundleChoiceGroup' }
         allocation:
           type: object
           required: [method, components]

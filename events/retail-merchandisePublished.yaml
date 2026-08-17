@@ -1,0 +1,40 @@
+# retail.merchandisePublished v1 — published by retail
+# Checked by tools/check-states.py.
+
+name: retail.merchandisePublished
+version: 1
+publisher: retail
+description: Merchandise is on sale.
+aggregate: merchandise
+emittedWhen: Merchandise published or withdrawn
+payload:
+- field: merchandiseId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: outletIds
+  type: array
+- field: isWithdrawn
+  type: boolean
+  notes: True on withdrawal. **The index must remove it**, not merely stop updating it
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Index or remove the description
+  idempotencyKey: merchandiseId + publishedAt
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Product dimension
+  idempotencyKey: merchandiseId + publishedAt
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: 'Withdrawal travels on the same event rather than a second one. A separate withdrawn event is
+  one a consumer can forget to subscribe to, and the failure is a shop still advertising something it
+  does not sell.
+
+
+  No state model emits this: merchandise publication is a field on the record, not a status enum. Same
+  shape as `fnb.menu`.'

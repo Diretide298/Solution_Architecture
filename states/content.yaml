@@ -17,6 +17,8 @@ transitions:
   trigger: operation
   guard: Live on the guest surfaces
   requiresApproval: true
+  emits:
+  - whitelabel.contentPublished
 - from: published
   to: draft
   operation: restoreConfigVersion

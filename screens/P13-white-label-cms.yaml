@@ -8,11 +8,11 @@ platform:
   code: P13
   audience: staff
   formFactor: web
-  shortName: Staff Web
-  name: Staff Web — White-Label CMS
+  shortName: Venue CMS
+  name: Venue CMS — White Label
   surface: staffFacing
   runtime: reactWeb
-  app: backoffice
+  app: venue-management-web
   appStatus: scaffolded
   offlineCapable: false
   packages:
@@ -30,6 +30,23 @@ platform:
     releaseCadence: weekly
   screenCount: 20
   wireframeBoard: wireframes/P13 White-Label CMS.dc.html
+  designReferences:
+  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    note: The CMS **is** the White Label Builder. These six boards are the design, not a reference for
+      one.
+  reachesOtherPlatforms:
+  - screen: ADM-016
+    platform: P09
+    board: wireframes/P09 Admin Web.dc.html#adm-016
+    note: White-label branding is administered from the platform console
+  - screen: ADM-017
+    platform: P09
+    board: wireframes/P09 Admin Web.dc.html#adm-017
+    note: Domain and certificate management sits with the platform, not the tenant
+  operator: venue
+  directions:
+  - ltr
+  - rtl
 screens:
 - id: CMS-001
   name: Tenant Workspace
@@ -45,9 +62,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: List skeleton; the count renders first
+    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    error: Could not load . Actions on the list are disabled
   navigation:
     exitTo: []
     inferred: true
@@ -55,13 +72,100 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-001
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/tenant-workspace
-    component: apps/backoffice/src/routes/white-label/TenantWorkspaceDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/TenantWorkspaceDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
 - id: CMS-002
   name: Brand Kit
   module: White Label
@@ -76,23 +180,44 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-005
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-002
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/brand-kit
-    component: apps/backoffice/src/routes/white-label/BrandKitDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/BrandKitDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: createUpload
+    contract: assets
+    purpose: Request a signed upload URL
+    trigger: onAction
+  - operationId: completeUpload
+    contract: assets
+    purpose: Confirm an upload and create the asset
+    trigger: onAction
 - id: CMS-003
   name: Typography
   module: White Label
@@ -107,9 +232,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load. Editing is blocked
   navigation:
     exitTo: []
     inferred: true
@@ -117,13 +242,180 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-003
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/typography
-    component: apps/backoffice/src/routes/white-label/TypographyDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/TypographyDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: createBanner
+    contract: white-label
+    purpose: Create a banner
+    trigger: onAction
+  - operationId: createContentPage
+    contract: white-label
+    purpose: Create a content page
+    trigger: onAction
+  - operationId: createPreview
+    contract: white-label
+    purpose: Generate a preview link
+    trigger: onAction
+  - operationId: createPromoBlock
+    contract: white-label
+    purpose: Create a promotional block
+    trigger: onAction
+  - operationId: deleteBanner
+    contract: white-label
+    purpose: Delete a banner
+    trigger: onAction
+  - operationId: deleteContentPage
+    contract: white-label
+    purpose: Delete a content page
+    trigger: onAction
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: getAppIcons
+    contract: white-label
+    purpose: Read app icon set
+    trigger: onLoad
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: getFeatureToggles
+    contract: white-label
+    purpose: Read tenant feature toggles
+    trigger: onLoad
+  - operationId: getFonts
+    contract: white-label
+    purpose: Read font configuration
+    trigger: onLoad
+  - operationId: getHomepageLayout
+    contract: white-label
+    purpose: Read homepage layout
+    trigger: onLoad
+  - operationId: getModuleEnablement
+    contract: white-label
+    purpose: Read module enablement
+    trigger: onLoad
+  - operationId: getNavigation
+    contract: white-label
+    purpose: Read navigation
+    trigger: onLoad
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: listBanners
+    contract: white-label
+    purpose: List banners
+    trigger: onLoad
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: listContentPages
+    contract: white-label
+    purpose: List custom content pages
+    trigger: onLoad
+  - operationId: listFaqs
+    contract: white-label
+    purpose: List FAQs
+    trigger: onLoad
+  - operationId: listPolicies
+    contract: white-label
+    purpose: List legal policies
+    trigger: onLoad
+  - operationId: listPromoBlocks
+    contract: white-label
+    purpose: List promotional blocks
+    trigger: onLoad
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
+  - operationId: setAppIcons
+    contract: white-label
+    purpose: Set app icons
+    trigger: onAction
+  - operationId: setFaqs
+    contract: white-label
+    purpose: Set FAQ categories and entries
+    trigger: onAction
+  - operationId: setFeatureToggles
+    contract: white-label
+    purpose: Set feature toggles
+    trigger: onAction
+  - operationId: setFonts
+    contract: white-label
+    purpose: Set fonts
+    trigger: onAction
+  - operationId: setHeader
+    contract: white-label
+    purpose: Configure the header
+    trigger: onAction
+  - operationId: setHomepageLayout
+    contract: white-label
+    purpose: Set homepage section order
+    trigger: onAction
+  - operationId: setLanguages
+    contract: white-label
+    purpose: Set enabled languages and default
+    trigger: onAction
+  - operationId: setMaintenanceMode
+    contract: white-label
+    purpose: Enable or clear maintenance mode
+    trigger: onAction
+  - operationId: setModuleEnablement
+    contract: white-label
+    purpose: Enable or disable modules
+    trigger: onAction
+  - operationId: setNavigation
+    contract: white-label
+    purpose: Set main and overflow navigation
+    trigger: onAction
+  - operationId: setPolicy
+    contract: white-label
+    purpose: Publish a policy version
+    trigger: onAction
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
+  - operationId: updateBanner
+    contract: white-label
+    purpose: Amend or activate a banner
+    trigger: onAction
+  - operationId: updateContentPage
+    contract: white-label
+    purpose: Amend a content page
+    trigger: onAction
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
 - id: CMS-004
   name: Logo & Assets
   module: White Label
@@ -138,9 +430,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: List skeleton; the count renders first
+    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    error: Could not load . Actions on the list are disabled
   navigation:
     exitTo: []
     inferred: true
@@ -148,13 +440,44 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-004
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/logo-assets
-    component: apps/backoffice/src/routes/white-label/LogoAssetsDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/LogoAssetsDetail.tsx
     status: notStarted
+  apis:
+  - operationId: listAssets
+    contract: maintenance
+    purpose: List assets
+    trigger: onLoad
+  - operationId: getAsset
+    contract: maintenance
+    purpose: Read an asset with history and documents
+    trigger: onLoad
+  - operationId: createAsset
+    contract: maintenance
+    purpose: Register an asset
+    trigger: onAction
+  - operationId: getAssetHistory
+    contract: maintenance
+    purpose: Service history
+    trigger: onLoad
+  - operationId: lookupAsset
+    contract: maintenance
+    purpose: Find an asset by tag or QR
+    trigger: onLoad
+  - operationId: setAssetStatus
+    contract: maintenance
+    purpose: Take an asset out of service or return it
+    trigger: onAction
+  - operationId: updateAsset
+    contract: maintenance
+    purpose: Amend an asset
+    trigger: onAction
 - id: CMS-005
   name: Theme Editor
   module: White Label
@@ -169,23 +492,36 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-007
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-005
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/theme-editor
-    component: apps/backoffice/src/routes/white-label/ThemeEditorDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/ThemeEditorDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
 - id: CMS-006
   name: Component Preview
   module: White Label
@@ -200,9 +536,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load. Editing is blocked
   navigation:
     exitTo: []
     inferred: true
@@ -210,13 +546,180 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-006
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/component-preview
-    component: apps/backoffice/src/routes/white-label/ComponentPreviewDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/ComponentPreviewDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
+  - operationId: createBanner
+    contract: white-label
+    purpose: Create a banner
+    trigger: onAction
+  - operationId: createContentPage
+    contract: white-label
+    purpose: Create a content page
+    trigger: onAction
+  - operationId: createPreview
+    contract: white-label
+    purpose: Generate a preview link
+    trigger: onAction
+  - operationId: createPromoBlock
+    contract: white-label
+    purpose: Create a promotional block
+    trigger: onAction
+  - operationId: deleteBanner
+    contract: white-label
+    purpose: Delete a banner
+    trigger: onAction
+  - operationId: deleteContentPage
+    contract: white-label
+    purpose: Delete a content page
+    trigger: onAction
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: getAppIcons
+    contract: white-label
+    purpose: Read app icon set
+    trigger: onLoad
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: getFeatureToggles
+    contract: white-label
+    purpose: Read tenant feature toggles
+    trigger: onLoad
+  - operationId: getFonts
+    contract: white-label
+    purpose: Read font configuration
+    trigger: onLoad
+  - operationId: getHomepageLayout
+    contract: white-label
+    purpose: Read homepage layout
+    trigger: onLoad
+  - operationId: getModuleEnablement
+    contract: white-label
+    purpose: Read module enablement
+    trigger: onLoad
+  - operationId: getNavigation
+    contract: white-label
+    purpose: Read navigation
+    trigger: onLoad
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: listBanners
+    contract: white-label
+    purpose: List banners
+    trigger: onLoad
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: listContentPages
+    contract: white-label
+    purpose: List custom content pages
+    trigger: onLoad
+  - operationId: listFaqs
+    contract: white-label
+    purpose: List FAQs
+    trigger: onLoad
+  - operationId: listPolicies
+    contract: white-label
+    purpose: List legal policies
+    trigger: onLoad
+  - operationId: listPromoBlocks
+    contract: white-label
+    purpose: List promotional blocks
+    trigger: onLoad
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
+  - operationId: setAppIcons
+    contract: white-label
+    purpose: Set app icons
+    trigger: onAction
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: setFaqs
+    contract: white-label
+    purpose: Set FAQ categories and entries
+    trigger: onAction
+  - operationId: setFeatureToggles
+    contract: white-label
+    purpose: Set feature toggles
+    trigger: onAction
+  - operationId: setFonts
+    contract: white-label
+    purpose: Set fonts
+    trigger: onAction
+  - operationId: setHeader
+    contract: white-label
+    purpose: Configure the header
+    trigger: onAction
+  - operationId: setHomepageLayout
+    contract: white-label
+    purpose: Set homepage section order
+    trigger: onAction
+  - operationId: setLanguages
+    contract: white-label
+    purpose: Set enabled languages and default
+    trigger: onAction
+  - operationId: setMaintenanceMode
+    contract: white-label
+    purpose: Enable or clear maintenance mode
+    trigger: onAction
+  - operationId: setModuleEnablement
+    contract: white-label
+    purpose: Enable or disable modules
+    trigger: onAction
+  - operationId: setNavigation
+    contract: white-label
+    purpose: Set main and overflow navigation
+    trigger: onAction
+  - operationId: setPolicy
+    contract: white-label
+    purpose: Publish a policy version
+    trigger: onAction
+  - operationId: updateBanner
+    contract: white-label
+    purpose: Amend or activate a banner
+    trigger: onAction
+  - operationId: updateContentPage
+    contract: white-label
+    purpose: Amend a content page
+    trigger: onAction
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
 - id: CMS-007
   name: Page Builder
   module: White Label
@@ -231,23 +734,36 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-012
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-007
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/page-builder
-    component: apps/backoffice/src/routes/white-label/PageBuilderDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/PageBuilderDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getHomepageLayout
+    contract: white-label
+    purpose: Read homepage layout
+    trigger: onLoad
+  - operationId: setHomepageLayout
+    contract: white-label
+    purpose: Set homepage section order
+    trigger: onAction
 - id: CMS-008
   name: Content Blocks
   module: White Label
@@ -262,9 +778,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
     exitTo: []
     inferred: true
@@ -272,13 +788,24 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-008
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/content-blocks
-    component: apps/backoffice/src/routes/white-label/ContentBlocksDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/ContentBlocksDetail.tsx
     status: notStarted
+  apis:
+  - operationId: listPromoBlocks
+    contract: white-label
+    purpose: List promotional blocks
+    trigger: onLoad
+  - operationId: listBanners
+    contract: white-label
+    purpose: List banners
+    trigger: onLoad
 - id: CMS-009
   name: Navigation & Menus
   module: White Label
@@ -293,9 +820,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: List skeleton; the count renders first
+    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    error: Could not load . Actions on the list are disabled
   navigation:
     exitTo: []
     inferred: true
@@ -303,13 +830,36 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-009
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/navigation-menus
-    component: apps/backoffice/src/routes/white-label/NavigationMenusDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/NavigationMenusDetail.tsx
     status: notStarted
+  apis:
+  - operationId: listMenus
+    contract: fnb
+    purpose: List menus
+    trigger: onLoad
+  - operationId: getMenu
+    contract: fnb
+    purpose: Read a menu with sections and items
+    trigger: onLoad
+  - operationId: createMenu
+    contract: fnb
+    purpose: Create a menu
+    trigger: onAction
+  - operationId: setMenuSections
+    contract: fnb
+    purpose: Set menu sections and their item ordering
+    trigger: onAction
+  - operationId: updateMenu
+    contract: fnb
+    purpose: Amend a menu
+    trigger: onAction
 - id: CMS-010
   name: Media Library
   module: White Label
@@ -324,9 +874,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load. Editing is blocked
   navigation:
     exitTo: []
     inferred: true
@@ -334,13 +884,64 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-010
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/media-library
-    component: apps/backoffice/src/routes/white-label/MediaLibraryDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/MediaLibraryDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getMediaEntitlements
+    contract: orders
+    purpose: What is already on this media
+    trigger: onLoad
+  - operationId: searchMedia
+    contract: assets
+    purpose: Search the asset library
+    trigger: onLoad
+  - operationId: appendEntitlementToMedia
+    contract: orders
+    purpose: Add something to a ticket the guest already holds
+    trigger: onAction
+  - operationId: completeUpload
+    contract: assets
+    purpose: Confirm an upload and create the asset
+    trigger: onAction
+  - operationId: createCollection
+    contract: assets
+    purpose: Create a collection
+    trigger: onAction
+  - operationId: createUpload
+    contract: assets
+    purpose: Request a signed upload URL
+    trigger: onAction
+  - operationId: deleteMediaAsset
+    contract: assets
+    purpose: Delete an asset
+    trigger: onAction
+  - operationId: getExpiringRights
+    contract: assets
+    purpose: Assets whose licence is expiring or expired
+    trigger: onLoad
+  - operationId: getMediaAsset
+    contract: assets
+    purpose: Read an asset with derivatives and usage
+    trigger: onLoad
+  - operationId: listCollections
+    contract: assets
+    purpose: List collections
+    trigger: onLoad
+  - operationId: replaceMediaAsset
+    contract: assets
+    purpose: Replace the file behind an asset
+    trigger: onAction
+  - operationId: updateMediaAsset
+    contract: assets
+    purpose: Amend metadata, tags or rights
+    trigger: onAction
 - id: CMS-013
   name: SEO & Metadata
   module: White Label
@@ -355,9 +956,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
     exitTo: []
     inferred: true
@@ -365,12 +966,14 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-013
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/seo-metadata
-    component: apps/backoffice/src/routes/white-label/SeoMetadataDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/SeoMetadataDetail.tsx
     status: notStarted
 - id: CMS-011
   name: Translations
@@ -386,9 +989,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
     exitTo: []
     inferred: true
@@ -396,13 +999,20 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-011
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/translations
-    component: apps/backoffice/src/routes/white-label/TranslationsDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/TranslationsDetail.tsx
     status: notStarted
+  apis:
+  - operationId: setLanguages
+    contract: white-label
+    purpose: Set enabled languages and default
+    trigger: onAction
 - id: CMS-012
   name: RTL Preview
   module: White Label
@@ -417,23 +1027,36 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-014
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-012
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/rtl-preview
-    component: apps/backoffice/src/routes/white-label/RtlPreviewDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/RtlPreviewDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
 - id: CMS-014
   name: Publishing Workflow
   module: White Label
@@ -448,23 +1071,40 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-015
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-014
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/publishing-workflow
-    component: apps/backoffice/src/routes/white-label/PublishingWorkflowDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/PublishingWorkflowDetail.tsx
     status: notStarted
+  apis:
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
 - id: CMS-015
   name: Version History
   module: White Label
@@ -479,9 +1119,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
     exitTo: []
     inferred: true
@@ -489,13 +1129,28 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-015
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/version-history
-    component: apps/backoffice/src/routes/white-label/VersionHistoryDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/VersionHistoryDetail.tsx
     status: notStarted
+  apis:
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
 - id: CMS-016
   name: Site Settings
   module: White Label
@@ -510,9 +1165,10 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Current values, with the level each resolves from
+    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
   navigation:
     exitTo: []
     inferred: true
@@ -520,13 +1176,20 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-016
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/site-settings
-    component: apps/backoffice/src/routes/white-label/SiteSettingsDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/SiteSettingsDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
 - id: CMS-017
   name: Domain & Certificate
   module: White Label
@@ -541,9 +1204,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
     exitTo: []
     inferred: true
@@ -551,12 +1214,14 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-017
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/domain-certificate
-    component: apps/backoffice/src/routes/white-label/DomainCertificateDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/DomainCertificateDetail.tsx
     status: notStarted
 - id: CMS-018
   name: Consent & Legal
@@ -572,9 +1237,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load. Editing is blocked
   navigation:
     exitTo: []
     inferred: true
@@ -582,13 +1247,60 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-018
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/consent-legal
-    component: apps/backoffice/src/routes/white-label/ConsentLegalDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/ConsentLegalDetail.tsx
     status: notStarted
+  apis:
+  - operationId: getGuestConsents
+    contract: marketing-crm
+    purpose: Read a guest's consent state
+    trigger: onLoad
+  - operationId: getConsentHistory
+    contract: marketing-crm
+    purpose: Full consent history
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: adjustLoyaltyPoints
+    contract: marketing-crm
+    purpose: Manually adjust points
+    trigger: onAction
+  - operationId: getGuestLoyalty
+    contract: marketing-crm
+    purpose: A guest's loyalty position
+    trigger: onLoad
+  - operationId: getGuestProfile
+    contract: marketing-crm
+    purpose: Read a guest profile
+    trigger: onLoad
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: mergeGuestProfiles
+    contract: marketing-crm
+    purpose: Merge a duplicate profile into this one
+    trigger: onAction
+  - operationId: searchGuests
+    contract: marketing-crm
+    purpose: Search guest profiles
+    trigger: onLoad
+  - operationId: updateGuestProfile
+    contract: marketing-crm
+    purpose: Amend a guest profile
+    trigger: onAction
 - id: CMS-019
   name: User Access
   module: White Label
@@ -603,9 +1315,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
     exitTo: []
     inferred: true
@@ -613,13 +1325,24 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-019
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/user-access
-    component: apps/backoffice/src/routes/white-label/UserAccessDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/UserAccessDetail.tsx
     status: notStarted
+  apis:
+  - operationId: listPrincipals
+    contract: identity
+    purpose: List principals
+    trigger: onLoad
+  - operationId: listRoles
+    contract: identity
+    purpose: List roles
+    trigger: onLoad
 - id: CMS-020
   name: Change Log
   module: White Label
@@ -634,9 +1357,9 @@ screens:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    empty: Not found — it may have been deleted or moved out of scope
+    error: Could not load
   navigation:
     exitTo: []
     inferred: true
@@ -644,10 +1367,17 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-020
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
-    app: backoffice
+    app: venue-management-web
     route: /white-label/change-log
-    component: apps/backoffice/src/routes/white-label/ChangeLogDetail.tsx
+    component: apps/venue-management-web/src/routes/white-label/ChangeLogDetail.tsx
     status: notStarted
+  apis:
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad

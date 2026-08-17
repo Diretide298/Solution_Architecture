@@ -1,0 +1,106 @@
+# F21 — A ride queue fills and a guest is redirected
+#
+# `queue` had 21 operations and no flow. The manual-entry branch is the one ADR-0012
+# exists for and it had never been traced end to end.
+#
+# Validated by tools/check-flows.py.
+
+id: F21
+name: A ride queue fills and a guest is redirected
+actor: guest
+capability: C34
+wave: 2
+frequency: constant
+criticality: convenience
+platforms:
+- P02 Guest App
+- P08 Venue Management
+- P06 Venue Staff App
+offlineBehaviour: '**Wait times are cached with their age on the guest app.** A wait time from twenty
+  minutes ago is worse than none, so the age is always shown.'
+trigger:
+  description: A guest opens the app to decide what to do next, and the ride they wanted has an hour's
+    wait.
+  entryScreen: GST-022
+  entryPoints:
+  - Guest app map
+  - Signage
+  - A push after joining
+steps:
+- step: 1
+  screen: GST-022
+  action: Guest sees the waits
+  operations:
+  - getWaitTimes
+  outcome: With the age of each reading
+- step: 2
+  screen: GST-059
+  action: Picks something shorter
+  operations:
+  - getWaitTimes
+  outcome: Or joins a virtual queue for the long one
+- step: 3
+  screen: BO-005
+  action: A supervisor sees the queue building
+  operations:
+  - listQueues
+  outcome: Before guests complain
+- step: 4
+  screen: EMP-032
+  action: The feed dies and a supervisor types the wait
+  operations:
+  - setWaitTime
+  outcome: '**Manual entry is first-class** (ADR-0012), not a fallback bolted on'
+- step: 5
+  screen: BO-005
+  action: Parties are called
+  operations:
+  - callNextParties
+  outcome: From the virtual queue
+branches:
+- at: 1
+  condition: No feed at this attraction
+  behaviour: '**Manual entry, or nothing.** A venue with no sensors still has queues, and the platform
+    must not require hardware to show a wait.'
+  severity: recoverable
+  resolvedBy: Supervisor
+- at: 1
+  condition: The reading is stale
+  behaviour: '**Age is shown and the reading is suppressed past a threshold.** A twenty-minute-old wait
+    presented as current sends guests to the wrong ride.'
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 4
+  condition: The feed dies mid-day
+  behaviour: '`getQueueFeedHealth` flags it. Manual entry takes over, and the guest app shows a wait
+    typed by a person rather than nothing.'
+  severity: recoverable
+  resolvedBy: Supervisor
+- at: 3
+  condition: The asset goes out of service
+  behaviour: '**The queue closes and waiting parties are released, not silently dropped.** A guest holding
+    a place for a closed ride will come back to ask.'
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 5
+  condition: A called party does not arrive
+  behaviour: Held for a window then skipped. Their place is not restored — **unlike a waitlist, where
+    being asleep is not declining**, a called queue place expires because the ride is running.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 2
+  condition: The guest joins two virtual queues at once
+  behaviour: Allowed or not is a venue policy nobody has stated. **Allowing it lets one guest hold two
+    places while standing in neither.**
+  severity: requiresStaff
+  resolvedBy: Venue manager
+exitStates:
+- state: completed
+  description: Guest redirected and rode something
+- state: deferred
+  description: In a virtual queue
+- state: abandoned
+  description: Queue closed, place released
+openQuestions:
+- Whether a guest may hold two virtual queue places at once. Allowing it means one guest occupies two
+  positions while standing in neither.

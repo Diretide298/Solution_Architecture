@@ -1,0 +1,84 @@
+# Cart — state model
+# Contract: orders.CartStatus
+# Checked by tools/check-states.py.
+
+entity: Cart
+contract: orders
+enum: CartStatus
+owner: orders
+initial:
+- active
+terminal:
+- expired
+- abandoned
+- checkedOut
+transitions:
+- from: active
+  to: expiring
+  trigger: timer
+  guard: '**The earliest lease is close to expiry.** A distinct state so the interface can offer an
+    extension before the guest loses anything, rather than after'
+- from: expiring
+  to: active
+  operation: extendCart
+  trigger: operation
+  guard: Extended. **Capped** — an indefinitely extendable hold is capacity permanently removed by someone
+    who left a tab open
+  isReversal: true
+- from: expiring
+  to: active
+  operation: addCartLine
+  trigger: operation
+  guard: A new line with a fresh lease moved the earliest expiry out
+- from: active
+  to: expired
+  trigger: timer
+  guard: '**Every lease released.** The capacity returns to sale, and the cart remains readable so a
+    guest following a link is told it lapsed rather than that it never existed'
+  emits:
+  - cart.abandoned
+- from: expiring
+  to: expired
+  trigger: timer
+  guard: Not extended in time
+  emits:
+  - cart.abandoned
+- from: active
+  to: abandoned
+  operation: abandonCart
+  trigger: operation
+  guard: '**The guest said no.** Distinct from expiry, and excluded from recovery campaigns — chasing
+    someone who emptied their cart is the difference between a reminder and a nuisance'
+- from: expiring
+  to: abandoned
+  operation: abandonCart
+  trigger: operation
+  guard: Emptied deliberately
+- from: active
+  to: checkedOut
+  operation: checkoutCart
+  trigger: operation
+  guard: '**Leases transfer to the order rather than being released and re-acquired** — releasing first
+    lets another guest take the capacity between the two calls'
+- from: expiring
+  to: checkedOut
+  operation: checkoutCart
+  trigger: operation
+  guard: Checked out in the last minutes, which is the common case
+- from: expired
+  to: active
+  operation: addCartLine
+  trigger: operation
+  guard: '**A guest returning to an expired cart and re-adding a line revives it.** Better than making
+    them start again, and the lines that could not be re-leased are named'
+  isReversal: true
+notes: 'A cart holds leases; an order holds money. Different lifetimes, different failure modes.
+
+
+  **`expired` is not terminal in practice.** A guest following a recovery link (22.3.6) lands on a cart
+  that lapsed, and re-adding a line revives it rather than forcing a fresh start — which is the whole
+  point of keeping the record after the leases go.
+
+
+  **`abandoned` and `expired` must not be collapsed.** One is a decision and one is a timeout, and only
+  the second should be chased.'

@@ -107,9 +107,11 @@ def main() -> int:
                         f"but {sid} does not declare it")
 
         for b in branches:
-            if (r := b.get("resolvedBy")):
-                if r not in screen_ids and (ops and r not in ops):
-                    WARNINGS.append(f"{name}: branch resolvedBy '{r}' is neither a screen nor an operation")
+            # resolvedBy names *who* resolves it — a role, or "Automatic". It was checked against
+            # screens and operations, which is the wrong vocabulary: "Duty manager" is the correct
+            # answer and produced a warning on every branch that had one.
+            if not b.get("resolvedBy"):
+                WARNINGS.append(f"{name}: a branch says nothing about who resolves it")
             if b.get("at") and not any(s.get("step") == b["at"] for s in steps):
                 ERRORS.append(f"{name}: branch at step {b['at']}, which does not exist")
 

@@ -50,11 +50,13 @@ branches:
   severity: dataLoss
   behaviour: isInternal is required, never defaulted, and the reply target is shown in the composer.
     Once sent it cannot be recalled — the prevention is the control.
+  resolvedBy: agent
 - at: 3
   condition: SLA breaches while awaiting an internal team
   severity: recoverable
   behaviour: The clock does not pause. It pauses only while awaiting the guest — otherwise every breach
     becomes someone else queue and the metric stops meaning anything.
+  resolvedBy: Automatic
 exitStates:
 - state: completed
   description: Case resolved with findings recorded

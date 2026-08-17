@@ -6609,15 +6609,38 @@ function toast(message) {
  *  a re-render — and so collapsing "operations" on one screen does not also
  *  collapse the notes on another. */
 const collapsedSections = new Set();
-const sectionKey = (label) =>
-  `${state.layer}/${state.mode}/${label.textContent.trim().toLowerCase()}`;
 
-/** A section owns every sibling after its label, up to the next label. */
+/**
+ * The two shapes that fold, and the one handler that folds them.
+ *
+ * A pane section is a label followed by its content as siblings. A sidebar
+ * group is a `.tree-group` whose head is its first child and whose rows are
+ * the rest — twelve platforms of 29 screens each, which is the list that made
+ * this worth doing: reaching the kiosk meant scrolling past the whole of Guest
+ * Web every time.
+ */
+const FOLD_HEADS = '.journey-section-label, .tree-group-head';
+
+const isTreeHead = (label) => label.classList.contains('tree-group-head');
+
+/** By view and heading, so the choice survives a re-render — and so collapsing
+ *  "operations" on one screen does not also collapse the notes on another. A
+ *  sidebar group is keyed by its grouping instead of the mode, because the
+ *  same layer regroups by platform, module or wave and those are different
+ *  lists with different names. */
+const sectionKey = (label) =>
+  isTreeHead(label)
+    ? `tree/${state.layer}/${groupBy()}/${label.textContent.trim().toLowerCase()}`
+    : `${state.layer}/${state.mode}/${label.textContent.trim().toLowerCase()}`;
+
+/** A section owns every sibling after its label, up to the next label. A
+ *  sidebar group owns the rest of its container, which has no next label to
+ *  stop at — the group element is the boundary. */
 function sectionBody(label) {
   const out = [];
   for (
     let node = label.nextElementSibling;
-    node && !node.classList.contains('journey-section-label');
+    node && (isTreeHead(label) || !node.classList.contains('journey-section-label'));
     node = node.nextElementSibling
   ) out.push(node);
   return out;
@@ -6648,17 +6671,17 @@ function toggleSection(label) {
 
 /** Re-applies the reader's choices to whatever a render just produced. */
 function refreshSections(root = document) {
-  for (const label of root.querySelectorAll('.journey-section-label')) applyCollapse(label);
+  for (const label of root.querySelectorAll(FOLD_HEADS)) applyCollapse(label);
 }
 
 function bindSections() {
   document.addEventListener('click', (event) => {
-    const label = event.target.closest('.journey-section-label');
+    const label = event.target.closest(FOLD_HEADS);
     if (label) toggleSection(label);
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
-    const label = event.target.closest?.('.journey-section-label');
+    const label = event.target.closest?.(FOLD_HEADS);
     if (!label) return;
     event.preventDefault();
     toggleSection(label);
@@ -6671,8 +6694,8 @@ function bindSections() {
     for (const record of records) {
       for (const node of record.addedNodes) {
         if (node.nodeType !== 1) continue;
-        if (node.classList?.contains('journey-section-label')) applyCollapse(node);
-        else if (node.querySelector?.('.journey-section-label')) refreshSections(node);
+        if (node.matches?.(FOLD_HEADS)) applyCollapse(node);
+        else if (node.querySelector?.(FOLD_HEADS)) refreshSections(node);
       }
     }
   });

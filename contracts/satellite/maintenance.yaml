@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Maintenance & Safety
   version: 0.1.0
-  x-ticvai-screen-count: 8
+  x-ticvai-screen-count: 35
   x-ticvai-tier: satellite
   x-ticvai-module: "15 — Maintenance & Safety Management"
   x-ticvai-requirements: 50
@@ -104,6 +104,10 @@ paths:
   /assets:
     get:
       operationId: listAssets
+      x-ticvai-consumed-by:
+        - "P08 BO-031 Access Point Configuration"
+        - "P08 BO-069 Asset Register"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-read-routing: replica
       summary: List assets
       tags: [asset]
@@ -144,6 +148,10 @@ paths:
 
     post:
       operationId: createAsset
+      x-ticvai-consumed-by:
+        - "P08 BO-031 Access Point Configuration"
+        - "P08 BO-069 Asset Register"
+        - "P13 CMS-004 Logo & Assets"
       summary: Register an asset
       description: >
         Rides, plant, vehicles, IT equipment, furniture. Where the asset backs a sellable
@@ -181,6 +189,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getAsset
+      x-ticvai-consumed-by:
+        - "P08 BO-031 Access Point Configuration"
+        - "P08 BO-069 Asset Register"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-read-routing: replica
       summary: Read an asset with history and documents
       description: >
@@ -203,6 +215,8 @@ paths:
       operationId: updateAsset
       x-ticvai-consumed-by:
         - "P08 BO-031 Access Point Configuration"
+        - "P08 BO-069 Asset Register"
+        - "P13 CMS-004 Logo & Assets"
       summary: Amend an asset
       tags: [asset]
       x-ticvai-permission: ASSET_MANAGE
@@ -235,6 +249,10 @@ paths:
   /assets/lookup:
     get:
       operationId: lookupAsset
+      x-ticvai-consumed-by:
+        - "P08 BO-031 Access Point Configuration"
+        - "P08 BO-069 Asset Register"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-read-routing: replica
       summary: Find an asset by tag or QR
       description: >
@@ -268,6 +286,10 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setAssetStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-031 Access Point Configuration"
+        - "P08 BO-069 Asset Register"
+        - "P13 CMS-004 Logo & Assets"
       summary: Take an asset out of service or return it
       description: >
         **This closes the loop into operations.** Taking a ride out of service marks it on the
@@ -309,6 +331,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getAssetHistory
+      x-ticvai-consumed-by:
+        - "P08 BO-031 Access Point Configuration"
+        - "P08 BO-069 Asset Register"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-read-routing: analytical
       summary: Service history
       description: >
@@ -342,6 +368,9 @@ paths:
       operationId: listWorkOrders
       x-ticvai-consumed-by:
         - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       x-ticvai-read-routing: replica
       summary: List work orders
       description: >
@@ -385,6 +414,11 @@ paths:
 
     post:
       operationId: createWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       summary: Raise a work order
       description: >
         Raised by anyone — a technician, a duty supervisor, a cashier who noticed a broken
@@ -422,6 +456,11 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       x-ticvai-read-routing: replica
       summary: Read a work order
       tags: [workOrder]
@@ -439,6 +478,11 @@ paths:
 
     patch:
       operationId: updateWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       summary: Assign, reprioritise or amend
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_MANAGE
@@ -473,6 +517,11 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: recordWorkOrderTime
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       summary: Start, pause or stop work
       description: >
         The timer. Labour time drives cost and is the ground truth for how long jobs actually
@@ -525,6 +574,11 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: recordWorkOrderParts
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       summary: Record parts consumed
       description: >
         Issues stock through the inventory movement ledger — one ledger, not a second parts
@@ -577,6 +631,11 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: cancelWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       summary: Cancel a work order
       description: >
         Raised in error, duplicated, or superseded by a larger job.
@@ -625,7 +684,10 @@ paths:
     post:
       operationId: completeWorkOrder
       x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
       summary: Complete a work order
       description: >
         Requires a resolution note and, where the category demands it, completion photographs.
@@ -677,6 +739,9 @@ paths:
     post:
       operationId: verifyWorkOrder
       x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
       summary: Supervisor verification
       description: >
@@ -715,9 +780,322 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   # ---------------------------------------------------------------- planned
+  /work-orders/{workOrderId}/accept:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acceptWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
+      summary: The assignee takes the job
+      description: >
+        18.2.2. **Distinct from being assigned.** A supervisor assigns; a technician accepts,
+        and the gap between the two is where a job sits unread on a phone in a locker.
+
+        Acceptance is what makes the assignment real — until it happens, the work order is a
+        request rather than a commitment, and the queue should show it differently.
+      tags: [maintenance]
+      x-ticvai-permission: MAINTENANCE_EXECUTE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriteWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: Not assigned to this principal, or already accepted
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /work-orders/{workOrderId}/reject:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: rejectWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
+      summary: The assignee declines, with a reason
+      description: >
+        18.2.3. Wrong skill, wrong shift, wrong venue, or already being done by somebody else.
+
+        **Returns the work order to `open` rather than cancelling it** — the job still needs
+        doing and somebody else must pick it up. A rejection that cancelled the work would lose
+        it silently.
+      tags: [maintenance]
+      x-ticvai-permission: MAINTENANCE_EXECUTE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriteWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum: [wrongSkill, notOnShift, wrongVenue, alreadyInHand, unsafe, other]
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Returned to the pool
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+
+  /work-orders/{workOrderId}/start:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: startWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
+      summary: Work has begun
+      description: >
+        18.2.4. **Starts the clock**, which is what makes `recordWorkOrderTime` meaningful and
+        what the maintenance analytics measure against.
+
+        Offline-capable and timestamped on the device. A technician in a plant room starts a job
+        with no signal, and the start time must be when they started rather than when they
+        surfaced.
+      tags: [maintenance]
+      x-ticvai-permission: MAINTENANCE_EXECUTE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriteWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startedAt:
+                  type: string
+                  format: date-time
+                  description: Device time where the job began offline. The server records both.
+      responses:
+        '200':
+          description: Started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+
+  /work-orders/{workOrderId}/pause:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: pauseWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
+      summary: Stopped, and why
+      description: >
+        18.2.5. **The reason decides the state.** Waiting for a part moves to `awaitingParts`
+        and is chased by ordering something; waiting for a person, a permit or an outage window
+        moves to `paused` and is chased by asking someone.
+
+        Collapsing the two is how a job waits three weeks for a part nobody ordered.
+      tags: [maintenance]
+      x-ticvai-permission: MAINTENANCE_EXECUTE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriteWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum: [awaitingParts, awaitingPermit, awaitingOutageWindow, awaitingSpecialist,
+                         endOfShift, safetyConcern, other]
+                note: { type: string, maxLength: 300 }
+                requisitionId:
+                  type: string
+                  format: uuid
+                  description: Where a part was ordered, so the two are linked.
+      responses:
+        '200':
+          description: Paused, in the state the reason implies
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+
+  /work-orders/{workOrderId}/resume:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: resumeWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
+      summary: Back to work
+      description: 18.2.4 again, from the other side. Returns to `inProgress` from either paused state.
+      tags: [maintenance]
+      x-ticvai-permission: MAINTENANCE_EXECUTE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriteWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Resumed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+
+  /work-orders/{workOrderId}/close:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: closeWorkOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
+      summary: Administratively closed
+      description: >
+        18.2.7. **Not the same as completing or verifying it.** Completion is the technician
+        saying the work is done; verification is someone else agreeing; closing is the
+        supervisor deciding the record needs no further action.
+
+        Used where a job was completed and verified, and equally where it was overtaken by
+        events — the asset was replaced, the fault did not recur, the venue closed the area.
+        **A work order that can only end by being completed is one that stays open forever when
+        the answer is "never mind".**
+      tags: [maintenance]
+      x-ticvai-permission: MAINTENANCE_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome]
+              properties:
+                outcome:
+                  type: string
+                  enum: [completedAndVerified, notReproducible, supersededByReplacement,
+                         noLongerApplicable, duplicate]
+                note: { type: string, maxLength: 500 }
+                duplicateOfWorkOrderId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrder' }
+
+  /work-orders/{workOrderId}/attachments:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: attachWorkOrderEvidence
+      x-ticvai-consumed-by:
+        - "P06 EMP-004 Task list"
+        - "P06 EMP-005 Task detail"
+        - "P06 EMP-006 Raise a task"
+        - "P08 BO-030 Access Point Directory"
+      summary: Photo, video, document, note or signature
+      description: >
+        18.5.1–18.5.5. **Evidence, not decoration.** A photo of the fault before and the repair
+        after is what a safety audit asks for, and a signature is what a contractor sign-off
+        needs.
+
+        The file itself goes to the media store; this records the link, the kind and when it was
+        captured. **Captured offline and queued** — a technician photographing a fault in a
+        basement must not lose it because the upload failed.
+      tags: [maintenance]
+      x-ticvai-permission: MAINTENANCE_EXECUTE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind]
+              properties:
+                kind: { type: string, enum: [photo, video, document, note, signature] }
+                assetRef: { type: string, format: uuid, description: In the media store, where it is a file }
+                text: { type: string, maxLength: 4000, description: Where the kind is a note }
+                capturedAt: { type: string, format: date-time }
+                stage: { type: string, enum: [before, during, after, signOff] }
+      responses:
+        '201':
+          description: Attached
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrderAttachment' }
+
   /maintenance-plans:
     get:
       operationId: listMaintenancePlans
+      x-ticvai-consumed-by:
+        - "P08 BO-071 Planned Maintenance"
       x-ticvai-read-routing: replica
       summary: List planned maintenance schedules
       tags: [planned]
@@ -744,6 +1122,8 @@ paths:
 
     post:
       operationId: createMaintenancePlan
+      x-ticvai-consumed-by:
+        - "P08 BO-071 Planned Maintenance"
       summary: Create a planned maintenance schedule
       description: >
         By elapsed time, by usage, or both — whichever comes first. A ride serviced every
@@ -811,6 +1191,8 @@ paths:
   /maintenance-plans/due:
     get:
       operationId: getDueMaintenance
+      x-ticvai-consumed-by:
+        - "P08 BO-071 Planned Maintenance"
       x-ticvai-read-routing: replica
       summary: Planned tasks due or overdue
       description: >
@@ -841,6 +1223,8 @@ paths:
   /inspection-templates:
     get:
       operationId: listInspectionTemplates
+      x-ticvai-consumed-by:
+        - "P06 EMP-048 Opening checklist"
       x-ticvai-read-routing: replica
       summary: List inspection templates
       description: >
@@ -861,6 +1245,8 @@ paths:
 
     post:
       operationId: createInspectionTemplate
+      x-ticvai-consumed-by:
+        - "P06 EMP-048 Opening checklist"
       x-ticvai-config-scope: tenant
       summary: Create an inspection template
       description: >
@@ -888,6 +1274,8 @@ paths:
   /inspections:
     get:
       operationId: listInspections
+      x-ticvai-consumed-by:
+        - "P06 EMP-048 Opening checklist"
       x-ticvai-read-routing: replica
       summary: List completed inspections
       description: >
@@ -932,6 +1320,8 @@ paths:
 
     post:
       operationId: submitInspection
+      x-ticvai-consumed-by:
+        - "P06 EMP-048 Opening checklist"
       summary: Submit a completed inspection
       description: >
         Offline-capable and photo-first. A failed item may raise a work order automatically,
@@ -969,6 +1359,11 @@ paths:
       operationId: listIncidents
       x-ticvai-consumed-by:
         - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-026 Incident report"
+        - "P06 EMP-027 Incident detail"
+        - "P06 EMP-029 Guest assistance"
+        - "P06 EMP-050 Post-incident restore"
+        - "P08 BO-072 Incident Log"
       x-ticvai-read-routing: replica
       summary: List incidents
       tags: [incident]
@@ -1006,7 +1401,12 @@ paths:
     post:
       operationId: reportIncident
       x-ticvai-consumed-by:
+        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-026 Incident report"
+        - "P06 EMP-027 Incident detail"
+        - "P06 EMP-029 Guest assistance"
+        - "P06 EMP-050 Post-incident restore"
+        - "P08 BO-072 Incident Log"
       summary: Report an incident
       description: >
         **An incident is not a work order.** It is something that happened to a person or a
@@ -1048,7 +1448,12 @@ paths:
     get:
       operationId: getIncident
       x-ticvai-consumed-by:
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-026 Incident report"
         - "P06 EMP-027 Incident detail"
+        - "P06 EMP-029 Guest assistance"
+        - "P06 EMP-050 Post-incident restore"
+        - "P08 BO-072 Incident Log"
       x-ticvai-read-routing: replica
       summary: Read an incident
       tags: [incident]
@@ -1067,7 +1472,12 @@ paths:
     patch:
       operationId: updateIncident
       x-ticvai-consumed-by:
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-026 Incident report"
         - "P06 EMP-027 Incident detail"
+        - "P06 EMP-029 Guest assistance"
+        - "P06 EMP-050 Post-incident restore"
+        - "P08 BO-072 Incident Log"
       summary: Investigate, escalate or close an incident
       description: >
         Closure requires findings and, where a corrective action was identified, a linked
@@ -1117,6 +1527,13 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: recordAuthorityNotification
+      x-ticvai-consumed-by:
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-026 Incident report"
+        - "P06 EMP-027 Incident detail"
+        - "P06 EMP-029 Guest assistance"
+        - "P06 EMP-050 Post-incident restore"
+        - "P08 BO-072 Incident Log"
       summary: Record notification to an external authority
       description: >
         Some incidents must be reported externally within a statutory window. This records
@@ -1289,7 +1706,7 @@ components:
 
     WorkOrderStatus:
       type: string
-      enum: [open, assigned, inProgress, paused, awaitingParts, completed, verified, cancelled]
+      enum: [open, assigned, inProgress, paused, awaitingParts, completed, verified, closed, cancelled]
 
     WorkOrderPriority:
       type: string
@@ -1333,6 +1750,26 @@ components:
             Raise and immediately suspend the asset. For a fault found on a live ride, the
             two are one action.
         recordedAt: { type: string, format: date-time }
+
+    WorkOrderAttachment:
+      type: object
+      x-ticvai-persistence: "maintenance.work_order_attachment"
+      required: [id, workOrderId, kind, capturedAt]
+      properties:
+        id: { type: string, format: uuid }
+        workOrderId: { type: string, format: uuid }
+        kind: { type: string, enum: [photo, video, document, note, signature] }
+        assetRef: { type: string, format: uuid, nullable: true }
+        text: { type: string, nullable: true }
+        stage: { type: string, enum: [before, during, after, signOff], nullable: true }
+        capturedByPrincipalId: { type: string, format: uuid }
+        capturedAt:
+          type: string
+          format: date-time
+          description: >
+            Device time. **Distinct from when it synced** — a photo taken at 09:14 in a basement
+            and uploaded at 11:40 is evidence of the first, not the second.
+        syncedAt: { type: string, format: date-time, nullable: true }
 
     WorkOrder:
       x-ticvai-persistence: "maintenance.work_order"

@@ -1,10 +1,10 @@
 # TICVAI
 
-Generated 14 August 2026
+Generated 17 August 2026
 
-**654 API operations · 230 tables designed · 347 screens · 39 state models · 16 events · 18 ADRs**
+**737 operations · 278 tables · 364 screens · 45 state models · 26 events · 18 ADRs**
 
-**Conflicts: 25 open, 41 closed, 0 blocking.**
+**Conflicts: 79 raised, 0 blocking.** See `conflict-status.md`.
 
 ---
 
@@ -12,49 +12,51 @@ Generated 14 August 2026
 
 | | |
 |---|---|
-| **`COVERAGE.md`** | What is here and what is not, against the whole build. Every figure counted from the files |
+| **`COVERAGE.md`** | What is here and what is not, against the whole build |
 | **`conflict-status.md`** | Every conflict and its state, one line each |
-| **`wireframes/TICVAI Wireframe Boards.dc.html`** | **12 boards, 347 screens, one visual system.** Open in a browser |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | 230 tables, 2,026 columns, eight sheets |
-| **`handoff/screen-index.json`** | Every screen joined to its board, operations, service and tables |
-| **`handoff/services-and-procedures.md`** | Where each operation gets its data, 22 services, ten stored procedures |
-| **`handoff/storage-design.md`** | The 30% of a migration that does not derive from the contracts |
-| **`docs/active/design-plan.md`** | Boards, forms, and what combines |
+| **`wireframes/TICVAI Wireframe Boards.dc.html`** | 12 boards, 364 screens. Open in a browser |
+| **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
+| **`handoff/build-order.md`** | Which apps can be built, and in what order |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | 278 tables, 2,025 columns, nine sheets |
+| **`handoff/services-and-procedures.md`** | Where each operation gets its data. 23 services, ten procedures |
+| **`docs/active/ai-scope-for-confirmation.md`** | AI scope, for the client to confirm |
 
 ## Folders
 
 | | |
 |---|---|
-| `contracts/` | 654 operations across 22 files |
-| `wireframes/` | **12 platform boards, 347 screens** |
-| `screens/` | 347 definitions across twelve platforms |
-| `flows/` | 12 user journeys with their unhappy paths |
-| `states/` · `events/` | 39 state models · 16 domain events, cross-checked |
-| `handoff/` | Schema workbook · storage design · integration register · artefact audit · tooltips |
-| `docs/` | 18 ADRs, registers, decisions |
-| `tools/` | **Six validators** and two generators |
+| `contracts/` | **737 operations** across 25 files — 246 spine, 443 satellite |
+| `screens/` | 347 definitions across 12 platforms |
+| `frontend/` | 10 app manifests, with build readiness |
+| `states/` · `events/` | 45 state models · 26 events, cross-checked |
+| `flows/` | 15 user journeys with their unhappy paths |
+| `wireframes/` | 12 platform boards, linked to the definitions both ways |
+| `handoff/` | Schema workbook · lineage · storage design · registers · tooltips |
+| `docs/` | 18 ADRs, conflict register, decisions |
+| `tools/` | **Seven validators** and two generators |
 | `repos/` | The six git repositories |
 
-    python3 tools/check-screens.py    check-frontend    check-flows
-    python3 tools/check-states.py     check-config-scope   check-wireframes
+    python3 tools/check-screens.py    check-frontend      check-flows
+    python3 tools/check-states.py     check-config-scope  check-wireframes
+    python3 tools/check-package.py    # the layers against each other
     python3 tools/build-cf-index.py   link-screens-contracts
 
 ---
 
+## Naming
+
+**Platforms and apps are named by who operates them.** `guest-*` is what a visitor touches,
+`venue-*` is what venue staff run, `ticvai-web` is the only one we operate. That is the
+question that matters at 9pm on a Saturday, because it answers who is supposed to fix it.
+
+Ten platforms map to one app each. Two apps serve two platforms and say so.
+
 ## Two levels of done
 
-**Every screen inventoried is now defined — 347 of 347.** 167 arrived on 14 August,
-extracted from the wireframe boards, which carry real purposes and real navigation.
+**Every screen is defined — 347 of 347.** Purpose, route, navigation, enough to draw.
 
-**67 have their states written.** That is the number that matters. A screen with a
-purpose and a route can be drawn; it cannot be built from. The states are where the behaviour
-lives, and on the sixteen scanner screens — the surface where offline matters most — the
-offline state is `TODO`.
-
-The same distinction runs through the flows: 8 written of roughly sixty, and between them
-they have found one missing screen, four missing operations and **one missing contract** —
-a task, which the employee app's fifty screens are built around and which appears in none of
-642 operations (CF-71).
+**All 347 have their states written.** That is what a developer builds from, and it is why only two
+apps — `venue-scanner` and `venue-pos` — currently clear the bar.
 
 ---
 
@@ -62,7 +64,8 @@ a task, which the employee app's fifty screens are built around and which appear
 
 The SQL was removed. **The schema workbook is the working artefact** while the design settles.
 Writing DDL against a moving design produces migrations that must be rewritten, and a
-forward-only migration cannot be rewritten.
+forward-only migration cannot be rewritten. What the six migrations held beyond the column
+list is in `handoff/storage-design.md`.
 
 ---
 
@@ -70,15 +73,17 @@ forward-only migration cannot be rewritten.
 
 | | Done | Total |
 |---|---|---|
-| **API operations** | **654** | — |
-| Requirements covered | 2,842 | 3,184 |
+| **API operations** | **707** | — |
+| API data lineage resolved | 707 | 707 |
+| Requirements with a contract | 2,778 | 2,990 |
 | Configuration levels decided | 321 | 321 |
-| Tables designed | 230 | — |
+| Tables designed | 266 | — |
 | Tables written | 0 | deliberate |
-| **Screens defined** | **347** | **347** |
-| **Screens specified** | **67** | 347 |
-| Operations reaching a screen | 154 | 654 |
-| Flows | 12 | ~60 |
+| **Screens defined** | **364** | 364 |
+| **Screens specified** | **364** | 364 |
+| Screens with operations | 290 | 347 |
+| Operations reaching a screen | 567 | 707 |
+| Flows | 15 | ~60 |
 | Sprint 0 | 0 | 11 |
 
 **Nothing has been executed.** No build, no `psql`, no pipeline.

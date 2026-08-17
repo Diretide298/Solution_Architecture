@@ -3,7 +3,7 @@
 **321 configuration requirements. 263 do not say at what level.**
 
 Four categories are already settled and are not open to preference — currency and money to
-region, ledger and settlement to region, brand and guest app to tenant, identity and consent
+region, ledger and settlement to region, brand and guest-app app to tenant, identity and consent
 and licensing to tenant. Those are law, store rules and contract.
 
 The twenty below are the rest. **Recommended by Softlabs, accepted by the client on 14 August.** Two were corrected in that conversation — see the provenance note at the foot.
@@ -17,7 +17,7 @@ overrides for itself. That is the same mechanism RLS already uses, so it costs n
 | 1 | **Ticket & entitlement rules** | 104 | `venue` | Validity, re-entry, expiry and transfer rules differ by attraction. A water park re-entry rule is not a museum re-entry rule, and both sit under one tenant |
 | 2 | **Pricing & discounts** | 66 | `venue` | A price list is per venue and per channel. **Tax rate is the exception and is regional** — a venue cannot choose its VAT |
 | 3 | **Cash & shift** | 52 | `venue` | Float amounts, variance tolerance and count method are operational. **Denominations and decimal places are regional** (ADR-0008) |
-| 4 | **Loyalty & membership** | 51 | `tenant` | A membership sold at one venue is honoured at all of them (CF-31). Earning and tier rules must be one scheme or the guest has several |
+| 4 | **Loyalty & membership** | 51 | `tenant` | A membership sold at one venue is honoured at all of them (CF-31). Earning and tier rules must be one scheme or the guest-app has several |
 | 5 | **Capacity & availability** | 50 | `venue` | Capacity is physical. Nothing above venue level knows how many people fit |
 | 6 | **Approval thresholds** | 48 | `venue` | Already settled twice — CF-36 refunds, CF-38 price variance. A flagship venue and a kiosk have different tolerances |
 | 7 | **Promotions & bundles** | 44 | `region` | Commercial campaigns usually run across venues, and a promotion configured per venue is one somebody has to configure per venue. **Override at venue** where a single site runs its own offer |
@@ -25,7 +25,7 @@ overrides for itself. That is the same mechanism RLS already uses, so it costs n
 | 9 | **Workstation & devices** | 24 | `venue` | **Client correction 14 Aug.** The venue defines profiles — type, layout, sellable products, attached devices — and a workstation is assigned one. Forty workstations configured individually is forty things that drift |
 | 10 | **Seating** | 21 | `venue` | A seat map belongs to a physical space. **Templates are regional** so a chain reuses a layout |
 | 11 | **Refund & cancellation** | 21 | `venue` | Policy differs by product and site. **The approval threshold on top of it is also venue** — same as CF-36 |
-| 12 | **Guest profile & CRM** | 21 | `tenant` | **Consent is a controller-level legal act**, and the controller is the tenant. Segments and preferences follow the profile, which is one per guest per tenant |
+| 12 | **Guest profile & CRM** | 21 | `tenant` | **Consent is a controller-level legal act**, and the controller is the tenant. Segments and preferences follow the profile, which is one per guest-app per tenant |
 | 13 | **B2B & partner** | 15 | `tenant` | A contract, a credit limit and a net rate are agreed with the tenant. **Allocation per venue** — a partner gets so many for this site |
 | 14 | **Access & gates** | 14 | `venue` | Access points are physical. Anti-passback windows and geofences are per gate |
 | 15 | **Security & session** | 14 | `tenant` | Password policy, MFA requirement, session timeout and lockout are one security posture. A venue relaxing MFA is a hole in the tenant |
@@ -52,7 +52,7 @@ commercial and cross-venue, and per-venue configuration means configuring it per
 inheritance both work — the question is which is the default and which is the override.
 
 **Loyalty at tenant (51).** Firm, and worth stating plainly: a membership sold at one venue
-and honoured at another (CF-31) cannot have per-venue earning rules without the guest holding
+and honoured at another (CF-31) cannot have per-venue earning rules without the guest-app holding
 several balances. If venues genuinely need their own schemes, they are separate programmes
 rather than one programme configured differently.
 
@@ -95,7 +95,7 @@ inheritance rule explicitly.
 | **Subscription and licensing** | 3 | `tenant` | Plans, grace periods, onboarding auto-configuration. Already settled |
 | **Event delivery and retention** | 2 | `tenant → venue` | **13.3.22 names the levels itself** — routing by event type, tenant, venue and business unit. Retention policy is tenant; routing filters resolve down. Developer & API is workshop-blocked |
 | **Payment methods per channel** | 1 | `venue` | Which methods a channel accepts. A kiosk taking cash and a web page not is a venue decision |
-| **Guest data validation** | 1 | `tenant` | Rules on the guest data collected. One profile schema per tenant, or the same guest validates differently by venue |
+| **Guest data validation** | 1 | `tenant` | Rules on the guest-app data collected. One profile schema per tenant, or the same guest-app validates differently by venue |
 | **F&B modifiers** | 1 | `venue` | Per your correction — F&B configuration is venue, and an outlet is assigned it |
 | **Reader types** | 1 | `venue` | At least three reader types with configurable properties. Device configuration, so venue |
 | **Safety checklists** | 1 | `tenant → venue` | **Templates tenant, instances venue.** A safety standard that varies by site is not a standard; the hazards it checks for do vary |

@@ -17,7 +17,7 @@ implicit read model in prose:
 
 - Reporting "reads the reporting replica, never the primary" — stated on 23 operations
 - Access validation "reads the primary unconditionally" — because a revoked entitlement that
-  admits a guest is worse than a slow gate
+  admits a guest-app is worse than a slow gate
 - Financial reports are "served from the reporting replica" — because a month-end report
   against the transactional database during a venue spike is the single most likely cause of
   an outage this platform has
@@ -47,8 +47,8 @@ satisfy.
 
 Correctness-critical reads, where a stale answer is a wrong answer rather than an old one:
 
-- **Access validation.** A revoked entitlement, a blacklisted guest, an expired pass. Replica
-  lag here admits someone who should be refused, and the guest is already through the gate by
+- **Access validation.** A revoked entitlement, a blacklisted guest-app, an expired pass. Replica
+  lag here admits someone who should be refused, and the guest-app is already through the gate by
   the time it resolves
 - **Capacity, envelopes, channel allocations and leases.** Overselling is not recoverable by
   waiting
@@ -63,7 +63,7 @@ Correctness-critical reads, where a stale answer is a wrong answer rather than a
 
 Operational reads where a second of staleness is invisible to the person reading:
 
-Catalogue browsing, product and price listing, guest profile reads, case and work order
+Catalogue browsing, product and price listing, guest-app profile reads, case and work order
 queues, asset lookups, menu reads, inventory listings, configuration reads.
 
 ### What must be `analytical`

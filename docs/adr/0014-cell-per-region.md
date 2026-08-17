@@ -12,7 +12,7 @@
 
 ADR-0001 set **Cell = Tenant × Jurisdiction**, with region-level splitting available as a
 configuration but discouraged as a default. The reasoning was cost: splitting within a
-jurisdiction multiplies the cost floor and fragments guest identity domestically, while
+jurisdiction multiplies the cost floor and fragments guest-app identity domestically, while
 buying blast radius that canary-gated migrations already provide.
 
 Two things have changed.
@@ -28,7 +28,7 @@ nobody trusts and nobody tests properly*. One path, always taken, cannot rot und
 
 Cross-cell entitlement redemption (ADR-0010) is exactly that kind of path under the
 jurisdiction-only rule: machinery that exists, that most tenants never touch, and that would
-be exercised for the first time by a real guest at a real gate.
+be exercised for the first time by a real guest-app at a real gate.
 
 ## Decision
 
@@ -42,7 +42,7 @@ Every region is its own cell. Not only where jurisdictions differ — always.
 |---|---|
 | 1 | **Region is already the configuration boundary.** It owns currency, decimal scale, time zone, date format, fiscal year and tax regime (ADR-0011). Making it the deployment boundary aligns two things that were arbitrarily separate |
 | 2 | **One rule, no conditional.** No "split at jurisdiction, sometimes at region, depending." Uniform rules are testable; conditional ones accumulate exceptions |
-| 3 | **Cross-cell becomes the normal path.** ADR-0010's redemption delegation, guest linking and wallet authorisation are exercised by every multi-region tenant, continuously — not first encountered in production at a border |
+| 3 | **Cross-cell becomes the normal path.** ADR-0010's redemption delegation, guest-app linking and wallet authorisation are exercised by every multi-region tenant, continuously — not first encountered in production at a border |
 | 4 | **Sizing is per region**, which is where load actually concentrates. A region's venues share a catchment, a calendar and a peak |
 | 5 | **Jurisdiction availability stops being an architectural question.** It becomes a provisioning-time placement check per deployment, which is where it belongs |
 
@@ -82,7 +82,7 @@ So the jurisdiction rule is not removed — it moves from being the *split rule*
 | | |
 |---|---|
 | **ADR-0010 machinery moves to Wave 1** | Guest Link Registry, redemption delegation, cross-cell wallet authorisation. These are no longer edge cases — a two-region tenant needs them on day one |
-| **Guest Link Registry is core, not compliance scaffolding** | Every multi-region guest has a link, whether or not a border is crossed |
+| **Guest Link Registry is core, not compliance scaffolding** | Every multi-region guest-app has a link, whether or not a border is crossed |
 | **Cross-cell testing is mandatory in CI** | The reference fixture already carries three regions. Cross-cell paths are now default-path tests |
 
 ### Simplified
@@ -113,7 +113,7 @@ matter: it treated the cross-cell path as a liability to be avoided rather than 
 to be exercised.
 
 Under jurisdiction-only splitting, most tenants sit entirely within one cell, the cross-cell
-code runs almost never, and the first real exercise of it is a guest at a gate in another
+code runs almost never, and the first real exercise of it is a guest-app at a gate in another
 country. That is the failure mode ADR-0013 was written to eliminate.
 
 ---
@@ -203,7 +203,7 @@ The same operation rebalances a hot shared cell onto a newly launched cluster.
   to, and a tenant's whole history is not something to delete on the day it moved.
 
 Cross-cell links are re-pointed rather than copied. An entitlement redeemable in another region
-holds a link that, copied, leaves two cells claiming the same guest.
+holds a link that, copied, leaves two cells claiming the same guest-app.
 
 ### The isolation question this raises
 

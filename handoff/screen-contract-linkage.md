@@ -1,13 +1,13 @@
 # Screen and contract linkage
 
-**143 of 642 operations reach a defined screen.** 499 do not.
+**143 of 689 operations reach a defined screen.** 499 do not.
 
 Derived both directions by `tools/link-screens-contracts.py`: `x-ticvai-consumed-by` on each
 operation, and validated operation ids on each screen.
 
 ## What the gap means now
 
-It used to mean missing screens. **All 347 screens now exist**, so it no longer does — it means
+It used to mean missing screens. **All 364 screens now exist**, so it no longer does — it means
 screens that name no operation. 203 of 347 declare none, and every one of those is a screen
 somebody can draw and nobody can build.
 

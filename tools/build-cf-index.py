@@ -72,6 +72,15 @@ def main() -> int:
         print(f"unrecognised section(s): {unknown}", file=sys.stderr)
         return 1
 
+    # A row whose text says it is closed while it sits in an open section. This drifted twice:
+    # new items were inserted at the top of the open table and completed ones were never moved,
+    # so on 17 August eleven closed conflicts were still filed as open.
+    RESOLVED = re.compile(r"\*\*Closed \d|Closed \d+ \w+\.|\*\*Closed\b|Recovered —|Added —", re.I)
+    for r in rows:
+        if r["section"].startswith("Open") and RESOLVED.search(" | ".join(r["cells"])):
+            print(f"  WARN  {r['id']} reads as resolved but sits under '{r['section']}'",
+                  file=sys.stderr)
+
     numbered = [r for r in rows if r["id"].startswith("CF-")]
     ids = sorted({int(re.sub(r"\D", "", r["id"])) for r in numbered})
     gaps = [n for n in range(1, max(ids) + 1) if n not in ids]

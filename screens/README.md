@@ -1,6 +1,6 @@
 # Screen definitions
 
-**347 screens across twelve platforms.** Everything inventoried is defined.
+**364 screens across twelve platforms.** Everything inventoried is defined.
 
 Each carries an id, a purpose, a module and wave, the operations it calls, its layout as
 regions and component kinds, its states, its navigation and its implementation path.
@@ -39,7 +39,7 @@ because a picture does not say what happens when the network dies.
 id: SCN-004
 name: Admitted
 purpose: ...            # why the screen exists
-apis:                   # validated against 642 operations
+apis:                   # validated against 689 operations
   - operationId: validateAccess
 layout:
   template: fullscreen
@@ -49,7 +49,7 @@ states:
 navigation:
   exitTo: [SCN-003]     # checked against the flows
 implementation:
-  app: scanner
+  app: venue-scanner
   route: /access/admitted
 ```
 
@@ -59,6 +59,6 @@ navigation resolution, and that a `posTerminal` or `handheld` platform declares
 
 ## What to do next
 
-**Write the states before writing more screens.** Sixteen scanner screens have `TODO` offline
-states and the scanner is the surface where offline matters most. P07 and P04 together are
+**Write the states before writing more screens.** Sixteen venue-scanner screens have `TODO` offline
+states and the venue-scanner is the surface where offline matters most. P07 and P04 together are
 twenty-six screens and would take the specified count from 27 to 43.

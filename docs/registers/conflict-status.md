@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**74 conflicts raised — CF-01 to CF-72, plus CF-33a and one screen-level item.**
+**90 conflicts raised — CF-01 to CF-87, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -8,17 +8,17 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **9** |
-| OPEN — Softlabs | **18** |
-| CLOSED | **41** |
+| OPEN — client | **16** |
+| OPEN — Softlabs | **1** |
+| CLOSED | **67** |
 | WITHDRAWN | **6** |
-| **Total** | **74** |
+| **Total** | **90** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**27 open, 41 closed.**
+**17 open, 67 closed.**
 
 
-## Open — needs a client decision — 9
+## Open — needs a client decision — 16
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -29,33 +29,23 @@ register.
 | **CF-41** | AI is a primary navigation tab in the employee app — Home, Tasks, Scan, AI, More. AI-06 sits in Wave 2, but the app shell cannot ship without the tab  | Qossai + Chinmay |
 | **CF-48** | Q2 Virtual Waiting Room. ADR-0012 separated Q1 (ride queues, contracted) from Q2 (on-sale throttling). Q2 is edge infrastructure, not a product contra | Dinesh + Qossai |
 | **CF-51** | Location-aware ticket activation is not contracted. 3.1.9 requires BLE beacon validation, geofencing, and entitlements that "shall only become active  | Chinmay + Qossai |
-| **CF-53** | 73 back office screens are counted and never itemised. The page inventory carries "POS · Scanner · Back office — 73" from v1 with no list behind it. S | Chinmay |
 | **CF-57** | AI configuration assistance is Wave 1 and is not in the phasing paper. Qossai: "one of the most important item for the AI… it's supposed to be from be | Chinmay |
+| **CF-61** | On-premise deployment was never designed for. Settled 14 Aug as the third client-facing model: the platform on the venue's own hardware, nothing leavi | Chinmay + Qossai |
+| **CF-64** | 89 retention requirements, two stated periods — and RPO/RTO is a narrower question than it looked. Only 4.3.4 (10 years, payment) and 6.1.78 (7 years) | Dinesh + Qossai |
+| **CF-67** | Virtual and hybrid events appear once and nowhere else. 1.3.30 requires "physical, virtual and hybrid events with configurable attendance rules and ac | Qossai |
+| **CF-69** | Four named integrations have no trace in any contract. DET and DCT — the Dubai and Abu Dhabi tourism authorities — are almost certainly mandatory visi | Qossai + Allam |
+| **CF-74** | "AI Configuration Assistant" is two unrelated things, and six ids exist twice. 8.1.1–8.1.6 are no-show revenue recognition and complimentary/invitatio | Chinmay — raise with Qossai |
+| **CF-83** | Abandoned-cart recovery may not be lawful as specified, and I built it without asking. 22.3.6 and 2.6.45 require identifying incomplete purchases and  | Allam + counsel |
+| **CF-84** | Donation VAT treatment is unstated and it is a tax question. 1.1.128–1.1.133 require donation collection through all POS channels. I posted donations  | Qossai + finance |
+| **CF-85** | Four holding windows were set by me as defaults and all four are commercial decisions. Cart expiry and extension cap — how long a guest holds capacity | Qossai + Allam |
 
-## Open — Softlabs to resolve — 18
+## Open — Softlabs to resolve — 1
 
 | ID | Issue | Owner |
 |---|---|---|
-| **CF-18** | Dynamic bundle auto-discounting design. How a dynamic bundle prices itself when its components change | Softlabs |
-| **CF-21** | Undiscussed domains — restated 14 Aug after an audit. The original entry named four domains totalling ~276 requirements and was wrong on composition.  | Chinmay — schedule three workshops |
-| **CF-23** | 10 Aug §5.1 has a lost subject — "agreed this makes more sense and will be adopted" names nobody. No owner for a decision since partially reversed | Chitrangi |
-| **CF-24** | 9.2% actor coverage. 292 of 3,184 requirements name a human actor. Assignment for the remaining ~91% is undetermined, which makes permission design pa | Chinmay |
-| **CF-42** | RTL and dark theme are Sprint 1 scope, not a later localisation pass. Arabic RTL means every layout mirrored, not translated, and the client's own hie | Chinmay / design |
-| **CF-49** | Release-management scope skipped the matrix. Thirteen Platform Admin screens raised 30 July, minuted, never written into a requirement — absent from t | Chinmay |
-| **CF-59** | Two domains have no owning contract, and neither is workshop-blocked. Approval Workflows & Governance (80 reqs) is genuinely cross-cutting — refund ap | Chinmay |
-| **CF-60** | 113 requirements on three matrix sheets have never been counted. Every figure quoted since 30 July — 3,184 across 21 domains — is the Functionality sh | Chinmay |
-| **CF-61** | On-premise deployment was never designed for. Settled 14 Aug as the third client-facing model: the platform on the venue's own hardware, nothing leavi | Chinmay + Qossai |
-| **CF-62** | `createReservation` had been silently absent from the contracts. `/reservations` was declared twice in `orders.yaml`; YAML keeps the last block and dr | Chinmay |
-| **CF-64** | 89 retention requirements, two stated periods. Only 4.3.4 (10 years, payment) and 6.1.78 (7 years) name a number. Combined with CF-60's 62 undesigned  | Dinesh + Qossai |
-| **CF-65** | 52 reports are named by title and nothing lists them. 347 requirements mention reporting; the matrix names specific reports — Deferred Revenue, Commis | Chinmay |
-| **CF-67** | Virtual and hybrid events appear once and nowhere else. 1.3.30 requires "physical, virtual and hybrid events with configurable attendance rules and ac | Qossai |
-| **CF-68** | The contracts have no concept of a payment provider. Two gateways are named in the integrations sheet — Stripe and Network International — and there i | Chinmay |
-| **CF-69** | Four named integrations have no trace in any contract. DET and DCT — the Dubai and Abu Dhabi tourism authorities — are almost certainly mandatory visi | Qossai + Allam |
-| **CF-70** | Three Postgres enums disagreed with their contract counterparts. `platform.device_kind` held nine values the API did not and the API six the database  | Chinmay |
-| **CF-71** | A task has no contract, and the employee app is fifty screens built around them. `listTasks`, `updateTask` and `createHandoverNote` appear in none of  | Chinmay |
-| **CF-72** | Twelve more lifecycle operations were missing, found the same way as CF-66. Writing the remaining eighteen state models exposed `rejectRequisition`, ` | Chinmay |
+| **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
 
-## Closed — 41
+## Closed — 67
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -73,9 +63,12 @@ register.
 | **CF-13** | Guest app publishing | Client — Option C, tiered |
 | **CF-15** | Online-first vs offline-first POS catalogue |  |
 | **CF-16** | Reference manual undelivered |  |
+| **CF-18** | Dynamic bundle auto-discounting design. Closed 17 August — ADR-0019, and the gap was two things wearing one name. The contract could not express a dyn |  |
 | **CF-19** | KDS scope |  |
 | **CF-20** | AI data residency |  |
 | **CF-22** | Accreditation vs entitlement |  |
+| **CF-23** | 10 Aug §5.1 has a lost subject — "agreed this makes more sense and will be adopted" names nobody. Closed 17 August: the missing name no longer matters |  |
+| **CF-24** | 9.2% actor coverage — 292 of 3,184 requirements name a human actor. Closed 17 August, and the measure was wrong. Actor coverage in requirement *text*  |  |
 | **CF-25** | Party inversion in the 12 Aug MoM | Client correcting the record | |
 | **CF-31** | Do entitlements cross jurisdictions? |  |
 | **CF-32** | Hyperscaler presence in the second jurisdiction |  |
@@ -86,19 +79,42 @@ register.
 | **CF-37** | FX policy for cross-region revenue splits |  |
 | **CF-38** | Price variance on re-pricing |  |
 | **CF-39** | White Label Builder had no owning context |  |
+| **CF-42** | RTL and dark theme are Sprint 1 scope, not a later localisation pass. Closed 17 August with a specification rather than a restatement — `docs/architec |  |
 | **CF-43** | AI governance has no screens |  |
 | **CF-44** | Conversational coverage 3 of 8 |  |
 | **CF-45** | Two Phase 1 screens require operating history |  |
 | **CF-46** | 3,185 / 22 domains vs 3,184 / 21 |  |
 | **CF-47** | ~102 screens absent from the page inventory |  |
+| **CF-49** | Release-management scope skipped the matrix. Thirteen Platform Admin screens raised 30 July, minuted, contracted as `platform-ops`, never written as a |  |
 | **CF-50** | Guest self-ordering had no contract. `diningAndFnb` is a module a tenant can switch on in the guest app, and nothing was reachable behind it — `listOu | Chinmay |
 | **CF-52** | Parking scope |  |
+| **CF-53** | 73 back office screens are counted and never itemised. The page inventory carries "POS · Scanner · Back office — 73" from v1 with no list behind it. S | Chinmay |
 | **CF-54** | The `pii` schema was declared and empty. V0001 created the schema, the V0001 rollback dropped two tables in it, and four foreign keys in V0003b refere | Chinmay |
 | **CF-55** | Four POS operations existed in the delivered design and in no contract. The Park POS mockups show Hold Order, Discount, Add Tip and a cash drawer, non | Chinmay |
 | **CF-56** | ADR-0014 contradicted by the shared-tenant hosting model. 14 Aug confirmed two models: dedicated infrastructure per tenant, and a shared TICVAI databa |  |
 | **CF-58** | Entitlements could not be appended to an existing ticket |  |
+| **CF-59** | Two domains had no owning contract, and neither was workshop-blocked. Approval Workflows & Governance (80 reqs) and Employee Mobile App & AI Assistant |  |
+| **CF-59a** | Approval Workflows — 80 requirements, no contract, implemented four times. Refund thresholds, shift variance, release promotion and manual discount ea | Chinmay |
+| **CF-60** | 113 requirements on three matrix sheets had never been counted. Every figure quoted since 30 July was the Functionality sheet alone. Counted 17 August |  |
+| **CF-62** | `createReservation` had been silently absent from the contracts. `/reservations` was declared twice in `orders.yaml`; YAML keeps the last block and dr | Chinmay |
 | **CF-63** | 263 of 273 "configurable" requirements did not say at what level |  |
+| **CF-65** | 52 reports named by title and nothing listed them. Closed 17 August, and counting properly found 133 rather than 52 — plus a split that matters more t |  |
 | **CF-66** | Seventeen enum values existed that nothing could reach. Writing state models for twenty entities found that the contracts could start and finish thing | Chinmay |
+| **CF-68** | The contracts have no concept of a payment provider. Two gateways are named in the integrations sheet — Stripe and Network International — and there i | Chinmay |
+| **CF-70** | Three Postgres enums disagreed with their contract counterparts. `platform.device_kind` held nine values the API did not and the API six the database  | Chinmay |
+| **CF-71** | A task has no contract, and the employee app is fifty screens built around them. Closed 17 August, and the premise was half wrong. Reading all fifty r |  |
+| **CF-72** | Twelve more lifecycle operations were missing, found the same way as CF-66. Writing the remaining eighteen state models exposed `rejectRequisition`, ` | Chinmay |
+| **CF-73** | 288 AI requirements had no contract, and the reqs-per-operation ratio hid it. The matrix files the entire AI platform under "Unified Operations Dashbo | Chinmay |
+| **CF-75** | The lineage read 51% because the deriver gave up at six levels of nesting. A paged response nests nine before its item ref — `responses → 200 → conten | Chinmay |
+| **CF-76** | Seven domain events are needed for RAG indexing and none exists. `whitelabel.contentPublished`, `fnb.menuPublished`, `retail.merchandisePublished`, `m |  |
+| **CF-77** | Package audit, 17 August — five defects across artefacts that each validated cleanly on their own. (1) `permissions.yaml` existed three times — `share | Chinmay |
+| **CF-78** | `askReportingQuestion` is an AI capability outside the AI governance boundary. Reporting's natural-language query calls a model, and wrote no `ai.inte | Chinmay |
+| **CF-79** | The register drifted from its own rows a second time |  |
+| **CF-80** | Table reference audit — one duplicate and 59 unlinked tables. `whitelabel.faq` was added by hand for the RAG source list and duplicated `whitelabel.fa |  |
+| **CF-81** | There was no cart, and nine requirements needed one. `createOrder` takes a whole basket at once — correct for a till, which builds locally and submits |  |
+| **CF-82** | Three more concepts the matrix names and the contracts did not. Found by sweeping every repeated noun in the matrix against the operation and schema v |  |
+| **CF-86** | Two commercial surfaces had screens and no contract behind them. Partner agreements: `getB2bCredit`, `setB2bCreditLimit`, `getChannelAllocations` and  |  |
+| **CF-87** | A warning I chose to leave was hiding two defects. `check-states` reported that `states/entitlement.yaml` referenced `access.TicketStatus`, which does |  |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
 ## Withdrawn or absorbed — 6
@@ -116,7 +132,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-72, no gaps
+- **Numbering:** CF-01 to CF-87, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

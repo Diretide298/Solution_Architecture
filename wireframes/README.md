@@ -2,7 +2,7 @@
 
 **Open `TICVAI Wireframe Boards.dc.html` first.** It links every board.
 
-Twelve platform boards, 347 screens, one visual system. Every file is
+Twelve platform boards, 364 screens, one visual system. Every file is
 self-contained apart from `support.js`, which sits alongside them — keep the
 folder together and any board opens in a browser with no build step.
 
@@ -47,10 +47,10 @@ operations that reach no screen, and the board header says so.
 
 ## What these boards do not settle
 
-- **One token set, three themes** (light guest, dark staff, light POS) is proposed here and not decided anywhere in the package. It determines whether `design-tokens` is one package or three.
+- **One token set, three themes** (light guest-app, dark staff, light POS) is proposed here and not decided anywhere in the package. It determines whether `design-tokens` is one package or three.
 - **RPO, RTO and retention** are unanswered. Six Admin screens are drawn against them.
-- **Four workshop-blocked domains** — accreditation, device management, developer/API, approval workflows — carry 212 requirements between them. Accreditation blocks the Wave 1 scanner.
-- **AI-61→66** is a Wave 1 commitment with no engineer. The AI tab is already in the delivered employee shell (CF-41).
+- **Four workshop-blocked domains** — accreditation-web, device management, developer/API, approval workflows — carry 212 requirements between them. Accreditation blocks the Wave 1 venue-scanner.
+- **AI-61→66** is a Wave 1 commitment with no engineer. The AI tab is already in the delivered venue-staff-app shell (CF-41).
 - **No audit register, no notification catalogue, no accessibility criteria.** Screens that depend on them are flagged.
 
 ## Six components carry a third of the work

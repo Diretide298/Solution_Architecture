@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Platform Operations
   version: 0.1.0
-  x-ticvai-screen-count: 18
+  x-ticvai-screen-count: 24
   x-ticvai-tier: satellite
   x-ticvai-module: "Cross-cutting — Control Plane release and environment management"
   x-ticvai-capabilities: [C96]
@@ -83,6 +83,7 @@ paths:
       operationId: listReleases
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
       x-ticvai-read-routing: replica
       summary: List releases
       tags: [release]
@@ -116,6 +117,9 @@ paths:
 
     post:
       operationId: createRelease
+      x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
       summary: Cut a release
       description: >
         A release names the component versions that ship together and the migrations they
@@ -156,6 +160,7 @@ paths:
       operationId: getRelease
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
       x-ticvai-read-routing: replica
       summary: Read a release with its rollout state
       tags: [release]
@@ -179,6 +184,9 @@ paths:
         schema: { type: string }
     post:
       operationId: rejectRelease
+      x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
       summary: Reject a release back a stage
       description: >
         Staging promotion is where a bad release is stopped, and stopping it needs to be as easy as promoting it.
@@ -215,6 +223,9 @@ paths:
         schema: { type: string }
     post:
       operationId: withdrawRelease
+      x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
       summary: Withdraw a release
       description: >
         Distinct from a rollback. The rollout state handles the mechanics of reversing a deployment; this records the decision that the artefact should never ship again.
@@ -252,6 +263,7 @@ paths:
     post:
       operationId: promoteRelease
       x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
       summary: Promote a release to the next environment
       description: >
@@ -404,6 +416,8 @@ paths:
         schema: { type: string }
     post:
       operationId: startRollout
+      x-ticvai-consumed-by:
+        - "P09 ADM-029 Deployment Monitor"
       summary: Start or continue a rollout
       description: >
         Begins at the canary and continues from it once held. **The canary should be a dedicated cell or the smallest shared one** — a canary that is itself a busy shared cell risks many tenants (ADR-0001).
@@ -670,6 +684,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getMigrationRun
+      x-ticvai-consumed-by:
+        - "P09 ADM-027 Database Migration Console"
       x-ticvai-read-routing: replica
       summary: Migration run progress per cell
       tags: [migration]
@@ -693,6 +709,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: rollbackMigrationRun
+      x-ticvai-consumed-by:
+        - "P09 ADM-027 Database Migration Console"
       summary: Roll a migration run back
       description: >
         Runs each migration's rollback section in reverse order against the cells that
@@ -854,7 +872,10 @@ paths:
     get:
       operationId: listSupportNotices
       x-ticvai-consumed-by:
+        - "P09 ADM-024 Release Notification Composer"
         - "P09 ADM-026 End-of-Support Notice Management"
+        - "P09 ADM-035 Support & Escalation Console"
+        - "P09 ADM-036 Platform Notification Broadcast"
       x-ticvai-read-routing: replica
       summary: End-of-support notices
       tags: [notice]
@@ -875,6 +896,9 @@ paths:
       operationId: publishSupportNotice
       x-ticvai-consumed-by:
         - "P09 ADM-024 Release Notification Composer"
+        - "P09 ADM-026 End-of-Support Notice Management"
+        - "P09 ADM-035 Support & Escalation Console"
+        - "P09 ADM-036 Platform Notification Broadcast"
       summary: Publish an end-of-support notice
       description: >
         Names the version, the date support ends, and which tenants are affected. Affected

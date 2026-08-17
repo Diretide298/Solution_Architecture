@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Virtual Queue
   version: 0.1.0
-  x-ticvai-screen-count: 12
+  x-ticvai-screen-count: 16
   x-ticvai-tier: satellite
   x-ticvai-module: "5 — F&B & Guest Management (Virtual Queue)"
   x-ticvai-requirements: 46
@@ -108,8 +108,13 @@ paths:
     get:
       operationId: listQueues
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
         - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-read-routing: replica
       summary: List queues
       description: >
@@ -147,7 +152,13 @@ paths:
     post:
       operationId: createQueue
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       summary: Create a queue
       description: >
         Bound to an attraction and, where one exists, to an asset — so a ride taken out of
@@ -181,6 +192,14 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getQueue
+      x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-read-routing: replica
       summary: Read a queue with live position
       tags: [queue]
@@ -199,7 +218,13 @@ paths:
     patch:
       operationId: updateQueue
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       summary: Amend queue configuration
       tags: [queue]
       x-ticvai-permission: QUEUE_MANAGE
@@ -236,6 +261,14 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setQueueStatus
+      x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       summary: Open, pause or close a queue
       description: >
         Pausing holds existing positions and stops new joins — the right response to a
@@ -288,7 +321,8 @@ paths:
         Where the party includes someone below the height requirement, the join is refused
         here rather than at the ride, which is a much better place to find out.
       tags: [entry]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -326,6 +360,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getQueueEntry
+      x-ticvai-consumed-by:
+        - "P02 GST-023 Virtual Queue / Join Queue"
       x-ticvai-read-routing: primary
       summary: Read a queue entry
       description: >
@@ -333,7 +369,8 @@ paths:
         cacheable for a few seconds — a thousand guests refreshing a countdown is its own
         load problem.
       tags: [entry]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -351,9 +388,12 @@ paths:
 
     delete:
       operationId: leaveQueue
+      x-ticvai-consumed-by:
+        - "P02 GST-023 Virtual Queue / Join Queue"
       summary: Leave a queue
       tags: [entry]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -461,7 +501,13 @@ paths:
     post:
       operationId: callNextParties
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       summary: Call the next parties forward
       description: >
         Advances the queue by a cycle. Notifies each called party through their app and, where
@@ -510,7 +556,13 @@ paths:
     get:
       operationId: listQueueEntries
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       x-ticvai-read-routing: primary
       summary: List entries in a queue
       description: Operator view. Position order, with no-shows and expiries visible.
@@ -544,7 +596,18 @@ paths:
     get:
       operationId: getWaitTimes
       x-ticvai-consumed-by:
+        - "P02 GST-022 Attraction Wait Times"
+        - "P02 GST-046 Branded Queue / Waiting Room"
+        - "P02 GST-051 Plan Your Adventure – Start"
+        - "P02 GST-059 Plan My Day – In Progress"
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
+        - "P11 ACC-006 Reviewer Queue"
       x-ticvai-read-routing: replica
       summary: Wait times across a venue
       description: >
@@ -555,7 +618,8 @@ paths:
         knew the difference, and an operator needs to know whether a figure came from a
         sensor or from someone's guess.
       tags: [waitTime]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -588,7 +652,13 @@ paths:
     put:
       operationId: setWaitTime
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-038 Reconciliation Queue"
       summary: Manually set a wait time
       description: >
         Operator override, and the fallback where no sensor feed exists. A manual figure is
@@ -625,6 +695,7 @@ paths:
       operationId: listQueueFeeds
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
+        - "P08 BO-003 Queue Integration Setup"
       x-ticvai-read-routing: replica
       summary: List configured sensor feeds
       description: >
@@ -647,6 +718,7 @@ paths:
     put:
       operationId: configureQueueFeed
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
       x-ticvai-config-scope: venue
       summary: Configure a sensor feed
@@ -696,7 +768,8 @@ paths:
         discarded rather than applied — a late reading that lowers a wait time misleads
         everyone downstream.
       tags: [feed]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -742,6 +815,7 @@ paths:
     post:
       operationId: testQueueFeed
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
       summary: Test a feed before trusting it
       description: >
@@ -775,6 +849,7 @@ paths:
     get:
       operationId: getQueueFeedHealth
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
       x-ticvai-read-routing: replica
       summary: Feed health
@@ -805,7 +880,8 @@ paths:
         rendering rather than for an application — a signage panel should not need to
         interpret anything.
       tags: [signage]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -838,7 +914,8 @@ paths:
         The now-serving display at a ride entrance. Short-lived and polled frequently, so it
         returns only what changed since the supplied cursor.
       tags: [signage]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins

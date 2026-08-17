@@ -1,6 +1,6 @@
 # AI Platform Rules
 
-> Distinct from [setup/llm-conventions](../setup/llm-conventions.md), which covers using AI to *write* code. This page covers building AI *features*.
+> Distinct from setup/llm-conventions, which covers using AI to *write* code. This page covers building AI *features*.
 
 ### 5.3 AI service rules
 

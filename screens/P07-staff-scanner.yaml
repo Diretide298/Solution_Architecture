@@ -8,11 +8,11 @@ platform:
   code: P07
   audience: staff
   formFactor: handheld
-  shortName: Staff Scanner
-  name: Staff Scanner — Access Control
+  shortName: Venue Scanner
+  name: Venue Scanner — Access Control
   surface: staffFacing
   runtime: reactNative
-  app: scanner
+  app: venue-scanner
   appStatus: scaffolded
   offlineCapable: true
   packages:
@@ -31,6 +31,13 @@ platform:
     releaseCadence: monthly, never on an event day
   screenCount: 16
   wireframeBoard: wireframes/P07 Staff Scanner.dc.html
+  designReferences:
+  - path: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    note: Employee app reference. The scanner shares its visual language and its offline strip.
+  operator: venue
+  directions:
+  - ltr
+  - rtl
 screens:
 - id: SCN-001
   name: Sign in
@@ -52,18 +59,21 @@ screens:
     offline: '**Signs in against the cached principal list from the last bundle.** A steward locked
       out at 08:00 because the venue wifi is down is a gate that does not open'
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-002
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-001
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/sign-in
-    component: apps/scanner/src/routes/access/SignInDetail.tsx
+    component: apps/venue-scanner/src/routes/access/SignInDetail.tsx
     status: notStarted
   apis:
   - operationId: login
@@ -74,6 +84,82 @@ screens:
     contract: shift
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: acceptShiftVariance
+    contract: shift
+    purpose: Accept an over/short beyond the threshold
+    trigger: onAction
+  - operationId: approveShiftOpen
+    contract: shift
+    purpose: Approve a shift opening outside tolerance
+    trigger: onAction
+  - operationId: closeShift
+    contract: shift
+    purpose: Blind close-out
+    trigger: onAction
+  - operationId: createCashMovement
+    contract: shift
+    purpose: Record a cash lift or add
+    trigger: onAction
+  - operationId: forceLogout
+    contract: identity
+    purpose: Supervisor termination of an abandoned session
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: getShift
+    contract: shift
+    purpose: Read a shift
+    trigger: onLoad
+  - operationId: listActiveSessions
+    contract: identity
+    purpose: List active sessions
+    trigger: onLoad
+  - operationId: listCashMovements
+    contract: shift
+    purpose: Lifts, adds and the opening float
+    trigger: onLoad
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listShifts
+    contract: shift
+    purpose: List shifts
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: openShift
+    contract: shift
+    purpose: Open a shift
+    trigger: onAction
+  - operationId: recordNoSale
+    contract: shift
+    purpose: Open the drawer without a sale
+    trigger: onAction
+  - operationId: reopenShift
+    contract: shift
+    purpose: Reopen a shift closed in error
+    trigger: onAction
+  - operationId: resumeShift
+    contract: shift
+    purpose: Resume a suspended shift
+    trigger: onAction
+  - operationId: revokeAllSessions
+    contract: identity
+    purpose: Revoke every session in scope
+    trigger: onAction
+  - operationId: suspendShift
+    contract: shift
+    purpose: Suspend a shift so another user can log in
+    trigger: onAction
 - id: SCN-002
   name: Access point & direction
   module: Access
@@ -93,18 +179,21 @@ screens:
     error: Cannot load. The last selection is offered
     offline: Fully offline. The access point list is in the bundle
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-015
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-002
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/access-point-direction
-    component: apps/scanner/src/routes/access/AccessPointDirectionDetail.tsx
+    component: apps/venue-scanner/src/routes/access/AccessPointDirectionDetail.tsx
     status: notStarted
   apis:
   - operationId: listAccessPoints
@@ -115,6 +204,22 @@ screens:
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: createAccessPoint
+    contract: access
+    purpose: Create an access point
+    trigger: onAction
+  - operationId: getAccessPoint
+    contract: access
+    purpose: Read an access point
+    trigger: onLoad
+  - operationId: setAccessPointGeofence
+    contract: access
+    purpose: Set a geofence for handheld validation
+    trigger: onAction
+  - operationId: updateAccessPoint
+    contract: access
+    purpose: Update an access point
+    trigger: onAction
 - id: SCN-003
   name: Ready to scan
   module: Access
@@ -135,19 +240,51 @@ screens:
     offline: '**The normal state.** The strip shows bundle age and pending journal count, and a steward
       who can see both knows what to trust'
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-004
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-003
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/ready-to-scan
-    component: apps/scanner/src/routes/access/ReadyToScanDetail.tsx
+    component: apps/venue-scanner/src/routes/access/ReadyToScanDetail.tsx
     status: notStarted
+  apis:
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-004
   name: Admitted
   module: Access
@@ -168,24 +305,57 @@ screens:
     offline: Identical offline. The entitlement is consumed in the local journal and the guest goes
       through
   navigation:
-    exitTo: []
+    exitTo:
+    - PTR-015
+    - SCN-010
+    - SCN-014
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-004
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/admitted
-    component: apps/scanner/src/routes/access/AdmittedDetail.tsx
+    component: apps/venue-scanner/src/routes/access/AdmittedDetail.tsx
     status: notStarted
   apis:
   - operationId: validateAccess
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
+  - operationId: consumeRedemptionRight
+    contract: cross-cell
+    purpose: Consume entries against a right, locally authoritative
+    trigger: onAction
 - id: SCN-005
   name: Denied
   module: Access
@@ -213,18 +383,43 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-005
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/denied
-    component: apps/scanner/src/routes/access/DeniedDetail.tsx
+    component: apps/venue-scanner/src/routes/access/DeniedDetail.tsx
     status: notStarted
   apis:
   - operationId: validateAccess
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-006
   name: Override
   module: Access
@@ -251,18 +446,43 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-006
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/override
-    component: apps/scanner/src/routes/access/OverrideDetail.tsx
+    component: apps/venue-scanner/src/routes/access/OverrideDetail.tsx
     status: notStarted
   apis:
   - operationId: overrideAccess
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-007
   name: Group admission
   module: Access
@@ -288,18 +508,43 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-007
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/group-admission
-    component: apps/scanner/src/routes/access/GroupAdmissionDetail.tsx
+    component: apps/venue-scanner/src/routes/access/GroupAdmissionDetail.tsx
     status: notStarted
   apis:
   - operationId: validateGroupAccess
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
 - id: SCN-008
   name: Manual entry
   module: Access
@@ -326,18 +571,43 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-008
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/manual-entry
-    component: apps/scanner/src/routes/access/ManualEntryDetail.tsx
+    component: apps/venue-scanner/src/routes/access/ManualEntryDetail.tsx
     status: notStarted
   apis:
   - operationId: lookupTicket
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-009
   name: Ticket lookup
   module: Access
@@ -363,18 +633,43 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-009
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/ticket-lookup
-    component: apps/scanner/src/routes/access/TicketLookupDetail.tsx
+    component: apps/venue-scanner/src/routes/access/TicketLookupDetail.tsx
     status: notStarted
   apis:
   - operationId: lookupTicket
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-010
   name: Blacklisted
   module: Access
@@ -400,18 +695,27 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-010
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/blacklisted
-    component: apps/scanner/src/routes/access/BlacklistedDetail.tsx
+    component: apps/venue-scanner/src/routes/access/BlacklistedDetail.tsx
     status: notStarted
   apis:
   - operationId: listBlacklist
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: addBlacklistEntry
+    contract: access
+    purpose: Blacklist a media code
+    trigger: onAction
+  - operationId: removeBlacklistEntry
+    contract: access
+    purpose: Remove a blacklist entry
+    trigger: onAction
 - id: SCN-011
   name: Delegated right
   module: Access
@@ -438,18 +742,23 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-011
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/delegated-right
-    component: apps/scanner/src/routes/access/DelegatedRightDetail.tsx
+    component: apps/venue-scanner/src/routes/access/DelegatedRightDetail.tsx
     status: notStarted
   apis:
   - operationId: getRedemptionRight
     contract: cross-cell
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: consumeRedemptionRight
+    contract: cross-cell
+    purpose: Consume entries against a right, locally authoritative
+    trigger: onAction
 - id: SCN-012
   name: Offline scanning
   module: Access
@@ -475,18 +784,43 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-012
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/offline-scanning
-    component: apps/scanner/src/routes/access/OfflineScanningDetail.tsx
+    component: apps/venue-scanner/src/routes/access/OfflineScanningDetail.tsx
     status: notStarted
   apis:
   - operationId: validateAccess
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-013
   name: Offline journal
   module: Access
@@ -512,18 +846,43 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-013
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/offline-journal
-    component: apps/scanner/src/routes/access/OfflineJournalDetail.tsx
+    component: apps/venue-scanner/src/routes/access/OfflineJournalDetail.tsx
     status: notStarted
   apis:
   - operationId: listScans
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-014
   name: Sync & reconciliation
   module: Access
@@ -543,18 +902,21 @@ screens:
     error: Sync failed. **The journal is kept** — a failed sync must never discard what it was carrying
     offline: Not applicable. This screen exists to end the offline period
   navigation:
-    exitTo: []
+    exitTo:
+    - ADM-003
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-014
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/sync-reconciliation
-    component: apps/scanner/src/routes/access/SyncReconciliationDetail.tsx
+    component: apps/venue-scanner/src/routes/access/SyncReconciliationDetail.tsx
     status: notStarted
   apis:
   - operationId: syncScans
@@ -565,6 +927,34 @@ screens:
     contract: orders
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncOrders
+    contract: orders
+    purpose: Replay orders recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-015
   name: Offline package
   module: Access
@@ -584,24 +974,51 @@ screens:
     error: Download failed. The previous bundle stays in place
     offline: Cannot refresh. The existing bundle continues to be used and its age is shown
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-003
     inferred: true
+    fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-015
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/offline-package
-    component: apps/scanner/src/routes/access/OfflinePackageDetail.tsx
+    component: apps/venue-scanner/src/routes/access/OfflinePackageDetail.tsx
     status: notStarted
   apis:
   - operationId: getOfflinePackage
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
 - id: SCN-016
   name: Gate mode
   module: Access
@@ -628,15 +1045,36 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-016
+    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
-    app: scanner
+    app: venue-scanner
     route: /access/gate-mode
-    component: apps/scanner/src/routes/access/GateModeDetail.tsx
+    component: apps/venue-scanner/src/routes/access/GateModeDetail.tsx
     status: notStarted
   apis:
   - operationId: setTurnstileMode
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: createAccessPoint
+    contract: access
+    purpose: Create an access point
+    trigger: onAction
+  - operationId: getAccessPoint
+    contract: access
+    purpose: Read an access point
+    trigger: onLoad
+  - operationId: listAccessPoints
+    contract: access
+    purpose: List access points
+    trigger: onLoad
+  - operationId: setAccessPointGeofence
+    contract: access
+    purpose: Set a geofence for handheld validation
+    trigger: onAction
+  - operationId: updateAccessPoint
+    contract: access
+    purpose: Update an access point
+    trigger: onAction

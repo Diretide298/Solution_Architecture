@@ -1,0 +1,71 @@
+# Table reservation — state model
+# Contract: fnb.TableReservationStatus
+# Checked by tools/check-states.py.
+
+entity: Table reservation
+contract: fnb
+enum: TableReservationStatus
+owner: fnb
+initial:
+- booked
+terminal:
+- completed
+- cancelled
+- noShow
+transitions:
+- from: booked
+  to: confirmed
+  operation: updateTableReservation
+  trigger: operation
+  guard: The guest confirmed, or a reminder was acknowledged
+- from: booked
+  to: seated
+  operation: seatTableReservation
+  trigger: operation
+  guard: '**The host named the actual table.** Committing one at booking time would refuse later bookings
+    against a constraint that did not need to exist'
+- from: confirmed
+  to: seated
+  operation: seatTableReservation
+  trigger: operation
+  guard: Arrived and sat down
+- from: seated
+  to: completed
+  trigger: cascade
+  guard: The table visit closed and the bill was settled
+- from: booked
+  to: cancelled
+  operation: updateTableReservation
+  trigger: operation
+  guard: '**Cover released immediately** — four seats returned at 18:00 can be sold for the same evening'
+- from: confirmed
+  to: cancelled
+  operation: updateTableReservation
+  trigger: operation
+  guard: Cancelled after confirming
+- from: booked
+  to: noShow
+  trigger: timer
+  guard: '**Nobody arrived within the grace period.** Distinct from cancelled: one told us, one did
+    not, and only the second is worth a policy'
+- from: confirmed
+  to: noShow
+  trigger: timer
+  guard: Confirmed and still did not arrive — the worse case, because the cover was held with more confidence
+- from: noShow
+  to: seated
+  operation: seatTableReservation
+  trigger: operation
+  guard: '**They turned up late and there is still a table.** A no-show that walks in is a guest, not
+    a record'
+  isReversal: true
+notes: '`noShow` is computed on a grace period, not set by a host. An operator cannot forget to mark
+  it, which is the point — a restaurant that only records the no-shows someone remembered cannot measure
+  them.
+
+
+  **`noShow` is not terminal in practice.** A party arriving twenty minutes late is still a party, and
+  refusing to seat them because a timer fired is a system overruling a host.
+
+
+  What happens on a no-show — a fee, a deposit forfeit, nothing — is **CF-85**, and unanswered.'

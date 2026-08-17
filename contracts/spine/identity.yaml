@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 9
+  x-ticvai-screen-count: 35
   x-ticvai-tier: spine
   x-ticvai-module: "17 — Guest Mobile App & Branding (auth) + cross-cutting staff auth"
   x-ticvai-requirements: 107
@@ -97,12 +97,15 @@ paths:
     post:
       operationId: login
       x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
-      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -139,8 +142,11 @@ paths:
     post:
       operationId: selectRole
       x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
         - "P06 EMP-002 Select venue & role"
-      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -168,7 +174,11 @@ paths:
   /auth/refresh:
     post:
       operationId: refreshToken
-      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -194,10 +204,15 @@ paths:
   /auth/logout:
     post:
       operationId: logout
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-046 Sign out"
       security:
         - bearerAuth: []
       x-ticvai-self-scoped: principal
-      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -208,6 +223,14 @@ paths:
   /auth/sessions/{sessionId}/force-logout:
     post:
       operationId: forceLogout
+      x-ticvai-consumed-by:
+        - "P06 EMP-001 Sign in"
+        - "P06 EMP-002 Select venue & role"
+        - "P06 EMP-042 Profile"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
       x-ticvai-permission: SESSION_FORCE_LOGOUT
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -238,11 +261,22 @@ paths:
   /auth/session:
     get:
       operationId: getCurrentSession
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-001 Sign in"
+        - "P06 EMP-002 Select venue & role"
+        - "P06 EMP-042 Profile"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
       x-ticvai-read-routing: primary
       security:
         - bearerAuth: []
       x-ticvai-self-scoped: principal
-      x-ticvai-permission: null   # unauthenticated or self-scoped
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -259,7 +293,11 @@ paths:
     get:
       operationId: listPrincipals
       x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P08 BO-057 Training & Certification"
         - "P09 ADM-020 Platform User Directory"
+        - "P10 PTR-003 Profile & Company Details"
+        - "P13 CMS-019 User Access"
       x-ticvai-read-routing: replica
       summary: List principals
       tags: [administration]
@@ -292,6 +330,10 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
     post:
       operationId: createPrincipal
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P09 ADM-020 Platform User Directory"
+        - "P10 PTR-003 Profile & Company Details"
       summary: Create a principal
       tags: [administration]
       x-ticvai-permission: USER_MANAGE
@@ -327,6 +369,8 @@ paths:
     get:
       operationId: getPrincipal
       x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
       x-ticvai-read-routing: replica
       summary: Read a principal
@@ -344,6 +388,10 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
       operationId: updatePrincipal
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P09 ADM-020 Platform User Directory"
+        - "P10 PTR-003 Profile & Company Details"
       summary: Update or deactivate a principal
       description: >
         Deactivation invalidates any live session immediately. Additive changes take effect
@@ -377,7 +425,9 @@ paths:
       operationId: listRoles
       x-ticvai-consumed-by:
         - "P06 EMP-002 Select venue & role"
+        - "P08 BO-054 Role Assignment"
         - "P09 ADM-021 Platform Role Management"
+        - "P13 CMS-019 User Access"
       x-ticvai-read-routing: replica
       summary: List roles
       description: >
@@ -407,6 +457,8 @@ paths:
     post:
       operationId: createRole
       x-ticvai-consumed-by:
+        - "P06 EMP-002 Select venue & role"
+        - "P08 BO-054 Role Assignment"
         - "P09 ADM-021 Platform Role Management"
       summary: Create a role
       tags: [administration]
@@ -437,6 +489,8 @@ paths:
   /grants:
     get:
       operationId: listGrants
+      x-ticvai-consumed-by:
+        - "P10 PTR-020 Sub-Agent Management"
       x-ticvai-read-routing: replica
       summary: List grants for a principal or role
       tags: [administration]
@@ -510,6 +564,8 @@ paths:
         schema: { type: string, format: uuid }
     delete:
       operationId: deleteGrant
+      x-ticvai-consumed-by:
+        - "P10 PTR-020 Sub-Agent Management"
       summary: Remove a grant
       description: >
         Removing an ALLOW takes effect at next login. Removing it from a principal with a
@@ -583,12 +639,14 @@ paths:
       operationId: registerGuest
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Create a guest account
       description: >
         Email or mobile. Verification follows via OTP; the account exists but is unverified
         until then, and an unverified account may browse but not transact.
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -619,6 +677,7 @@ paths:
     post:
       operationId: requestGuestOtp
       x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
       summary: Request a one-time code
       description: >
@@ -628,7 +687,8 @@ paths:
         **The response never reveals whether the identifier exists.** It is the same either
         way; only the message differs, and only the owner receives it.
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -664,9 +724,13 @@ paths:
   /auth/guest/otp/verify:
     post:
       operationId: verifyGuestOtp
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Verify a one-time code and issue a session
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -699,13 +763,17 @@ paths:
   /auth/guest/social:
     post:
       operationId: guestSocialLogin
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Sign in with Apple or Google
       description: >
         Where the provider's verified email matches an existing account, the identities are
         linked rather than a duplicate created. Where it does not, a new account is created —
         an unverified email from a provider is not proof of ownership.
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -738,6 +806,9 @@ paths:
   /auth/guest/uae-pass:
     post:
       operationId: guestUaePassLogin
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Sign in with a national identity provider
       description: >
         OAuth authorisation-code exchange. Returns a verified identity, so an account created
@@ -746,7 +817,8 @@ paths:
         Government onboarding has lead time and should be started before it becomes the
         critical path.
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -774,10 +846,21 @@ paths:
   /auth/guest/session:
     get:
       operationId: getGuestSession
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-001 Sign in"
+        - "P06 EMP-002 Select venue & role"
+        - "P06 EMP-042 Profile"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
       x-ticvai-read-routing: primary
       summary: Read the current guest session
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -794,13 +877,17 @@ paths:
 
     delete:
       operationId: guestLogout
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: End a guest session
       description: >
         Ends this device's session. `allDevices` revokes every session for the subject, which
         is what a guest reaching for "sign out everywhere" after losing a phone actually
         wants.
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -817,6 +904,9 @@ paths:
   /auth/guest/link-checkout:
     post:
       operationId: linkGuestCheckout
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Attach a guest checkout to an account
       description: >
         A guest who bought without an account, then registered. Orders matching the verified
@@ -826,7 +916,8 @@ paths:
         on an unverified claim would hand someone else's booking history to whoever asked for
         it.
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -872,7 +963,8 @@ paths:
 
         Where the guest is linked across cells, the request fans out (ADR-0010).
       tags: [guestAuth]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -903,11 +995,22 @@ paths:
   /auth/sso/providers:
     get:
       operationId: listSsoProviders
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-001 Sign in"
+        - "P06 EMP-002 Select venue & role"
+        - "P06 EMP-042 Profile"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
       x-ticvai-read-routing: replica
       summary: Identity providers configured for this tenant
       description: Called before the login screen renders, so it is unauthenticated.
       tags: [sso]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -929,10 +1032,14 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: startSsoAuthorization
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-read-routing: replica
       summary: Begin an SSO flow
       tags: [sso]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -962,13 +1069,17 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: completeSsoAuthorization
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Exchange an SSO code for a session
       description: >
         Group-to-role mapping is applied here. **A group with no mapping grants nothing** —
         an unmapped group must never fall back to a default role, or the identity provider
         becomes a way to mint access nobody configured.
       tags: [sso]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # no session yet — this is how one is obtained
+      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1002,6 +1113,18 @@ paths:
   /tenants/sso-config:
     get:
       operationId: getSsoConfig
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: replica
       summary: Read SSO configuration
       tags: [sso]
@@ -1020,6 +1143,18 @@ paths:
 
     put:
       operationId: setSsoConfig
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-config-scope: tenant
       summary: Configure an identity provider
       description: >
@@ -1053,10 +1188,21 @@ paths:
   /auth/mfa/methods:
     get:
       operationId: listMfaMethods
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-001 Sign in"
+        - "P06 EMP-002 Select venue & role"
+        - "P06 EMP-042 Profile"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
       x-ticvai-read-routing: replica
       summary: Enrolled MFA methods
       tags: [mfa]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1072,13 +1218,17 @@ paths:
 
     post:
       operationId: enrolMfaMethod
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Enrol an MFA method
       description: >
         Returns a secret or challenge to complete enrolment. **The method is not active until
         verified** — enrolling without verifying would lock the principal out of their own
         account.
       tags: [mfa]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1112,9 +1262,13 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: verifyMfaEnrolment
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Complete enrolment
       tags: [mfa]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1142,13 +1296,17 @@ paths:
 
     delete:
       operationId: removeMfaMethod
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Remove an MFA method
       description: >
         Refused where it is the only active method and the principal's role requires MFA.
         Removing the last factor from an account that must have one is not a choice the
         account holder gets to make.
       tags: [mfa]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1173,7 +1331,8 @@ paths:
         A session that authenticated hours ago is not the same as a person present at the
         keyboard now, and for those actions the difference matters.
       tags: [mfa]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1209,9 +1368,13 @@ paths:
         schema: { type: string }
     post:
       operationId: verifyMfaChallenge
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
       summary: Complete a step-up challenge
       tags: [mfa]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
+      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1241,6 +1404,14 @@ paths:
   /auth/sessions:
     get:
       operationId: listActiveSessions
+      x-ticvai-consumed-by:
+        - "P06 EMP-001 Sign in"
+        - "P06 EMP-002 Select venue & role"
+        - "P06 EMP-042 Profile"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
       x-ticvai-read-routing: primary
       summary: List active sessions
       description: >
@@ -1277,6 +1448,14 @@ paths:
   /auth/sessions/revoke-all:
     post:
       operationId: revokeAllSessions
+      x-ticvai-consumed-by:
+        - "P06 EMP-001 Sign in"
+        - "P06 EMP-002 Select venue & role"
+        - "P06 EMP-042 Profile"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Agent Login"
       summary: Revoke every session in scope
       description: >
         Incident response. Requires step-up authentication and a reason, and is recorded

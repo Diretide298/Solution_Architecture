@@ -33,6 +33,8 @@ SCREENS = ROOT / "screens"
 CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 if not CONTRACTS.exists():
     CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+if not CONTRACTS.exists():
+    CONTRACTS = ROOT / "contracts"
 
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
@@ -75,7 +77,37 @@ RUNTIME_FOR = {"web": {"reactWeb"}, "mobileApp": {"reactNative"},
 OFFLINE_REQUIRED = {"posTerminal", "handheld"}
 
 
+SHORTNAMES: dict[str, str] = {}
+
+# A guest or public surface may only call operations a guest can call. Enforced because a
+# sibling-attachment pass on 17 August put 659 staff operations onto guest screens — including
+# `applyManualDiscount` and `exchangeOrderLines` on a guest's own ticket list — and every other
+# checker passed, because each operation existed and resolved to a table.
+GUEST_PLATFORMS = {"P01", "P02", "P05", "P11"}
+
+
+def check_guest_operations(name: str, code: str, screen: dict, staff_ops: set[str]) -> None:
+    if code not in GUEST_PLATFORMS:
+        return
+    for a in (screen.get("apis") or []):
+        if (oid := a.get("operationId")) in staff_ops:
+            ERRORS.append(f"{name}: {screen['id']} is a guest surface and declares '{oid}', "
+                          "which carries a staff permission")
+
+
 def check_platform(name: str, p: dict) -> None:
+    """Also enforces that a shortName identifies exactly one platform.
+
+    Three platforms were called "Staff Web" until 17 August — P08 back office, P12 support and
+    P13 the CMS. A name that identifies three things identifies none, and it is the kind of
+    collision that survives because each file is individually correct.
+    """
+    if sn := p.get("shortName"):
+        if sn in SHORTNAMES and SHORTNAMES[sn] != p.get("code"):
+            ERRORS.append(f"{name}: shortName '{sn}' is already used by "
+                          f"{SHORTNAMES[sn]} — a name identifying two platforms identifies none")
+        SHORTNAMES[sn] = p.get("code")
+
     for k in ("code", "audience", "formFactor", "shortName", "name"):
         if k not in p:
             ERRORS.append(f"{name}: platform is missing '{k}'")
@@ -111,6 +143,7 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
 
     seen: set[str] = set()
     for s in doc["screens"]:
+        check_guest_operations(name, doc["platform"]["code"], s, STAFF_OPS)
         sid = s["id"]
         if sid in seen:
             ERRORS.append(f"{name}: duplicate screen id {sid}")
@@ -153,7 +186,34 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
         ERRORS.append(f"{name}: screenCount says {declared}, file has {len(doc['screens'])}")
 
 
+def load_staff_operations() -> set[str]:
+    """Operations carrying a staff permission. A guest surface may declare none of them."""
+    out: set[str] = set()
+    for tier in ("spine", "satellite"):
+        d = CONTRACTS / tier
+        if not d.exists():
+            continue
+        for f in d.glob("*.yaml"):
+            doc = yaml.safe_load(f.read_text())
+            for item in (doc.get("paths") or {}).values():
+                if not isinstance(item, dict):
+                    continue
+                for verb, op in item.items():
+                    if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict):
+                        # `x-ticvai-guest-callable` marks an operation a guest performs on
+                        # their own data — createOrder, createPayment, acquireLease. The
+                        # permission is for staff doing it on a guest's behalf at a till.
+                        if op.get("x-ticvai-permission") and not op.get("x-ticvai-guest-callable"):
+                            out.add(op["operationId"])
+    return out
+
+
+STAFF_OPS: set[str] = set()
+
+
 def main() -> int:
+    global STAFF_OPS
+    STAFF_OPS = load_staff_operations()
     files = sorted(SCREENS.glob("P*.yaml"))
     if not files:
         print("no platform files found", file=sys.stderr)

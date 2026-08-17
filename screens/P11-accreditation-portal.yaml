@@ -7,8 +7,8 @@ platform:
   code: P11
   audience: public
   formFactor: web
-  shortName: Public Web
-  name: Public Web — Accreditation
+  shortName: Accreditation Web
+  name: Accreditation Web — Applications
   surface: public
   runtime: reactWeb
   offlineCapable: false
@@ -18,7 +18,7 @@ platform:
   - ltr
   - rtl
   screenCount: 8
-  app: accreditation
+  app: accreditation-web
   appStatus: not scaffolded
   packages:
   - design-tokens
@@ -33,6 +33,13 @@ platform:
     networkAssumption: public internet
     releaseCadence: monthly
   wireframeBoard: wireframes/P11 Accreditation.dc.html
+  reachesOtherPlatforms:
+  - screen: SCN-003
+    platform: P07
+    board: wireframes/P07 Staff Scanner.dc.html#scn-003
+    note: A steward scans an accreditation credential at a service gate — the same handheld, a different
+      credential kind
+  operator: public
 screens:
 - id: ACC-001
   name: Landing / Programme Overview
@@ -45,9 +52,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-001
@@ -55,13 +62,16 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /applicant-journey/landing-programme-overview
-    component: apps/accreditation/src/routes/applicant-journey/LandingProgrammeOverviewDetail.tsx
+    component: apps/accreditation-web/src/routes/applicant-journey/LandingProgrammeOverviewDetail.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
 - id: ACC-002
   name: Registration Form
   module: Applicant Journey
@@ -73,9 +83,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-002
@@ -83,14 +93,25 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /applicant-journey/registration-form
-    component: apps/accreditation/src/routes/applicant-journey/RegistrationForm.tsx
+    component: apps/accreditation-web/src/routes/applicant-journey/RegistrationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ACC-001
     inferred: true
+    exitTo:
+    - ACC-007
+    fromFlows: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: Find registration form for this venue.
+  apis:
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: Requests awaiting a decision, or already decided
+    trigger: onLoad
 - id: ACC-003
   name: Application Review & Submit
   module: Applicant Journey
@@ -102,9 +123,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-003
@@ -112,14 +133,18 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /applicant-journey/application-review-and-submit
-    component: apps/accreditation/src/routes/applicant-journey/ApplicationReviewAndSubmitWizard.tsx
+    component: apps/accreditation-web/src/routes/applicant-journey/ApplicationReviewAndSubmitWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ACC-001
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: Application Review & Submit — the screen a person opens when they need to deal with application
+    review & submit.
 - id: ACC-004
   name: Application Status Tracking
   module: Applicant Journey
@@ -131,9 +156,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-004
@@ -141,9 +166,9 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /applicant-journey/application-status-tracking
-    component: apps/accreditation/src/routes/applicant-journey/ApplicationStatusTrackingDetail.tsx
+    component: apps/accreditation-web/src/routes/applicant-journey/ApplicationStatusTrackingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -151,6 +176,9 @@ screens:
     exitTo:
     - ACC-002
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: Find application status tracking for this venue.
 - id: ACC-005
   name: Accreditation Badge
   module: Applicant Journey
@@ -162,9 +190,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-005
@@ -172,16 +200,26 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /applicant-journey/accreditation-badge
-    component: apps/accreditation/src/routes/applicant-journey/AccreditationBadgeDetail.tsx
+    component: apps/accreditation-web/src/routes/applicant-journey/AccreditationBadgeDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ACC-001
     exitTo:
     - ACC-002
+    - SCN-004
     inferred: true
+    fromFlows: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: Find accreditation badge for this venue.
+  apis:
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: Requests awaiting a decision, or already decided
+    trigger: onLoad
 - id: ACC-006
   name: Reviewer Queue
   module: Reviewer (Internal)
@@ -193,9 +231,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-006
@@ -203,9 +241,9 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /reviewer-internal/reviewer-queue
-    component: apps/accreditation/src/routes/reviewer-internal/ReviewerQueueList.tsx
+    component: apps/accreditation-web/src/routes/reviewer-internal/ReviewerQueueList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -213,6 +251,14 @@ screens:
     exitTo:
     - ACC-007
     inferred: true
+  apis:
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: Find the right one quickly, and act on it without opening it.
 - id: ACC-007
   name: Reviewer Application Detail
   module: Reviewer (Internal)
@@ -224,9 +270,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-007
@@ -234,14 +280,29 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail
-    component: apps/accreditation/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx
+    component: apps/accreditation-web/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ACC-001
     inferred: true
+    exitTo:
+    - ACC-005
+    fromFlows: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: Everything known about one reviewer application, and what can be done to it.
+  apis:
+  - operationId: decideApprovalRequest
+    contract: approvals
+    purpose: Approve or reject
+    trigger: onAction
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: Requests awaiting a decision, or already decided
+    trigger: onLoad
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)
@@ -253,9 +314,9 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Content loads
+    empty: Nothing here yet, with what to do about it
+    error: Could not load
   wireframe:
     status: drafted
     board: wireframes/P11 Accreditation.dc.html#acc-008
@@ -263,9 +324,9 @@ screens:
   - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
     mapping until the domain is discussed.
   implementation:
-    app: accreditation
+    app: accreditation-web
     route: /reviewer-internal/credential-register
-    component: apps/accreditation/src/routes/reviewer-internal/CredentialRegisterList.tsx
+    component: apps/accreditation-web/src/routes/reviewer-internal/CredentialRegisterList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -273,3 +334,6 @@ screens:
     exitTo:
     - ACC-007
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  purpose: Get a guest into the app, fast, on a device that may be shared.

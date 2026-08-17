@@ -1,0 +1,36 @@
+# reporting.definitionPublished v1 — published by reporting
+# Checked by tools/check-states.py.
+
+name: reporting.definitionPublished
+version: 1
+publisher: reporting
+description: A report definition is available to run.
+aggregate: reportDefinition
+emittedWhen: Definition created or amended
+payload:
+- field: definitionId
+  type: uuid
+- field: tenantId
+  type: uuid
+- field: name
+  type: string
+- field: description
+  type: string
+- field: dimensions
+  type: array
+  notes: What it groups by. Retrievable — "which report shows refunds by cashier"
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Index so a report can be found by what it answers
+  idempotencyKey: definitionId + publishedAt
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: '**Closes part of CF-65.** The matrix names 52 reports by title and nobody can find them; indexing
+  name, description and dimensions makes them findable by the question they answer rather than by remembering
+  what someone called them.
+
+
+  No state model emits this: a report definition is created or amended and has no lifecycle beyond that.'

@@ -39,7 +39,7 @@ transaction as the state change, so a crash cannot leave an event unpublished fo
 happened"* — not *"outbox table"*. The column list is already on screen; the hover should carry
 what the diagram cannot.
 
-**A missing key means no tooltip, not an empty one.** All 230 tables have one. An empty hover
+**A missing key means no tooltip, not an empty one.** All 278 tables have one. An empty hover
 card is worse than none, because it invites a second hover — and a tip reading "Derived from
 fnb.Menu" is the same failure wearing text.
 

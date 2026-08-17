@@ -1,0 +1,105 @@
+# F14 — A discount needs a manager
+#
+# The approval flow a venue meets most often, and the one where every second of
+# latency is a person standing at a counter.
+#
+# Validated by tools/check-flows.py.
+
+id: F14
+name: A discount needs a manager
+actor: cashier
+capability: C02
+wave: 1
+frequency: daily
+criticality: financial
+platforms:
+- P04 Venue POS
+- P08 Venue Management
+offlineBehaviour: '**The evaluation is offline-capable and the approval is not.** A till that cannot
+  ask whether a discount needs approval cannot sell at a discount, so the matrix travels in the offline
+  bundle and the request queues.'
+trigger:
+  description: A cashier applies a discount larger than their own authority, with a guest standing at
+    the counter.
+  entryScreen: POS-002
+  entryPoints:
+  - Manual discount at the till
+  - Price override
+  - Complimentary ticket
+steps:
+- step: 1
+  screen: POS-002
+  action: Applies the discount
+  operations:
+  - evaluatePromotions
+  outcome: The till knows immediately whether this needs approval
+- step: 2
+  screen: POS-002
+  action: Sees that it does, and who can grant it
+  operations:
+  - evaluateApprovalRequirement
+  outcome: '**Named, not "needs approval"** — the cashier can go and find Sara'
+- step: 3
+  screen: BO-084
+  action: The manager sees it in their inbox
+  operations:
+  - listApprovalRequests
+  outcome: Sorted by what breaches soonest, and this one has a guest waiting
+- step: 4
+  screen: BO-085
+  action: Approves it
+  operations:
+  - decideApprovalRequest
+  outcome: Recorded with who and why. **The approval does not apply the discount**
+- step: 5
+  screen: POS-005
+  action: The till applies it and completes the sale
+  operations:
+  - createOrder
+  - createPayment
+  outcome: Under the cashier’s permission, with the approval referenced on the line
+branches:
+- at: 2
+  condition: No approver is available at this venue
+  behaviour: '`noApproverAvailable`. **The cashier learns now rather than after raising a request nobody
+    can decide** — and the sale proceeds without the discount or not at all, which is a decision they
+    can make with the guest present.'
+  severity: requiresStaff
+  resolvedBy: Cashier
+- at: 2
+  condition: The till is offline
+  behaviour: The matrix is in the bundle so the till still knows approval is needed. **The request cannot
+    be raised.** Venue policy decides whether the discount is refused or applied and reconciled later
+    — and that policy is CF-36’s threshold question in a different costume.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 3
+  condition: The manager is on the shop floor
+  behaviour: Mobile approval — `EMP-037` on the staff app. A manager who must return to an office to
+    approve a discount is a queue at the till.
+  severity: recoverable
+  resolvedBy: Manager
+- at: 4
+  condition: The manager is the cashier
+  behaviour: '**Refused.** Segregation of duties survives a busy Saturday, and the cashier must find
+    someone else.'
+  severity: requiresStaff
+  resolvedBy: Another manager
+- at: 4
+  condition: It breaches the SLA
+  behaviour: Escalates to the next level. At a till the SLA is minutes, not hours, and the escalation
+    is what stops a guest waiting for someone in a meeting.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 5
+  condition: The guest leaves before approval
+  behaviour: The order is voided and the approval withdrawn. **Not rejected** — nobody refused it.
+  severity: recoverable
+  resolvedBy: Cashier
+exitStates:
+- state: completed
+  description: Discount approved and applied
+- state: abandoned
+  description: Guest left, order voided
+- state: deferred
+  description: Applied offline, reconciled later under venue policy

@@ -1,0 +1,40 @@
+# whitelabel.contentPublished v1 — published by whitelabel
+# Checked by tools/check-states.py.
+
+name: whitelabel.contentPublished
+version: 1
+publisher: whitelabel
+description: A tenant published content to their guest surfaces — a page, a banner, an FAQ or a policy.
+aggregate: tenantConfig
+emittedWhen: ContentStatus draft to published
+payload:
+- field: tenantId
+  type: uuid
+- field: configVersion
+  type: string
+- field: changedKinds
+  type: array
+  notes: page, faq, policy, banner, promoBlock — only what actually changed
+- field: changedIds
+  type: array
+  notes: So indexing is incremental. **Republishing a whole config to change one FAQ would reindex everything**
+- field: locales
+  type: array
+  notes: Which languages changed. A translation added is new content to retrieve
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Reindex the changed pages, FAQs and policies
+  idempotencyKey: configVersion + changedIds
+  onFailure: retry
+  isCritical: false
+- context: guest-app
+  purpose: Invalidate the cached config so guests see it
+  idempotencyKey: configVersion
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: '**Carries what changed, not that something did.** A publish event with no change list forces
+  a full reindex on every save, and a tenant editing a homepage over a week would rebuild the knowledge
+  base daily.'

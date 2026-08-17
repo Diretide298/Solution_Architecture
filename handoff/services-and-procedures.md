@@ -13,7 +13,7 @@ operation against the tables it reads and writes.
 You asked for tentative stored procedures. Here is the honest recommendation before the list,
 because the list is short on purpose.
 
-**Services for all 654 operations. Stored procedures for ten.**
+**Services for all 689 operations. Stored procedures for ten.**
 
 A stored procedure per operation would be a second codebase in a second language with its own
 deployment, its own review path and no type checking against the contracts. It also breaks two
@@ -36,7 +36,7 @@ trips cost more than the logic.
 
 ## Services — one per contract
 
-Twenty-two services, mirroring the contract boundaries. **The contract is already the service
+Twenty-three services, mirroring the contract boundaries. **The contract is already the service
 boundary**; inventing a different one would create two maps of the same territory.
 
 ### Spine
@@ -50,7 +50,7 @@ boundary**; inventing a different one would create two maps of the same territor
 | `AccessService` | 19 | Validation, scans, access points, admission profiles |
 | `LedgerService` | 46 | Journals, periods, FX, settlement, inter-entity |
 | `ShiftService` | 13 | Open, suspend, close, variance, no-sale |
-| `CrossCellService` | 16 | Redemption rights, guest links, wallet allocation |
+| `CrossCellService` | 16 | Redemption rights, guest-app links, wallet allocation |
 
 ### Satellite
 
@@ -99,7 +99,7 @@ most readily give up.
 ### 2. `orders.sp_post_refund`
 
 Same shape in reverse, plus the reversal entry. A refund that posts to the ledger and not to
-the entitlement leaves a guest holding a valid ticket for something they were paid back for.
+the entitlement leaves a guest-app holding a valid ticket for something they were paid back for.
 
 ### 3. `access.sp_validate_and_record`
 
@@ -119,8 +119,8 @@ else runs between them.
 
 ### 5. `seating.sp_hold_seats`
 
-Holds a set of seats or none. Partial seat holds are the worst outcome: a guest gets four of
-six and neither the platform nor the guest knows what to do next. Set-based, atomic, and
+Holds a set of seats or none. Partial seat holds are the worst outcome: a guest-app gets four of
+six and neither the platform nor the guest-app knows what to do next. Set-based, atomic, and
 returns which seats failed.
 
 ### 6. `orders.sp_close_shift`
@@ -178,15 +178,44 @@ the tables it writes, its read routing, its scope level and whether it works off
 
 | | |
 |---|---|
-| Operations with a resolved table | **336 of 654 (51%)** |
-| Derived from persistence markers | 299 |
-| Hand-mapped | 37 |
-| Unresolved | 318 |
+| **Operations with a resolved table** | **689 of 689 — 100%** |
+| Derived from persistence markers | 481 |
+| Inferred from the URL path | 100 |
+| Hand-mapped | 90 |
 
-**The 318 are not a defect list.** Most return a projection — `OrderSummary`, `TicketStatus`,
-`MediaEntitlements` — computed across tables rather than persisted, and a projection has no
-marker because there is nothing to mark. Others are commands with no response body, health
-checks, and the sync endpoints.
+It was 51% until 17 August, and the gap was a **defect in the deriver, not missing data**: the
+reference walker gave up at six levels, and a paged response nests nine before reaching its
+item — `responses → 200 → content → json → schema → allOf → item → properties → items → $ref`.
+**Every list operation in the platform resolved to nothing**, including `listProducts`, while
+`getProduct` on the same schema worked. Raising the limit took it to 73% in one change.
+
+The rest was closed deliberately. Commands acting on a known object take their table from the
+path root — `/orders/{id}/hold` acts on `orders.sales_order` — and the ninety genuine
+projections were mapped by hand.
+
+## Two stores, not one
+
+**Six operations touch a vector database.** The AI capabilities read embeddings from Qdrant and
+their metadata from Postgres, and the lineage marks which.
+
+| | |
+|---|---|
+| `ai.knowledge_collection`, `ai.knowledge_document` | **Postgres** — metadata, status, chunk counts |
+| `ai.chunk_ref` | **Postgres** — maps a Qdrant point id back to its document and scope. The join between the stores |
+| `qdrant:tenant_{id}_knowledge` | **Qdrant** — chunk text, embeddings, and a payload carrying `scope_path` |
+| `qdrant:tenant_{id}_catalogue` | **Qdrant** — product and membership descriptions, for semantic search |
+
+**One collection per tenant, named for the tenant.** Isolation is the collection boundary, not
+a filter inside a shared index — a forgotten filter is a cross-tenant breach, and a missing
+collection is a loud failure. Only the second is recoverable.
+
+`scope_path` travels in the Qdrant payload as well, because a venue's operating procedure is
+not an answer to a question about another venue, and the vector store has no row-level security
+to fall back on.
+
+**The embedding model is recorded on the collection.** Changing it invalidates every vector in
+it, and a collection searched with mismatched embeddings returns plausible nonsense rather than
+an error.
 
 **What the resolved half is for:** before changing a table, the sheet says which operations
 break. Before building an operation, it says which tables it needs and therefore which service

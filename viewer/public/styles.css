@@ -372,6 +372,27 @@ kbd {
   user-select: none;
 }
 .tree-group-head:hover { color: var(--text); }
+/* The same fold the pane sections have, on the same handler. Twelve platforms
+   of up to 29 screens each meant reaching the kiosk was a scroll past the whole
+   of Guest Web; the marker is here so the head reads as a control before it is
+   clicked rather than after. */
+.tree-group-head { cursor: pointer; user-select: none; }
+.tree-group-head::before {
+  content: '';
+  flex: none;
+  width: 0; height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transform: rotate(90deg);
+  transition: transform .13s ease;
+  opacity: .7;
+}
+.tree-group-head.collapsed::before { transform: rotate(0deg); }
+.tree-group-head:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
+/* a group with nothing under it is not a control */
+.tree-group-head.empty-section { cursor: default; pointer-events: none; }
+.tree-group-head.empty-section::before { visibility: hidden; }
 .tree-group-dot { width: 7px; height: 7px; border-radius: 2px; flex: none; }
 .tree-group-count { margin-left: auto; font-weight: 500; letter-spacing: 0; }
 

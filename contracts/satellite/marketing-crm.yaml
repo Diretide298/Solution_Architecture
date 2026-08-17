@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 18
+  x-ticvai-screen-count: 37
   x-ticvai-tier: satellite
   x-ticvai-module: "20 — Marketing & CRM"
   x-ticvai-requirements: 319
@@ -108,6 +108,10 @@ paths:
   /guests:
     get:
       operationId: searchGuests
+      x-ticvai-consumed-by:
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-read-routing: replica
       summary: Search guest profiles
       description: >
@@ -155,9 +159,11 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getGuestProfile
+      x-ticvai-guest-callable: true   # a guest session resolves this to their own record; the permission is for staff reading anyone's
       x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-017 My Account Dashboard"
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-read-routing: replica
       summary: Read a guest profile
       description: >
@@ -179,7 +185,9 @@ paths:
     patch:
       operationId: updateGuestProfile
       x-ticvai-consumed-by:
-        - "P01 WEB-020 Profile & Preferences"
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       summary: Amend a guest profile
       tags: [guest]
       x-ticvai-permission: GUEST_MANAGE
@@ -216,6 +224,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: mergeGuestProfiles
+      x-ticvai-consumed-by:
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       summary: Merge a duplicate profile into this one
       description: >
         Orders, cases, loyalty and consent transfer to the surviving profile. **Consent does
@@ -262,6 +274,11 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getGuestConsents
+      x-ticvai-guest-callable: true   # a guest session resolves this to their own record; the permission is for staff reading anyone's
+      x-ticvai-consumed-by:
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-read-routing: primary   # sending against a withdrawn consent is a compliance failure
       summary: Read a guest's consent state
       description: >
@@ -284,8 +301,15 @@ paths:
     post:
       operationId: recordConsent
       x-ticvai-consumed-by:
+        - "P01 WEB-009 Wishlist"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-020 Saved Items / Wishlist"
+        - "P02 GST-039 Profile"
+        - "P13 CMS-018 Consent & Legal"
       security:
         - guestAuth: []
         - bearerAuth: []
@@ -304,7 +328,8 @@ paths:
         staff token, requires `GUEST_MANAGE`, and the resulting record names them in
         `recordedByPrincipalId` — consent captured by proxy has to be attributable.
       tags: [consent]
-      x-ticvai-permission: null   # guest self-scoped, or GUEST_MANAGE when agent-recorded
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -335,6 +360,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getConsentHistory
+      x-ticvai-consumed-by:
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-read-routing: analytical
       summary: Full consent history
       description: Every decision in sequence. This is what a regulator asks to see.
@@ -363,8 +392,7 @@ paths:
   /consent-purposes:
     get:
       operationId: listConsentPurposes
-      x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
+      x-ticvai-guest-callable: true   # a guest session resolves this to their own record; the permission is for staff reading anyone's
       x-ticvai-read-routing: replica
       summary: Configured consent purposes
       tags: [consent]
@@ -485,6 +513,15 @@ paths:
       operationId: getWishlist
       x-ticvai-consumed-by:
         - "P01 WEB-009 Wishlist"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-020 Saved Items / Wishlist"
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-read-routing: replica
       summary: Read a guest's saved items
       description: >
@@ -496,7 +533,8 @@ paths:
         than dropped. A guest who saved something and finds it silently gone assumes the
         feature is broken.
       tags: [guest]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -516,12 +554,19 @@ paths:
       operationId: addToWishlist
       x-ticvai-consumed-by:
         - "P01 WEB-009 Wishlist"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-020 Saved Items / Wishlist"
       summary: Save an item
       description: >
         Idempotent on the variant — saving twice is one entry, not two. The count matters to
         the guest and to demand signals, so a double tap must not inflate it.
       tags: [guest]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -571,9 +616,16 @@ paths:
       operationId: removeFromWishlist
       x-ticvai-consumed-by:
         - "P01 WEB-009 Wishlist"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-020 Saved Items / Wishlist"
       summary: Remove a saved item
       tags: [guest]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -592,6 +644,17 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listGuestDevices
+      x-ticvai-consumed-by:
+        - "P01 WEB-009 Wishlist"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-020 Saved Items / Wishlist"
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       summary: A guest's registered devices
       description: >
         Here rather than in tenancy. `platform.device` is staff hardware bound to a
@@ -599,7 +662,8 @@ paths:
         venue nor bound to anything, and it is registered for one reason: to be sent to.
         That makes it guest engagement.
       tags: [guest]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -619,6 +683,14 @@ paths:
 
     post:
       operationId: registerGuestDevice
+      x-ticvai-consumed-by:
+        - "P01 WEB-009 Wishlist"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-020 Saved Items / Wishlist"
       summary: Register a device for push
       description: >
         Called on install and again whenever the provider rotates the token — which happens
@@ -628,7 +700,8 @@ paths:
         **A registered device is not consent to send.** Push still requires a current consent
         for the purpose; this only records where a message could go.
       tags: [guest]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -672,13 +745,22 @@ paths:
         schema: { type: string, format: uuid }
     delete:
       operationId: revokeGuestDevice
+      x-ticvai-consumed-by:
+        - "P01 WEB-009 Wishlist"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-020 Saved Items / Wishlist"
       summary: Revoke a device registration
       description: >
         Sign-out, uninstall, or a guest removing a device they no longer have. Revoked rather
         than deleted — a token that starts failing needs a record explaining why, or the same
         dead token gets retried indefinitely.
       tags: [guest]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -842,6 +924,8 @@ paths:
 
     post:
       operationId: createCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Create a campaign
       description: >
         Created in draft. One-off, scheduled, or triggered by an event such as a booking, a
@@ -874,6 +958,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       x-ticvai-read-routing: replica
       summary: Read a campaign with performance
       tags: [campaign]
@@ -891,6 +977,8 @@ paths:
 
     patch:
       operationId: updateCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Amend, pause or resume a campaign
       description: >
         Content and audience are editable only in draft. A live campaign may be paused,
@@ -933,6 +1021,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: testSendCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Send a test to named recipients
       description: >
         Renders with sample personalisation. Bypasses consent because the recipients are
@@ -979,6 +1069,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: launchCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Launch or schedule a campaign
       description: >
         Evaluates the segment, applies consent and suppression, and queues the send. The
@@ -1029,6 +1121,8 @@ paths:
         schema: { type: string }
     post:
       operationId: pauseCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Pause a campaign mid-send
       description: >
         Halts sending. **Recipients already sent to are not unsent** — pausing stops the next message, not the last one.
@@ -1067,6 +1161,8 @@ paths:
         schema: { type: string }
     post:
       operationId: unscheduleCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Pull a scheduled campaign before it sends
       description: >
         Returns it to draft. Distinct from stopping: nothing has been sent, so there is no partial audience to reason about.
@@ -1094,6 +1190,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: stopCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       summary: Stop a campaign mid-send
       description: >
         Halts remaining sends immediately. Messages already dispatched cannot be recalled,
@@ -1129,6 +1227,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getCampaignPerformance
+      x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
       x-ticvai-read-routing: analytical
       summary: Delivery and engagement
       description: >
@@ -1181,6 +1281,8 @@ paths:
 
     post:
       operationId: createMessageTemplate
+      x-ticvai-consumed-by:
+        - "P12 SUP-007 Canned Response Management"
       x-ticvai-config-scope: tenant
       summary: Create a message template
       description: >
@@ -1266,6 +1368,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getMessageStatus
+      x-ticvai-consumed-by:
+        - "P10 PTR-004 Notifications"
       x-ticvai-read-routing: replica
       summary: Delivery status of one message
       tags: [message]
@@ -1286,8 +1390,13 @@ paths:
     get:
       operationId: listCases
       x-ticvai-consumed-by:
+        - "P06 EMP-028 Lost & found"
+        - "P06 EMP-029 Guest assistance"
+        - "P08 BO-073 Lost & Found Register"
+        - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
+        - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-read-routing: replica
       summary: List service cases
       tags: [case]
@@ -1327,7 +1436,13 @@ paths:
     post:
       operationId: createCase
       x-ticvai-consumed-by:
+        - "P06 EMP-028 Lost & found"
+        - "P06 EMP-029 Guest assistance"
+        - "P08 BO-073 Lost & Found Register"
         - "P10 PTR-021 Support & Contact"
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
+        - "P12 SUP-005 Live Chat Workspace"
       summary: Raise a service case
       description: >
         From any channel — agent, guest app, email, chat. The SLA clock starts at creation
@@ -1360,6 +1475,11 @@ paths:
     get:
       operationId: getCase
       x-ticvai-consumed-by:
+        - "P06 EMP-028 Lost & found"
+        - "P06 EMP-029 Guest assistance"
+        - "P10 PTR-021 Support & Contact"
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-read-routing: replica
       summary: Read a case with its thread
@@ -1379,6 +1499,11 @@ paths:
     patch:
       operationId: updateCase
       x-ticvai-consumed-by:
+        - "P06 EMP-028 Lost & found"
+        - "P06 EMP-029 Guest assistance"
+        - "P10 PTR-021 Support & Contact"
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
       summary: Assign, reprioritise or resolve a case
       tags: [case]
@@ -1420,6 +1545,11 @@ paths:
     post:
       operationId: addCaseMessage
       x-ticvai-consumed-by:
+        - "P06 EMP-028 Lost & found"
+        - "P06 EMP-029 Guest assistance"
+        - "P10 PTR-021 Support & Contact"
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
       summary: Add a message or internal note
       description: >
@@ -1463,6 +1593,13 @@ paths:
         schema: { type: string }
     post:
       operationId: reopenCase
+      x-ticvai-consumed-by:
+        - "P06 EMP-028 Lost & found"
+        - "P06 EMP-029 Guest assistance"
+        - "P10 PTR-021 Support & Contact"
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
+        - "P12 SUP-005 Live Chat Workspace"
       summary: Reopen a resolved case
       description: >
         The guest came back on the same issue. Reopening rather than raising a new case is what makes repeat problems visible — a second case looks like a second problem.
@@ -1502,6 +1639,11 @@ paths:
     post:
       operationId: escalateCase
       x-ticvai-consumed-by:
+        - "P06 EMP-028 Lost & found"
+        - "P06 EMP-029 Guest assistance"
+        - "P10 PTR-021 Support & Contact"
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
       summary: Escalate a case
       tags: [case]
@@ -1533,6 +1675,7 @@ paths:
   /loyalty/programmes:
     get:
       operationId: listLoyaltyProgrammes
+      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-read-routing: replica
       summary: List loyalty programmes
       tags: [loyalty]
@@ -1585,7 +1728,9 @@ paths:
     get:
       operationId: getGuestLoyalty
       x-ticvai-consumed-by:
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-read-routing: replica
       summary: A guest's loyalty position
       tags: [loyalty]
@@ -1609,6 +1754,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: adjustLoyaltyPoints
+      x-ticvai-consumed-by:
+        - "P06 EMP-043 Device settings"
+        - "P08 BO-036 Device Registry"
+        - "P13 CMS-018 Consent & Legal"
       summary: Manually adjust points
       description: >
         Goodwill, correction, or reversal. Requires a reason and is reported separately —
@@ -1688,7 +1837,8 @@ paths:
         Guest-facing. A low rating may open a service case automatically where the venue
         configures it — feedback that goes nowhere is worse than no feedback mechanism.
       tags: [feedback]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append

@@ -109,11 +109,11 @@ rollout is enough. Much smaller than a dedicated pilot site.
 
 # Priority 2 — Scope confirmations
 
-## 5. Two employee modules have no provenance — CF-40
+## 5. Two venue-staff-app modules have no provenance — CF-40
 
 **Decision · Qossai / Allam**
 
-Two screens in the employee app design reference appear in **neither the requirement matrix
+Two screens in the venue-staff-app app design reference appear in **neither the requirement matrix
 nor any of the seven MoMs**:
 
 | | What it is |
@@ -161,11 +161,11 @@ requirements). Worth confirming this is intended.
 
 ---
 
-## 8. AI is a primary navigation tab in the employee app — CF-41
+## 8. AI is a primary navigation tab in the venue-staff-app app — CF-41
 
 **Decision · Qossai + Chinmay**
 
-The employee app's bottom navigation is Home · Tasks · Scan · **AI** · More.
+The venue-staff-app app's bottom navigation is Home · Tasks · Scan · **AI** · More.
 
 AI-06 sits in Wave 2 of the phasing paper, but the app shell cannot ship without the tab
 existing.
@@ -227,13 +227,13 @@ Both need to be priced features in the licensing model rather than absorbed.
 
 | # | Domain | Reqs | Why it matters |
 |---|---|---|---|
-| **13** | **Accreditation & Credential Management** | 58 | **Accreditation validation appears on the employee scanner.** Not safely deferrable — the scanner shell needs it |
+| **13** | **Accreditation & Credential Management** | 58 | **Accreditation validation appears on the venue-staff-app venue-scanner.** Not safely deferrable — the venue-scanner shell needs it |
 | **14** | **Developer & API Management** | 94 | Largest of the four. Sandbox, API keys, developer roles |
 | **15** | **Device Management** | 60 | 100% hardware-dependent. Manages the lifecycle of every device in every other domain |
 | **16** | **Rentals** *(inside F&B POS)* | ~64 | Check-out and check-in, deposits, serial tracking, overdue |
 
 Also outstanding: **17 — AI concierge mechanism and token billing model (CF-14)**, and
-**guest authentication**, which is 83 requirements — the largest single sub-domain in the
+**guest-app authentication**, which is 83 requirements — the largest single sub-domain in the
 matrix — with one passing mention across seven MoMs.
 
 ---

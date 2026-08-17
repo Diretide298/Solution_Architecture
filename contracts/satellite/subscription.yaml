@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 10
+  x-ticvai-screen-count: 34
   x-ticvai-tier: satellite
   x-ticvai-module: "18 — Subscription & Licensing Management"
   x-ticvai-requirements: 59
@@ -105,12 +105,199 @@ tags:
 
 paths:
   # ---------------------------------------------------------------- tenants
+  /partner-agreements:
+    get:
+      operationId: listPartnerAgreements
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P10 PTR-011 Quote Management"
+        - "P10 PTR-017 Commission Statement"
+      summary: Commercial agreements with B2B partners
+      description: >
+        2.7.32. **The object every other partner operation assumes and none of them had.** Credit
+        limits, channel allocations and settlement all existed; the agreement that says what a
+        partner is entitled to did not.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: expiringWithinDays
+          in: query
+          description: >
+            2.7.37. **An agreement that lapses silently keeps selling at rates nobody agreed
+            to**, which is discovered at settlement rather than at sale.
+          schema: { type: integer }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/PartnerAgreementStatus' }
+      responses:
+        '200':
+          description: Agreements
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PartnerAgreement' }
+
+    post:
+      operationId: createPartnerAgreement
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+      summary: Agree commercial terms with a partner
+      description: >
+        2.7.31, 2.7.32, 2.7.36. Net rates or commission, credit terms, which products, which
+        channels, and when it expires.
+
+        **Rate and commission are alternatives, not both.** A partner buys at a net rate and
+        keeps the margin, or sells at face value and is paid commission — and a partner on both
+        is being paid twice for the same sale.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PartnerAgreement' }
+      responses:
+        '201':
+          description: Created, pending approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartnerAgreement' }
+
+  /partner-agreements/{agreementId}:
+    parameters:
+      - name: agreementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updatePartnerAgreement
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+      summary: Amend, suspend or terminate
+      description: >
+        **Amending creates a version; it does not overwrite.** An order placed last week was
+        placed under last week's rate, and settlement must be able to say which.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PartnerAgreement' }
+      responses:
+        '200':
+          description: Amended as a new version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartnerAgreement' }
+
+  /partner-registrations:
+    post:
+      operationId: registerPartner
+      summary: A business applies to become a partner
+      description: >
+        2.7.33. **Self-registration with approval**, not an account somebody creates by hand.
+        Routes through `approvals`, because whether to trade with a company is a commercial
+        decision with a threshold and an approver.
+      tags: [subscription]
+      x-ticvai-permission: null   # a prospective partner, before any account exists
+      x-ticvai-auth: anonymous
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [companyName, contactEmail, country]
+              properties:
+                companyName: { type: string }
+                tradingName: { type: string }
+                contactName: { type: string }
+                contactEmail: { type: string }
+                country: { type: string }
+                taxRegistrationNumber: { type: string }
+                expectedVolume: { type: string }
+      responses:
+        '202':
+          description: Submitted for approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartnerAgreement' }
+
+  /partner-agreements/{agreementId}/commission-statement:
+    parameters:
+      - name: agreementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCommissionStatement
+      x-ticvai-consumed-by:
+        - "P10 PTR-011 Quote Management"
+        - "P10 PTR-017 Commission Statement"
+      summary: What the partner earned and what is owed
+      description: >
+        2.7.13, 2.7.40. **Per period, and reconcilable to the orders behind it** — a statement a
+        partner cannot check line by line is a statement they will dispute.
+
+        Uses the agreement version in force **at the time of each sale**, not the current one,
+        which is why amendment creates a version.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Statement
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommissionStatement' }
+
   /tenants:
     get:
       operationId: listTenants
       x-ticvai-consumed-by:
         - "P09 ADM-002 Platform Dashboard"
         - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: replica
       summary: List tenants
       tags: [tenant]
@@ -144,6 +331,18 @@ paths:
 
     post:
       operationId: createTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Create a tenant
       description: >
         Creates the record only. **No cell exists until a region is provisioned** — a tenant
@@ -181,6 +380,18 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: replica
       summary: Read a tenant with cells and subscription
       tags: [tenant]
@@ -198,6 +409,18 @@ paths:
 
     patch:
       operationId: updateTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Amend tenant details
       tags: [tenant]
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -231,6 +454,18 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: suspendTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Suspend a tenant
       description: >
         Graceful and reversible. Data is retained, cells stay provisioned, and the behaviour
@@ -273,6 +508,18 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reactivateTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Lift a suspension
       tags: [tenant]
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -301,6 +548,18 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: terminateTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Begin termination
       description: >
         Deliberately harder to reach than suspension. Starts a retention window during which
@@ -352,6 +611,7 @@ paths:
       operationId: listPlans
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
       x-ticvai-read-routing: replica
       summary: List subscription plans
       tags: [plan]
@@ -370,6 +630,9 @@ paths:
 
     post:
       operationId: createPlan
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
       summary: Create a subscription plan
       description: >
         A plan bundles licensed modules, entitlement limits and a cell tier. Plans are
@@ -402,6 +665,9 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getPlan
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
       x-ticvai-read-routing: replica
       summary: Read a plan
       tags: [plan]
@@ -419,6 +685,9 @@ paths:
 
     post:
       operationId: createPlanVersion
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
       summary: Publish a new version of a plan
       description: >
         Existing subscribers remain on their version until migrated deliberately. A pricing
@@ -452,6 +721,18 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getSubscription
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: replica
       summary: Read the current subscription
       tags: [subscription]
@@ -470,7 +751,17 @@ paths:
     put:
       operationId: setSubscription
       x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Assign or change a subscription
       description: >
         Upgrades take effect immediately. **Downgrades are checked first**: if the target
@@ -513,6 +804,18 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: previewSubscriptionChange
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Preview the effect of a plan change
       description: >
         What would change, what would break, and the prorated amount. Run before committing —
@@ -544,7 +847,17 @@ paths:
     get:
       operationId: getTenantLicences
       x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: primary   # gates module enablement. Stale grants access to an unlicensed module
       summary: What a tenant is licensed to use
       description: >
@@ -572,6 +885,18 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: addLicenceAddOn
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: License a module outside the plan
       description: >
         A module or limit increase sold separately. Add-ons survive a plan change unless
@@ -597,6 +922,18 @@ paths:
 
     delete:
       operationId: removeLicenceAddOn
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Remove an add-on
       tags: [licensing]
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -634,7 +971,17 @@ paths:
     get:
       operationId: getEntitlementUsage
       x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
         - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: analytical
       summary: Usage against licensed limits
       description: >
@@ -661,6 +1008,18 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listTenantCells
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: replica
       summary: List a tenant's cells
       description: One per region (ADR-0014), with placement, tier and health.
@@ -681,7 +1040,17 @@ paths:
     post:
       operationId: provisionCell
       x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Provision a cell for a region
       description: >
         Every region is its own cell. **Jurisdiction is enforced here, not trusted**: a region
@@ -729,6 +1098,15 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getCell
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-read-routing: replica
       summary: Read a cell
       tags: [cell]
@@ -746,6 +1124,15 @@ paths:
 
     patch:
       operationId: updateCellTier
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
       summary: Change a cell's tier
       description: >
         Promotion from shared to dedicated is a migration, not a setting. Returns a job to
@@ -787,6 +1174,15 @@ paths:
         schema: { type: string }
     post:
       operationId: decommissionCell
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
       summary: Begin decommissioning a cell
       description: >
         **Refused while any tenant remains on it.** Migrate them first — `planTenantMigration` exists for exactly this.
@@ -823,6 +1219,15 @@ paths:
         schema: { type: string }
     post:
       operationId: cancelDecommission
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
       summary: Halt a decommission
       description: >
         Returns the cell to active.
@@ -859,6 +1264,16 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getCellCapacity
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
       summary: Load against headroom
       description: >
         **Capacity is driven by traffic and concurrent users, not by tenant count.** A shared
@@ -1139,7 +1554,12 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
         - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-read-routing: replica
       summary: Cell health and schema version
       description: >
@@ -1166,7 +1586,14 @@ paths:
     get:
       operationId: listCellJobs
       x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-read-routing: replica
       summary: Provisioning, migration and maintenance jobs
       tags: [cell]
@@ -1201,7 +1628,17 @@ paths:
     get:
       operationId: getUsageMetering
       x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: analytical
       summary: Metered usage for a period
       description: >
@@ -1431,7 +1868,17 @@ paths:
     get:
       operationId: listSubscriptionInvoices
       x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-routing: replica
       summary: List subscription invoices
       description: >
@@ -1464,6 +1911,18 @@ paths:
 
     post:
       operationId: generateInvoice
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
       summary: Generate an invoice for a period
       description: >
         Prices the metered usage against the subscription's plan version. Idempotent per
@@ -1504,6 +1963,110 @@ components:
     LocalisedText:
       type: object
       additionalProperties: { type: string }
+
+    PartnerAgreementStatus:
+      type: string
+      enum: [pendingApproval, active, expiringSoon, expired, suspended, terminated]
+
+    PartnerRateMode:
+      type: string
+      description: >
+        **Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells
+        at face value and is paid commission. Both is being paid twice for the same sale.
+      enum: [netRate, commission]
+
+    PartnerAgreement:
+      type: object
+      x-ticvai-persistence: "control.partner_agreement"
+      required: [partnerId, rateMode, validFrom]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        partnerId: { type: string, format: uuid }
+        partnerName: { type: string, readOnly: true }
+        version:
+          type: integer
+          readOnly: true
+          description: >
+            **Amending creates a version.** An order placed last week was placed under last
+            week's rate, and settlement must be able to say which.
+        status: { $ref: '#/components/schemas/PartnerAgreementStatus' }
+        rateMode: { $ref: '#/components/schemas/PartnerRateMode' }
+        commissionPercent: { type: number, nullable: true }
+        netRates:
+          type: array
+          description: Per product or category. Absent means the commission applies across the catalogue.
+          items:
+            type: object
+            properties:
+              productId: { type: string, format: uuid, nullable: true }
+              categoryId: { type: string, format: uuid, nullable: true }
+              netPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              maxDiscountPercent:
+                type: number
+                nullable: true
+                description: >
+                  1.6.10. **What the partner may not undercut.** A reseller selling below the
+                  venue's own price damages the direct channel, and the venue usually cares
+                  more about that than the margin.
+        creditTermDays:
+          type: integer
+          description: 2.7.36. Net 30, net 60. Drives when an invoice becomes overdue.
+        creditLimit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        allowedChannels:
+          type: array
+          items: { $ref: '#/components/schemas/SalesChannel' }
+        allowedVenueIds:
+          type: array
+          items: { type: string, format: uuid }
+        requiresApprovalAboveValue:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: 2.7.39. Routes through `approvals` rather than a second mechanism here.
+        validFrom: { type: string, format: date }
+        validTo:
+          type: string
+          format: date
+          nullable: true
+          description: >
+            2.7.37. **An agreement that lapses silently keeps selling at rates nobody agreed
+            to**, discovered at settlement rather than at sale. Null means open-ended, which
+            should be rare and deliberate.
+        expiryAlertDays: { type: integer, default: 30 }
+        approvalRequestId: { type: string, nullable: true, readOnly: true }
+        notes: { type: string }
+
+    CommissionStatement:
+      type: object
+      x-ticvai-persistence: "none — aggregated from orders and control.partner_agreement"
+      properties:
+        agreementId: { type: string, format: uuid }
+        partnerName: { type: string }
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        currency: { type: string }
+        grossSales: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        refunds: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        netSales: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        commissionEarned: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        amountDue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lines:
+          type: array
+          description: >
+            **Reconcilable order by order.** A statement a partner cannot check line by line is
+            a statement they will dispute, and the dispute costs more than the detail.
+          items:
+            type: object
+            properties:
+              orderId: { type: string, format: uuid }
+              orderNumber: { type: string }
+              soldAt: { type: string, format: date-time }
+              agreementVersion:
+                type: integer
+                description: The version in force at the time of that sale, not the current one.
+              gross: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              commission: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              isRefunded: { type: boolean }
 
     TenantStatus:
       type: string
