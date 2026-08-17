@@ -13,3 +13,12 @@ viewer/shot-*.png
 *.log
 .DS_Store
 Thumbs.db
+
+# The accounts and validation store — real people, real password hashes.
+# Never in the repository.
+viewer/api/ticvai.db
+viewer/api/ticvai.db-wal
+viewer/api/ticvai.db-shm
+__pycache__/
+*.pyc
+.venv/
