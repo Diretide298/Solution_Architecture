@@ -447,6 +447,56 @@ await mode('audit');
 await wait(900);
 await shot('36-audit-backend');
 
+// -- 4b. the views added in the second drop --------------------------------
+// These were photographed by hand once and then went three days without being
+// regenerated, because this script did not know about them. A figure the
+// rebuild skips is a figure that quietly stops being true.
+
+const scope = async (paneId, key, settle = 1500) => {
+  const sel = `#${paneId} button[data-scope="${key}"]`;
+  if (!(await page.$(sel))) { console.warn(`  ! no ${key} scope in #${paneId}`); return false; }
+  await page.click(sel);
+  await wait(settle);
+  return true;
+};
+
+await layer('contracts');
+await mode('lineage');
+await wait(1300);
+await shot('hc-lineage');
+if (await scope('lineage-scope', 'services', 1800)) await shot('hc-lineage-services');
+if (await scope('lineage-scope', 'tables', 1600)) await shot('hc-lineage-tables');
+await scope('lineage-scope', 'operations', 1000);
+
+await layer('frontend');
+await mode('waves');
+await wait(1700);
+await shot('hc-waves');
+
+await layer('decisions');
+await wait(1400);
+await shot('hc-decisions');
+if (await scope('decisions-scope', 'permissions', 1600)) await shot('hc-vectors');
+if (await scope('decisions-scope', 'gaps', 1400)) await shot('hc-gaps');
+if (await scope('decisions-scope', 'registers', 1400)) await shot('hc-registers');
+
+// a table explaining itself in the delivery's own words
+await layer('backend');
+await wait(1200);
+console.log(`  hovered: ${await hover('#tree .tree-file', { nth: 0 })}`);
+await shot('hc-table-tip');
+
+// the permissions graph, the densest one the declutter had to carry
+await layer('contracts');
+await mode('graph');
+if (await scope('graph-scope', 'permissions', 4500)) await shot('hc-graph-permissions');
+
+// the schema picker with the workbook's footnote rows no longer read as modules
+await layer('backend');
+await mode('data');
+await wait(1600);
+await shot('hc-data-clean');
+
 // -- 5. light theme, for the teams that print ------------------------------
 await layer('contracts');
 await mode('graph');

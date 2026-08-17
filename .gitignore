@@ -1,23 +1,15 @@
-# dependencies
+# Build output. The .NET obj/ trees rewrite themselves on every build, so
+# tracking them means 156 files turn up modified in a commit that only touched
+# a stylesheet. Nothing here is authored; it all comes back from a build.
+**/obj/
+**/bin/
 node_modules/
 
-# build output
-dist/
-build/
-.next/
-out/
+# Screenshots taken while debugging the viewer. The manual's figures live in
+# viewer/manual/shots and are kept, because manual.html renders them.
+viewer/shot-*.png
 
-# local env
-.env
-.env.local
-*.local
-
-# editor / OS
+# Local scratch
+*.log
 .DS_Store
 Thumbs.db
-.idea/
-*.swp
-
-# logs
-*.log
-npm-debug.log*

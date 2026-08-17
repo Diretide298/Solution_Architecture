@@ -44,6 +44,9 @@ export class BoxDiagram {
     this.hover = null;
     this.hoverRow = null;
     this.showRows = true;
+    // Boxes the user opened out to their full column list. Kept by id so the
+    // choice survives a relayout, a rescope and a live reload of the data.
+    this.expanded = new Set();
 
     this.width = 900;
     this.height = 600;
@@ -72,14 +75,18 @@ export class BoxDiagram {
 
     this.nodes = nodes.map((source) => {
       const old = previous.get(source.id);
-      const shown = Math.min(source.rows?.length ?? 0, MAX_ROWS);
-      const hidden = (source.rows?.length ?? 0) - shown;
+      const total = source.rows?.length ?? 0;
+      const open = this.expanded.has(source.id);
+      const shown = open ? total : Math.min(total, MAX_ROWS);
+      const hidden = total - shown;
       return {
         ...source,
         shownRows: shown,
         hiddenRows: hidden,
+        // the fold row is drawn whenever there is something to fold either way
+        foldable: total > MAX_ROWS,
         w: BOX_W,
-        h: HEADER_H + PAD_Y * 2 + shown * ROW_H + (hidden > 0 ? ROW_H : 0),
+        h: HEADER_H + PAD_Y * 2 + shown * ROW_H + (total > MAX_ROWS ? ROW_H : 0),
         x: keepPositions ? old.x : 0,
         y: keepPositions ? old.y : 0,
         vx: 0,
@@ -422,7 +429,8 @@ export class BoxDiagram {
     const node = this.nodeAt(sx, sy);
     if (!node) return false;
     const row = this.rowAt(node, sx, sy);
-    if (row?.refTarget) this.onRow(row, node);
+    if (this.foldAt(node, sx, sy)) this.toggleFold(node);
+    else if (row?.refTarget) this.onRow(row, node);
     else this.onSelect(node);
     return true;
   }
@@ -433,6 +441,39 @@ export class BoxDiagram {
     const top = node.y - node.h / 2 + HEADER_H + PAD_Y;
     const index = Math.floor((world.y - top) / ROW_H);
     return index >= 0 && index < node.shownRows ? node.rows[index] : null;
+  }
+
+  /** True when the point is on the "+N more" / "show less" line of the box. */
+  foldAt(node, sx, sy) {
+    if (!node?.foldable) return false;
+    const world = this.toWorld(sx, sy);
+    const top = node.y - node.h / 2 + HEADER_H + PAD_Y;
+    const index = Math.floor((world.y - top) / ROW_H);
+    return index === node.shownRows;
+  }
+
+  /**
+   * Open a box out to every column, or fold it back to the first MAX_ROWS.
+   * The box grows downward from where it sits rather than re-running the
+   * layout, so the one you opened does not walk off under your cursor.
+   */
+  toggleFold(node) {
+    if (!node?.foldable) return false;
+    const total = node.rows.length;
+    const open = !this.expanded.has(node.id);
+    if (open) this.expanded.add(node.id);
+    else this.expanded.delete(node.id);
+
+    const shown = open ? total : Math.min(total, MAX_ROWS);
+    const grew = (shown - node.shownRows) * ROW_H;
+    node.shownRows = shown;
+    node.hiddenRows = total - shown;
+    node.h += grew;
+    node.y += grew / 2; // keep the header still; the box opens downward
+    this.userAdjusted = true;
+    this.reheat(0.12);
+    this.draw();
+    return true;
   }
 
   // ── drawing ─────────────────────────────────────────────────────
@@ -645,10 +686,20 @@ export class BoxDiagram {
         y += ROW_H * k;
       }
 
-      if (node.hiddenRows > 0) {
+      // The fold line. It is a control, so it says so: underlined on hover and
+      // lit in the box's own colour, rather than sitting there looking like the
+      // note that it used to be.
+      if (node.foldable) {
+        const open = node.hiddenRows === 0;
+        const label = open ? '− show less' : `+${node.hiddenRows} more`;
+        const hot = this.hover === node && this.hoverFold;
         ctx.font = `italic ${rowSize}px ui-sans-serif, system-ui, sans-serif`;
-        ctx.fillStyle = faint;
-        ctx.fillText(`+${node.hiddenRows} more`, left + 9 * k, y);
+        ctx.fillStyle = hot ? node.color : faint;
+        ctx.fillText(label, left + 9 * k, y);
+        if (hot) {
+          const w2 = ctx.measureText(label).width;
+          ctx.fillRect(left + 9 * k, y + rowSize * 0.62, w2, Math.max(1, k));
+        }
       }
 
       ctx.globalAlpha = 1;
@@ -694,8 +745,10 @@ export class BoxDiagram {
       if (this._drag && !this._drag.moved) {
         const rect = canvas.getBoundingClientRect();
         const node = this._drag.node;
-        const row = this.rowAt(node, e.clientX - rect.left, e.clientY - rect.top);
-        if (row?.refTarget) this.onRow(row, node);
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        const row = this.rowAt(node, x, y);
+        if (this.foldAt(node, x, y)) this.toggleFold(node);
+        else if (row?.refTarget) this.onRow(row, node);
         else this.onSelect(node);
       }
       this._drag = null;
@@ -707,10 +760,12 @@ export class BoxDiagram {
       if (this._drag || this._pan) return;
       const node = this.nodeAt(e.offsetX, e.offsetY);
       const row = node ? this.rowAt(node, e.offsetX, e.offsetY) : null;
-      if (node !== this.hover || row !== this.hoverRow) {
+      const fold = node ? this.foldAt(node, e.offsetX, e.offsetY) : false;
+      if (node !== this.hover || row !== this.hoverRow || fold !== this.hoverFold) {
         this.hover = node;
         this.hoverRow = row;
-        canvas.style.cursor = row?.refTarget ? 'pointer' : node ? 'pointer' : 'grab';
+        this.hoverFold = fold;
+        canvas.style.cursor = node ? 'pointer' : 'grab';
         this.draw();
       }
     });

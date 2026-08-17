@@ -955,9 +955,11 @@ pre.code {
 
 @media (max-width: 760px) {
   :root {
-    /* two rows: the layer rail cannot share one with the mode rail and leave
-       either wide enough to read a label in */
-    --topbar-h: 84px;
+    /* three rows: the small controls, then the layer rail, then the mode rail.
+       Neither rail can share a row with anything and stay wide enough to read
+       a label in, and the bar must be tall enough to hold all three — a row
+       that overflows this box lands somewhere nobody can reach. */
+    --topbar-h: 124px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-left: env(safe-area-inset-left, 0px);
@@ -1022,12 +1024,12 @@ pre.code {
   }
   .search-trigger-text, .search-trigger kbd { display: none; }
 
-  /* Basis 0, not auto. With `auto` the rail asks for the width of all five
-     buttons at once, which no longer fits beside the toggle and the brand, so
-     it wraps to a row of its own and takes the bar to four rows inside a box
-     sized for two. Basis 0 lets it take what is left of the first row and
-     scroll within it, which is what the 1100px rule already assumes. */
-  .seg-layer { flex: 1 1 0; min-width: 0; }
+  /* The layer rail takes a row of its own, as the mode rail does. Sharing the
+     first row leaves it 126px, which is one layer of five visible and four
+     behind a swipe — no way to learn the window has five layers at all. A
+     whole row is 365px, which is exactly what the five buttons need, so
+     nothing scrolls and the choice is legible. */
+  .seg-layer { order: 1; flex: 1 0 100%; min-width: 0; }
   .seg-layer button { padding: 6px 9px; min-height: 30px; }
 
   /* the wordmark is the first thing to give up its width to the layer rail;
