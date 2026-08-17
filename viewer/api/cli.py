@@ -128,6 +128,36 @@ def forget(args) -> None:
     print(f"Deleted {rows} verdict(s) by {args.email}.")
 
 
+def passwd(args) -> None:
+    """Set a new password on an account, at this terminal.
+
+    The web route deliberately demands the current password, which is no use
+    when the current one is the problem — forgotten, or set by something other
+    than the person it belongs to. This asks for nothing but the new one,
+    because standing at the machine with the store on it is already the whole
+    proof. Every session is dropped, so anything signed in with the old
+    password stops being signed in.
+    """
+    db.init()
+    account = db.one(
+        "SELECT id, email, role FROM account WHERE email_folded = ?", (db.fold(args.email),))
+    if not account:
+        print(f"No account for {args.email}.")
+        return
+
+    replacement = _read_password()
+    db.write(
+        "UPDATE account SET password_hash = ? WHERE id = ?",
+        (security.hash_password(replacement), account["id"]),
+    )
+    dropped = db.one(
+        "SELECT COUNT(*) AS n FROM session WHERE account_id = ?", (account["id"],))["n"]
+    db.write("DELETE FROM session WHERE account_id = ?", (account["id"],))
+    print(f"Set a new password for {account['email']} ({account['role']}).")
+    if dropped:
+        print(f"{dropped} session(s) signed out.")
+
+
 def adopt(args) -> None:
     """Copy one account out of another store, password and all.
 
@@ -194,6 +224,10 @@ def main() -> None:
     p.add_argument("email")
     p.add_argument("--yes", action="store_true", help="actually delete them")
     p.set_defaults(func=forget)
+
+    p = subs.add_parser("passwd", help="set a new password on an account, without the old one")
+    p.add_argument("email")
+    p.set_defaults(func=passwd)
 
     p = subs.add_parser("adopt", help="copy one account out of another store, password and all")
     p.add_argument("email")

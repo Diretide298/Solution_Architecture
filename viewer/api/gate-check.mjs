@@ -35,7 +35,22 @@ let pass = 0, fail = 0;
 const check = (n, ok, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ` — ${d}` : ''}`); ok ? pass++ : fail++; };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const OWNER = { email: 'chinmay.parab@softlabsgroup.com', name: 'Chinmay Parab', password: 'the-first-administrator' };
+// A harness address, never a real person's.
+//
+// This used to name the owner of the repository, with a password written in
+// this file. The harness does what it says on the tin — it creates the first
+// administrator — so the account it left behind was a real admin account whose
+// password was committed and pushed to a public remote. It then looked exactly
+// like an account its supposed owner had made, which is how it survived: there
+// was nothing about it to notice.
+//
+// The address varies per run so a store that already holds one from an earlier
+// run does not silently pass a check about the *first* account.
+const OWNER = {
+  email: `gate.owner${Date.now().toString().slice(-6)}@softlabsgroup.com`,
+  name: 'Gate Harness',
+  password: `gate-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`,
+};
 
 const browser = await puppeteer.launch({
   executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',

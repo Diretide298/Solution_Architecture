@@ -114,9 +114,15 @@ into the temp file rather than the store. `adopt` below is what got it back.
 ```
 python -m api.cli list                          # accounts and open invites
 python -m api.cli admin you@softlabsgroup.com   # the first account, if there is none
+python -m api.cli passwd you@softlabsgroup.com  # a new password, without the old one
 python -m api.cli adopt you@softlabsgroup.com --source other.db --yes
 python -m api.cli forget harness@softlabsgroup.com --yes
 ```
+
+`passwd` asks for nothing but the new password. The web route demands the
+current one, which is no use when the current one is the problem — forgotten,
+or set by something other than the person it belongs to. Standing at the
+machine the store is on is the proof. Every session is dropped.
 
 `adopt` copies one account out of another store — the stored hash moves across
 unchanged, so the password stays the one they chose. Sessions and verdicts are
