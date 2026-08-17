@@ -265,7 +265,11 @@ const $ = (id) => document.getElementById(id);
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
   if (className) node.className = className;
-  if (text != null) node.textContent = text;
+  // A node passed here used to be stringified into "[object HTMLSpanElement]"
+  // and rendered as that, in the page, where a reader would see it. Append it
+  // instead, which is plainly what the caller meant.
+  if (text instanceof Node) node.append(text);
+  else if (text != null) node.textContent = text;
   return node;
 };
 
@@ -472,6 +476,7 @@ async function boot() {
   renderLayers();
   bindUI();
   connectLiveReload();
+  bindSections();
   // delegated, so everything rendered from here on carries its tips without
   // being wired up individually
   installTips();
@@ -492,6 +497,10 @@ async function boot() {
   } else {
     setMode('graph');
   }
+
+  // The layer the app opens on never went through setLayer, so nothing has
+  // asked for its parts yet.
+  hydrateLayer();
 }
 
 // ── layer switching ──────────────────────────────────────────────────
@@ -563,27 +572,126 @@ function setLayer(key) {
   renderSidePane();
   renderAudit();
   setMode(next);
+
+  // Draw with what is here, then draw again with what arrives. On a layer
+  // whose parts are already in hand this does nothing at all.
+  hydrateLayer(key);
+}
+
+/**
+ * What each layer opens on. These used to be picked at boot, when every part
+ * was already in hand; a part now arrives later, so they are picked when it
+ * does — and only if the reader has not already chosen for themselves.
+ */
+function applyPartDefaults() {
+  // the whole database, so the first thing seen is the shape of it
+  if (!state.dataModule && state.backend?.modules?.length) state.dataModule = ALL_SCHEMAS;
+  if (!state.screenId) state.screenId = state.journeys?.screens?.[0]?.id ?? null;
+  // the order machine first: fourteen transitions, four reversals and every
+  // approval rule in the platform, so it shows what the view is for
+  if (!state.machineId) {
+    state.machineId =
+      state.domain?.machines?.find((m) => m.id === 'order')?.id ??
+      state.domain?.machines?.[0]?.id ?? null;
+  }
+}
+
+/**
+ * Fetches whatever the layer still needs, then rebuilds what was built from
+ * it. The pickers and the laid-out diagrams are the subtle part: they used to
+ * be filled once at boot, when every part was already in hand. A picker built
+ * from a part that had not arrived holds nothing, and nothing would ever fill
+ * it again — so each part refreshes exactly what is made from it.
+ */
+function hydrateLayer(key = state.layer) {
+  return ensureParts(LAYER_PARTS[key] ?? [], key).then((arrived) => {
+    if (!arrived.length) return;
+    applyPartDefaults();
+
+    if (arrived.includes('backend')) renderData();
+    if (arrived.includes('domain')) {
+      fillMachineSelect();
+      fillEventSelect();
+    }
+    // setMode only resizes an already-drawn canvas, so the graph would keep
+    // whatever it drew before the part landed — for the spine, no edges at all.
+    renderGraph();
+
+    renderSideGroups();
+    renderTree();
+    renderSideNote();
+    renderSidePane();
+    renderAudit();
+    setMode(state.mode);
+  });
+}
+
+// ── loading the delivery, a layer at a time ─────────────────────────
+// Fetching all seven payloads up front cost 4.8 MB and four seconds before
+// anything could be read, and six of the seven were for layers the reader had
+// not opened. Each part is fetched when a layer that needs it is opened, and
+// the view re-renders when it lands. Every render path already tolerates a
+// missing part — they were all fetched with .catch(() => null) — so "not here
+// yet" is a state the app was already built to survive.
+
+/** Which parts a layer cannot be drawn without. */
+const LAYER_PARTS = {
+  frontend: ['journeys', 'lineage'],
+  // the spine graph draws one edge per pair of contracts that share an event,
+  // and the events are in the domain part — so contracts needs it too
+  contracts: ['lineage', 'domain'],
+  backend: ['backend', 'lineage'],
+  domain: ['domain'],
+  decisions: ['decisions'],
+};
+const ALL_PARTS = ['journeys', 'backend', 'domain', 'lineage', 'decisions'];
+
+const partInFlight = new Map();
+
+/** Fetches one part once, no matter how many views ask for it at the time. */
+function loadPart(key) {
+  if (state[key]) return Promise.resolve(state[key]);
+  if (partInFlight.has(key)) return partInFlight.get(key);
+  const request = fetch(`/api/${key}`)
+    .then((r) => r.json())
+    .catch(() => null)
+    .then((data) => {
+      state[key] = data;
+      partInFlight.delete(key);
+      return data;
+    });
+  partInFlight.set(key, request);
+  return request;
+}
+
+/**
+ * Makes sure a layer's parts are in hand, then redraws — but only if the
+ * reader is still on that layer. Switching away twice while two fetches are in
+ * flight must not repaint the layer they have since left.
+ */
+async function ensureParts(keys, layerAtRequest) {
+  const missing = keys.filter((k) => !state[k]);
+  if (!missing.length) return [];
+  document.body.dataset.loading = '1';
+  await Promise.all(missing.map(loadPart));
+  delete document.body.dataset.loading;
+  if (layerAtRequest && state.layer !== layerAtRequest) return [];
+  return missing;
 }
 
 async function loadIndex() {
-  // all three layers resolve against the contracts and rebuild together, so
-  // they are fetched together — the audit needs every layer's problems anyway
-  const [index, journeys, backend, domain, lineage, tooltips, decisions] = await Promise.all([
-    fetch('/api/index').then((r) => r.json()),
-    fetch('/api/journeys').then((r) => r.json()).catch(() => null),
-    fetch('/api/backend').then((r) => r.json()).catch(() => null),
-    fetch('/api/domain').then((r) => r.json()).catch(() => null),
-    fetch('/api/lineage').then((r) => r.json()).catch(() => null),
-    fetch('/api/tooltips').then((r) => r.json()).catch(() => null),
-    fetch('/api/decisions').then((r) => r.json()).catch(() => null),
-  ]);
+  // The index is the one part nothing can be drawn without: the tree, the
+  // graph and every selection resolve against it.
+  const index = await fetch('/api/index').then((r) => r.json());
   state.index = index;
-  state.journeys = journeys;
-  state.backend = backend;
-  state.domain = domain;
-  state.lineage = lineage;
-  state.tooltips = tooltips;
-  state.decisions = decisions;
+  state.journeys = null;
+  state.backend = null;
+  state.domain = null;
+  state.lineage = null;
+  state.decisions = null;
+
+  // Small, and read by every layer's hover text, so it is not worth deferring.
+  state.tooltips = await fetch('/api/tooltips').then((r) => r.json()).catch(() => null);
 
   state.nodesById = new Map(index.nodes.map((n) => [n.id, n]));
 
@@ -616,14 +724,7 @@ async function loadIndex() {
   state.erScope = state.erScope ?? defaultFile;
   fillScopeSelect($('er-scope'), state.erScope);
 
-  // defaults for the other two layers, so neither opens empty
-  // opens on the whole database, so the first thing seen is the shape of it
-  state.dataModule = state.dataModule ?? (backend?.modules?.length ? ALL_SCHEMAS : null);
-  state.screenId = state.screenId ?? journeys?.screens?.[0]?.id ?? null;
-  // the order machine first: fourteen transitions, four reversals and every
-  // approval rule in the platform, so it shows what the view is for
-  state.machineId =
-    state.machineId ?? domain?.machines?.find((m) => m.id === 'order')?.id ?? domain?.machines?.[0]?.id ?? null;
+  applyPartDefaults();
 
   renderSideGroups();
   renderTree();
@@ -632,9 +733,9 @@ async function loadIndex() {
   renderAudit();
   renderGraph();
   renderER();
-  renderData(); // laid out at load, so the backend layer opens already settled
-  fillMachineSelect();
-  fillEventSelect();
+  // The data diagram and the two domain pickers are built from parts that are
+  // now fetched on demand, so they are filled by hydrateLayer when those parts
+  // arrive rather than here, where there would be nothing to fill them with.
 }
 
 /** Problems belong to the layer that produced them. */
@@ -6050,6 +6151,87 @@ function toast(message) {
 }
 
 // ── wiring ───────────────────────────────────────────────────────────
+// ── collapsible sections ────────────────────────────────────────────
+// Every pane in the app builds a section the same way: a section label
+// followed by its content as siblings, up to the next label. That one shape,
+// held to in 35 places, is what lets this be a single handler rather than 35
+// edits — and what makes a new section collapsible the day it is written,
+// without its author doing anything.
+
+/** Sections the reader has shut, by view and heading, so the choice survives
+ *  a re-render — and so collapsing "operations" on one screen does not also
+ *  collapse the notes on another. */
+const collapsedSections = new Set();
+const sectionKey = (label) =>
+  `${state.layer}/${state.mode}/${label.textContent.trim().toLowerCase()}`;
+
+/** A section owns every sibling after its label, up to the next label. */
+function sectionBody(label) {
+  const out = [];
+  for (
+    let node = label.nextElementSibling;
+    node && !node.classList.contains('journey-section-label');
+    node = node.nextElementSibling
+  ) out.push(node);
+  return out;
+}
+
+function applyCollapse(label) {
+  const shut = collapsedSections.has(sectionKey(label));
+  label.classList.toggle('collapsed', shut);
+  label.setAttribute('aria-expanded', String(!shut));
+  if (!label.hasAttribute('tabindex')) {
+    label.setAttribute('tabindex', '0');
+    label.setAttribute('role', 'button');
+  }
+  const body = sectionBody(label);
+  for (const node of body) node.hidden = shut;
+  // A heading that hides nothing is not a control; say so rather than inviting
+  // a click that does nothing.
+  label.classList.toggle('empty-section', body.length === 0);
+}
+
+function toggleSection(label) {
+  if (!sectionBody(label).length) return;
+  const key = sectionKey(label);
+  if (collapsedSections.has(key)) collapsedSections.delete(key);
+  else collapsedSections.add(key);
+  applyCollapse(label);
+}
+
+/** Re-applies the reader's choices to whatever a render just produced. */
+function refreshSections(root = document) {
+  for (const label of root.querySelectorAll('.journey-section-label')) applyCollapse(label);
+}
+
+function bindSections() {
+  document.addEventListener('click', (event) => {
+    const label = event.target.closest('.journey-section-label');
+    if (label) toggleSection(label);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const label = event.target.closest?.('.journey-section-label');
+    if (!label) return;
+    event.preventDefault();
+    toggleSection(label);
+  });
+
+  // Panes re-render constantly and rebuild their DOM each time. Watching for
+  // new labels keeps the collapse state without every render path having to
+  // remember to ask for it.
+  const observer = new MutationObserver((records) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (node.nodeType !== 1) continue;
+        if (node.classList?.contains('journey-section-label')) applyCollapse(node);
+        else if (node.querySelector?.('.journey-section-label')) refreshSections(node);
+      }
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
 function bindUI() {
   // the layer and mode bars are rebuilt on every switch, so they wire
   // themselves in renderLayers / renderModes rather than here
