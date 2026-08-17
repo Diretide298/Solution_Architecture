@@ -998,6 +998,30 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
   text-transform: uppercase; color: var(--text-faint);
 }
 .reach-values { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+/* The operations the lineage never resolved. Amber rather than red: nothing is
+   broken, the delivery simply does not say — and the row exists so the table
+   count above cannot be read as a total when it is only a floor. */
+.reach-label.warn { color: var(--warning); }
+
+/* The rest of a contract's operations, a page at a time. Full width and last
+   in the group, so it reads as the end of the list rather than a row in it. */
+.lineage-more {
+  display: block; width: 100%;
+  margin: 6px 0 2px;
+  padding: 7px 10px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+}
+.lineage-more:hover { border-color: var(--accent); color: var(--text); }
+
+.warn-note {
+  border-left: 2px solid color-mix(in srgb, var(--warning) 55%, transparent);
+  padding-left: 9px;
+}
 
 /* the reverse index in the right-hand pane */
 .link-weight.writes { color: #f87171; }

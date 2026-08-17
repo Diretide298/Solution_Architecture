@@ -197,6 +197,7 @@ const state = {
   mode: 'graph',
   structureFile: null, // file currently diagrammed
   treeCache: new Map(),
+  detailLoaded: new Set(), // contracts whose held-back fields have been merged in
   erScope: null,
   journeyId: null,
   journeys: null,
@@ -659,6 +660,14 @@ function partsArrived(arrived) {
     fillMachineSelect();
     fillEventSelect();
   }
+  // The trail from a contract into the database is drawn from two parts that
+  // are both extras on the Contracts layer, so the reader is on screen before
+  // either lands. Redrawing just that block is cheaper than the whole reader,
+  // which would re-fetch and re-highlight the source for no reason.
+  if (arrived.includes('backend') || arrived.includes('lineage')) {
+    const node = state.selectedId ? state.nodesById.get(state.selectedId) : null;
+    if (node && !$('reader-body').hidden) renderTrace(node);
+  }
 }
 
 // ── loading the delivery, a layer at a time ─────────────────────────
@@ -700,6 +709,79 @@ const LAYER_EXTRAS = {
 };
 
 const ALL_PARTS = ['journeys', 'backend', 'domain', 'lineage', 'decisions'];
+
+// ── the fields the index no longer carries ──────────────────────────
+// The per-layer split above could not touch /api/index, because every layer
+// needs it — it was 1.9 MB of the 3.0 MB the viewer fetched to open. Two
+// fields are three tenths of that on their own, and neither is ever read for
+// more than one contract at a time: the fields of all 554 schemas, which only
+// the ER diagram reads, and the prose on every node, which only the reader
+// shows.
+//
+// So they arrive per contract and are merged back into the node objects the
+// index already delivered. Merging rather than keeping a second map is what
+// makes this a small change: every existing reader of `node.description` or
+// `schema.properties` goes on working, and only the two views that need the
+// fields have to wait for them.
+
+const detailInFlight = new Map();
+
+/** Puts the held-back fields back on the nodes of one contract. */
+function ensureDetail(file) {
+  if (!file || state.detailLoaded.has(file)) return Promise.resolve();
+  if (detailInFlight.has(file)) return detailInFlight.get(file);
+
+  const request = fetch(`/api/detail?file=${encodeURIComponent(file)}`)
+    .then((r) => r.json())
+    .catch(() => null)
+    .then((detail) => {
+      for (const [id, fields] of Object.entries(detail ?? {})) {
+        const node = state.nodesById.get(id);
+        if (node) Object.assign(node, fields);
+      }
+      // A failed fetch is marked loaded too. Retrying on every render would
+      // hammer a server that is already unhappy, and the views below all
+      // tolerate the fields being absent — they did so before this existed.
+      state.detailLoaded.add(file);
+      detailInFlight.delete(file);
+    });
+
+  detailInFlight.set(file, request);
+  return request;
+}
+
+/**
+ * The ER diagram needs one more round than the reader does. It draws the
+ * schemas of one contract plus any schema they reference from another — and
+ * which ones those are is written in `properties`, which is exactly the field
+ * that has not arrived yet. So: fetch the contract, read the refs that appear,
+ * then fetch the contracts they point into.
+ */
+async function ensureERDetail(file) {
+  await ensureDetail(file);
+  const own = (state.index?.nodes ?? []).filter((n) => n.type === 'schema' && n.file === file);
+  const elsewhere = new Set();
+  for (const schema of own) {
+    for (const property of schema.properties ?? []) {
+      const target = property.refTarget ? state.nodesById.get(property.refTarget) : null;
+      if (target && target.file !== file) elsewhere.add(target.file);
+    }
+  }
+  await Promise.all([...elsewhere].map(ensureDetail));
+}
+
+/** True once ensureERDetail would have nothing left to fetch. */
+function erDetailReady(file) {
+  if (!state.detailLoaded.has(file)) return false;
+  const own = (state.index?.nodes ?? []).filter((n) => n.type === 'schema' && n.file === file);
+  for (const schema of own) {
+    for (const property of schema.properties ?? []) {
+      const target = property.refTarget ? state.nodesById.get(property.refTarget) : null;
+      if (target && !state.detailLoaded.has(target.file)) return false;
+    }
+  }
+  return true;
+}
 
 const partInFlight = new Map();
 
@@ -2053,6 +2135,21 @@ function buildER(file) {
 function renderER({ focus } = {}) {
   const file = state.erScope;
   if (!file) return;
+
+  // The fields these boxes are made of arrive per contract. Drawing named but
+  // empty boxes first and filling them a moment later would be worse than
+  // waiting: an entity with no fields is a claim, and a wrong one. The hint
+  // line says what is happening, because a diagram that is briefly blank with
+  // no explanation reads as broken.
+  if (!erDetailReady(file)) {
+    $('er-hint').textContent = `reading the fields of ${file.split('/').pop()}…`;
+    ensureERDetail(file).then(() => {
+      // the reader may have moved on while it was in flight
+      if (state.erScope === file) renderER({ focus });
+    });
+    return;
+  }
+
   const { nodes, edges, ownCount } = buildER(file);
   er.setData(nodes, edges);
   er.setSelected(state.selectedId);
@@ -2394,15 +2491,63 @@ function screenReach(screen) {
     return chip;
   }), 'Eight operations in the platform run as a stored procedure. This screen calls one.');
 
-  if (!tables.length) {
-    card.append(
-      el('div', 'reach-row',
-        el('span', 'pane-note',
-          `It calls ${entry.operations.join(', ')}, and none of those resolves to a table — usually ` +
-          `because the operation returns a computed projection rather than reading one.`))
+  // Which of the screen's operations contributed nothing to that table list.
+  //
+  // The count above is a union of what the lineage resolved, and it was stated
+  // as if it were the whole truth. On the Home Landing it said "1 table" while
+  // two of the three operations behind it — listProducts among them — carry no
+  // reads or writes at all, which is plainly not a claim that the product list
+  // touches no table. A number that is right about the data and wrong about the
+  // system has to say which it is.
+  // Two different reasons an operation adds nothing, and they are not the same
+  // claim. `unresolved` means the lineage was never filled in for it — a gap in
+  // the delivery. Anything else means the lineage did look and found no table,
+  // which is a real answer: the operation returns a computed projection.
+  const unresolved = [];
+  const projection = [];
+  for (const name of entry.operations) {
+    const op = state.lineage?.operations?.find((o) => o.name === name);
+    if (op && (op.reads?.length ?? 0) + (op.writes?.length ?? 0) > 0) continue;
+    (!op || op.source === 'unresolved' ? unresolved : projection).push(name);
+  }
+
+  if (unresolved.length) {
+    const row = el('div', 'reach-row');
+    row.append(el('span', 'reach-label warn', 'not resolved'));
+    const values = el('span', 'reach-values');
+    for (const name of unresolved) {
+      const chip = el('button', 'lineage-table unknown', name);
+      tip(chip, name,
+        'The lineage carries no reads or writes for this operation, so whatever it touches is not ' +
+        'counted above. 318 of the 654 operations are in that state.');
+      chip.onclick = () => openOperation(name);
+      values.append(chip);
+    }
+    row.append(values);
+    card.append(row);
+  }
+
+  box.append(card);
+
+  if (unresolved.length) {
+    box.append(
+      el('p', 'pane-note warn-note',
+        `${unresolved.length} of the ${entry.operations.length} operation` +
+        `${entry.operations.length === 1 ? '' : 's'} this screen calls ` +
+        `${unresolved.length === 1 ? 'has' : 'have'} no lineage at all, so ` +
+        `${tables.length
+          ? `${tables.length} is a floor and not a total`
+          : 'no table could be counted'}. ` +
+        'That is a gap in handoff/api-data-lineage.json rather than a fact about this screen.')
+    );
+  } else if (!tables.length) {
+    box.append(
+      el('p', 'pane-note',
+        `It calls ${projection.join(', ')}, and the lineage resolved every one of them to no table — ` +
+        `usually because the operation returns a computed projection rather than reading one.`)
     );
   }
-  box.append(card);
+
   box.append(
     el('p', 'pane-note',
       'From handoff/screen-index.json — the same chain the Lineage view shows from the contracts end.')
@@ -4554,74 +4699,114 @@ function renderLineageByOperation(body, hit) {
     summary.append(el('span', 'lineage-group-count', `${resolved} of ${ops.length} resolved`));
     section.append(summary);
 
-    for (const op of ops) {
-      const row = el('div', `lineage-row${op.resolved ? '' : ' unresolved'}`);
+    // A closed <details> still builds every child it is given, and this view
+    // gave it all 654 operations across 24 contracts — 7,098 elements for a
+    // list of which one or two groups are ever open. The rows are built when a
+    // group is first opened instead, which is the only moment anyone can see
+    // them, and a group opened once keeps what it built.
+    //
+    // A group is capped as well: a contract with 90 operations is still 900
+    // elements arriving in one frame, and nobody reads 90 rows before
+    // scrolling. The rest come a page at a time, on a button that says how
+    // many are left rather than an infinite scroll that never says.
+    const fill = () => {
+      if (section.dataset.filled) return;
+      section.dataset.filled = '1';
+      appendLineageRows(section, ops);
+    };
+    if (section.open) fill();
+    else section.addEventListener('toggle', fill, { once: true });
 
-      const name = el('button', 'lineage-op', op.name);
-      name.onclick = () => openOperation(op.name);
-      row.append(name);
-
-      const meta = el('div', 'lineage-meta');
-      if (op.verb) meta.append(el('span', `verb ${op.verb.toLowerCase()}`, op.verb));
-      if (op.path) meta.append(el('span', 'lineage-path', op.path));
-      if (op.routing) {
-        const chip = el('span', `lineage-routing${op.routingFrom === 'workbook' ? ' from-workbook' : ''}`, op.routing);
-        chip.style.borderColor = ROUTING_COLOR[op.routing] ?? 'currentColor';
-        const ROUTING_WHY = {
-          replica: 'A read that may be served from a replica. ADR-0016 — the write path and the read path are separated deliberately.',
-          analytical: 'Served from the analytical store. Never on a transaction path.',
-          write: 'A write. It goes to the primary by definition.',
-          primary: 'Must hit the primary. Either it writes, or it reads something it just wrote.',
-        };
-        tip(chip, `Routed to the ${op.routing}`,
-          ROUTING_WHY[op.routing] ?? 'Routing stated by the schema reference.',
-          op.routingFrom === 'workbook'
-            ? 'from the workbook — api-data-lineage.json left this blank'
-            : null);
-        meta.append(chip);
-      }
-      if (op.procedure) {
-        const chip = el('span', 'lineage-procedure', op.procedure);
-        tip(chip, 'Stored procedure',
-          `One of the few operations that runs as a stored procedure. **Services for all 654 ` +
-          `operations, stored procedures for ten** — a procedure per operation would be a second ` +
-          `codebase in a second language, with no type checking against the contracts.`);
-        meta.append(chip);
-      }
-      if (op.scope) {
-        const chip = el('span', 'lineage-scope', op.scope);
-        tip(chip, `Scoped to a ${op.scope}`,
-          'The level in the seven-level hierarchy this operation is authorised at. A grant here ' +
-          'inherits downward and never bubbles up.');
-        meta.append(chip);
-      }
-      if (op.offline) meta.append(tipFor(el('span', 'lineage-offline', 'offline'), 'offline'));
-      if (op.service) {
-        const chip = el('span', 'lineage-service', op.service);
-        tip(chip, op.service, 'The service that owns this operation. 22 services across 654 operations.');
-        meta.append(chip);
-      }
-      row.append(meta);
-
-      if (op.reads.length || op.writes.length) {
-        const tables = el('div', 'lineage-tables');
-        for (const t of op.writes) tables.append(tableChip(t, { write: true }));
-        for (const t of op.reads) tables.append(tableChip(t));
-        row.append(tables);
-      } else {
-        const none = el('div', 'lineage-tables');
-        const chip = el('span', 'lineage-unresolved-chip', 'no table');
-        tip(chip, 'Resolves to no table',
-          'Marked `unresolved` by the lineage rather than left blank. **Usually correct rather than ' +
-          'missing**: an operation returning a computed projection has no persistence marker because ' +
-          'there is nothing to mark. Commands with no body, health checks and sync endpoints are ' +
-          'the same. 318 of the 654 are in this state.');
-        none.append(chip);
-        row.append(none);
-      }
-      section.append(row);
-    }
     body.append(section);
+  }
+}
+
+/** How many rows of one group arrive at a time. */
+const LINEAGE_PAGE = 60;
+
+function appendLineageRows(section, ops, from = 0) {
+  const page = ops.slice(from, from + LINEAGE_PAGE);
+  const more = ops.length - (from + page.length);
+
+  for (const op of page) {
+    const row = el('div', `lineage-row${op.resolved ? '' : ' unresolved'}`);
+
+    const name = el('button', 'lineage-op', op.name);
+    name.onclick = () => openOperation(op.name);
+    row.append(name);
+
+    const meta = el('div', 'lineage-meta');
+    if (op.verb) meta.append(el('span', `verb ${op.verb.toLowerCase()}`, op.verb));
+    if (op.path) meta.append(el('span', 'lineage-path', op.path));
+    if (op.routing) {
+      const chip = el('span', `lineage-routing${op.routingFrom === 'workbook' ? ' from-workbook' : ''}`, op.routing);
+      chip.style.borderColor = ROUTING_COLOR[op.routing] ?? 'currentColor';
+      const ROUTING_WHY = {
+        replica: 'A read that may be served from a replica. ADR-0016 — the write path and the read path are separated deliberately.',
+        analytical: 'Served from the analytical store. Never on a transaction path.',
+        write: 'A write. It goes to the primary by definition.',
+        primary: 'Must hit the primary. Either it writes, or it reads something it just wrote.',
+      };
+      tip(chip, `Routed to the ${op.routing}`,
+        ROUTING_WHY[op.routing] ?? 'Routing stated by the schema reference.',
+        op.routingFrom === 'workbook'
+          ? 'from the workbook — api-data-lineage.json left this blank'
+          : null);
+      meta.append(chip);
+    }
+    if (op.procedure) {
+      const chip = el('span', 'lineage-procedure', op.procedure);
+      tip(chip, 'Stored procedure',
+        `One of the few operations that runs as a stored procedure. **Services for all 654 ` +
+        `operations, stored procedures for ten** — a procedure per operation would be a second ` +
+        `codebase in a second language, with no type checking against the contracts.`);
+      meta.append(chip);
+    }
+    if (op.scope) {
+      const chip = el('span', 'lineage-scope', op.scope);
+      tip(chip, `Scoped to a ${op.scope}`,
+        'The level in the seven-level hierarchy this operation is authorised at. A grant here ' +
+        'inherits downward and never bubbles up.');
+      meta.append(chip);
+    }
+    if (op.offline) meta.append(tipFor(el('span', 'lineage-offline', 'offline'), 'offline'));
+    if (op.service) {
+      const chip = el('span', 'lineage-service', op.service);
+      tip(chip, op.service, 'The service that owns this operation. 22 services across 654 operations.');
+      meta.append(chip);
+    }
+    row.append(meta);
+
+    if (op.reads.length || op.writes.length) {
+      const tables = el('div', 'lineage-tables');
+      for (const t of op.writes) tables.append(tableChip(t, { write: true }));
+      for (const t of op.reads) tables.append(tableChip(t));
+      row.append(tables);
+    } else {
+      const none = el('div', 'lineage-tables');
+      const chip = el('span', 'lineage-unresolved-chip', 'no table');
+      tip(chip, 'Resolves to no table',
+        'Marked `unresolved` by the lineage rather than left blank. **Usually correct rather than ' +
+        'missing**: an operation returning a computed projection has no persistence marker because ' +
+        'there is nothing to mark. Commands with no body, health checks and sync endpoints are ' +
+        'the same. 318 of the 654 are in this state.');
+      none.append(chip);
+      row.append(none);
+    }
+    section.append(row);
+  }
+
+  // The button carries the count, so "there is more" and "how much more" are
+  // the same glance. Removing itself before appending the next page keeps it
+  // last without any reordering.
+  if (more > 0) {
+    const button = el('button', 'lineage-more', `${more} more in this contract`);
+    button.type = 'button';
+    button.onclick = () => {
+      button.remove();
+      appendLineageRows(section, ops, from + page.length);
+    };
+    section.append(button);
   }
 }
 
@@ -5596,10 +5781,138 @@ function addLinkSection(pane, title, entries, emptyText) {
   }
 }
 
+// ── where a contract lands in the database ───────────────────────────
+/**
+ * The Backend layer has said "this table came from that schema" since the
+ * start, and the Contracts layer never said the reverse — so the trail ran one
+ * way only. Reading a schema, "does this become a table, and which one" could
+ * only be answered by switching layer and searching for it by name. 182 of the
+ * 554 schemas become a table and 21 become more than one, which is exactly the
+ * case a one-way link hides.
+ *
+ * For an operation the join is not in the contracts at all:
+ * `x-ticvai-persistence` says which schemas persist, never which operations
+ * reach them. So it comes from the lineage — and the lineage is candid about
+ * how much of itself is unresolved. Saying "no tables, and here is why" is the
+ * point; drawing nothing would read as "touches nothing", which is a different
+ * claim and usually a false one.
+ */
+function renderTrace(node) {
+  const box = $('reader-trace');
+  box.innerHTML = '';
+  if (node.type === 'schema') traceSchema(box, node);
+  else if (node.type === 'operation') traceOperation(box, node);
+}
+
+function traceSchema(box, node) {
+  // The backend part is an extra on this layer, so it lands after the reader is
+  // already drawn. "Not here yet" and "none" are different answers, and only
+  // one of them is worth printing — partsArrived redraws when it arrives.
+  if (!state.backend) return;
+
+  const tables = (state.backend.tables ?? []).filter((t) => t.schemaId === node.id);
+  box.append(sectionHead('Stored as', tables.length));
+
+  if (!tables.length) {
+    box.append(
+      el('p', 'pane-empty',
+        'No table in the schema reference is derived from this schema. Most are not meant to be — ' +
+        'a request body, a filter or a projection has nowhere to be stored — and 182 of the 554 ' +
+        'schemas do become one.')
+    );
+    return;
+  }
+
+  for (const table of tables) {
+    const row = el('div', 'link-item');
+    const dot = el('span', 'type-dot');
+    // green for what exists in SQL, blue for what is still only planned — the
+    // same two colours the Backend layer uses for the same distinction
+    dot.style.background = table.migration ? '#34d399' : '#60a5fa';
+    row.append(dot, el('span', 'link-name', table.name));
+    row.append(el('span', 'link-weight', `${table.columns} columns`));
+    row.append(
+      el('span', 'link-file',
+        table.migration ? `${table.migration} · in SQL` : 'planned, no migration')
+    );
+    row.onclick = () => {
+      selectTable(table.name);
+      setLayer('backend');
+      setMode('data');
+    };
+    box.append(row);
+  }
+
+  if (tables.length > 1) {
+    box.append(
+      el('p', 'pane-note',
+        `This schema is stored across ${tables.length} tables. 21 of them are — usually a parent ` +
+        'and its lines, flattened into one object by the API and kept apart in the database.')
+    );
+  }
+  box.append(
+    el('p', 'pane-note',
+      'From the schema reference workbook, which names the schema each table was derived from.')
+  );
+}
+
+function traceOperation(box, node) {
+  const entry = state.lineage?.operations?.find((o) => o.name === node.name);
+  if (!entry) return;
+
+  const writes = entry.writes ?? [];
+  const reads = (entry.reads ?? []).filter((t) => !writes.includes(t));
+  const touched = new Set([...writes, ...(entry.reads ?? [])]).size;
+
+  box.append(sectionHead('Reaches', touched));
+
+  const card = el('div', 'reach-card');
+  const line = (label, nodes) => {
+    if (!nodes.length) return;
+    const row = el('div', 'reach-row');
+    row.append(el('span', 'reach-label', label));
+    const values = el('span', 'reach-values');
+    for (const item of nodes) values.append(item);
+    row.append(values);
+    card.append(row);
+  };
+
+  if (entry.service) line('service', [el('span', 'lineage-service', entry.service)]);
+  line('writes', writes.map((t) => tableChip(t, { write: true })));
+  line('reads', reads.map((t) => tableChip(t)));
+  if (entry.procedure) line('stored procedure', [el('span', 'lineage-procedure', entry.procedure)]);
+  if (entry.routing) line('routing', [el('span', 'badge', entry.routing)]);
+
+  if (!touched) {
+    card.append(
+      el('div', 'reach-row',
+        el('span', 'pane-note',
+          entry.source === 'unresolved'
+            ? 'The lineage carries no tables for this operation. 318 of the 654 are in that state: ' +
+              'the row exists, the reads and writes were never filled in. It is not a claim that ' +
+              'this operation touches nothing.'
+            : 'The lineage resolved this operation and found no table — usually because it returns ' +
+              'a computed projection rather than reading one.'))
+    );
+  }
+  box.append(card);
+  box.append(
+    el('p', 'pane-note',
+      `From handoff/api-data-lineage.json · ${entry.source}. The Lineage view shows the same join ` +
+      'across all 654 operations at once.')
+  );
+}
+
 // ── reader ───────────────────────────────────────────────────────────
 async function renderReader(node, { scroll = true } = {}) {
   $('reader-empty').hidden = true;
   $('reader-body').hidden = false;
+
+  // The prose is held back from the index and fetched per contract. The reader
+  // is already about to fetch the source of the same file, so this costs it no
+  // extra round trip worth measuring — and it has to be awaited rather than
+  // filled in afterwards, because the header is written once, right below.
+  await ensureDetail(node.file);
 
   // header
   const head = $('reader-head');
@@ -5616,6 +5929,10 @@ async function renderReader(node, { scroll = true } = {}) {
   if (node.description) {
     head.append(el('div', 'reader-desc', node.description.trim()));
   }
+
+  // Where it lands in the database — drawn before the verdict, because it is
+  // most of what somebody signing off an operation needs to know.
+  renderTrace(node);
 
   // An operation is one of the four things a person signs off. Schemas and
   // params are parts of one, not artefacts in their own right, so they get no

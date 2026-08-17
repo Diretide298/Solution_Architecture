@@ -7,6 +7,7 @@
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { watch } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildIndex } from './lib/indexer.mjs';
@@ -44,12 +45,54 @@ let tooltips = null;
 let decisions = null;
 let indexing = null;
 
+// ---- the boot payload, and what is held back from it -----------------------
+// /api/index was 1.9 MB of the 3.0 MB the viewer fetched to open, and unlike
+// the other parts every layer needs it — so the per-layer lazy loading could
+// not touch it. Two fields are three tenths of that weight on their own:
+//
+//   properties   0.39 MB   the fields of all 554 schemas
+//   description  0.20 MB   the prose on every node
+//
+// Neither is ever read for more than one file at a time. `properties` is read
+// by the ER diagram, which draws one contract; `description` by the reader,
+// which shows one node. So they are cut out of the index and served per file,
+// and the client merges them back into the node it already has. What arrives
+// at boot is what the tree, the graph and the search need — names, kinds,
+// files and counts — and nothing that only a detail view will ask for.
+const DETAIL_FIELDS = ['description', 'properties'];
+
+let indexSlim = null;
+/** file -> { [nodeId]: { description, properties } } */
+let detailByFile = null;
+
+function splitDetail(full) {
+  const slim = { ...full, nodes: [] };
+  const byFile = new Map();
+  for (const node of full.nodes) {
+    const lean = {};
+    const heavy = {};
+    for (const [key, value] of Object.entries(node)) {
+      if (DETAIL_FIELDS.includes(key)) heavy[key] = value;
+      else lean[key] = value;
+    }
+    slim.nodes.push(lean);
+    if (!Object.keys(heavy).length) continue;
+    if (!byFile.has(node.file)) byFile.set(node.file, {});
+    byFile.get(node.file)[node.id] = heavy;
+  }
+  return { slim, byFile };
+}
+
 async function refreshIndex(reason = 'startup') {
   if (indexing) return indexing; // coalesce concurrent rebuilds
   indexing = (async () => {
     const started = Date.now();
     try {
       index = await buildIndex(ROOT, args.dir);
+      // split once per rebuild, not once per request
+      ({ slim: indexSlim, byFile: detailByFile } = splitDetail(index));
+      // everything stringified and compressed against the old index is stale
+      packedCache.clear();
 
       // both other layers resolve against the contracts, so all three rebuild
       // together — the API is the join between the frontend and the backend
@@ -167,9 +210,56 @@ const MIME = {
   '.woff2': 'font/woff2',
 };
 
-function send(res, status, body, type = 'text/plain; charset=utf-8') {
-  res.writeHead(status, { 'Content-Type': type, 'Cache-Control': 'no-store' });
+/**
+ * Compression is worth more here than any amount of trimming: the payloads are
+ * JSON full of repeated keys and repeated contract paths, which is close to the
+ * best case for it. The index goes from 1.9 MB to about a tenth of that on the
+ * wire. It is applied only above a size where the compression costs more than
+ * it saves, and only where the client asked for it.
+ *
+ * This is a different saving from the slim index above, and the two do not
+ * overlap: gzip makes the bytes cheaper to move, the split makes them cheaper
+ * to parse and hold. A browser still has to build every object it is sent,
+ * compressed or not.
+ */
+const GZIP_ABOVE = 4096;
+
+function send(res, status, body, type = 'text/plain; charset=utf-8', req = null) {
+  const headers = { 'Content-Type': type, 'Cache-Control': 'no-store' };
+  const wants = /\bgzip\b/.test(req?.headers['accept-encoding'] ?? '');
+  const size = Buffer.byteLength(body ?? '');
+  if (wants && size > GZIP_ABOVE && !COMPRESSED.test(type)) {
+    const packed = gzipSync(body);
+    headers['Content-Encoding'] = 'gzip';
+    headers['Vary'] = 'Accept-Encoding';
+    res.writeHead(status, headers);
+    return res.end(packed);
+  }
+  res.writeHead(status, headers);
   res.end(body);
+}
+
+/** Already-compressed formats only get bigger. */
+const COMPRESSED = /^(image\/(png|jpeg|gif|webp)|font\/woff)/;
+
+/** JSON that has already been stringified once and will not change until the
+ *  next rebuild, so it is compressed once rather than on every request. */
+const packedCache = new Map();
+function sendCachedJson(res, req, key, value) {
+  let entry = packedCache.get(key);
+  if (!entry) {
+    const body = Buffer.from(JSON.stringify(value));
+    entry = { body, packed: gzipSync(body) };
+    packedCache.set(key, entry);
+  }
+  const wants = /\bgzip\b/.test(req.headers['accept-encoding'] ?? '');
+  res.writeHead(200, {
+    'Content-Type': MIME['.json'],
+    'Cache-Control': 'no-store',
+    Vary: 'Accept-Encoding',
+    ...(wants ? { 'Content-Encoding': 'gzip' } : {}),
+  });
+  res.end(wants ? entry.packed : entry.body);
 }
 
 const server = http.createServer(async (req, res) => {
@@ -179,37 +269,51 @@ const server = http.createServer(async (req, res) => {
     // --- API ---------------------------------------------------------------
     if (url.pathname === '/api/index') {
       if (!index) await refreshIndex('on demand');
-      return send(res, 200, JSON.stringify(index), MIME['.json']);
+      // ?full=1 puts the held-back fields back in one payload. Nothing in the
+      // viewer asks for it; it is there so a script that wants the whole index
+      // in one piece does not have to reassemble it from the detail endpoint.
+      const full = url.searchParams.get('full') === '1';
+      return sendCachedJson(res, req, full ? 'index-full' : 'index', full ? index : indexSlim);
+    }
+
+    // The fields held back from the index, for the one contract being read.
+    if (url.pathname === '/api/detail') {
+      if (!index) await refreshIndex('on demand');
+      const file = url.searchParams.get('file') ?? '';
+      const detail = detailByFile?.get(file);
+      // A contract with nothing held back is not an error — an enum-only file
+      // has no properties and no prose — so an empty object is the answer.
+      return sendCachedJson(res, req, `detail:${file}`, detail ?? {});
     }
 
     if (url.pathname === '/api/journeys') {
       if (!journeys) await refreshIndex('on demand');
-      return send(res, 200, JSON.stringify(journeys), MIME['.json']);
+      return sendCachedJson(res, req, 'journeys', journeys);
     }
 
     if (url.pathname === '/api/backend') {
       if (!backend) await refreshIndex('on demand');
-      return send(res, 200, JSON.stringify(backend), MIME['.json']);
+      return sendCachedJson(res, req, 'backend', backend);
     }
 
     if (url.pathname === '/api/domain') {
       if (!domain) await refreshIndex('on demand');
-      return send(res, 200, JSON.stringify(domain), MIME['.json']);
+      return sendCachedJson(res, req, 'domain', domain);
     }
 
     if (url.pathname === '/api/lineage') {
       if (!lineage) await refreshIndex('on demand');
-      return send(res, 200, JSON.stringify(lineage), MIME['.json']);
+      return sendCachedJson(res, req, 'lineage', lineage);
     }
 
     if (url.pathname === '/api/tooltips') {
       if (!tooltips) await refreshIndex('on demand');
-      return send(res, 200, JSON.stringify(tooltips), MIME['.json']);
+      return sendCachedJson(res, req, 'tooltips', tooltips);
     }
 
     if (url.pathname === '/api/decisions') {
       if (!decisions) await refreshIndex('on demand');
-      return send(res, 200, JSON.stringify(decisions), MIME['.json']);
+      return sendCachedJson(res, req, 'decisions', decisions);
     }
 
     if (url.pathname === '/api/file' || url.pathname === '/api/tree') {
@@ -334,7 +438,8 @@ const server = http.createServer(async (req, res) => {
     if (!info?.isFile()) return send(res, 404, 'not found');
 
     const body = await readFile(file);
-    return send(res, 200, body, MIME[path.extname(file)] ?? 'application/octet-stream');
+    // app.js alone is 270 KB of text, and the boards are larger still
+    return send(res, 200, body, MIME[path.extname(file)] ?? 'application/octet-stream', req);
   } catch (err) {
     console.error(err);
     return send(res, 500, String(err.message ?? err));

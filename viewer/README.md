@@ -216,6 +216,19 @@ The right-hand pane answers "what links to this" about whatever is selected:
 Every one of those is a click, so a database column can be followed back to the screen that
 displays it and forward to the migration that creates it.
 
+The reader itself carries the same trail, so it does not need the pane to be open:
+
+- a **schema** says which tables it is **stored as** — 182 of the 554 become one, and 21 become
+  more than one, which is the case a link in only the other direction hides
+- an **operation** says which tables it **reaches**, which of them it writes, and the service
+  behind it — or, for 318 of the 654, that the lineage carries nothing for it. That is stated as
+  a gap in `handoff/api-data-lineage.json`, never as a finding that the operation touches nothing
+
+A screen's **reaches** block names the operations in the same position. It used to print the
+union of what resolved and stop there: the Home Landing said "1 table" while two of the three
+operations behind it — `listProducts` among them — had no lineage at all. It now names them and
+says the count is a floor.
+
 ## Contracts
 
 **Left pane grouping** — the sidebar lists the contracts three ways, toggled at the top:
@@ -316,6 +329,38 @@ Keys: `Ctrl`/`Cmd`+`K` search · `1` `2` `3` layer · `m` cycle the sidebar grou
 `j` journey · `p` apps · `g` graph · `s` structure · `e` ER · `r` reader · `d` data · `o` routing ·
 `v` migrations · `a` audit · `l` local graph of selection.
 
+## What it costs to open
+
+Opening the viewer once fetched all seven payloads — 4.8 MB, seven requests, four seconds before
+anything could be read — and six of the seven were for layers nobody had opened. Three changes,
+in the order they mattered:
+
+**Each part is fetched when a layer needs it.** A part a layer cannot draw without is required; a
+part only its side pane reads is fetched behind the layer once it is on screen. That distinction
+is the one the first attempt missed, and it failed quietly rather than loudly — the Lineage view
+drew perfectly, then marked all 671 of its table chips "not in the schema reference" because the
+list it checks them against had not been asked for.
+
+**Two fields left the index.** `/api/index` was 1.9 MB and, unlike the other parts, every layer
+needs it — so the split above could not touch it. The fields of all 554 schemas and the prose on
+every node are three tenths of its weight, and neither is read for more than one contract at a
+time. They are served per contract by `/api/detail` and merged back onto the nodes the client
+already has, so every existing reader of `node.description` goes on working unchanged.
+
+**Everything is gzipped.** JSON full of repeated keys and repeated contract paths is close to the
+best case for it.
+
+| | before | now |
+|---|---|---|
+| opening on Contracts | 4.77 MB · 7 requests | **179 KB** · 3 requests |
+| `/api/index` alone | 1.93 MB | 98 KB |
+| the Lineage view | 7,098 elements at once | 106, and a group's rows when it is opened |
+
+The last row is a different saving from the first two: gzip makes bytes cheaper to move, the
+split makes them cheaper to parse, and neither stops a browser building 7,098 elements for a list
+of which one group is ever open. A contract's rows are built when its group is first opened, and
+above 60 they arrive a page at a time on a button that says how many are left.
+
 ## Layout
 
 | | |
@@ -331,7 +376,7 @@ Keys: `Ctrl`/`Cmd`+`K` search · `1` `2` `3` layer · `m` cycle the sidebar grou
 | `lib/migrations.mjs` | the versioned SQL — tables, keys, partitioning, row security |
 | `lib/relationships.mjs` | `handoff/relationships.csv` — the stated relationships and their kind |
 | `lib/domain.mjs` | `states/` and `events/`, cross-checked against each other and the contracts |
-| `server.mjs` | static server, `/api/index`, `/api/journeys`, `/api/domain`, `/api/backend`, `/api/file`, `/api/tree`, SSE |
+| `server.mjs` | static server, `/api/index`, `/api/detail`, `/api/journeys`, `/api/domain`, `/api/backend`, `/api/file`, `/api/tree`, SSE — gzipped |
 | `public/graph.js` | canvas node-link renderer — force-directed, or placed and directed for Spine |
 | `public/structure.js` | tree and nested block renderers |
 | `public/boxdiagram.js` | box-and-row layered layout, used by ER and Data |

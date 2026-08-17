@@ -769,6 +769,12 @@ kbd {
 .badge.warn { border-color: color-mix(in srgb, var(--warning) 50%, transparent); }
 .badge.warn b { color: var(--warning); }
 
+/* Where the contract lands in the database. Sits between the badges and the
+   source, so the trail is read before the YAML rather than after it. Empty for
+   every node type that has no such trail, hence :empty rather than a margin
+   the block would carry whether or not it drew anything. */
+.reader-trace:not(:empty) { margin-bottom: 18px; }
+
 .reader-source {
   border: 1px solid var(--border);
   border-radius: var(--radius);
