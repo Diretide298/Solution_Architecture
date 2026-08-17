@@ -145,6 +145,15 @@
         max-height: 115mm;
         margin: 0 auto;
       }
+      /* A whole phone screen is more than twice as tall as it is wide. Scaled to
+         the column it would be taller than the page carrying it, and a figure
+         that may not break lands nowhere at all — so bound these by height too. */
+      figure.portrait img {
+        width: auto;
+        max-width: 100%;
+        max-height: 118mm;
+        margin: 0 auto;
+      }
       figcaption {
         font-size: 8.3pt;
         color: var(--dim);
@@ -338,12 +347,14 @@
         <div><span class="n">11</span>Tracing across layers<span class="d">The Links pane</span></div>
         <div><span class="n">12</span>Search<span class="d">Ctrl+K over everything</span></div>
         <div><span class="n">13</span>The audit<span class="d">What it checks, what it found</span></div>
-        <div><span class="n">14</span>Reading the colours<span class="d">One reference table</span></div>
-        <div><span class="n">15</span>Keyboard shortcuts<span class="d">Full list</span></div>
-        <div><span class="n">16</span>Keeping it current<span class="d">Live reload, editing sources</span></div>
-        <div><span class="n">17</span>Known gaps<span class="d">What is deliberately not shown</span></div>
-        <div><span class="n">18</span>Troubleshooting<span class="d">When something looks wrong</span></div>
-        <div><span class="n">19</span>Glossary<span class="d">Terms used throughout</span></div>
+        <div><span class="n">14</span>Accounts, invites and sign-off<span class="d">Who you are, and what you decided</span></div>
+        <div><span class="n">15</span>Reading the colours<span class="d">One reference table</span></div>
+        <div><span class="n">16</span>Keyboard shortcuts<span class="d">Full list</span></div>
+        <div><span class="n">17</span>The viewer on a phone<span class="d">Two breakpoints, two drawers, five canvases</span></div>
+        <div><span class="n">18</span>Keeping it current<span class="d">Live reload, editing sources</span></div>
+        <div><span class="n">19</span>Known gaps<span class="d">What is deliberately not shown</span></div>
+        <div><span class="n">20</span>Troubleshooting<span class="d">When something looks wrong</span></div>
+        <div><span class="n">21</span>Glossary<span class="d">Terms used throughout</span></div>
       </div>
 
       <h3>Before you start</h3>
@@ -389,6 +400,12 @@ npm install</pre>
       <p>
         Open <code>http://localhost:4173</code> in Chrome or Edge. Add <code>--open</code> to have it
         launch the browser for you. Stop the server with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
+      </p>
+      <p>
+        The viewer asks who you are before it draws anything, and the accounts it asks against
+        are held by a second process. <code>.\start.ps1</code> starts both halves together and is
+        the easier way in; chapter 14 is the whole of that half — where accounts come from, and
+        what an account is for.
       </p>
 
       <h3>Flags</h3>
@@ -1696,7 +1713,7 @@ npm install</pre>
       </figure>
 
       <h4>Selecting a state</h4>
-      <figure class="fig-pair">
+      <figure class="fig-pair tall">
         <img src="shots/51-states-selected.png" alt="A state selected" />
         <img src="shots/52-states-links.png" alt="The right pane for a selected state" />
         <figcaption>
@@ -1734,7 +1751,7 @@ npm install</pre>
       </figure>
 
       <h4>The sidebar — and the list that matters</h4>
-      <figure>
+      <figure class="portrait">
         <img src="shots/57-sidebar-domain.png" alt="The domain sidebar" />
         <figcaption>
           <b class="figno"></b> — Three groups. <b>State models</b> shows
@@ -2481,9 +2498,291 @@ otherwise             <span class="c">→</span> DENY</pre>
       </div>
     </section>
 
-    <!-- ═══════════════════ 14. COLOURS ═══════════════════ -->
+    <!-- ═══════════════════ 14. ACCOUNTS ═══════════════════ -->
     <section class="chapter">
-      <h2>14 · Reading the colours</h2>
+      <h2>14 · Accounts, invites and sign-off</h2>
+      <p class="chapter-lede">
+        Every chapter so far is the viewer reading. This is the one part that writes: who you
+        are, and what you decided about an artefact.
+      </p>
+
+      <h3>Two processes, and why</h3>
+      <p>
+        The viewer is two programs. The Node server on port <code>4173</code> reads the delivery
+        package — contracts, screens, boards, lineage — and holds nothing; every number in this
+        manual comes back out of a file each time it starts. The FastAPI service on port
+        <code>8787</code> holds the opposite: what a person <em>writes</em>, and nothing else.
+      </p>
+      <p>
+        They are separate because the readers are about 5,400 lines of working, harnessed code.
+        Rewriting them in Python to sit them beside the accounts would buy nothing and risk
+        plenty. <code>start.ps1</code> starts both, each in its own window, so that a half which
+        dies at second three still has its reason on screen an hour later.
+      </p>
+
+      <pre>cd viewer
+.\start.ps1                                     <span class="c"># both halves</span>
+python -m uvicorn api.main:app --port 8787      <span class="c"># the accounts half alone</span></pre>
+
+      <div class="note">
+        <span class="label">8787, not 8000</span>
+        <p>
+          On this machine 8000 falls inside a range Windows reserves, and binding it fails with
+          <code>Errno 10013</code>. The port is not a preference, it is what was available.
+        </p>
+      </div>
+
+      <p>
+        Because the two halves are on different ports, the browser treats every call from the
+        viewer to the accounts service as cross-origin. The session cookie only rides along when
+        credentials are included, and allowing credentials rules out a wildcard origin — so the
+        service names the origins it will answer, rather than answering everyone.
+      </p>
+
+      <h3>The way in</h3>
+      <p>
+        The viewer asks who you are before it draws anything. If nobody is signed in it sends
+        you to the sign-in page, <b>carrying where you were headed</b>, so a deep link into a
+        particular node still lands there once you are through. If the accounts service is not
+        answering it sends you there as well: that page is the one page that can explain the
+        situation, and failing open — showing the whole delivery package because the thing that
+        checks permission is down — would be the wrong way round.
+      </p>
+
+      <figure class="portrait">
+        <img src="shots/ac-login.png" alt="The sign-in page" />
+        <figcaption>
+          <b class="figno"></b> — The sign-in page. It says where accounts come from, because
+          the question it is most often asked is how to get one, and the answer is not on this
+          page.
+        </figcaption>
+      </figure>
+
+      <p>
+        There is no signup form anywhere, so the first account has to come from somewhere else.
+        This same page offers to make it — <b>once, ever</b>, while no account exists at all.
+        The moment that succeeds the door closes behind it and everybody after is invited. It
+        works that way round so the first password is chosen by the person who will use it,
+        rather than generated by somebody else and sent to them. From a terminal it is the same
+        account:
+      </p>
+
+      <pre>python -m api.cli admin you@softlabsgroup.com</pre>
+
+      <h3>Why invites rather than open signup</h3>
+      <p>
+        The obvious alternative is a signup page that only accepts an address on the company
+        domain. It does not work, and the reason is worth stating plainly: <b>restricting
+        signup to a domain only checks the address a stranger claims.</b> Anyone who can reach
+        the page could register as <code>ceo@softlabsgroup.com</code> and start signing artefacts
+        off under that name — which defeats the entire point of recording who approved what.
+      </p>
+      <p>
+        An invite fixes the address at the moment it is created, by somebody who already holds an
+        account, and whoever opens the link cannot change it. <b>So the invite is the
+        verification</b>: the person who could vouch for the address is the person who typed it.
+        Nothing has to be proved afterwards, which is why <b>no mail server is involved</b> — the
+        link is handed over however you already talk to each other. The domain rule is checked
+        where the invite is made rather than where it is redeemed, for the same reason.
+      </p>
+
+      <table>
+        <tr><th style="width:120pt">An invite</th><th>And why</th></tr>
+        <tr>
+          <td><b>Works once</b></td>
+          <td>It becomes an account and is spent. A link that still worked afterwards would be a second way into the same account.</td>
+        </tr>
+        <tr>
+          <td><b>Expires in 7 days</b></td>
+          <td>The default; 1 and 30 are offered too. A link that never expires is a credential nobody remembers issuing.</td>
+        </tr>
+        <tr>
+          <td><b>Can be withdrawn</b></td>
+          <td>While it is unused. Once redeemed there is an account to disable instead, and withdrawing the invite would change nothing.</td>
+        </tr>
+        <tr>
+          <td><b>Is superseded</b></td>
+          <td>A second invite to the same address revokes the first, so a resend cannot leave two live links for one person.</td>
+        </tr>
+        <tr>
+          <td><b>Is stored hashed</b></td>
+          <td>SHA-256. The token exists in the clear exactly once, in the reply that created it. It is not recoverable afterwards by anyone, including whoever takes a copy of the database. If it is lost, withdraw it and make another.</td>
+        </tr>
+      </table>
+
+      <div class="note">
+        <span class="label">The token rides in the fragment, not the query</span>
+        <p>
+          <code>/invite.html#<i>token</i></code>, not <code>?token=</code>. A fragment is never
+          sent to the server in a request line, so the token never lands in an access log. The
+          page shows one of three things and never two — checking the link, the form, or the
+          refusal. Never a form over a dead link: choosing a password and only then being told
+          the link is spent is a small cruelty.
+        </p>
+      </div>
+
+      <h3>A verdict is append-only</h3>
+      <p>
+        A verdict is one of three words — <b>approved</b>, <b>needs work</b>, <b>rejected</b> —
+        against one artefact, with a note, and it carries who gave it and when. The current
+        verdict on an artefact is simply <b>its newest row</b>.
+      </p>
+      <p>
+        Nothing is ever rewritten. A row is a thing a person said at a time, and editing it would
+        lose the fact that <b>somebody once thought otherwise</b>, which is usually the part
+        worth having: a table that went <em>needs work</em> and then <em>approved</em> has a
+        history that a table approved first time does not, and the difference is invisible if
+        only the answer is kept. So earlier verdicts stay, listed underneath the current one.
+      </p>
+
+      <figure>
+        <img src="shots/ac-verdict.png" alt="The verdict block on an operation" />
+        <figcaption>
+          <b class="figno"></b> — The block on an operation nobody has judged yet. It says so
+          rather than showing an empty panel. Recording a verdict replaces the chip and pushes
+          whatever was there into the earlier rows below it. The note field asks for a reason
+          because a verdict with none gets rediscovered the hard way.
+        </figcaption>
+      </figure>
+
+      <p>
+        The block is drawn immediately with what it knows and filled in when the history
+        arrives, so a slow or absent service never holds up the view it sits in. If the accounts
+        service is not running it says that, and the rest of the page carries on.
+      </p>
+
+      <h3>Four things can be signed off</h3>
+      <table>
+        <tr><th style="width:80pt">Artefact</th><th style="width:130pt">Where the block is</th><th>Identified by</th></tr>
+        <tr><td><b>Operation</b></td><td>The Contracts Reader, under the path</td><td>Its <code>operationId</code></td></tr>
+        <tr><td><b>Table</b></td><td>The Links pane, at the bottom</td><td><code>schema.table</code></td></tr>
+        <tr><td><b>Screen</b></td><td>The screen page</td><td>Its screen id</td></tr>
+        <tr><td><b>Board</b></td><td>The board's own page</td><td>Its board id</td></tr>
+      </table>
+
+      <div class="warn-box">
+        <span class="label">Schemas and parameters deliberately cannot be</span>
+        <p>
+          A schema is part of an operation, not an artefact in its own right, and so is a
+          parameter. Offering a verdict on every node in the graph would produce thousands of
+          things to judge and no more assurance than judging the 654 operations does — <b>a
+          verdict on everything is noise rather than rigour</b>. The four kinds above are the
+          things somebody is actually asked to accept.
+        </p>
+      </div>
+
+      <h3>Managing the people</h3>
+      <p>
+        Inviting somebody, changing what they are allowed to do, and changing your own password
+        are one page rather than three, reached from the initials in the top bar. Only an
+        administrator is shown it; the service refuses the calls to anyone else regardless, and
+        hiding the controls as well is so that nobody is offered a button that will only tell
+        them no.
+      </p>
+
+      <figure>
+        <img src="shots/ac-admin.png" alt="The accounts page" />
+        <figcaption>
+          <b class="figno"></b> — Making a link, every invite and its state, and the accounts
+          with the verdict count each has given. An invite reads <b>open</b>, <b>redeemed</b>,
+          <b>revoked</b> or <b>expired</b> — four states, so a link that did nothing can be told
+          from one that was never opened.
+        </figcaption>
+      </figure>
+
+      <div class="note">
+        <span class="label">Disabled, never deleted</span>
+        <p>
+          A verdict points at the person who gave it. Deleting an account would either orphan
+          the verdict or take it with them, and both lose something worth keeping — so an
+          account is switched off instead, and its sessions end with it. Being unable to sign in
+          again is not the same as no longer being signed in, and only the second one is any
+          use. The last active administrator cannot be disabled or demoted, and nobody can do
+          either to themselves.
+        </p>
+      </div>
+
+      <h3>What is stored, and how</h3>
+      <p>
+        One SQLite file beside the service — not inside the delivery package, which stays exactly
+        as the vendor shipped it.
+      </p>
+
+      <table>
+        <tr><th style="width:70pt">Table</th><th>Holds</th></tr>
+        <tr><td><code>account</code></td><td>One row per person. Password hashed with argon2. One account per address, compared case-insensitively.</td></tr>
+        <tr><td><code>invite</code></td><td>One row per link. Token hashed. Carries the address it is for and the role it grants.</td></tr>
+        <tr><td><code>session</code></td><td>One row per sign-in. Token hashed, 14-day expiry.</td></tr>
+        <tr><td><code>verdict</code></td><td>Append-only. One row per thing somebody said, about one artefact, at one time.</td></tr>
+      </table>
+
+      <p>Three rules hold the rest of it together, and each answers a specific way in:</p>
+
+      <table>
+        <tr><th style="width:150pt">Rule</th><th>Against</th></tr>
+        <tr>
+          <td><b>Nothing is stored as it was sent</b></td>
+          <td>
+            Passwords go through <b>argon2</b>. Session and invite tokens are 256 bits from the
+            operating system — random enough to need no stretching — and are stored as
+            <b>SHA-256</b>. So <b>a copy of the database cannot be replayed as a login</b>, nor
+            used to mint accounts from the invites in it.
+          </td>
+        </tr>
+        <tr>
+          <td><b>A token is never compared by scanning</b></td>
+          <td>Every lookup is on the hash, which is a key lookup and therefore constant time. An expired or forged cookie simply finds nothing, rather than finding something and being argued with.</td>
+        </tr>
+        <tr>
+          <td><b>One message for two failures</b></td>
+          <td>"No such account" and "wrong password" answer identically. Telling them apart hands an attacker a list of who holds an account here.</td>
+        </tr>
+      </table>
+
+      <p>
+        The only password rule is <b>twelve characters</b>. There are deliberately no
+        composition rules, because "one capital, one digit" pushes people to
+        <code>Password1!</code> and no further, while length is the thing that actually resists
+        guessing. Changing a password ends every other session on that account — which is what
+        somebody does when they think one has been taken, and it would be no use at all if
+        whoever took it stayed signed in.
+      </p>
+
+      <div class="warn-box">
+        <span class="label">The cookie is deliberately not <code>Secure</code></span>
+        <p>
+          It is <code>HttpOnly</code>, so script cannot read it and an injection cannot steal it,
+          and <code>SameSite=Lax</code>. It is <em>not</em> <code>Secure</code> by default because
+          the viewer runs over plain http on a workstation, and a <code>Secure</code> cookie
+          would never be sent at all — sign-in would silently never work. Set
+          <code>TICVAI_SECURE_COOKIE=1</code> the moment this is served over https.
+        </p>
+      </div>
+
+      <table>
+        <tr><th style="width:140pt">Variable</th><th style="width:110pt">Default</th><th>Sets</th></tr>
+        <tr><td><code>TICVAI_DB</code></td><td><code>api/ticvai.db</code></td><td>Where the store lives.</td></tr>
+        <tr><td><code>TICVAI_DOMAIN</code></td><td><code>softlabsgroup.com</code></td><td>The only domain that may hold an account.</td></tr>
+        <tr><td><code>TICVAI_SECURE_COOKIE</code></td><td>unset</td><td>Set to <code>1</code> when served over https.</td></tr>
+      </table>
+
+      <div class="note">
+        <span class="label">What is tested is what should not work</span>
+        <p>
+          <code>api/api-check.mjs</code> runs 29 assertions, and most of them are attempts to get
+          in the ways that ought to fail: a forged cookie, a reviewer minting invites, redeeming
+          an invite twice, claiming an address the invite was not for, and telling an unknown
+          account apart from a wrong password. <code>api/ui-auth-check.mjs</code> walks the whole
+          path through the browser instead — an admin invites somebody, that person opens the
+          link and sets a password, then records a verdict and sees it stick — because the
+          browser is where the wiring can be wrong.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 15. COLOURS ═══════════════════ -->
+    <section class="chapter">
+      <h2>15 · Reading the colours</h2>
       <p class="chapter-lede">The palette is consistent across every view. One page, all of it.</p>
 
       <h4>Contract tiers</h4>
@@ -2536,9 +2835,9 @@ otherwise             <span class="c">→</span> DENY</pre>
       </figure>
     </section>
 
-    <!-- ═══════════════════ 15. SHORTCUTS ═══════════════════ -->
+    <!-- ═══════════════════ 16. SHORTCUTS ═══════════════════ -->
     <section class="chapter">
-      <h2>15 · Keyboard shortcuts</h2>
+      <h2>16 · Keyboard shortcuts</h2>
       <p class="chapter-lede">
         View shortcuts work from any layer — the viewer switches layer to follow you.
       </p>
@@ -2577,9 +2876,229 @@ otherwise             <span class="c">→</span> DENY</pre>
       </table>
     </section>
 
-    <!-- ═══════════════════ 16. KEEPING CURRENT ═══════════════════ -->
+    <!-- ═══════════════════ 17. PHONE ═══════════════════ -->
     <section class="chapter">
-      <h2>16 · Keeping it current</h2>
+      <h2>17 · The viewer on a phone</h2>
+      <p class="chapter-lede">
+        The same application, not a cut-down one. Two breakpoints, both measured off this layout
+        rather than taken from a table of devices.
+      </p>
+
+      <figure class="portrait">
+        <img src="shots/ph-graph.png" alt="The Contracts graph on a phone" />
+        <figcaption>
+          <b class="figno"></b> — The Contracts layer on a 390&nbsp;×&nbsp;844 screen. Both rails
+          are gone, the bar has become three rows, and the canvas has the rest. Nothing has been
+          removed from the application — the rails are behind the two buttons at either end of
+          the first row.
+        </figcaption>
+      </figure>
+
+      <h3>Where the two breakpoints are, and why there</h3>
+      <table>
+        <tr><th style="width:70pt">Below</th><th>What changes, and the measurement behind it</th></tr>
+        <tr>
+          <td><b>1100px</b></td>
+          <td>
+            <b>The links pane goes.</b> The top bar's own children need 1074px on the Contracts
+            layer — six modes, the widest of the five layers — so below that the bar and two
+            fixed rails cannot share the width. The right-hand pane is the one to lose, because
+            it is <b>a reverse index rather than navigation</b>: everything in it is reachable
+            another way.
+          </td>
+        </tr>
+        <tr>
+          <td><b>760px</b></td>
+          <td>
+            <b>Both rails leave the grid.</b> With the 220px tree rail still in place the main
+            area falls under 540px, and the widest fixed content stops fitting — the 330px app
+            card, the 290px wave card, the 210px lineage label column. No amount of narrowing
+            the rail recovers that, so narrowing is not the answer.
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        Between the two, the layer rail and the mode rail <b>scroll sideways rather than
+        wrapping</b>. Wrapping would spend a whole row of a bar that is already short to spare
+        somebody a swipe, and a segmented control that does not show its own selection is worse
+        than a wrapped one — so whichever button has just become active is scrolled back into
+        view. The per-view toolbars scroll for the same reason, and nothing in them is
+        right-aligned once they do.
+      </p>
+
+      <h3>The bar becomes three rows</h3>
+      <figure>
+        <img src="shots/ph-topbar.png" alt="The three-row top bar" />
+        <figcaption>
+          <b class="figno"></b> — <code>--topbar-h</code> is <b>124px</b> here, against 48px on a
+          desktop. The small controls first, then the layer rail, then the modes. The badge on
+          Audit still counts that layer's errors.
+        </figcaption>
+      </figure>
+
+      <p>
+        Each rail takes a whole row because neither can share one and stay legible. Sharing the
+        first row leaves the layer rail 126px, which is <b>one layer of five visible and four
+        behind a swipe</b> — no way to learn the window has five layers at all. A whole row is
+        365px, which is exactly what the five buttons need, so nothing scrolls and the choice can
+        be read. The mode rail takes the second whole row on the same argument: six labels have
+        nowhere else to go, and it is the control used most.
+      </p>
+      <p>
+        What gives up its width to them is the wordmark, the "contract graph" subtitle — a
+        subtitle for a window with room for one — and the search box, which becomes its icon
+        alone. The <kbd>Ctrl</kbd>&nbsp;<kbd>K</kbd> hint goes with it: on a device with no
+        <kbd>Ctrl</kbd> key it is a lie.
+      </p>
+
+      <div class="note">
+        <span class="label">Why the rows start at the top rather than centring</span>
+        <p>
+          If the bar's children ever wrap to more rows than 124px allows, centring them pushes
+          the first row <em>above</em> the top edge, where nothing can reach it — including the
+          button that opens the tree. Starting at the top instead makes that failure visible
+          rather than invisible.
+        </p>
+      </div>
+
+      <h3>The rails become drawers</h3>
+      <p>
+        Below 760px both panes are fixed off screen and slide in over the view. Each has a
+        button at its own end of the bar's first row, and the pattern is the ordinary one: a
+        <b>dimming backdrop</b> behind the open drawer, a tap on it dismisses, and
+        <kbd>Esc</kbd> closes.
+      </p>
+
+      <div class="fig-pair tall">
+        <figure>
+          <img src="shots/ph-drawer.png" alt="The tree open as a drawer" />
+          <figcaption><b class="figno"></b> — The tree. The button that opened it is lit, and the canvas behind it is dimmed rather than hidden.</figcaption>
+        </figure>
+        <figure>
+          <img src="shots/ph-links.png" alt="The links pane open as a drawer" />
+          <figcaption><b class="figno"></b> — The links pane, from the right. Its button appears only once the pane holds something.</figcaption>
+        </figure>
+      </div>
+
+      <table>
+        <tr><th style="width:130pt">Detail</th><th>The reason for it</th></tr>
+        <tr>
+          <td><b>The backdrop starts below the bar</b></td>
+          <td>So the button that opened a drawer is always the button that closes it. The bar sits above both the drawers and the backdrop; only the content is covered.</td>
+        </tr>
+        <tr>
+          <td><b>A closed drawer is out of the tab order</b></td>
+          <td>Off screen is not enough. It is hidden as well, so <kbd>Tab</kbd> does not walk into a pane nobody can see.</td>
+        </tr>
+        <tr>
+          <td><b><kbd>Esc</kbd> is handled before the typing guard</b></td>
+          <td>Single letters pick a view, so they are ignored while somebody is writing — but the tree's own filter box is the field most likely to have focus <em>inside</em> a drawer, and <kbd>Esc</kbd> has to work from there.</td>
+        </tr>
+        <tr>
+          <td><b>The links button hides itself</b></td>
+          <td>Before anything is selected, and on the Decisions layer which never fills the pane, it would open an empty drawer. It reads that off the pane itself rather than off a list of views, so a view that starts filling it needs no change.</td>
+        </tr>
+        <tr>
+          <td><b>Anything that changes the view closes both</b></td>
+          <td>Whatever asked for a view — a mode button, a tree row, a search result — the point was to look at it, so nothing may be left covering it.</td>
+        </tr>
+      </table>
+
+      <h4>Picking a row closes the drawer. Opening a folder does not.</h4>
+      <p>
+        This is the one behaviour worth stating on its own, because it looks like an
+        inconsistency and is not. Tapping a row that <b>selects something</b> — a contract, a
+        screen, a table — closes the drawer, because getting to that thing is the entire reason
+        the drawer was opened and the answer is behind it. Tapping a row that only
+        <b>discloses its children</b> closes nothing, because it has not answered anything yet:
+        you are still navigating, and a drawer that shut on every tap would have to be reopened
+        to take the next step. The distinction is read off the row itself — whether it has
+        children below it — rather than from a list of which rows are which.
+      </p>
+
+      <h3>The five canvases answer to fingers</h3>
+      <p>
+        Graph, Structure, ER, Data and States are all canvases, drawn by four renderers — ER and
+        Data are the same one, pointed at different material. They were built mouse-first:
+        press-drag-release pans, the wheel zooms. None of that exists on a phone, so <b>one
+        file</b> adds the three gestures a canvas is expected to answer to, once, rather than
+        four times over.
+      </p>
+
+      <table>
+        <tr><th style="width:110pt">Gesture</th><th>Does</th></tr>
+        <tr><td><b>One finger, dragged</b></td><td>Pans, exactly as dragging the background does with a mouse.</td></tr>
+        <tr>
+          <td><b>Two fingers</b></td>
+          <td>Pinch to zoom, <b>anchored on the midpoint between them</b>, and the diagram translates with that midpoint as well. Without the translation the picture is pinned under the gesture and only grows, which reads as a stuck view.</td>
+        </tr>
+        <tr><td><b>A tap</b></td><td>Selects, the same as a click. Under 8px of travel and under 300ms.</td></tr>
+        <tr><td><b>A long press</b></td><td><b>Nothing.</b> Deliberately — see below.</td></tr>
+      </table>
+
+      <p>
+        A gesture that travels more than 8px stops being a candidate tap the moment it does, so a
+        pan can never end in a selection nobody asked for. A second finger cancels the pending
+        tap outright: a pinch is never a selection, and that is also what stops a two-finger
+        gesture which began on a node from dragging it — <b>the touch path never drags nodes</b>,
+        it pans, zooms and taps. Lifting one finger of two re-seeds the survivor where it is,
+        rather than letting the view jump by the gap between them.
+      </p>
+
+      <div class="note">
+        <span class="label">A long press is not a slow tap</span>
+        <p>
+          Past 300ms the gesture is a press and produces no selection. A finger held still on a
+          diagram is somebody reading it, not somebody choosing; and a press is what the phone
+          itself uses to start text selection and its own menus. Treating it as a click would
+          select whatever happened to be underneath at the end of it.
+        </p>
+      </div>
+
+      <div class="warn-box">
+        <span class="label">Nothing about the mouse changed</span>
+        <p>
+          The gesture handler ignores every pointer that is not a real finger. A mouse produces
+          pointer events <em>and</em> mouse events, so a handler that took both would run
+          alongside the one already there and double every pan; rewriting the mouse path instead
+          would mean re-deriving node dragging, hover highlighting, row clicks and double-clicks
+          across four files, which is the one thing this change must not disturb. A stylus is
+          left to the mouse path too — it already pans, drags nodes and hovers, which is more
+          than the touch path would give it.
+        </p>
+        <p>
+          A finger also synthesises <code>mousedown</code>, <code>mousemove</code>,
+          <code>mouseup</code> and <code>click</code>, and those would reach the renderers' own
+          handlers: a one-finger drag would pan twice, and lifting off a node would fire a
+          selection the pan never meant to produce. Cancelling the touch events kills the
+          synthesised ones at the source, and stops the page scrolling under the gesture while
+          it is at it.
+        </p>
+      </div>
+
+      <h3>Notched phones</h3>
+      <p>
+        The safe-area insets are read once and used throughout. The bar pads its top by the top
+        inset and its sides by the left and right ones; the drawers pad the side they are
+        attached to; the tree and the links pane pad their bottoms so the home indicator does not
+        sit over the last row of whatever is scrolled there. The graph legend, the toast, and the
+        Reader, audit and journey bodies all clear the bottom inset the same way.
+      </p>
+
+      <div class="note">
+        <span class="label">A drawer that slides is telling you where it came from</span>
+        <p>
+          Somebody who has asked their phone for less movement still needs the drawer to open, so
+          reduced motion shortens the transition to nothing rather than removing it. The pane
+          arrives in place; it just does not travel.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 18. KEEPING CURRENT ═══════════════════ -->
+    <section class="chapter">
+      <h2>18 · Keeping it current</h2>
       <p class="chapter-lede">Edit a source file, save, and the open page updates itself.</p>
 
       <p>
@@ -2624,11 +3143,18 @@ node manual/build.mjs     <span class="c"># re-renders the PDF</span></pre>
         with a blank figure in it. Adding a view to the viewer means adding one entry to the
         <code>SHOTS</code> sequence and one section here.
       </p>
+      <p>
+        It signs in first, because the viewer no longer draws for anyone who has not.
+        <code>VIEWER_EMAIL</code> and <code>VIEWER_PASSWORD</code> say which account, so nobody's
+        real password has to live in the file. The phone figures in chapter 17 are the one place
+        it changes the window: it swaps to a 390&nbsp;×&nbsp;844 viewport with touch, takes those
+        shots and swaps back, so anything added after them is still photographed at desktop size.
+      </p>
     </section>
 
-    <!-- ═══════════════════ 17. GAPS ═══════════════════ -->
+    <!-- ═══════════════════ 19. GAPS ═══════════════════ -->
     <section class="chapter">
-      <h2>17 · Known gaps</h2>
+      <h2>19 · Known gaps</h2>
       <p class="chapter-lede">
         On disk but not shown, and why. None of these are bugs; each is a decision.
       </p>
@@ -2692,9 +3218,9 @@ node manual/build.mjs     <span class="c"># re-renders the PDF</span></pre>
       </p>
     </section>
 
-    <!-- ═══════════════════ 18. TROUBLESHOOTING ═══════════════════ -->
+    <!-- ═══════════════════ 20. TROUBLESHOOTING ═══════════════════ -->
     <section class="chapter">
-      <h2>18 · Troubleshooting</h2>
+      <h2>20 · Troubleshooting</h2>
 
       <table>
         <tr><th style="width:150pt">Symptom</th><th>Cause and fix</th></tr>
@@ -2749,12 +3275,35 @@ node manual/build.mjs     <span class="c"># re-renders the PDF</span></pre>
             under their own heading. Look below the operations list.
           </td>
         </tr>
+        <tr>
+          <td><b>It sends you to a sign-in page</b></td>
+          <td>
+            Expected — the viewer draws for nobody it cannot name. If that page says the service
+            is not running, only the reading half is up: start the other with
+            <code>.\start.ps1</code>, or <code>python -m uvicorn api.main:app --port 8787</code>.
+            Chapter 14.
+          </td>
+        </tr>
+        <tr>
+          <td><b>A verdict will not record</b></td>
+          <td>
+            The block says which of the two it is: not signed in, or the accounts service not
+            answering. Neither stops you reading.
+          </td>
+        </tr>
+        <tr>
+          <td><b>No drawers on a narrow window</b></td>
+          <td>
+            The rails only leave the grid below 760px. Between 760 and 1100 the tree is still in
+            place and only the links pane is gone — it is not missing, it is one width away.
+          </td>
+        </tr>
       </table>
     </section>
 
-    <!-- ═══════════════════ 19. GLOSSARY ═══════════════════ -->
+    <!-- ═══════════════════ 21. GLOSSARY ═══════════════════ -->
     <section class="chapter">
-      <h2>19 · Glossary</h2>
+      <h2>21 · Glossary</h2>
 
       <table>
         <tr><th style="width:110pt">Term</th><th>Means</th></tr>
@@ -2788,6 +3337,9 @@ node manual/build.mjs     <span class="c"># re-renders the PDF</span></pre>
         <tr><td><b>Context</b></td><td>A bounded context — which is also what a contract is. The 16 that publish or consume events are where the real coupling between contracts lives.</td></tr>
         <tr><td><b>Wireframe</b></td><td>A rendered drawing of one screen, flow or platform, generated from the screen definition. Structure only — what is on the screen and where, not what it will look like. In <code>wireframes/</code>.</td></tr>
         <tr><td><b>Design board</b></td><td>An exported UI/UX artboard covering a whole platform, drawn by a designer. In <code>designs/</code>.</td></tr>
+        <tr><td><b>Verdict</b></td><td>What one person decided about one artefact at one time — approved, needs work or rejected, with a note. Append-only; the current verdict is the newest row.</td></tr>
+        <tr><td><b>Invite</b></td><td>A single-use link for one fixed address, made by somebody who already holds an account. It is what stands in for verifying the address, which is why there is no signup page.</td></tr>
+        <tr><td><b>Drawer</b></td><td>A sidebar, off screen below 760px, opened by a button in the top bar and closed by the backdrop, <kbd>Esc</kbd>, or picking something in it.</td></tr>
       </table>
 
       <div class="note">

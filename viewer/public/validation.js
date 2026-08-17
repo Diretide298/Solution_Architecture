@@ -1,14 +1,14 @@
 /**
  * Who is signed in, and what they have decided about an artefact.
  *
- * The viewer itself stays open: anyone on the machine can read the delivery
- * package without an account, because it is a reference tool and gating it
- * would only make it less used. An account is needed to *write* a verdict,
- * because the whole value of a verdict is knowing who gave it.
+ * The viewer is behind a sign-in: requireSignIn() runs before anything is
+ * fetched, so a stranger is sent to the door rather than handed two megabytes
+ * of somebody's architecture. Signing in is also what makes a verdict worth
+ * having, since the whole value of one is knowing who gave it.
  *
  * Everything here talks to the FastAPI service, which is a separate process on
- * a separate port. If it is not running the viewer carries on reading, and the
- * verdict blocks say so rather than breaking the page.
+ * a separate port. If it is not running nobody can get in at all, which is the
+ * price of the gate; the sign-in page is the one place that says so plainly.
  */
 
 // The service is on its own port, so calls are cross-origin and the session
@@ -46,6 +46,53 @@ async function call(path, { method = 'GET', body } = {}) {
   }
   return data;
 }
+
+export const apiBase = () => API;
+
+/**
+ * Makes sure somebody is signed in before the viewer draws anything, and sends
+ * them to the sign-in page if not.
+ *
+ * Returns false when it has started a navigation, so the caller stops rather
+ * than carrying on against a page that is about to be replaced.
+ *
+ * If the service is unreachable this still sends them to the sign-in page,
+ * which is the one page that can explain the situation. Failing open — showing
+ * the whole delivery package because the thing that checks permission is down
+ * — would be the wrong way round.
+ */
+export async function requireSignIn() {
+  let state = null;
+  try {
+    state = await authState();
+  } catch {
+    location.replace(`/login.html?next=${encodeURIComponent(location.pathname + location.hash)}`);
+    return false;
+  }
+  if (state.signedIn) {
+    session = { signedIn: true, account: state.account, reachable: true };
+    announce();
+    return true;
+  }
+  location.replace(`/login.html?next=${encodeURIComponent(location.pathname + location.hash)}`);
+  return false;
+}
+
+/** What the sign-in page needs before it can draw: is anyone signed in, and
+ *  does an account exist at all. Throws if the service is not answering, which
+ *  is a different thing from nobody being signed in. */
+export const authState = () => call('/api/auth/state');
+
+export const bootstrapAccount = (email, name, password) =>
+  call('/api/auth/bootstrap', { method: 'POST', body: { email, name, password } });
+
+export const listAccounts = () => call('/api/accounts');
+export const setAccountActive = (id, active) =>
+  call(`/api/accounts/${id}/active?active=${active ? 'true' : 'false'}`, { method: 'POST' });
+export const setAccountRole = (id, role) =>
+  call(`/api/accounts/${id}/role?role=${encodeURIComponent(role)}`, { method: 'POST' });
+export const changePassword = (current, replacement) =>
+  call('/api/auth/password', { method: 'POST', body: { current, replacement } });
 
 export async function refreshSession() {
   try {
@@ -242,9 +289,17 @@ export function verdictBlock(kind, id, label = id) {
   drawStatus(null);
   drawForm();
   load();
-  // a sign-in or sign-out changes what this block offers
-  const stop = onAuthChange(() => load());
-  box.addEventListener('DOMNodeRemovedFromDocument', stop);
+
+  // A sign-in or sign-out changes what this block offers. Panes are rebuilt
+  // constantly, so a block that never unsubscribes would pile up: every one
+  // ever rendered would hold its detached DOM alive and fire another request
+  // on each sign-in. Mutation events would be the obvious hook and are gone
+  // from the browser, so the check happens where it is certain to run — on the
+  // notification itself, which is the only thing that would do any work.
+  const stop = onAuthChange(() => {
+    if (!box.isConnected) return stop();
+    load();
+  });
 
   return box;
 }

@@ -473,6 +473,14 @@ async function boot() {
   window.__data = data;
   window.__machine = machine;
   window.__state = state;
+
+  // The viewer is behind a sign-in. Ask before fetching two megabytes that a
+  // stranger is not going to be shown, and send them where they can do
+  // something about it — carrying where they were headed, so a link into a
+  // particular node still lands there afterwards.
+  const signedIn = await auth.requireSignIn();
+  if (!signedIn) return;
+
   await loadIndex();
   renderLayers();
   bindUI();
@@ -608,13 +616,7 @@ function applyPartDefaults() {
 function hydrateLayer(key = state.layer) {
   return ensureParts(LAYER_PARTS[key] ?? [], key).then((arrived) => {
     if (!arrived.length) return;
-    applyPartDefaults();
-
-    if (arrived.includes('backend')) renderData();
-    if (arrived.includes('domain')) {
-      fillMachineSelect();
-      fillEventSelect();
-    }
+    partsArrived(arrived);
     // setMode only resizes an already-drawn canvas, so the graph would keep
     // whatever it drew before the part landed — for the spine, no edges at all.
     renderGraph();
@@ -625,7 +627,38 @@ function hydrateLayer(key = state.layer) {
     renderSidePane();
     renderAudit();
     setMode(state.mode);
+  }).then(() => hydrateExtras(key));
+}
+
+/**
+ * The parts this layer's panes read but its views do not need to draw. Fetched
+ * behind the layer rather than in front of it, so switching stays immediate,
+ * and repainted when they arrive.
+ */
+function hydrateExtras(key = state.layer) {
+  return ensureParts(LAYER_EXTRAS[key] ?? [], key).then((arrived) => {
+    if (!arrived.length) return;
+    // The same work a required part gets. A part fetched as an extra here is
+    // the very same part another layer would call required, and it arrives
+    // exactly once — so if the pickers and diagrams built from it are not set
+    // up now, nothing will ever do it. That is not hypothetical: contracts
+    // pulls in `backend` for its links pane, which meant that by the time the
+    // reader reached the Backend layer the part was already in hand, `arrived`
+    // was empty there, and the data view drew with no schema scope at all.
+    partsArrived(arrived);
+    renderSidePane();
+    setMode(state.mode);
   });
+}
+
+/** Everything that has to happen once, whenever a part first lands. */
+function partsArrived(arrived) {
+  applyPartDefaults();
+  if (arrived.includes('backend')) renderData();
+  if (arrived.includes('domain')) {
+    fillMachineSelect();
+    fillEventSelect();
+  }
 }
 
 // ── loading the delivery, a layer at a time ─────────────────────────
@@ -646,6 +679,26 @@ const LAYER_PARTS = {
   domain: ['domain'],
   decisions: ['decisions'],
 };
+/**
+ * Parts a layer does not need to draw itself, but which its panes read.
+ *
+ * This distinction is the one the first version of the lazy loading missed,
+ * and it went wrong quietly rather than loudly. The Lineage view drew
+ * perfectly well without the backend part — and then marked all 671 of its
+ * table chips "not in the schema reference" and refused to open any of them,
+ * because the list it checks them against was not there. Only 13 are really
+ * unknown. A pane that reads a part must ask for it, even when the view around
+ * it does not.
+ *
+ * These are fetched after the layer is already on screen and drawn again when
+ * they land, so they cost nothing at the moment of switching.
+ */
+const LAYER_EXTRAS = {
+  contracts: ['journeys', 'backend'], // links pane: called-by-screens, persisted-as; lineage chips
+  backend: ['journeys'],              // table pane: the screens that reach it
+  frontend: ['backend'],              // screen chips: is this table real
+};
+
 const ALL_PARTS = ['journeys', 'backend', 'domain', 'lineage', 'decisions'];
 
 const partInFlight = new Map();
@@ -6256,7 +6309,7 @@ function bindSections() {
 function openAccountPanel() {
   $('account-panel').hidden = false;
   renderAccountPanel();
-  const first = auth.account() ? $('invite-email-input') : $('signin-email');
+  const first = auth.account() ? null : $('signin-email');
   first?.focus();
 }
 
@@ -6277,7 +6330,6 @@ function renderAccountPanel() {
     $('account-email').textContent = who.email;
     $('account-role-note').textContent = who.role === 'admin' ? ', an admin' : '';
     $('account-admin').hidden = who.role !== 'admin';
-    if (who.role === 'admin') renderInviteList();
   }
 }
 
@@ -6303,40 +6355,6 @@ function renderAccountButton() {
   badge.textContent = initials.toUpperCase();
   button.classList.add('signed-in');
   button.title = `${who.email} — ${who.role}`;
-}
-
-async function renderInviteList() {
-  const box = $('invite-list');
-  if (!box) return;
-  box.innerHTML = '';
-  let invites = [];
-  try {
-    ({ invites } = await auth.listInvites());
-  } catch {
-    box.append(el('p', 'pane-note', 'Could not read the invites.'));
-    return;
-  }
-  if (!invites.length) {
-    box.append(el('p', 'pane-note', 'Nobody has been invited yet.'));
-    return;
-  }
-  for (const invite of invites) {
-    const row = el('div', `invite-row-item ${invite.state}`);
-    row.append(el('span', 'invite-state', invite.state));
-    row.append(el('span', 'invite-who', invite.email));
-    row.append(el('span', 'invite-role', invite.role));
-    if (invite.state === 'open') {
-      const revoke = el('button', 'chip invite-revoke', 'Withdraw');
-      revoke.type = 'button';
-      revoke.onclick = async () => {
-        revoke.disabled = true;
-        try { await auth.revokeInvite(invite.id); } catch { /* the list will show it */ }
-        renderInviteList();
-      };
-      row.append(revoke);
-    }
-    box.append(row);
-  }
 }
 
 function bindAccountUI() {
@@ -6375,40 +6393,6 @@ function bindAccountUI() {
   $('signout').onclick = async () => {
     await auth.signOut();
     closeAccountPanel();
-  };
-
-  $('invite-create').onclick = async () => {
-    $('invite-error').hidden = true;
-    $('invite-result').hidden = true;
-    const email = $('invite-email-input').value.trim();
-    const role = $('invite-role-input').value;
-    $('invite-create').disabled = true;
-    try {
-      const invite = await auth.createInvite(email, role);
-      // An absolute link, because it is about to be pasted somewhere else.
-      $('invite-link').value = `${location.origin}${invite.link}`;
-      $('invite-result').hidden = false;
-      $('invite-email-input').value = '';
-      renderInviteList();
-    } catch (error) {
-      $('invite-error').textContent = error.message;
-      $('invite-error').hidden = false;
-    } finally {
-      $('invite-create').disabled = false;
-    }
-  };
-
-  $('invite-copy').onclick = async () => {
-    $('invite-link').select();
-    try {
-      await navigator.clipboard.writeText($('invite-link').value);
-      $('invite-copy').textContent = 'Copied';
-      setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 1400);
-    } catch {
-      // clipboard permission refused — the text is selected, so Ctrl+C works
-      $('invite-copy').textContent = 'Press Ctrl+C';
-      setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 2200);
-    }
   };
 
   auth.onAuthChange(() => {

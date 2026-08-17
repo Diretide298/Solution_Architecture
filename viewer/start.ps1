@@ -8,8 +8,10 @@
     contracts, schemas, boards and lineage on 4173. FastAPI holds the things a
     person writes — who they are, and what they decided — on 8787.
 
-    Both are started here and both are stopped when you press Ctrl+C, so you
-    never leave half the application running.
+    Each gets its own window and each keeps running after this script finishes,
+    so their logs stay where you can read them. A window that closes the instant
+    something goes wrong takes the reason with it, which is exactly when you
+    need it. Close a window to stop that half; -Shared runs both here instead.
 
 .PARAMETER Port
     Where the viewer is served. Default 4173.
@@ -19,17 +21,26 @@
     8000, which falls inside a range Windows reserves and refuses to bind.
 
 .PARAMETER NoApi
-    Start only the viewer. It still reads everything; the verdict blocks say
-    the service is not running rather than breaking the page.
+    Start only the viewer. Note that the viewer is behind a sign-in, and the
+    accounts service is what answers it — so with this flag the viewer starts
+    but nobody can get in. It is here for working on the server itself.
 
 .PARAMETER NoBrowser
     Do not open a browser.
+
+.PARAMETER Shared
+    Run both in this one window instead of giving each its own, and stop both
+    when this window is closed. Useful for a script or a CI job, where two extra
+    windows are a nuisance rather than a help.
 
 .EXAMPLE
     .\start.ps1
 
 .EXAMPLE
     .\start.ps1 -Port 5000 -ApiPort 9000 -NoBrowser
+
+.EXAMPLE
+    .\start.ps1 -Shared
 #>
 
 [CmdletBinding()]
@@ -37,7 +48,8 @@ param(
     [int]    $Port      = 4173,
     [int]    $ApiPort   = 8787,
     [switch] $NoApi,
-    [switch] $NoBrowser
+    [switch] $NoBrowser,
+    [switch] $Shared
 )
 
 $ErrorActionPreference = 'Stop'
@@ -168,8 +180,9 @@ $python = $null
 if (-not $NoApi) {
     $found = Find-Python
     if ($null -eq $found) {
-        Write-Warn 'No Python found, so accounts and validation will not start.'
-        Write-Warn 'The viewer still reads everything. Install Python to enable sign-in.'
+        Write-Warn 'No Python found, so the accounts service cannot start.'
+        Write-Warn 'The viewer is behind a sign-in, so nobody will be able to get in.'
+        Write-Warn 'Install Python and run this again.'
         $NoApi = $true
     }
     else {
@@ -182,7 +195,7 @@ if (-not $NoApi) {
                 '-r', (Join-Path $PSScriptRoot 'api\requirements.txt')
             )
             if ($code -ne 0 -or (Invoke-Quiet $python @('-c', 'import fastapi, uvicorn, argon2')) -ne 0) {
-                Write-Warn 'Could not install the python dependencies, so sign-in is off.'
+                Write-Warn 'Could not install the python dependencies, so nobody can sign in.'
                 Write-Warn "Run: `"$python`" -m pip install -r api\requirements.txt"
                 $NoApi = $true
             }
@@ -208,91 +221,122 @@ if (-not $NoApi -and -not (Test-PortFree -Number $ApiPort)) {
     exit 1
 }
 
-# Stop both halves however this ends — Ctrl+C, an error, or a clean finish.
-$handler = { Stop-Started }
-Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action $handler | Out-Null
+<#
+    Opens a half in its own window and leaves it there.
 
-try {
-    # ── accounts and validation ──────────────────────────────────────
-    if (-not $NoApi) {
-        Write-Host ''
-        Write-Step "starting accounts and validation on $ApiPort"
-        $api = Start-Process -FilePath $python `
-            -ArgumentList @('-m', 'uvicorn', 'api.main:app', '--port', "$ApiPort", '--log-level', 'warning') `
+    The window runs the program directly and, whatever happens, does not close
+    on its own: if the program dies at second three, the reason is still on
+    screen an hour later. -NoExit alone is not enough, because a program that
+    fails during startup scrolls its error past and then sits at a bare prompt;
+    the trailing message says which half this was and what it did.
+#>
+function Start-Half {
+    param(
+        [string]$Title, [string]$Exe, [string]$Arguments, [string]$Colour = 'Gray'
+    )
+    $inner = @"
+`$host.UI.RawUI.WindowTitle = '$Title'
+Write-Host '$Title' -ForegroundColor $Colour
+Write-Host 'Close this window to stop it.' -ForegroundColor DarkGray
+Write-Host ''
+& $Exe $Arguments
+Write-Host ''
+Write-Host '$Title stopped (exit code ' -NoNewline -ForegroundColor Yellow
+Write-Host `$LASTEXITCODE -NoNewline -ForegroundColor Yellow
+Write-Host '). This window stays open so you can read why.' -ForegroundColor Yellow
+"@
+    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($inner))
+    return Start-Process -FilePath 'powershell' `
+        -ArgumentList @('-NoExit', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', $encoded) `
+        -WorkingDirectory $PSScriptRoot -PassThru
+}
+
+function Wait-Until {
+    param([scriptblock]$Test, [int]$Tries = 60)
+    foreach ($attempt in 1..$Tries) {
+        Start-Sleep -Milliseconds 250
+        try { if (& $Test) { return $true } } catch { }
+    }
+    return $false
+}
+
+# ── accounts and validation ──────────────────────────────────────────
+$health = $null
+if (-not $NoApi) {
+    Write-Host ''
+    Write-Step "starting accounts and validation on $ApiPort"
+    $apiArgs = "-m uvicorn api.main:app --port $ApiPort"
+    if ($Shared) {
+        $api = Start-Process -FilePath $python -ArgumentList $apiArgs `
             -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru
         $script:Started += $api
-
-        # Wait for it to answer rather than guessing at a sleep.
-        $ready = $false
-        foreach ($attempt in 1..40) {
-            Start-Sleep -Milliseconds 250
-            if ($api.HasExited) { break }
-            try {
-                $health = Invoke-RestMethod -Uri "http://localhost:$ApiPort/api/health" -TimeoutSec 2
-                $ready = $true
-                break
-            } catch { }
-        }
-
-        if ($ready) {
-            Write-Good "accounts and validation  http://localhost:$ApiPort/docs"
-            if ($health.accounts -eq 0) {
-                Write-Host ''
-                Write-Warn 'No accounts exist yet. Make the first one in another terminal:'
-                Write-Warn "  python -m api.cli admin you@$($health.domain)"
-                Write-Warn 'Then invite everyone else from the viewer.'
-            }
-        }
-        else {
-            Write-Warn "The validation service did not come up on $ApiPort."
-            Write-Warn 'The viewer will still read everything; sign-in will be off.'
-        }
+    }
+    else {
+        Start-Half -Title "TICVAI accounts :$ApiPort" -Exe "`"$python`"" `
+            -Arguments $apiArgs -Colour 'Cyan' | Out-Null
     }
 
-    # ── the viewer ───────────────────────────────────────────────────
-    Write-Host ''
-    Write-Step "starting the viewer on $Port"
-    $viewer = Start-Process -FilePath 'node' `
-        -ArgumentList @('server.mjs', '--port', "$Port") `
-        -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru
-    $script:Started += $viewer
-
-    $ready = $false
-    foreach ($attempt in 1..40) {
-        Start-Sleep -Milliseconds 250
-        if ($viewer.HasExited) { break }
-        try {
-            Invoke-WebRequest -Uri "http://localhost:$Port/api/index" -UseBasicParsing -TimeoutSec 2 | Out-Null
-            $ready = $true
-            break
-        } catch { }
+    if (Wait-Until { $script:health = Invoke-RestMethod -Uri "http://localhost:$ApiPort/api/health" -TimeoutSec 2; $true }) {
+        $health = $script:health
+        Write-Good "accounts and validation  http://localhost:$ApiPort/docs"
     }
-
-    if (-not $ready) {
-        Write-Bad "The viewer did not come up on $Port."
-        Stop-Started
-        exit 1
-    }
-    Write-Good "viewer                   http://localhost:$Port"
-
-    if (-not $NoBrowser) { Start-Process "http://localhost:$Port" | Out-Null }
-
-    Write-Host ''
-    Write-Host '  Ctrl+C stops both.' -ForegroundColor DarkGray
-    Write-Host ''
-
-    # Hold here until something exits or the user interrupts. Waiting on the
-    # processes rather than spinning keeps this off the CPU.
-    while ($true) {
-        Start-Sleep -Seconds 1
-        foreach ($proc in $script:Started) {
-            if ($proc.HasExited) {
-                Write-Warn "$($proc.Name) (pid $($proc.Id)) stopped on its own."
-                throw 'A process exited.'
-            }
-        }
+    else {
+        Write-Warn "The accounts service did not come up on $ApiPort."
+        Write-Warn 'Its window is still open — the reason will be in it.'
     }
 }
-finally {
-    Stop-Started
+
+# ── the viewer ───────────────────────────────────────────────────────
+Write-Host ''
+Write-Step "starting the viewer on $Port"
+$viewerArgs = "server.mjs --port $Port"
+if ($Shared) {
+    $viewer = Start-Process -FilePath 'node' -ArgumentList $viewerArgs `
+        -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru
+    $script:Started += $viewer
+}
+else {
+    Start-Half -Title "TICVAI viewer :$Port" -Exe 'node' `
+        -Arguments $viewerArgs -Colour 'Green' | Out-Null
+}
+
+if (-not (Wait-Until { Invoke-WebRequest -Uri "http://localhost:$Port/api/index" -UseBasicParsing -TimeoutSec 2 | Out-Null; $true })) {
+    Write-Bad "The viewer did not come up on $Port."
+    if (-not $Shared) { Write-Bad 'Its window is still open — the reason will be in it.' }
+    if ($Shared) { Stop-Started }
+    exit 1
+}
+Write-Good "viewer                   http://localhost:$Port"
+
+# ── where to go first ────────────────────────────────────────────────
+Write-Host ''
+if ($null -ne $health -and $health.accounts -eq 0) {
+    Write-Host '  No account exists yet.' -ForegroundColor Yellow
+    Write-Host "  Open http://localhost:$Port and the first page will offer to make one." -ForegroundColor Yellow
+    Write-Host "  It is an administrator, and it is the only account that page will ever make." -ForegroundColor DarkGray
+    Write-Host ''
+}
+
+if (-not $NoBrowser) { Start-Process "http://localhost:$Port" | Out-Null }
+
+if ($Shared) {
+    Write-Host '  Both are running in this window. Ctrl+C stops them.' -ForegroundColor DarkGray
+    Write-Host ''
+    try {
+        while ($true) {
+            Start-Sleep -Seconds 1
+            foreach ($proc in $script:Started) {
+                if ($proc.HasExited) {
+                    Write-Warn "$($proc.Name) (pid $($proc.Id)) stopped on its own."
+                    throw 'A process exited.'
+                }
+            }
+        }
+    }
+    finally { Stop-Started }
+}
+else {
+    Write-Host '  Each half has its own window and keeps running.' -ForegroundColor DarkGray
+    Write-Host '  Close a window to stop that half. This one is finished.' -ForegroundColor DarkGray
+    Write-Host ''
 }

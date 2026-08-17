@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI — accounts</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">TICVAI</span>
+        <span class="brand-sub">accounts</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <!-- Everything below is for an admin. The server refuses these calls to
+         anyone else regardless; hiding them as well is so that nobody is shown
+         a control that will only tell them no. -->
+    <main id="denied" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Not for you</h1>
+        <p class="auth-note">
+          This page manages accounts, which only an administrator can do. If you
+          think that should be you, ask one of them.
+        </p>
+        <a class="auth-button" href="/">Back to the viewer</a>
+      </div>
+    </main>
+
+    <main id="admin" class="admin-main" hidden>
+      <!-- ── inviting ─────────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Invite someone</h2>
+        <p class="auth-note">
+          The address is fixed here, by you, and cannot be changed by whoever
+          opens the link. That is what makes an invite count as having verified
+          it — so send the link however you already talk to them. It works once,
+          and only for that address.
+        </p>
+        <div class="invite-row">
+          <input id="invite-email" class="auth-input" type="email"
+                 placeholder="them@softlabsgroup.com" />
+          <select id="invite-role" class="scope-select">
+            <option value="reviewer">reviewer</option>
+            <option value="admin">admin</option>
+          </select>
+          <select id="invite-days" class="scope-select">
+            <option value="7">7 days</option>
+            <option value="1">1 day</option>
+            <option value="30">30 days</option>
+          </select>
+          <button id="invite-create" class="chip" type="button">Make a link</button>
+        </div>
+        <p class="auth-error" id="invite-error" hidden></p>
+
+        <div id="invite-result" hidden>
+          <div class="journey-section-label">their link — shown once</div>
+          <div class="invite-link-row">
+            <input id="invite-link" class="auth-input" type="text" readonly />
+            <button id="invite-copy" class="chip" type="button">Copy</button>
+          </div>
+          <p class="auth-note auth-fine">
+            Not stored and not recoverable — only a hash of it is kept, so that
+            a copy of the database cannot be used to make accounts. If it is
+            lost, withdraw it and make another.
+          </p>
+        </div>
+      </section>
+
+      <!-- ── the invites ──────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Invites <span id="invite-count" class="admin-count"></span></h2>
+        <div id="invites" class="admin-table"></div>
+      </section>
+
+      <!-- ── the people ───────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Accounts <span id="account-count" class="admin-count"></span></h2>
+        <p class="auth-note auth-fine">
+          An account is disabled rather than deleted, because a verdict points
+          at the person who gave it. Deleting would either orphan the verdict or
+          take it with them, and both lose something worth keeping.
+        </p>
+        <div id="accounts" class="admin-table"></div>
+        <p class="auth-error" id="account-error" hidden></p>
+      </section>
+
+      <!-- ── your own password ────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Your password</h2>
+        <p class="auth-note auth-fine">
+          Changing it signs out every other session on your account, which is
+          the point of changing it.
+        </p>
+        <label class="auth-label" for="pw-current">Current password</label>
+        <input id="pw-current" class="auth-input" type="password" autocomplete="current-password" />
+        <label class="auth-label" for="pw-new">New password</label>
+        <input id="pw-new" class="auth-input" type="password" autocomplete="new-password" />
+        <label class="auth-label" for="pw-confirm">New password again</label>
+        <input id="pw-confirm" class="auth-input" type="password" autocomplete="new-password" />
+        <p class="auth-error" id="pw-error" hidden></p>
+        <p class="auth-ok" id="pw-ok" hidden>Changed. Other sessions have been signed out.</p>
+        <button id="pw-submit" class="auth-button" type="button">Change it</button>
+      </section>
+    </main>
+
+    <script type="module">
+      import {
+        authState, listAccounts, setAccountActive, setAccountRole,
+        createInvite, listInvites, revokeInvite, changePassword,
+      } from '/validation.js';
+
+      const $ = (id) => document.getElementById(id);
+      const el = (tag, cls, text) => {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text instanceof Node) n.append(text);
+        else if (text != null) n.textContent = text;
+        return n;
+      };
+      const when = (iso) => {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return Number.isNaN(+d) ? iso
+          : d.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+
+      let me = null;
+
+      const state = await authState().catch(() => null);
+      if (!state || !state.signedIn) {
+        location.href = `/login.html?next=${encodeURIComponent('/admin.html')}`;
+      } else if (state.account.role !== 'admin') {
+        $('denied').hidden = false;
+        $('whoami').textContent = state.account.email;
+      } else {
+        me = state.account;
+        $('whoami').textContent = `${me.email} · admin`;
+        $('admin').hidden = false;
+        refreshInvites();
+        refreshAccounts();
+      }
+
+      // ── invites ────────────────────────────────────────────────
+      async function refreshInvites() {
+        const box = $('invites');
+        box.innerHTML = '';
+        let invites = [];
+        try { ({ invites } = await listInvites()); }
+        catch { box.append(el('p', 'pane-note', 'Could not read the invites.')); return; }
+
+        const open = invites.filter((i) => i.state === 'open').length;
+        $('invite-count').textContent = `${open} open of ${invites.length}`;
+        if (!invites.length) {
+          box.append(el('p', 'pane-note', 'Nobody has been invited yet.'));
+          return;
+        }
+        for (const invite of invites) {
+          const row = el('div', `admin-row invite-row-item ${invite.state}`);
+          row.append(el('span', 'invite-state', invite.state));
+          row.append(el('span', 'invite-who', invite.email));
+          row.append(el('span', 'invite-role', invite.role));
+          row.append(el('span', 'admin-when',
+            invite.state === 'open' ? `expires ${when(invite.expires_at)}`
+              : invite.redeemed_at ? `used ${when(invite.redeemed_at)}`
+              : invite.revoked_at ? `withdrawn ${when(invite.revoked_at)}`
+              : `expired ${when(invite.expires_at)}`));
+          if (invite.state === 'open') {
+            const revoke = el('button', 'chip', 'Withdraw');
+            revoke.type = 'button';
+            revoke.onclick = async () => {
+              revoke.disabled = true;
+              try { await revokeInvite(invite.id); } catch { /* the refresh shows the truth */ }
+              refreshInvites();
+            };
+            row.append(revoke);
+          } else {
+            row.append(el('span'));
+          }
+          box.append(row);
+        }
+      }
+
+      $('invite-create').onclick = async () => {
+        $('invite-error').hidden = true;
+        $('invite-result').hidden = true;
+        $('invite-create').disabled = true;
+        try {
+          const invite = await createInvite(
+            $('invite-email').value.trim(),
+            $('invite-role').value,
+            Number($('invite-days').value),
+          );
+          $('invite-link').value = `${location.origin}${invite.link}`;
+          $('invite-result').hidden = false;
+          $('invite-email').value = '';
+          refreshInvites();
+        } catch (error) {
+          $('invite-error').textContent = error.message;
+          $('invite-error').hidden = false;
+        } finally {
+          $('invite-create').disabled = false;
+        }
+      };
+
+      $('invite-copy').onclick = async () => {
+        $('invite-link').select();
+        try {
+          await navigator.clipboard.writeText($('invite-link').value);
+          $('invite-copy').textContent = 'Copied';
+        } catch {
+          $('invite-copy').textContent = 'Press Ctrl+C';
+        }
+        setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 1600);
+      };
+
+      // ── accounts ───────────────────────────────────────────────
+      async function refreshAccounts() {
+        const box = $('accounts');
+        box.innerHTML = '';
+        let accounts = [];
+        try { ({ accounts } = await listAccounts()); }
+        catch { box.append(el('p', 'pane-note', 'Could not read the accounts.')); return; }
+
+        const live = accounts.filter((a) => a.active).length;
+        $('account-count').textContent = `${live} active of ${accounts.length}`;
+
+        for (const person of accounts) {
+          const row = el('div', `admin-row account-row${person.active ? '' : ' disabled'}`);
+          row.append(el('span', 'account-name', person.name || '—'));
+          row.append(el('span', 'invite-who', person.email + (person.id === me.id ? ' (you)' : '')));
+
+          const role = el('select', 'scope-select admin-role');
+          for (const value of ['reviewer', 'admin']) {
+            const option = el('option', null, value);
+            option.value = value;
+            if (person.role === value) option.selected = true;
+            role.append(option);
+          }
+          role.disabled = person.id === me.id;
+          role.onchange = async () => {
+            $('account-error').hidden = true;
+            try { await setAccountRole(person.id, role.value); }
+            catch (error) {
+              $('account-error').textContent = error.message;
+              $('account-error').hidden = false;
+            }
+            refreshAccounts();
+          };
+          row.append(role);
+
+          row.append(el('span', 'admin-when',
+            `${person.verdicts} verdict${person.verdicts === 1 ? '' : 's'}`));
+
+          if (person.id === me.id) {
+            row.append(el('span', 'admin-when', 'active'));
+          } else {
+            const toggle = el('button', 'chip', person.active ? 'Disable' : 'Enable');
+            toggle.type = 'button';
+            toggle.onclick = async () => {
+              $('account-error').hidden = true;
+              toggle.disabled = true;
+              try { await setAccountActive(person.id, !person.active); }
+              catch (error) {
+                $('account-error').textContent = error.message;
+                $('account-error').hidden = false;
+              }
+              refreshAccounts();
+            };
+            row.append(toggle);
+          }
+          box.append(row);
+        }
+      }
+
+      // ── password ───────────────────────────────────────────────
+      $('pw-submit').onclick = async () => {
+        $('pw-error').hidden = true;
+        $('pw-ok').hidden = true;
+        const next = $('pw-new').value;
+        if (next !== $('pw-confirm').value) {
+          $('pw-error').textContent = 'Those two passwords are not the same.';
+          $('pw-error').hidden = false;
+          return;
+        }
+        $('pw-submit').disabled = true;
+        try {
+          await changePassword($('pw-current').value, next);
+          for (const id of ['pw-current', 'pw-new', 'pw-confirm']) $(id).value = '';
+          $('pw-ok').hidden = false;
+        } catch (error) {
+          $('pw-error').textContent = error.message;
+          $('pw-error').hidden = false;
+        } finally {
+          $('pw-submit').disabled = false;
+        }
+      };
+    </script>
+  </body>
+</html>

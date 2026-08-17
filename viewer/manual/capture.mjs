@@ -135,8 +135,50 @@ const shotOf = async (name, selector, pad = 0) => {
 
 // ── go ───────────────────────────────────────────────────────────────
 console.log(`\nCapturing ${URL} with ${path.basename(EXE)}\n`);
+
+// The viewer asks who you are before it draws anything, so the capture has to
+// come in the way a person does. The credentials are read from the environment
+// so that nobody's real password has to live in this file; the fallback is the
+// account api/ui-auth-check.mjs makes on this machine, which is what makes
+// `node manual/capture.mjs` work with nothing set.
+const WHO = {
+  email: process.env.VIEWER_EMAIL ?? 'harness.admin@softlabsgroup.com',
+  password: process.env.VIEWER_PASSWORD ?? 'a-long-enough-passphrase',
+};
+
+console.log('signing in');
+await page.goto(`${URL}/login.html`, { waitUntil: 'domcontentloaded' });
+// If a session is already live this page forwards to the viewer instead of
+// drawing a form, so its absence is a state rather than a failure.
+const form = await page
+  .waitForSelector('#signin:not([hidden]) #email', { timeout: 15000 })
+  .catch(() => null);
+if (form) {
+  await wait(600);
+  await shotOf('ac-login', '.auth-card', 14);
+  await page.type('#email', WHO.email, { delay: 20 });
+  await page.type('#password', WHO.password, { delay: 20 });
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {}),
+    page.click('#submit'),
+  ]);
+  await wait(1400);
+  console.log(`  signed in as ${WHO.email}`);
+} else {
+  console.log('  already signed in');
+}
+
 await page.goto(URL, { waitUntil: 'domcontentloaded' });
-await page.waitForSelector('#layers button', { timeout: 20000 });
+try {
+  await page.waitForSelector('#layers button', { timeout: 20000 });
+} catch {
+  console.error(
+    `\nThe viewer never drew. If it bounced to the sign-in page, ${WHO.email} is not\n` +
+    'an account here — set VIEWER_EMAIL and VIEWER_PASSWORD and run this again.'
+  );
+  await browser.close();
+  process.exit(1);
+}
 await wait(1800);
 
 // -- 1. the window itself ---------------------------------------------------
@@ -497,7 +539,45 @@ await mode('data');
 await wait(1600);
 await shot('hc-data-clean');
 
-// -- 5. light theme, for the teams that print ------------------------------
+// -- 5. accounts and sign-off ----------------------------------------------
+// The one part of the viewer that writes rather than reads. It answers to the
+// FastAPI service on 8787; with that stopped the blocks say so instead, which
+// is a true picture of a half-started machine and no use as a figure. So the
+// state each one was photographed in is printed rather than assumed.
+console.log('accounts');
+await layer('contracts');
+await mode('reader');
+await open('op:contracts/spine/catalogue.yaml#listProducts');
+await wait(1400);
+const verdict = await page.evaluate(() => {
+  const box = document.querySelector('#reader-validation .verdict-box');
+  if (!box) return null;
+  return box.querySelector('.verdict-chip')?.textContent.trim() ?? '(no chip)';
+});
+console.log(`  verdict block: ${verdict ?? '(no block — is the operation selected?)'}`);
+if (verdict === 'Not reviewed' || verdict === null) {
+  console.warn('  ! nothing recorded on listProducts — is the service on 8787 running?');
+}
+await shotOf('ac-verdict', '#reader-validation', 8);
+
+// The invites and the people, which live on their own page rather than in the
+// panel. Only an admin is shown this, so the shot is only right when the
+// account this signed in as is one.
+await page.goto(`${URL}/admin.html`, { waitUntil: 'domcontentloaded' });
+const isAdmin = await page
+  .waitForSelector('#admin:not([hidden])', { timeout: 12000 })
+  .catch(() => null);
+if (isAdmin) {
+  await wait(1200);
+  await shot('ac-admin');
+} else {
+  console.warn(`  ! ${WHO.email} is not an admin, so there is no invite page to photograph`);
+}
+await page.goto(URL, { waitUntil: 'domcontentloaded' });
+await page.waitForSelector('#layers button', { timeout: 20000 });
+await wait(1600);
+
+// -- 6. light theme, for the teams that print ------------------------------
 await layer('contracts');
 await mode('graph');
 await page.click('#theme-toggle');
@@ -505,6 +585,55 @@ await wait(900);
 await press('#graph-recenter');
 await shot('40-light-theme');
 await page.click('#theme-toggle');
+await wait(600);
+
+// -- 7. the phone ----------------------------------------------------------
+// The responsive layout only exists below 760px, so none of it can be
+// photographed at the 1600px width every shot above uses. One viewport swap,
+// the shots that need it, and the desktop viewport back at the end — anything
+// added after this section would otherwise be photographed on a phone.
+console.log('phone');
+const DESKTOP = { width: 1600, height: 1000, deviceScaleFactor: 2 };
+const PHONE = { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
+
+await page.setViewport(PHONE);
+// The breakpoints are CSS and would apply to a bare resize, but the topbar
+// rails scroll their active button into view on load and the drawer toggles
+// are wired once — so reload rather than trusting the resize.
+await page.reload({ waitUntil: 'domcontentloaded' });
+await page.waitForSelector('#layers button', { timeout: 20000 });
+await wait(2200);
+
+await layer('contracts');
+await mode('graph');
+await press('#graph-recenter');
+await shot('ph-graph');
+// --topbar-h is 124px here: small controls, then the layer rail, then the modes
+await shot('ph-topbar', { x: 0, y: 0, width: 390, height: 124 });
+
+// the tree off-canvas, over the view it was opened from
+await page.click('#drawer-left-toggle');
+await wait(800);
+await shot('ph-drawer');
+// closed from the toggle, which is never under the backdrop — the backdrop's
+// own centre is behind the open drawer, so clicking it here would miss
+await page.click('#drawer-left-toggle');
+await wait(600);
+
+// The links pane is the other drawer, and its toggle stays hidden until the
+// pane holds something — so there has to be a selection before this works.
+await mode('reader');
+await open('op:contracts/spine/orders.yaml#createOrder');
+await wait(1400);
+if (await page.$('#drawer-right-toggle:not([hidden])')) {
+  await page.click('#drawer-right-toggle');
+  await wait(800);
+  await shot('ph-links');
+} else {
+  console.warn('  ! the links drawer toggle is hidden — nothing selected?');
+}
+
+await page.setViewport(DESKTOP);
 await wait(600);
 
 // ── report ───────────────────────────────────────────────────────────

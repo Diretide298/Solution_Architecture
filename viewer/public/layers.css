@@ -1254,3 +1254,64 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
   .verdict-history-row { grid-template-columns: 10px 1fr; }
   .verdict-history-when { grid-column: 2; }
 }
+
+/* ── the accounts page ───────────────────────────────────────────────
+   Its own page rather than a panel in the viewer: managing people is a
+   different job from reading contracts, and it wants room for a table. */
+
+.admin-page { background: var(--bg); min-height: 100vh; }
+.admin-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+  position: sticky; top: 0; z-index: 5;
+}
+.admin-bar-right { display: flex; align-items: center; gap: 12px; }
+.admin-who { font-size: 12px; color: var(--text-faint); }
+.admin-main { max-width: 940px; margin: 0 auto; padding: 22px 18px 60px; }
+.admin-panel {
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--bg-panel);
+  padding: 18px 20px; margin-bottom: 18px;
+}
+.admin-heading {
+  margin: 0 0 8px; font-size: 14px; color: var(--text);
+  display: flex; align-items: baseline; gap: 9px;
+}
+.admin-count { font-size: 11.5px; font-weight: 400; color: var(--text-faint); }
+.admin-table { margin-top: 10px; }
+.admin-row {
+  display: grid; gap: 10px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.admin-row:last-child { border-bottom: 0; }
+.invite-row-item.admin-row { grid-template-columns: 78px 1fr auto 150px 88px; }
+.account-row { grid-template-columns: 1fr 1.4fr 110px 92px 84px; }
+.account-row.disabled { opacity: .5; }
+.account-name { color: var(--text); }
+.admin-when { color: var(--text-faint); font-size: 11.5px; }
+.admin-role { padding: 3px 6px; font-size: 11.5px; }
+.auth-ok {
+  margin: 12px 0 0; padding: 8px 10px;
+  font-size: 12.5px; color: var(--ok, #4ade80);
+  border: 1px solid color-mix(in srgb, var(--ok, #4ade80) 40%, transparent);
+  background: color-mix(in srgb, var(--ok, #4ade80) 10%, transparent);
+  border-radius: 6px;
+}
+.auth-pre {
+  margin: 6px 0 14px; padding: 9px 11px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  font-size: 12px; font-family: ui-monospace, Menlo, monospace;
+  color: var(--text-dim); overflow-x: auto;
+}
+
+@media (max-width: 760px) {
+  .admin-main { padding: 14px 12px 40px; }
+  .admin-panel { padding: 14px; }
+  .invite-row-item.admin-row, .account-row {
+    grid-template-columns: 1fr auto; row-gap: 4px;
+  }
+  .admin-when { grid-column: 1 / -1; }
+}

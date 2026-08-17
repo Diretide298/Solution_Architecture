@@ -62,10 +62,9 @@
           >
             <span class="icon-links" aria-hidden="true"></span>
           </button>
-          <!-- Reading needs no account; recording a verdict does. This says
-               which of those you currently are. -->
+          <!-- Who you are signed in as, and the way out. -->
           <button id="account-toggle" class="icon-btn account-toggle" type="button"
-                  title="Sign in to record verdicts" aria-haspopup="dialog">
+                  title="Your account" aria-haspopup="dialog">
             <span id="account-initials" class="account-initials">·</span>
           </button>
           <button id="theme-toggle" class="icon-btn" title="Toggle theme" type="button">◐</button>
@@ -391,9 +390,8 @@
         <!-- signed out -->
         <div id="account-signin">
           <p class="auth-note">
-            The viewer reads without an account. One is needed to record a
-            verdict, because a verdict is only worth anything if it says who
-            gave it.
+            Your session has ended. Sign in again to carry on — nothing you were
+            looking at has moved.
           </p>
           <label class="auth-label" for="signin-email">Email</label>
           <input id="signin-email" class="auth-input" type="email"
@@ -415,37 +413,13 @@
             Signed in as <b id="account-email"></b><span id="account-role-note"></span>.
           </p>
 
-          <!-- admin only: making the links -->
+          <!-- admin only: the door to everything about accounts -->
           <div id="account-admin" hidden>
-            <div class="journey-section-label">invite someone</div>
             <p class="auth-note auth-fine">
-              The address is fixed here and cannot be changed by whoever opens
-              the link — which is what makes an invite count as having verified
-              it. Send the link however you already talk.
+              Inviting people, enabling and disabling accounts, and changing
+              your own password all live on one page.
             </p>
-            <div class="invite-row">
-              <input id="invite-email-input" class="auth-input" type="email"
-                     placeholder="them@softlabsgroup.com" />
-              <select id="invite-role-input" class="scope-select">
-                <option value="reviewer">reviewer</option>
-                <option value="admin">admin</option>
-              </select>
-              <button id="invite-create" class="chip" type="button">Invite</button>
-            </div>
-            <p class="auth-error" id="invite-error" hidden></p>
-            <div id="invite-result" hidden>
-              <div class="journey-section-label">their link — shown once</div>
-              <div class="invite-link-row">
-                <input id="invite-link" class="auth-input" type="text" readonly />
-                <button id="invite-copy" class="chip" type="button">Copy</button>
-              </div>
-              <p class="auth-note auth-fine">
-                Not stored and not recoverable. If it is lost, make another.
-              </p>
-            </div>
-
-            <div class="journey-section-label">invites</div>
-            <div id="invite-list" class="invite-list"></div>
+            <a class="auth-button" href="/admin.html">Manage accounts and invites</a>
           </div>
 
           <button id="signout" class="auth-button auth-button-quiet" type="button">Sign out</button>

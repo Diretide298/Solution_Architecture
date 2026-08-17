@@ -3,6 +3,32 @@
 // artefact and sees it stick. Driven through the browser, not the API, because
 // that is where the wiring can be wrong.
 import puppeteer from 'puppeteer-core';
+
+// The viewer is behind a sign-in now, so a harness has to come in the front
+// door like anyone else. The cookie is set on localhost by the accounts
+// service; cookies ignore the port, so it rides along to the viewer too.
+let harnessSignedIn = false;
+async function harnessSignIn(target) {
+  if (harnessSignedIn) return;
+  // Not login.html: once the cookie is set that page redirects to the viewer
+  // the moment it loads, which destroys the execution context in the middle of
+  // the very call that set it. invite.html is on the same origin, needs no
+  // account, and stays put.
+  await target.goto('http://localhost:4173/invite.html', { waitUntil: 'domcontentloaded' });
+  const ok = await target.evaluate(async () => {
+    const r = await fetch('http://localhost:8787/api/auth/login', {
+      method: 'POST', credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        email: 'harness.admin@softlabsgroup.com',
+        password: 'a-long-enough-passphrase',
+      }),
+    });
+    return r.ok;
+  });
+  if (!ok) throw new Error('the harness could not sign in — is the accounts service running?');
+  harnessSignedIn = true;
+}
 const VIEWER = 'http://localhost:4173';
 const API = 'http://localhost:8787';
 const OUT = 'C:/Users/CHINMA~1.PAR/AppData/Local/Temp/claude/c--Users-Chinmay-Parab-Desktop-ticvai/fbd4bcf3-a6ac-43c2-ab81-807eba134bb2/scratchpad';
@@ -33,95 +59,84 @@ const boot = async (url = VIEWER) => {
   await wait(2600);
 };
 
-await boot();
-
-// ── signed out ───────────────────────────────────────────────────────
-check('the viewer reads without an account',
-  await page.evaluate(() => document.querySelectorAll('#tree .tree-file').length > 0),
-  'the tree is populated');
-
-check('the topbar shows nobody is signed in',
-  await page.evaluate(() => document.querySelector('#account-initials')?.textContent.trim() === '·'));
-
-// an operation offers a verdict, but not the means to give one
-await page.evaluate(() => {
-  const row = document.querySelector('#tree .tree-file');
-  row.click();
-});
-await wait(900);
-await page.evaluate(() => {
-  const child = document.querySelector('#tree .tree-children .tree-child, #tree .tree-children .tree-file');
-  child?.click();
-});
-await wait(1400);
-
-const anon = await page.evaluate(() => {
-  const box = document.querySelector('#reader-validation .verdict-box');
-  return {
-    present: Boolean(box),
-    chip: box?.querySelector('.verdict-chip')?.textContent,
-    prompt: box?.querySelector('.verdict-signin')?.textContent,
-    canRecord: Boolean(box?.querySelector('.verdict-set')),
-  };
-});
-check('an operation shows its validation state', anon.present, anon.chip);
-// Not "Not reviewed": verdicts are append-only by design, so an earlier run of
-// this harness leaves its own verdict behind. Assert the shape, not a state
-// only a virgin database has.
-check('and the state it shows is a real one',
-  ['Not reviewed', 'Approved', 'Rejected', 'Needs work'].includes(anon.chip), anon.chip);
-check('a signed-out reader is offered a sign-in, not a verdict button',
-  !anon.canRecord && /Sign in/.test(anon.prompt ?? ''), anon.prompt);
-
-// ── the admin signs in through the panel ─────────────────────────────
-await page.evaluate(() => document.querySelector('#account-toggle').click());
-await wait(500);
-check('the account panel opens', await page.evaluate(() => !document.querySelector('#account-panel').hidden));
-
-await page.type('#signin-email', ADMIN.email);
-await page.type('#signin-password', 'wrong-but-long-enough');
-await page.evaluate(() => document.querySelector('#signin-submit').click());
-await wait(1200);
-check('a wrong password is reported in the panel',
-  await page.evaluate(() => !document.querySelector('#signin-error').hidden),
-  await page.evaluate(() => document.querySelector('#signin-error').textContent));
-
-await page.evaluate(() => { document.querySelector('#signin-password').value = ''; });
-await page.type('#signin-password', ADMIN.password);
-await page.evaluate(() => document.querySelector('#signin-submit').click());
+// The viewer is behind the door now, so this starts at the door. What happens
+// to a stranger who arrives is gate-check's subject, not this one's; this
+// follows a person who has been let in.
+await page.goto(`${VIEWER}/login.html`, { waitUntil: 'domcontentloaded' });
 await wait(1600);
 
-check('signing in closes the panel',
-  await page.evaluate(() => document.querySelector('#account-panel').hidden));
-const initials = await page.evaluate(() => document.querySelector('#account-initials').textContent.trim());
-check('the topbar now shows who is signed in', initials !== '·' && initials.length >= 1, initials);
+check('the door is the landing page',
+  await page.evaluate(() => !document.querySelector('#signin').hidden ||
+                            !document.querySelector('#bootstrap').hidden),
+  'sign-in offered');
 
-// ── the admin invites someone ────────────────────────────────────────
+await page.type('#email', ADMIN.email);
+await page.type('#password', 'wrong-but-long-enough');
+await page.evaluate(() => document.querySelector('#submit').click());
+await wait(1400);
+check('a wrong password is refused at the door',
+  await page.evaluate(() => !document.querySelector('#error').hidden),
+  await page.evaluate(() => document.querySelector('#error').textContent));
+
+await page.evaluate(() => { document.querySelector('#password').value = ''; });
+await page.type('#password', ADMIN.password);
+await page.evaluate(() => document.querySelector('#submit').click());
+await wait(3000);
+
+check('signing in lands in the viewer', !page.url().includes('/login.html'),
+  page.url().replace(VIEWER, '') || '/');
+await page.waitForSelector('#layers button', { timeout: 25000 });
+await wait(2600);
+check('which now draws',
+  await page.evaluate(() => document.querySelectorAll('#tree .tree-file').length > 0));
+
+await page.evaluate(() => document.querySelector('#tree .tree-file').click());
+await wait(900);
+await page.evaluate(() => {
+  document.querySelector('#tree .tree-children .tree-child, #tree .tree-children .tree-file')?.click();
+});
+await wait(1600);
+const anon = await page.evaluate(() => {
+  const box = document.querySelector('#reader-validation .verdict-box');
+  return { present: Boolean(box), chip: box?.querySelector('.verdict-chip')?.textContent };
+});
+check('an operation shows its validation state', anon.present, anon.chip);
+
+// ── the account panel ───────────────────────────────────
+const initials = await page.evaluate(() => document.querySelector('#account-initials').textContent.trim());
+check('the topbar shows who is signed in', initials !== '·' && initials.length >= 1, initials);
+
 await page.evaluate(() => document.querySelector('#account-toggle').click());
-await wait(600);
-check('an admin sees the invite controls',
+await wait(700);
+check('the account panel opens',
+  await page.evaluate(() => !document.querySelector('#account-panel').hidden));
+check('an admin is pointed at the accounts page',
   await page.evaluate(() => !document.querySelector('#account-admin').hidden));
 
-const outside = await (async () => {
-  await page.type('#invite-email-input', 'someone@gmail.com');
-  await page.evaluate(() => document.querySelector('#invite-create').click());
-  await wait(1200);
-  return page.evaluate(() => ({
-    shown: !document.querySelector('#invite-error').hidden,
-    text: document.querySelector('#invite-error').textContent,
-  }));
-})();
+// ── inviting, from the accounts page ─────────────────────────
+await page.goto(`${VIEWER}/admin.html`, { waitUntil: 'networkidle2' });
+await wait(2200);
+check('the accounts page opens for an admin',
+  await page.evaluate(() => !document.querySelector('#admin').hidden));
+
+await page.type('#invite-email', 'someone@gmail.com');
+await page.evaluate(() => document.querySelector('#invite-create').click());
+await wait(1400);
+const outside = await page.evaluate(() => ({
+  shown: !document.querySelector('#invite-error').hidden,
+  text: document.querySelector('#invite-error').textContent,
+}));
 check('an address outside the domain is refused in the UI', outside.shown, outside.text);
 
-await page.evaluate(() => { document.querySelector('#invite-email-input').value = ''; });
-await page.type('#invite-email-input', REVIEWER);
+await page.evaluate(() => { document.querySelector('#invite-email').value = ''; });
+await page.type('#invite-email', REVIEWER);
 await page.evaluate(() => document.querySelector('#invite-create').click());
 await wait(1600);
 
 const made = await page.evaluate(() => ({
   shown: !document.querySelector('#invite-result').hidden,
   link: document.querySelector('#invite-link').value,
-  listed: document.querySelectorAll('#invite-list .invite-row-item').length,
+  listed: document.querySelectorAll('#invites .invite-row-item').length,
 }));
 check('an invite is made and its link shown once', made.shown && made.link.includes('/invite.html#'),
   made.link.replace(/#.*/, '#…'));
@@ -230,18 +245,32 @@ check('and it is in the store, not just on the page',
 // ── a reviewer is not an admin ───────────────────────────────────────
 await reviewerPage.evaluate(() => document.querySelector('#account-toggle').click());
 await wait(700);
-check('a reviewer is not offered the invite controls',
+check('a reviewer is not pointed at the accounts page',
   await reviewerPage.evaluate(() => document.querySelector('#account-admin').hidden));
 
+await reviewerPage.goto(`${VIEWER}/admin.html`, { waitUntil: 'networkidle2' });
+await wait(2000);
+check('and the accounts page refuses them',
+  await reviewerPage.evaluate(() => !document.querySelector('#denied').hidden));
+
 // ── signing out ──────────────────────────────────────────────────────
+// Back to the viewer first: the accounts page has no account panel on it, and
+// the reviewer was left there by the check above.
+await reviewerPage.goto(VIEWER, { waitUntil: 'domcontentloaded' });
+await reviewerPage.waitForSelector('#layers button', { timeout: 25000 });
+await wait(2600);
+await reviewerPage.evaluate(() => document.querySelector('#account-toggle').click());
+await wait(600);
 await reviewerPage.evaluate(() => document.querySelector('#signout').click());
-await wait(1600);
+await wait(1800);
 check('signing out returns the topbar to nobody',
   await reviewerPage.evaluate(() => document.querySelector('#account-initials').textContent.trim() === '·'));
 
-const afterOut = await reviewerPage.evaluate(() =>
-  document.querySelectorAll('#reader-validation .verdict-set').length);
-check('and the verdict buttons go with it', afterOut === 0, `${afterOut} buttons`);
+// and the viewer will not draw for them any more
+await reviewerPage.goto(VIEWER, { waitUntil: 'networkidle2' });
+await wait(1800);
+check('and the viewer sends them back to the door',
+  reviewerPage.url().includes('/login.html'), reviewerPage.url().replace(VIEWER, ''));
 
 check('no console errors', errors.length === 0, errors.slice(0, 3).join(' | '));
 await browser.close();

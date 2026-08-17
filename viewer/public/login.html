@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI — sign in</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <body class="auth-page">
+    <main class="auth-card">
+      <div class="brand auth-brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">TICVAI</span>
+        <span class="brand-sub">contract graph</span>
+      </div>
+
+      <section id="checking" class="auth-state">
+        <p class="auth-note">One moment…</p>
+      </section>
+
+      <!-- Nobody holds an account yet. Shown once, ever: the moment this
+           succeeds the door closes behind it and everyone after is invited. -->
+      <section id="bootstrap" class="auth-state" hidden>
+        <h1 class="auth-title">Set up the first account</h1>
+        <p class="auth-note">
+          No account exists yet. This one will be the administrator — it can
+          invite everyone else, and it is the only way in until it does. This
+          page is offered only while there are no accounts.
+        </p>
+
+        <label class="auth-label" for="boot-email">Your email</label>
+        <input id="boot-email" class="auth-input" type="email" autocomplete="username"
+               placeholder="you@softlabsgroup.com" />
+        <label class="auth-label" for="boot-name">Your name</label>
+        <input id="boot-name" class="auth-input" type="text" autocomplete="name"
+               placeholder="How your verdicts will be signed" />
+        <label class="auth-label" for="boot-password">Password</label>
+        <input id="boot-password" class="auth-input" type="password"
+               autocomplete="new-password" placeholder="At least 12 characters" />
+        <label class="auth-label" for="boot-confirm">Password again</label>
+        <input id="boot-confirm" class="auth-input" type="password" autocomplete="new-password" />
+
+        <p class="auth-error" id="boot-error" hidden></p>
+        <button id="boot-submit" class="auth-button" type="button">Create the administrator</button>
+        <p class="auth-note auth-fine">
+          Nobody else sees this password, now or later — only a hash of it is
+          kept. Long beats complicated: three or four unrelated words are easier
+          to remember and harder to guess than <code>Passw0rd!</code>
+        </p>
+      </section>
+
+      <!-- the ordinary way in -->
+      <section id="signin" class="auth-state" hidden>
+        <h1 class="auth-title">Sign in</h1>
+        <p class="auth-note">
+          The contract graph, the lineage, the boards and the sign-off record.
+        </p>
+
+        <label class="auth-label" for="email">Email</label>
+        <input id="email" class="auth-input" type="email" autocomplete="username"
+               placeholder="you@softlabsgroup.com" />
+        <label class="auth-label" for="password">Password</label>
+        <input id="password" class="auth-input" type="password" autocomplete="current-password" />
+
+        <p class="auth-error" id="error" hidden></p>
+        <button id="submit" class="auth-button" type="button">Sign in</button>
+        <p class="auth-note auth-fine">
+          No account? Ask an administrator for an invite link. Accounts are made
+          from invites rather than from a signup page, so that the address on an
+          account is one somebody vouched for.
+        </p>
+      </section>
+
+      <!-- the service is not running, so there is nothing to sign in to -->
+      <section id="offline" class="auth-state" hidden>
+        <h1 class="auth-title">The service is not running</h1>
+        <p class="auth-note">
+          Signing in needs the accounts service, and it is not answering on
+          <code id="offline-where"></code>.
+        </p>
+        <p class="auth-note">Start both halves together:</p>
+        <pre class="auth-pre">cd viewer
+.\start.ps1</pre>
+        <p class="auth-note auth-fine">Or just the accounts service:</p>
+        <pre class="auth-pre">python -m uvicorn api.main:app --port 8787</pre>
+        <button id="retry" class="auth-button" type="button">Try again</button>
+      </section>
+    </main>
+
+    <script type="module">
+      import { authState, signIn, bootstrapAccount, apiBase } from '/validation.js';
+
+      const $ = (id) => document.getElementById(id);
+      const show = (which) => {
+        for (const id of ['checking', 'bootstrap', 'signin', 'offline']) {
+          $(id).hidden = id !== which;
+        }
+      };
+
+      // Where to go once in. Set by the viewer when it bounced someone here,
+      // so a deep link survives signing in.
+      const wanted = new URLSearchParams(location.search).get('next') || '/';
+      const goOn = () => { location.href = wanted.startsWith('/') ? wanted : '/'; };
+
+      async function decide() {
+        show('checking');
+        try {
+          const state = await authState();
+          if (state.signedIn) return goOn();
+          if (state.needsBootstrap) {
+            show('bootstrap');
+            $('boot-email').focus();
+            return;
+          }
+          show('signin');
+          $('email').focus();
+        } catch {
+          $('offline-where').textContent = apiBase();
+          show('offline');
+        }
+      }
+
+      const fail = (id, message) => {
+        $(id).textContent = message;
+        $(id).hidden = false;
+      };
+
+      const doSignIn = async () => {
+        $('error').hidden = true;
+        $('submit').disabled = true;
+        $('submit').textContent = 'Signing in…';
+        try {
+          await signIn($('email').value.trim(), $('password').value);
+          goOn();
+        } catch (error) {
+          fail('error', error.message);
+          $('submit').disabled = false;
+          $('submit').textContent = 'Sign in';
+        }
+      };
+
+      const doBootstrap = async () => {
+        $('boot-error').hidden = true;
+        const password = $('boot-password').value;
+        if (password !== $('boot-confirm').value) {
+          return fail('boot-error', 'Those two passwords are not the same.');
+        }
+        if (password.length < 12) {
+          return fail('boot-error', 'A password needs at least 12 characters.');
+        }
+        $('boot-submit').disabled = true;
+        $('boot-submit').textContent = 'Creating…';
+        try {
+          await bootstrapAccount($('boot-email').value.trim(), $('boot-name').value, password);
+          goOn();
+        } catch (error) {
+          fail('boot-error', error.message);
+          $('boot-submit').disabled = false;
+          $('boot-submit').textContent = 'Create the administrator';
+        }
+      };
+
+      $('submit').onclick = doSignIn;
+      $('boot-submit').onclick = doBootstrap;
+      $('retry').onclick = decide;
+      for (const id of ['email', 'password']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') doSignIn(); });
+      }
+      for (const id of ['boot-email', 'boot-name', 'boot-password', 'boot-confirm']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') doBootstrap(); });
+      }
+
+      decide();
+    </script>
+  </body>
+</html>
