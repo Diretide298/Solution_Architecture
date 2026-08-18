@@ -1,0 +1,37 @@
+[Unit]
+Description=TICVAI viewer — accounts and verdicts
+Documentation=file://@APP_DIR@/viewer/api/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=@APP_USER@
+Group=@APP_USER@
+WorkingDirectory=@APP_DIR@/viewer
+
+Environment=TICVAI_DB=@APP_DIR@/viewer/api/ticvai.db
+# Set this to 1 the moment there is a certificate in front. Until then the
+# cookie must not carry Secure, or the browser will decline to send it at all
+# and nobody can sign in.
+Environment=TICVAI_SECURE_COOKIE=
+
+# Loopback only. nginx is the sole way in, so there is one door to guard.
+ExecStart=@APP_DIR@/.venv/bin/uvicorn api.main:app --host 127.0.0.1 --port 8787
+
+Restart=always
+RestartSec=2
+
+# The service reads its own code and writes exactly one file. Nothing else on
+# the machine is its business.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=@APP_DIR@/viewer/api
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

@@ -586,11 +586,34 @@ function revealActive(rail) {
   active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
 }
 
+/**
+ * The layers this account may open, in tab order.
+ *
+ * The list comes from the server, not from a decision made here. A guest's
+ * payload does not contain the Backend or Decisions branch at all, so drawing
+ * the tab would offer a door onto an empty room — and deciding it here would
+ * mean two places could disagree about what the account is allowed.
+ */
+function visibleLayers() {
+  const allowed = state.session?.layers;
+  if (!allowed) return LAYERS;
+  const set = new Set(allowed);
+  return LAYERS.filter((l) => set.has(l.key));
+}
+
+/** Modes within a layer, likewise narrowed for a guest. Audit is never theirs. */
+function visibleModes(layer) {
+  const only = state.session?.modes?.[layer.key];
+  if (!only) return layer.modes;
+  const set = new Set(only);
+  return layer.modes.filter(([key]) => set.has(key));
+}
+
 function renderLayers() {
   const bar = $('layers');
   bar.innerHTML = '';
   document.body.dataset.layer = state.layer;
-  for (const layer of LAYERS) {
+  for (const layer of visibleLayers()) {
     const button = el('button', null, layer.label);
     button.dataset.layer = layer.key;
     button.title = layer.hint;
@@ -605,7 +628,7 @@ function renderLayers() {
 function renderModes() {
   const bar = $('modes');
   bar.innerHTML = '';
-  for (const [key, label] of layerOf(state.layer).modes) {
+  for (const [key, label] of visibleModes(layerOf(state.layer))) {
     const button = el('button', 'mode', label);
     button.dataset.mode = key;
     button.classList.toggle('active', key === state.mode);
@@ -924,6 +947,14 @@ async function ensureParts(keys, layerAtRequest) {
 }
 
 async function loadIndex() {
+  // Who this is, and what they may open. First, because it decides which tabs
+  // are drawn — and a guest asking for a layer they cannot have would be met
+  // with a 403 rather than a view.
+  state.session = await fetch('/api/session').then((r) => r.json()).catch(() => null);
+  if (state.session?.layers && !state.session.layers.includes(state.layer)) {
+    state.layer = state.session.layers[0];
+  }
+
   // The index is the one part nothing can be drawn without: the tree, the
   // graph and every selection resolve against it.
   const index = await fetch('/api/index').then((r) => r.json());

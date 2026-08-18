@@ -35,7 +35,9 @@ def _read_password() -> str:
 def add_admin(args) -> None:
     db.init()
     try:
-        email = security.check_email(args.email)
+        # An admin is always inside the company, so the domain rule applies
+        # here with no exception — the guest relaxation is for invites only.
+        email = security.check_email(args.email, "admin")
     except security.DomainError as exc:
         sys.exit(str(exc))
 
@@ -55,9 +57,14 @@ def add_admin(args) -> None:
 def add_invite(args) -> None:
     db.init()
     try:
-        email = security.check_email(args.email)
+        # The role decides whether the domain rule applies: a guest is an
+        # outside client and is expected to be on another domain.
+        email = security.check_email(args.email, args.role)
     except security.DomainError as exc:
         sys.exit(str(exc))
+
+    # A guest link leaves the company, so it is worth less for less time.
+    days = min(args.days, security.GUEST_INVITE_DAYS) if args.role == "guest" else args.days
 
     folded = db.fold(email)
     if db.one("SELECT id FROM account WHERE email_folded = ?", (folded,)):
@@ -73,7 +80,7 @@ def add_invite(args) -> None:
         """INSERT INTO invite (email, email_folded, token_hash, role, created_at, expires_at)
            VALUES (?, ?, ?, ?, ?, ?)""",
         (email, folded, security.token_hash(token), args.role,
-         security.stamp(), security.invite_expiry(args.days)),
+         security.stamp(), security.invite_expiry(days)),
     )
     print(f"invite for {email} ({args.role}), good for {args.days} days:\n")
     print(f"  {args.base}/invite.html#{token}\n")
@@ -212,7 +219,8 @@ def main() -> None:
 
     p = subs.add_parser("invite", help="make an invite link for one address")
     p.add_argument("email")
-    p.add_argument("--role", default="reviewer", choices=["reviewer", "admin"])
+    p.add_argument("--role", default="reviewer", choices=list(security.ROLES),
+                   help="guest is an outside client: reads a restricted view, records nothing")
     p.add_argument("--days", type=int, default=security.INVITE_DAYS)
     p.add_argument("--base", default="http://localhost:4173")
     p.set_defaults(func=add_invite)

@@ -1,6 +1,6 @@
 # Viewer — work index
 
-**33 items — V-01 to V-33.**
+**34 items — V-01 to V-34.**
 
 Generated from `PLAN.md`, which holds the reasoning and the anchors. This is the
 index: one line per item, so anything's state can be checked without reading it.
@@ -9,15 +9,14 @@ index: one line per item, so anything's state can be checked without reading it.
 |---|---|
 | BLOCKED — needs your decision | **5** |
 | IN FLIGHT — agents running | **2** |
-| OPEN — security | **3** |
 | OPEN — verified bugs | **3** |
 | OPEN — missing views | **2** |
 | OPEN — reviewer experience | **3** |
 | OPEN — polish | **6** |
-| DONE | **14** |
+| DONE | **18** |
 
-**Blocking: V-05.** No outside address can hold an account until the data server
-is behind the session.
+**Nothing is blocking.** The gate, the guest role and the role-filtered
+payloads all landed on 18 August, so an outside address can now hold an account.
 
 ---
 
@@ -37,14 +36,6 @@ is behind the session.
 |---|---|---|
 | **V-27** | `tools/check-package.py` UTF-8 + `check-flows.py` warning→error and branch walk | check-flows done, check-package still running |
 | **V-28** | The **Domains** lens page — `domains.html` / `.js` / `.css` | not yet written |
-
-## Open — security — 3
-
-| ID | Item |
-|---|---|
-| **V-05** | **Blocking.** Put `server.mjs` behind the session — every payload is open on 4173, and `/api/file` returns any `.yaml`/`.md`/`.json`/`.csv` in the tree |
-| **V-06** | Role-filtered payloads and a gate on `/api/file`. **Unblocked.** ADR-0025 replaced the two guest markers with one `x-ticvai-audience` field across 776 operations — 96 name `guest`. There is now a single vocabulary to filter against |
-| **V-07** | The `guest` role — invite-only, off-domain, read-only, enforced server-side |
 
 ## Open — verified bugs — 3
 
@@ -86,7 +77,7 @@ is behind the session.
 |---|---|
 | **V-24** | Stop the demo API on 8788 and remove `demo.db` |
 
-## Done — 14
+## Done — 18
 
 | ID | Item |
 |---|---|
@@ -103,6 +94,10 @@ is behind the session.
 | **V-09** | Graph arrowheads — painted the background colour because `fillStyle = strokeStyle` ran after `restore()` |
 | **V-13** | Lead-in paragraphs ending in `:` losing their payload — both extractors |
 | **V-26** | Root `README.md` back to 776 operations — restored by the 18 August re-extraction |
+| **V-05** | **The gate.** `lib/session.mjs` — every payload and every page behind the session, the sign-in page the one exception. `/api/index` 401s without a cookie |
+| **V-06** | **Role-filtered payloads.** `lib/audience.mjs` — a guest's index carries no audit and `/api/decisions`, `/api/backend`, `/api/lineage`, `/api/file`, `/api/tree` answer 403. Not hidden in the browser; absent from the payload |
+| **V-07** | **The `guest` role.** Off-domain by invite only, 3-day links, read-only enforced by `require_writer`. `checks/guest-check.mjs` — 26 checks |
+| **V-34** | **Deploy.** `deploy/` — setup.sh, three units, a backup timer, nginx on one origin. Both processes on loopback |
 | **V-19/22** | Docked legends, routing legend above the fold, red retired from meaning "primary (write)" |
 
 ---
@@ -123,7 +118,7 @@ now reads 776. V-26 is closed by the dump, not by me.
 
 ## Integrity
 
-- **Numbering:** V-01 to V-33; done items keep their original id or carry V-D
+- **Numbering:** V-01 to V-34; done items keep their original id or carry V-D
 - **Reasoning** lives in `PLAN.md`; this file holds no argument, only state
 - **Anchors** were checked against the source by a second reader. Re-verify any
   that is more than a few commits old — this package moves daily

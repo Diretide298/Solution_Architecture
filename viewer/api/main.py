@@ -14,6 +14,7 @@ binding it fails with Errno 10013.
 
 from __future__ import annotations
 
+import os
 from typing import List, Optional
 
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Response, Request
@@ -28,15 +29,22 @@ app = FastAPI(
     description=__doc__,
 )
 
-# The viewer is served by the Node process on another port, so the browser
-# treats calls here as cross-origin. Credentials must be allowed for the
-# session cookie to be sent at all, and allowing credentials rules out "*".
+# On a workstation the viewer is served by the Node process on another port, so
+# the browser treats calls here as cross-origin. Credentials must be allowed for
+# the session cookie to be sent at all, and allowing credentials rules out "*".
+#
+# A deployment puts both behind one address, where there is no cross-origin call
+# to permit and this list is simply unused. TICVAI_ORIGINS is for the case in
+# between — a server whose two halves are still on separate ports — and takes a
+# comma-separated list. It is never "*": that combined with credentials would
+# let any site on the internet read this one using the visitor's own session.
+_extra = [o.strip() for o in os.environ.get("TICVAI_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:4173", "http://127.0.0.1:4173",
         "http://localhost:8787", "http://127.0.0.1:8787",
-    ],
+    ] + _extra,
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["Content-Type"],
@@ -136,6 +144,19 @@ def require_account(account: Optional[dict] = Depends(current_account)) -> dict:
 def require_admin(account: dict = Depends(require_account)) -> dict:
     if account["role"] != "admin":
         raise HTTPException(403, "Only an admin can do that.")
+    return account
+
+
+def require_writer(account: dict = Depends(require_account)) -> dict:
+    """Anyone who may record a decision — admin or reviewer, never a guest.
+
+    A guest is read-only, and this is where that is true. Hiding the verdict
+    form in the browser is presentation; a hidden form is still a POST away for
+    anyone who opens devtools. The rule has to be here or it is not a rule.
+    """
+    if account["role"] not in security.WRITERS:
+        raise HTTPException(
+            403, "A guest account can read the package but cannot record a verdict.")
     return account
 
 
@@ -302,8 +323,8 @@ def set_active(account_id: int, active: bool, admin: dict = Depends(require_admi
 
 @app.post("/api/accounts/{account_id}/role")
 def set_role(account_id: int, role: str, admin: dict = Depends(require_admin)):
-    if role not in ("admin", "reviewer"):
-        raise HTTPException(400, "A role is either admin or reviewer.")
+    if role not in security.ROLES:
+        raise HTTPException(400, f"A role is one of {', '.join(security.ROLES)}.")
     row = db.one("SELECT id, role FROM account WHERE id = ?", (account_id,))
     if not row:
         raise HTTPException(404, "No such account.")
@@ -352,13 +373,20 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
     opens the link. That is what makes an invite count as having verified the
     address: the person who could vouch for it is the person who typed it.
     """
+    # The role is settled before the address, because it is the role that
+    # decides whether the domain rule applies. A guest is an outside client and
+    # is expected to be on another domain; a reviewer is not.
+    if body.role not in security.ROLES:
+        raise HTTPException(400, f"A role is one of {', '.join(security.ROLES)}.")
+
     try:
-        email = security.check_email(body.email)
+        email = security.check_email(body.email, body.role)
     except security.DomainError as exc:
         raise HTTPException(400, str(exc))
 
-    if body.role not in ("admin", "reviewer"):
-        raise HTTPException(400, "A role is either admin or reviewer.")
+    # A guest link goes to an address outside the company, so it is worth less
+    # for less time. Asking for longer is capped rather than refused.
+    days = min(body.days, security.GUEST_INVITE_DAYS) if body.role == "guest" else body.days
 
     folded = db.fold(email)
     if db.one("SELECT id FROM account WHERE email_folded = ?", (folded,)):
@@ -379,7 +407,7 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
            VALUES (?, ?, ?, ?, ?, ?, ?)""",
         (
             email, folded, security.token_hash(token), body.role,
-            admin["id"], security.stamp(), security.invite_expiry(body.days),
+            admin["id"], security.stamp(), security.invite_expiry(days),
         ),
     )
     # The only time the token exists in the clear. It is not recoverable later,
@@ -489,7 +517,7 @@ def redeem(body: Redemption, response: Response, request: Request):
 # ── verdicts ─────────────────────────────────────────────────────────
 
 @app.post("/api/validation")
-def record(body: VerdictIn, account: dict = Depends(require_account)):
+def record(body: VerdictIn, account: dict = Depends(require_writer)):
     if body.verdict not in VERDICTS:
         raise HTTPException(400, f"A verdict is one of {', '.join(VERDICTS)}.")
     if body.target_kind not in TARGET_KINDS:

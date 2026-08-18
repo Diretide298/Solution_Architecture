@@ -1,0 +1,39 @@
+[Unit]
+Description=TICVAI viewer — the delivery package
+Documentation=file://@APP_DIR@/viewer/README.md
+# The reader asks the accounts service who is at the door, so it is useless
+# before that is up. Not a hard dependency: if accounts dies later the reader
+# keeps running and refuses everyone, which is the correct way to fail.
+After=network-online.target ticvai-api.service
+Wants=network-online.target ticvai-api.service
+
+[Service]
+Type=exec
+User=@APP_USER@
+Group=@APP_USER@
+WorkingDirectory=@APP_DIR@/viewer
+
+# Where to ask who is signed in. Loopback — the two processes are on one host.
+Environment=TICVAI_AUTH=http://127.0.0.1:8787
+# TICVAI_OPEN=1 lifts the gate entirely. It exists for a workstation that wants
+# the old behaviour and must never appear on anything with a public address.
+# setup.sh proves the gate holds before it finishes, so a stray value here
+# fails the deploy rather than quietly serving the package to the internet.
+
+# Loopback only. nginx is the sole way in.
+ExecStart=/usr/bin/node server.mjs --port 4173 --host 127.0.0.1
+
+Restart=always
+RestartSec=2
+
+# It reads the package and writes nothing at all.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

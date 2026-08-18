@@ -1,0 +1,21 @@
+[Unit]
+Description=TICVAI viewer — snapshot the accounts and verdicts
+
+[Service]
+Type=oneshot
+User=@APP_USER@
+Group=@APP_USER@
+
+# `sqlite3 .backup` rather than `cp`, because the database is live: a plain
+# copy taken mid-write produces a file that opens and is wrong, which is worse
+# than one that fails to open. This takes a consistent snapshot without
+# stopping the service.
+#
+# It is the only copy of anything a person typed. The package can be regenerated
+# from a dump; a verdict cannot be regenerated from anything.
+ExecStart=/bin/sh -c 'install -d -m 700 @APP_DIR@/backups && \
+  /usr/bin/sqlite3 @APP_DIR@/viewer/api/ticvai.db ".backup @APP_DIR@/backups/ticvai-$(date +%%Y%%m%%d-%%H%%M).db" && \
+  ls -1t @APP_DIR@/backups/ticvai-*.db | tail -n +15 | xargs -r rm --'
+
+[Install]
+WantedBy=multi-user.target

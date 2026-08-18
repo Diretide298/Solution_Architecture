@@ -20,16 +20,30 @@ import { buildTooltips } from './lib/tooltips.mjs';
 import { buildDecisions } from './lib/decisions.mjs';
 import { buildDomains } from './lib/domains.mjs';
 import { extractFrame } from './lib/wireframes.mjs';
+import { gate } from './lib/session.mjs';
+import { guestMayCall, filterFor, layersFor, modesFor } from './lib/audience.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..');
 const PUBLIC = path.join(here, 'public');
 
+// Where the accounts service listens. Same host in every deployment — this is
+// a loopback call, not a trip over the network.
+const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
+// Named for what it does rather than what it undoes, and deliberately not
+// TICVAI_OPEN — there is already an --open flag that opens a browser, and a
+// switch that turns off authentication must not be one letter from it.
+const NO_GATE = process.env.TICVAI_NO_GATE === '1';
+
 function parseArgs(argv) {
-  const args = { port: 4173, dir: 'contracts', open: false };
+  // host defaults to every interface, which is right on a workstation and
+  // wrong on a server — there nginx is the only way in, so the deployment
+  // passes --host 127.0.0.1 and port 4173 is unreachable from outside.
+  const args = { port: 4173, dir: 'contracts', open: false, host: undefined };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--port') args.port = Number(argv[++i]);
     else if (argv[i] === '--dir') args.dir = argv[++i];
+    else if (argv[i] === '--host') args.host = argv[++i];
     else if (argv[i] === '--open') args.open = true;
   }
   return args;
@@ -274,7 +288,9 @@ const packedCache = new Map();
 function sendCachedJson(res, req, key, value) {
   let entry = packedCache.get(key);
   if (!entry) {
-    const body = Buffer.from(JSON.stringify(value));
+    // A thunk, so a filtered variant is built once on the miss rather than
+    // rebuilt on every hit and then thrown away.
+    const body = Buffer.from(JSON.stringify(typeof value === 'function' ? value() : value));
     entry = { body, packed: gzipSync(body) };
     packedCache.set(key, entry);
   }
@@ -292,6 +308,40 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   try {
+    // --- the gate ----------------------------------------------------------
+    // Before anything is read from disk. The sign-in page and the two files it
+    // needs are the only things a stranger is given; everything else — every
+    // payload and every page — waits for a session.
+    let role = null;
+    if (!NO_GATE) {
+      const seen = await gate(req, res, url, AUTH_BASE);
+      if (seen.answered) return;
+      role = seen.role;
+
+      // A guest is an outside client. The endpoints they may not call are
+      // refused here, at the door, rather than filtered further down — there
+      // is nothing in /api/backend or /api/decisions a client should receive,
+      // so the honest answer is 403 and not a hollowed-out payload.
+      //
+      // /api/session is exempt: it is what this account is, not what the
+      // package holds, and a guest has to be able to ask it or the tab strip
+      // cannot draw itself.
+      if (role === 'guest' && url.pathname.startsWith('/api/')
+          && url.pathname !== '/api/session' && !guestMayCall(url.pathname)) {
+        return send(res, 403, JSON.stringify({ error: 'not for a guest account' }), MIME['.json']);
+      }
+    }
+
+    // What this account may open, so the tab strip and the payload cannot
+    // disagree. The browser is told what it has rather than asked to guess.
+    if (url.pathname === '/api/session') {
+      return send(res, 200, JSON.stringify({
+        role: role ?? 'reviewer',
+        layers: layersFor(role ?? 'reviewer'),
+        modes: modesFor(role ?? 'reviewer'),
+      }), MIME['.json']);
+    }
+
     // --- API ---------------------------------------------------------------
     if (url.pathname === '/api/index') {
       if (!index) await refreshIndex('on demand');
@@ -299,7 +349,16 @@ const server = http.createServer(async (req, res) => {
       // viewer asks for it; it is there so a script that wants the whole index
       // in one piece does not have to reassemble it from the detail endpoint.
       const full = url.searchParams.get('full') === '1';
-      return sendCachedJson(res, req, full ? 'index-full' : 'index', full ? index : indexSlim);
+      const key = full ? 'index-full' : 'index';
+      const payload = full ? index : indexSlim;
+      // A guest's copy is a different document and gets its own cache entry —
+      // sharing one would eventually serve the unfiltered index to whoever
+      // asked second.
+      return sendCachedJson(
+        res, req,
+        role === 'guest' ? `${key}:guest` : key,
+        () => filterFor(role, '/api/index', payload)
+      );
     }
 
     // The fields held back from the index, for the one contract being read.
@@ -314,7 +373,11 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === '/api/journeys') {
       if (!journeys) await refreshIndex('on demand');
-      return sendCachedJson(res, req, 'journeys', journeys);
+      return sendCachedJson(
+        res, req,
+        role === 'guest' ? 'journeys:guest' : 'journeys',
+        () => filterFor(role, '/api/journeys', journeys)
+      );
     }
 
     if (url.pathname === '/api/backend') {
@@ -503,7 +566,7 @@ for (const dir of WATCH_DIRS) {
   }
 }
 
-server.listen(args.port, () => {
+server.listen(args.port, args.host, () => {
   const url = `http://localhost:${args.port}`;
   console.log(`\n  TICVAI contract viewer  →  ${url}`);
   console.log(`  watching ${watched.join(', ') || 'nothing'} for changes\n`);

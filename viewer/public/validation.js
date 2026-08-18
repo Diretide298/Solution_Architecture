@@ -11,9 +11,16 @@
  * price of the gate; the sign-in page is the one place that says so plainly.
  */
 
-// The service is on its own port, so calls are cross-origin and the session
-// cookie only rides along with credentials: 'include'.
-const API = localStorage.getItem('ticvai-api') ?? 'http://localhost:8787';
+// On a workstation the service is on its own port, so calls are cross-origin
+// and the session cookie only rides along with credentials: 'include'.
+//
+// A deployment puts nginx in front of both processes on one address, so there
+// the right base is the empty string — same origin, no CORS to configure, and
+// one cookie that both halves see. Anything other than localhost is taken to
+// be that, because a workstation is the only place the two ports are apart.
+// `ticvai-api` in localStorage still overrides, which is what the harnesses use.
+const sameOrigin = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const API = localStorage.getItem('ticvai-api') ?? (sameOrigin ? '' : 'http://localhost:8787');
 
 export const VERDICTS = [
   ['approved', 'Approved'],
@@ -245,6 +252,16 @@ export function verdictBlock(kind, id, label = id) {
       button.onclick = () => document.dispatchEvent(new CustomEvent('ticvai:signin'));
       prompt.append(button);
       formBox.append(prompt);
+      return;
+    }
+
+    // A guest reads and records nothing. Saying so is the point: an absent
+    // form reads as a page that failed to load, and a client who thinks the
+    // viewer is broken will say so to somebody other than us. The server
+    // refuses the write in any case — this is the explanation, not the rule.
+    if (session.account?.role === 'guest') {
+      formBox.append(el('p', 'pane-note',
+        'Signed in as a guest — you can read this package and record nothing.'));
       return;
     }
 
