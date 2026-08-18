@@ -54,6 +54,7 @@
           <select id="invite-role" class="scope-select">
             <option value="reviewer">reviewer</option>
             <option value="admin">admin</option>
+            <option value="guest">guest — outside client</option>
           </select>
           <select id="invite-days" class="scope-select">
             <option value="7">7 days</option>
@@ -62,6 +63,18 @@
           </select>
           <button id="invite-create" class="chip" type="button">Make a link</button>
         </div>
+        <!-- A guest is the one role whose rules differ, and both differences
+             are invisible until the invite is made: the address may be outside
+             the company, and the link is capped at three days however long is
+             asked for. Saying so here beats a surprise afterwards. -->
+        <p class="auth-note" id="invite-guest-note" hidden>
+          <strong>A guest is an outside client.</strong> They read the Frontend
+          and Contracts layers and record nothing — no Decisions, no Backend,
+          no audit. The <code>@softlabsgroup.com</code> rule does not apply, so
+          the address can be anywhere; you typing it is what vouches for it.
+          The link expires in <strong>three days</strong> whatever is chosen
+          above.
+        </p>
         <p class="auth-error" id="invite-error" hidden></p>
 
         <div id="invite-result" hidden>
@@ -192,6 +205,17 @@
         }
       }
 
+      // The placeholder and the note follow the role, because the address rule
+      // is the thing that changes and an @softlabsgroup.com placeholder above a
+      // guest invite reads as a refusal waiting to happen.
+      $('invite-role').onchange = () => {
+        const guest = $('invite-role').value === 'guest';
+        $('invite-guest-note').hidden = !guest;
+        $('invite-email').placeholder = guest
+          ? 'them@theircompany.com'
+          : 'them@softlabsgroup.com';
+      };
+
       $('invite-create').onclick = async () => {
         $('invite-error').hidden = true;
         $('invite-result').hidden = true;
@@ -242,7 +266,7 @@
           row.append(el('span', 'invite-who', person.email + (person.id === me.id ? ' (you)' : '')));
 
           const role = el('select', 'scope-select admin-role');
-          for (const value of ['reviewer', 'admin']) {
+          for (const value of ['reviewer', 'admin', 'guest']) {
             const option = el('option', null, value);
             option.value = value;
             if (person.role === value) option.selected = true;
