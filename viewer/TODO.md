@@ -95,8 +95,8 @@ payloads all landed on 18 August, so an outside address can now hold an account.
 | **V-13** | Lead-in paragraphs ending in `:` losing their payload — both extractors |
 | **V-26** | Root `README.md` back to 776 operations — restored by the 18 August re-extraction |
 | **V-05** | **The gate.** `lib/session.mjs` — every payload and every page behind the session, the sign-in page the one exception. `/api/index` 401s without a cookie |
-| **V-06** | **Role-filtered payloads.** `lib/audience.mjs` — a guest's index carries no audit and `/api/decisions`, `/api/backend`, `/api/lineage`, `/api/file`, `/api/tree` answer 403. Not hidden in the browser; absent from the payload |
-| **V-07** | **The `guest` role.** Off-domain by invite only, 3-day links, read-only enforced by `require_writer`. `checks/guest-check.mjs` — 26 checks |
+| **V-06** | **Role-filtered reads.** `lib/audience.mjs` — a client reads everything except the Decisions layer. `/api/decisions` 403s, and so does `/api/file` for anything that layer serves, which is the leak that matters: an ADR is a `.md` |
+| **V-07** | **The `client` role.** Off-domain by invite only, 3-day links, read-only enforced by `require_writer`. Named `client` not `guest` — the package already uses `guest` for a venue visitor. `checks/client-check.mjs` — 32 checks |
 | **V-34** | **Deploy.** `deploy/` — setup.sh, three units, a backup timer, nginx on one origin. Both processes on loopback |
 | **V-19/22** | Docked legends, routing legend above the fold, red retired from meaning "primary (write)" |
 

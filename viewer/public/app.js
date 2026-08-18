@@ -589,7 +589,7 @@ function revealActive(rail) {
 /**
  * The layers this account may open, in tab order.
  *
- * The list comes from the server, not from a decision made here. A guest's
+ * The list comes from the server, not from a decision made here. A client's
  * payload does not contain the Backend or Decisions branch at all, so drawing
  * the tab would offer a door onto an empty room — and deciding it here would
  * mean two places could disagree about what the account is allowed.
@@ -601,7 +601,8 @@ function visibleLayers() {
   return LAYERS.filter((l) => set.has(l.key));
 }
 
-/** Modes within a layer, likewise narrowed for a guest. Audit is never theirs. */
+/** Modes within a layer. A client gets every mode of every layer they can
+ *  open — the narrowing is by layer, not within one. */
 function visibleModes(layer) {
   const only = state.session?.modes?.[layer.key];
   if (!only) return layer.modes;
@@ -948,7 +949,7 @@ async function ensureParts(keys, layerAtRequest) {
 
 async function loadIndex() {
   // Who this is, and what they may open. First, because it decides which tabs
-  // are drawn — and a guest asking for a layer they cannot have would be met
+  // are drawn — and a client asking for a layer they cannot have would be met
   // with a 403 rather than a view.
   state.session = await fetch('/api/session').then((r) => r.json()).catch(() => null);
   if (state.session?.layers && !state.session.layers.includes(state.layer)) {

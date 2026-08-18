@@ -360,6 +360,26 @@ CSS-scales `.journey-track` (the pattern already exists in `frameStage`,
 
 # 5. A guest account type
 
+> **Superseded in two ways, 18 August — built as written below, then changed.**
+>
+> **The role is `client`, not `guest`.** The package already uses `guest` for a
+> venue visitor, on 96 operations in `x-ticvai-audience`. Two meanings for one
+> word in one repository is a bug waiting for somebody to read the wrong one.
+>
+> **A client sees everything except the Decisions layer**, not the Frontend and
+> Contracts subset decided on 17 August. Requested directly, and the narrower
+> version withheld the data model and the state machines — which are a
+> description of what is being built, and the thing a client is entitled to.
+> What is still withheld is the deliberation: rejected options, what they would
+> have cost, which vendor lost, what has since been superseded.
+>
+> Everything else below holds as written: invite-only, off-domain only for this
+> role, three-day links, read-only enforced by `require_writer`, and the payload
+> refused rather than hollowed out. The one addition experience forced is the
+> `/api/file` gate — an ADR is a `.md` file, so refusing `/api/decisions` and
+> leaving that endpoint open would have let a client read every decision one
+> path at a time.
+
 Requested: an account **outside `softlabsgroup.com`** that can **view but not
 write**.
 

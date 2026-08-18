@@ -36,7 +36,7 @@ def add_admin(args) -> None:
     db.init()
     try:
         # An admin is always inside the company, so the domain rule applies
-        # here with no exception — the guest relaxation is for invites only.
+        # here with no exception — the client relaxation is for invites only.
         email = security.check_email(args.email, "admin")
     except security.DomainError as exc:
         sys.exit(str(exc))
@@ -57,14 +57,14 @@ def add_admin(args) -> None:
 def add_invite(args) -> None:
     db.init()
     try:
-        # The role decides whether the domain rule applies: a guest is an
-        # outside client and is expected to be on another domain.
+        # The role decides whether the domain rule applies: a client is
+        # outside the company and is expected to be on another domain.
         email = security.check_email(args.email, args.role)
     except security.DomainError as exc:
         sys.exit(str(exc))
 
-    # A guest link leaves the company, so it is worth less for less time.
-    days = min(args.days, security.GUEST_INVITE_DAYS) if args.role == "guest" else args.days
+    # A client link leaves the company, so it is worth less for less time.
+    days = min(args.days, security.CLIENT_INVITE_DAYS) if args.role == "client" else args.days
 
     folded = db.fold(email)
     if db.one("SELECT id FROM account WHERE email_folded = ?", (folded,)):
@@ -82,7 +82,7 @@ def add_invite(args) -> None:
         (email, folded, security.token_hash(token), args.role,
          security.stamp(), security.invite_expiry(days)),
     )
-    print(f"invite for {email} ({args.role}), good for {args.days} days:\n")
+    print(f"invite for {email} ({args.role}), good for {days} days:\n")
     print(f"  {args.base}/invite.html#{token}\n")
     print("Send that link to them. It works once, and only for that address.")
     print("It is not stored and cannot be shown again — make another if it is lost.")
@@ -220,7 +220,7 @@ def main() -> None:
     p = subs.add_parser("invite", help="make an invite link for one address")
     p.add_argument("email")
     p.add_argument("--role", default="reviewer", choices=list(security.ROLES),
-                   help="guest is an outside client: reads a restricted view, records nothing")
+                   help="client is outside the company: reads everything but the decisions, records nothing")
     p.add_argument("--days", type=int, default=security.INVITE_DAYS)
     p.add_argument("--base", default="http://localhost:4173")
     p.set_defaults(func=add_invite)

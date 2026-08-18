@@ -62,35 +62,42 @@ ls -l /srv/ticvai/backups/
 
 ## Inviting a client
 
-A guest is an outside client: they read a restricted view and record nothing.
+A client is somebody outside the company: they read everything except the
+decisions, and record nothing.
 
 ```
 sudo -u ticvai env TICVAI_DB=/srv/ticvai/viewer/api/ticvai.db \
   PYTHONPATH=/srv/ticvai/viewer /srv/ticvai/.venv/bin/python \
-  -m api.cli invite them@theircompany.com --role guest --base http://<server>
+  -m api.cli invite them@theircompany.com --role client --base http://<server>
 ```
 
 The `@softlabsgroup.com` rule still applies to `admin` and `reviewer`. It is
-lifted for `guest` alone, because a client is by definition somewhere else —
+lifted for `client` alone, because a client is by definition somewhere else —
 and what replaces it is the invite. The address is fixed by the admin who
 types it and cannot be changed by whoever opens the link, so the person who
-could vouch for the address is the person who typed it. Guest links expire in
+could vouch for the address is the person who typed it. Client links expire in
 three days rather than seven.
 
-**What a guest sees:** Frontend (Screen, Journey, Apps, Waves) and Contracts
-(Reader, Structure). **What they do not:** Decisions, Backend, Lineage, every
-Audit view, and the verdict history. Not hidden in the browser — a guest's
-`/api/index` does not contain the audit at all, and `/api/decisions`,
-`/api/backend`, `/api/file` and `/api/tree` answer 403 to them.
+**What a client sees:** everything — Frontend, Contracts, Domain and Backend,
+every mode of each, the audit included. **What they do not:** the Decisions
+layer. The ADRs, the registers and the conflict log record the options that
+were rejected, what they would have cost and what has since been superseded,
+and a reader who takes a rejected option for a current one is reading
+something that was never meant to be a statement.
+
+Not hidden in the browser. `/api/decisions` answers 403, and so does
+`/api/file` for anything the Decisions layer serves — which is the one that
+matters, because an ADR is a `.md` file and blocking only the endpoint would
+leave every decision readable one path at a time.
 
 Prove it rather than believe it:
 
 ```
-node viewer/checks/guest-check.mjs
+node viewer/checks/client-check.mjs
 ```
 
-26 checks. It creates a guest, asks the server the questions a curious client
-would ask from devtools, and removes the account afterwards.
+32 checks. It creates a client, asks the server the questions a curious
+reader would ask from devtools, and removes the account afterwards.
 
 ## This address has no certificate
 

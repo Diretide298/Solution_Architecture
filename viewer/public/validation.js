@@ -255,13 +255,13 @@ export function verdictBlock(kind, id, label = id) {
       return;
     }
 
-    // A guest reads and records nothing. Saying so is the point: an absent
+    // A client reads and records nothing. Saying so is the point: an absent
     // form reads as a page that failed to load, and a client who thinks the
     // viewer is broken will say so to somebody other than us. The server
     // refuses the write in any case — this is the explanation, not the rule.
-    if (session.account?.role === 'guest') {
+    if (session.account?.role === 'client') {
       formBox.append(el('p', 'pane-note',
-        'Signed in as a guest — you can read this package and record nothing.'));
+        'Signed in as a client — you can read this package and record nothing.'));
       return;
     }
 

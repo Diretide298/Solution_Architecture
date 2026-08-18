@@ -1,37 +1,76 @@
 /**
- * What a guest is allowed to read.
+ * What a client is allowed to read.
  *
- * A guest is an outside client, not a contractor. The decision of 17 August is
- * that they see their product and the interface they will build against, and
- * nothing about how it was argued for or how it is stored:
+ * A client is somebody outside the company who has been given a login to read
+ * the package. The rule is **everything except the decisions**: they see the
+ * product, the interface, the data model and the state machines — the whole
+ * deliverable — and not the arguments that produced it.
  *
- *   sees      Frontend — Screen, Journey, Apps, Waves
- *             Contracts — Reader, Structure
+ *   sees      Frontend   screens, journeys, apps, waves
+ *             Contracts  the API they will build against
+ *             Domain     state models and events
+ *             Backend    the data model, migrations, routing
  *
- *   does not  Decisions      rejected options, cost arguments, vendor choices
- *             Audit          a live defect count is our own quality control
- *             Backend        row-security policies, read/write routing
- *             Lineage        a candour page naming what is stale
- *             Verdicts       reviewers disagreeing, and per-person statistics
+ *   does not  Decisions  the ADRs, the registers, the conflict log
  *
- * The rule this file exists to enforce: **a guest's payload must not contain
+ * Why that one and nothing else: an ADR records the options that were rejected,
+ * what they would have cost, which vendor lost and why, and what has since been
+ * superseded. That is deliberation, and a reader who takes a rejected option
+ * for a current one is reading something that was never meant to be a
+ * statement. The rest of the package is a description of what is being built,
+ * which is the thing a client is entitled to.
+ *
+ * The rule this file exists to enforce: **a client's payload must not contain
  * the branch at all**, rather than contain it and have the browser decline to
  * draw it. A client handed a login can open devtools and fetch whatever the
  * server will answer. Hiding a tab in `app.js` is decoration; this is the
  * access control.
+ *
+ * Named `client` and not `guest` because the package already has a guest — its
+ * own word for a venue visitor, on 96 operations in `x-ticvai-audience`.
  */
 
-/** Endpoints a guest may call at all. Everything else is refused outright. */
-const GUEST_ENDPOINTS = new Set([
-  '/api/index',
-  '/api/detail',
-  '/api/journeys',
-  '/api/tooltips',
-  '/api/events',
-]);
+/** Endpoints a client may not call. Everything else is theirs. */
+const CLIENT_DENIED = new Set(['/api/decisions']);
 
-export function guestMayCall(pathname) {
-  return GUEST_ENDPOINTS.has(pathname);
+export function clientMayCall(pathname) {
+  return !CLIENT_DENIED.has(pathname);
+}
+
+/**
+ * Files a client may not read through /api/file or /api/tree.
+ *
+ * This is the leak that makes the endpoint list insufficient on its own:
+ * /api/file will return any .md in the tree, and the ADRs are .md files. Refuse
+ * /api/decisions and leave the endpoint open, and a client reads every ADR one
+ * path at a time.
+ *
+ * The list is derived from the decisions payload rather than hardcoded, so it
+ * is exactly what the Decisions layer serves and stays right as the package
+ * changes. A new register appears in `docs/registers/` and it is covered
+ * without anybody remembering to add it here.
+ */
+export function decisionFiles(decisions) {
+  const files = new Set();
+  for (const adr of decisions?.adrs ?? []) if (adr.file) files.add(adr.file);
+  for (const doc of decisions?.documents ?? []) if (doc.file) files.add(doc.file);
+  // The normative spec the Decisions layer executes, which names it in prose.
+  files.add('docs/architecture/specs/permission-vectors.json');
+  return files;
+}
+
+/**
+ * True when this path is part of the Decisions layer.
+ *
+ * Compared with the path normalised the way /api/file receives it — forward
+ * slashes, no leading ./ — because a Windows-authored path and a URL parameter
+ * have to agree here or the check silently passes everything.
+ */
+export function isDecisionFile(rel, files) {
+  const norm = String(rel).replace(/\\/g, '/').replace(/^\.\//, '');
+  if (files.has(norm)) return true;
+  // Every ADR, including one added since the payload was built.
+  return /^docs\/adr\//i.test(norm);
 }
 
 /**
@@ -40,52 +79,19 @@ export function guestMayCall(pathname) {
  * never disagree — the browser is told what it has, not asked to guess.
  */
 export function layersFor(role) {
-  return role === 'guest'
-    ? ['frontend', 'contracts']
+  return role === 'client'
+    ? ['frontend', 'contracts', 'domain', 'backend']
     : ['frontend', 'contracts', 'domain', 'backend', 'decisions'];
 }
 
-export function modesFor(role) {
-  return role === 'guest'
-    ? { frontend: ['screen', 'journey', 'apps', 'waves'], contracts: ['reader', 'structure'] }
-    : null; // null means "whatever the layer normally offers"
+/** null means "whatever the layer normally offers". A client gets every mode
+ *  of every layer they can open, including Audit: they see the package as it
+ *  is, and a defect count is part of how it is. */
+export function modesFor() {
+  return null;
 }
 
-/**
- * The index, with everything a guest may not see taken out.
- *
- * `problems` is the one that matters most and is easiest to miss: it is the
- * audit, carried inside the index rather than fetched separately, so filtering
- * the Audit *view* would have left the defect list in the payload.
- */
-export function indexForGuest(index) {
-  if (!index) return index;
-  const { problems, structure, ...rest } = index;
-  return {
-    ...rest,
-    // Kept as an empty list rather than dropped, so the client renders "nothing
-    // to report" instead of breaking on an absent field.
-    problems: [],
-    guest: true,
-  };
-}
-
-/**
- * Journeys, minus the reviewer's apparatus.
- *
- * The screens themselves are the point of a guest's view, so they stay whole.
- * What goes is the commentary about how complete they are.
- */
-export function journeysForGuest(journeys) {
-  if (!journeys) return journeys;
-  const { problems, coverage, missing, ...rest } = journeys;
-  return { ...rest, problems: [], guest: true };
-}
-
-/** One place that decides, so a new endpoint cannot quietly default to open. */
-export function filterFor(role, pathname, payload) {
-  if (role !== 'guest') return payload;
-  if (pathname === '/api/index') return indexForGuest(payload);
-  if (pathname === '/api/journeys') return journeysForGuest(payload);
-  return payload;
-}
+// There is deliberately no per-endpoint payload filter. A client either may
+// call an endpoint or may not, and on the ones they may they receive exactly
+// what a reviewer receives. A filter that hollows out a payload is a second
+// place for the rule to live, and the second place is the one that drifts.

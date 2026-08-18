@@ -148,15 +148,15 @@ def require_admin(account: dict = Depends(require_account)) -> dict:
 
 
 def require_writer(account: dict = Depends(require_account)) -> dict:
-    """Anyone who may record a decision — admin or reviewer, never a guest.
+    """Anyone who may record a decision — admin or reviewer, never a client.
 
-    A guest is read-only, and this is where that is true. Hiding the verdict
+    A client is read-only, and this is where that is true. Hiding the verdict
     form in the browser is presentation; a hidden form is still a POST away for
     anyone who opens devtools. The rule has to be here or it is not a rule.
     """
     if account["role"] not in security.WRITERS:
         raise HTTPException(
-            403, "A guest account can read the package but cannot record a verdict.")
+            403, "A client account can read the package but cannot record a verdict.")
     return account
 
 
@@ -374,7 +374,7 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
     address: the person who could vouch for it is the person who typed it.
     """
     # The role is settled before the address, because it is the role that
-    # decides whether the domain rule applies. A guest is an outside client and
+    # decides whether the domain rule applies. A client is outside the company and
     # is expected to be on another domain; a reviewer is not.
     if body.role not in security.ROLES:
         raise HTTPException(400, f"A role is one of {', '.join(security.ROLES)}.")
@@ -384,9 +384,9 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
     except security.DomainError as exc:
         raise HTTPException(400, str(exc))
 
-    # A guest link goes to an address outside the company, so it is worth less
+    # A client link goes to an address outside the company, so it is worth less
     # for less time. Asking for longer is capped rather than refused.
-    days = min(body.days, security.GUEST_INVITE_DAYS) if body.role == "guest" else body.days
+    days = min(body.days, security.CLIENT_INVITE_DAYS) if body.role == "client" else body.days
 
     folded = db.fold(email)
     if db.one("SELECT id FROM account WHERE email_folded = ?", (folded,)):

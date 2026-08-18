@@ -34,16 +34,21 @@ ALLOWED_DOMAIN = os.environ.get("TICVAI_DOMAIN", "softlabsgroup.com").lower()
 SESSION_DAYS = 14
 INVITE_DAYS = 7
 
-# The three roles. A guest is an outside client: it reads a restricted view and
-# writes nothing. Kept here rather than in main.py because two places used to
-# hold the list and the second was always the one that got missed.
-ROLES = ("admin", "reviewer", "guest")
+# The three roles. A client is outside the company: it reads everything except
+# the decisions and writes nothing. Kept here rather than in main.py because two
+# places held the list and the second was always the one that got missed.
+#
+# Named `client` and not `guest` because this codebase already has a guest: the
+# package's own word for a venue visitor, in `x-ticvai-audience` on 96
+# operations. Two meanings for one word in one repository is a bug waiting for
+# somebody to read the wrong one.
+ROLES = ("admin", "reviewer", "client")
 WRITERS = ("admin", "reviewer")
 
-# A guest invite is a link to an address we do not control, handed to somebody
+# A client invite is a link to an address we do not control, handed to somebody
 # outside the company. A shorter window is the cheapest thing that limits what
 # a forwarded or leaked link is worth.
-GUEST_INVITE_DAYS = 3
+CLIENT_INVITE_DAYS = 3
 
 # Deliberately not a full RFC 5322 parser. It rejects the shapes that are not
 # addresses; the invite, not the regex, is what establishes the address is real.
@@ -79,25 +84,25 @@ def check_email(email: str, role: str = "reviewer") -> str:
     this company and signing artefacts off in their name. It stays exactly as
     it was for `admin` and `reviewer`.
 
-    A guest is an outside client, so the rule cannot apply — the address is
+    A client is outside the company, so the rule cannot apply — the address is
     meant to be elsewhere. What replaces it is the invite: an admin types the
     address, the token fixes it, and whoever opens the link cannot change it.
     The person who could vouch for the address is the person who typed it.
 
-    That reasoning only holds while a guest cannot be created any other way, so
+    That reasoning only holds while a client cannot be created any other way, so
     `/api/auth/bootstrap` refuses the role and there is no self-signup path.
     """
     address = email.strip()
     if not _EMAIL.match(address):
         raise DomainError(f"{address!r} is not an email address.")
-    if role == "guest":
+    if role == "client":
         return address
     domain = address.rsplit("@", 1)[1].lower()
     if domain != ALLOWED_DOMAIN:
         raise DomainError(
             f"Only {ALLOWED_DOMAIN} addresses can hold an account, and "
             f"{address!r} is on {domain}. An outside address can be invited "
-            f"as a guest, which reads but records nothing."
+            f"as a client, which reads but records nothing."
         )
     return address
 

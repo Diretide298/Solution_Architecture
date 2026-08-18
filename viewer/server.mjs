@@ -21,7 +21,7 @@ import { buildDecisions } from './lib/decisions.mjs';
 import { buildDomains } from './lib/domains.mjs';
 import { extractFrame } from './lib/wireframes.mjs';
 import { gate } from './lib/session.mjs';
-import { guestMayCall, filterFor, layersFor, modesFor } from './lib/audience.mjs';
+import { clientMayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..');
@@ -318,17 +318,11 @@ const server = http.createServer(async (req, res) => {
       if (seen.answered) return;
       role = seen.role;
 
-      // A guest is an outside client. The endpoints they may not call are
-      // refused here, at the door, rather than filtered further down — there
-      // is nothing in /api/backend or /api/decisions a client should receive,
-      // so the honest answer is 403 and not a hollowed-out payload.
-      //
-      // /api/session is exempt: it is what this account is, not what the
-      // package holds, and a guest has to be able to ask it or the tab strip
-      // cannot draw itself.
-      if (role === 'guest' && url.pathname.startsWith('/api/')
-          && url.pathname !== '/api/session' && !guestMayCall(url.pathname)) {
-        return send(res, 403, JSON.stringify({ error: 'not for a guest account' }), MIME['.json']);
+      // A client reads everything except the decisions, so the refusal is
+      // narrow and it happens here, at the door. The honest answer is 403 and
+      // not a hollowed-out payload: they either may read a thing or may not.
+      if (role === 'client' && !clientMayCall(url.pathname)) {
+        return send(res, 403, JSON.stringify({ error: 'not for a client account' }), MIME['.json']);
       }
     }
 
@@ -349,16 +343,7 @@ const server = http.createServer(async (req, res) => {
       // viewer asks for it; it is there so a script that wants the whole index
       // in one piece does not have to reassemble it from the detail endpoint.
       const full = url.searchParams.get('full') === '1';
-      const key = full ? 'index-full' : 'index';
-      const payload = full ? index : indexSlim;
-      // A guest's copy is a different document and gets its own cache entry —
-      // sharing one would eventually serve the unfiltered index to whoever
-      // asked second.
-      return sendCachedJson(
-        res, req,
-        role === 'guest' ? `${key}:guest` : key,
-        () => filterFor(role, '/api/index', payload)
-      );
+      return sendCachedJson(res, req, full ? 'index-full' : 'index', full ? index : indexSlim);
     }
 
     // The fields held back from the index, for the one contract being read.
@@ -373,11 +358,7 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === '/api/journeys') {
       if (!journeys) await refreshIndex('on demand');
-      return sendCachedJson(
-        res, req,
-        role === 'guest' ? 'journeys:guest' : 'journeys',
-        () => filterFor(role, '/api/journeys', journeys)
-      );
+      return sendCachedJson(res, req, 'journeys', journeys);
     }
 
     if (url.pathname === '/api/backend') {
@@ -419,6 +400,17 @@ const server = http.createServer(async (req, res) => {
       const allowed = url.pathname === '/api/file' ? /\.(ya?ml|md|json|csv)$/i : /\.ya?ml$/i;
       if (!abs.startsWith(ROOT + path.sep) || !allowed.test(abs)) {
         return send(res, 403, 'refused');
+      }
+      // The endpoint list alone does not hold the line here. An ADR is a .md
+      // file, so refusing /api/decisions and leaving this open lets a client
+      // read every decision one path at a time — which is the whole of what
+      // they are not supposed to have.
+      if (role === 'client') {
+        // Built on demand rather than trusted to be there: the registers are
+        // only known from this payload, and an unbuilt one would narrow the
+        // check to the ADR directory without saying so.
+        if (!decisions) await refreshIndex('on demand');
+        if (isDecisionFile(rel, decisionFiles(decisions))) return send(res, 403, 'refused');
       }
       const text = await readFile(abs, 'utf8');
 
