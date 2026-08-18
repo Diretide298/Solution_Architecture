@@ -369,26 +369,54 @@ export async function buildDecisions(root) {
   // only place a reader learns that 347 requirements need a report register and
   // no report register exists. Lifted out so it can be shown as findings.
   const audit = documents.find((d) => d.id === 'artefact-audit');
-  const gaps = [];
+
+  // The register carries the audit three times over: the original finding, a
+  // dated position after the work, and the classes still blocked. Reading every
+  // table and pushing every row listed each class twice — once red from the
+  // first table and once green from the second — so the page said Configuration
+  // and Audit and Notification had nothing behind them on the same screen as
+  // the register saying both were closed on 17 August.
+  //
+  // The document is chronological, so a later table supersedes an earlier one
+  // for any class it names. Keyed case-insensitively, because the first table
+  // capitalises and the later ones do not, and two cases of one name is what
+  // made the duplicates look like different classes.
+  const byClass = new Map();
   for (const table of audit?.tables ?? []) {
     const head = table.headers.map((h) => h.toLowerCase());
     const at = (name) => head.findIndex((h) => h.includes(name));
-    const [reqs, klass, hold, artefact] = [at('req'), at('class'), at('hold'), at('artefact')];
-    if (klass < 0 || artefact < 0) continue;
+    const [reqs, klass, hold] = [at('req'), at('class'), at('hold')];
+    // Three shapes, and the third is the one that was being dropped: the
+    // classes still open name what blocks them rather than what covers them,
+    // so a table with no Artefact column is the most important of the three.
+    const artefact = at('artefact');
+    const blocked = at('blocked');
+    const verdictAt = artefact >= 0 ? artefact : blocked;
+    if (klass < 0 || verdictAt < 0) continue;
+
     for (const row of table.rows) {
-      const verdict = row[artefact] ?? '';
-      const open = /🔴|🟡/.test(verdict);
-      gaps.push({
+      const name = strip(row[klass]);
+      if (!name) continue;
+      const verdict = strip(row[verdictAt] ?? '');
+      // A blocked class is open and stays open, whatever it looks like: the
+      // column says who we are waiting on, not what we hold.
+      const isBlocked = artefact < 0;
+      const state = isBlocked ? 'blocked'
+        : /🔴/.test(verdict) ? 'missing'
+        : /🟡/.test(verdict) ? 'partial'
+        : 'covered';
+      byClass.set(name.toLowerCase(), {
         requirements: Number(strip(row[reqs] ?? '').replace(/[^\d]/g, '')) || 0,
-        class: strip(row[klass]),
-        holding: strip(row[hold] ?? ''),
-        verdict: strip(verdict),
-        state: /🔴/.test(verdict) ? 'missing' : /🟡/.test(verdict) ? 'partial' : 'covered',
-        open,
+        class: name,
+        holding: isBlocked ? '' : strip(row[hold] ?? ''),
+        blockedBy: isBlocked ? verdict : '',
+        verdict,
+        state,
+        open: state !== 'covered',
       });
     }
   }
-  gaps.sort((a, b) => b.requirements - a.requirements);
+  const gaps = [...byClass.values()].sort((a, b) => b.requirements - a.requirements);
 
   const missing = gaps.filter((g) => g.state === 'missing');
   if (missing.length) {

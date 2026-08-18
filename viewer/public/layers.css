@@ -948,6 +948,9 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
 .gap-name { font-size: 12px; color: var(--text-dim); }
 .gap-name.missing { color: #f87171; font-weight: 600; }
 .gap-name.partial { color: #fbbf24; }
+/* Blocked is open, but not open on us — the bar and the name say so in the
+   colour used elsewhere for "real, and not here yet". */
+.gap-name.blocked { color: #60a5fa; font-weight: 600; }
 
 .doc-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

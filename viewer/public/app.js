@@ -5510,10 +5510,15 @@ function renderArtefactGaps(body, hit) {
   for (const gap of gaps) {
     const line = el('div', 'routing-row');
     const name = el('span', `gap-name ${gap.state}`, gap.class);
+    const said = gap.verdict.replace(/^[✅🟡🔴]\s*/, '');
     tip(name, gap.class,
-      gap.state === 'covered'
-        ? `Covered — ${gap.verdict.replace(/^[✅🟡🔴]\s*/, '')}`
-        : `**${gap.verdict.replace(/^[✅🟡🔴]\s*/, '')}**`,
+      gap.state === 'blocked'
+        // Not a gap in the package. Somebody outside it owes an answer, and
+        // saying which is the only thing that moves it.
+        ? `**Blocked — waiting on ${said}**
+
+Not ours to close.`
+        : gap.state === 'covered' ? `Covered — ${said}` : `**${said}**`,
       gap.holding ? `holding: ${gap.holding}` : null);
     line.append(name);
 
@@ -5521,8 +5526,15 @@ function renderArtefactGaps(body, hit) {
     bar.style.width = `${(gap.requirements / max) * 100}%`;
     const seg = el('div', 'routing-seg', String(gap.requirements));
     seg.style.flexGrow = '1';
-    seg.style.background =
-      gap.state === 'missing' ? '#f87171' : gap.state === 'partial' ? '#fbbf24' : '#34d399';
+    seg.style.background = {
+      missing: '#f87171',
+      partial: '#fbbf24',
+      // blocked is not the same as absent: the work cannot start until a
+      // workshop happens or the client answers, so colouring it red would put
+      // somebody else's decision on our side of the ledger.
+      blocked: '#60a5fa',
+      covered: '#34d399',
+    }[gap.state] ?? '#34d399';
     bar.append(seg);
     line.append(bar);
     line.append(el('span', 'routing-total', gap.state));
@@ -5533,7 +5545,8 @@ function renderArtefactGaps(body, hit) {
   const legend = el('div', 'inline-legend');
   body.append(legend);
   renderBoxLegend(legend,
-    [['#f87171', 'nothing behind it'], ['#fbbf24', 'partial'], ['#34d399', 'covered']],
+    [['#f87171', 'nothing behind it'], ['#fbbf24', 'partial'],
+     ['#60a5fa', 'blocked — waiting on someone else'], ['#34d399', 'covered']],
     'bar length is the number of requirements that need an artefact of this class');
 }
 

@@ -1,6 +1,6 @@
 # Viewer — work index
 
-**34 items — V-01 to V-34.**
+**35 items — V-01 to V-35.**
 
 Generated from `PLAN.md`, which holds the reasoning and the anchors. This is the
 index: one line per item, so anything's state can be checked without reading it.
@@ -13,7 +13,7 @@ index: one line per item, so anything's state can be checked without reading it.
 | OPEN — missing views | **2** |
 | OPEN — reviewer experience | **3** |
 | OPEN — polish | **6** |
-| DONE | **18** |
+| DONE | **19** |
 
 **Nothing is blocking.** The gate, the guest role and the role-filtered
 payloads all landed on 18 August, so an outside address can now hold an account.
@@ -77,7 +77,7 @@ payloads all landed on 18 August, so an outside address can now hold an account.
 |---|---|
 | **V-24** | Stop the demo API on 8788 and remove `demo.db` |
 
-## Done — 18
+## Done — 19
 
 | ID | Item |
 |---|---|
@@ -98,6 +98,7 @@ payloads all landed on 18 August, so an outside address can now hold an account.
 | **V-06** | **Role-filtered reads.** `lib/audience.mjs` — a client reads everything except the Decisions layer. `/api/decisions` 403s, and so does `/api/file` for anything that layer serves, which is the leak that matters: an ADR is a `.md` |
 | **V-07** | **The `client` role.** Off-domain by invite only, 3-day links, read-only enforced by `require_writer`. Named `client` not `guest` — the package already uses `guest` for a venue visitor. `checks/client-check.mjs` — 32 checks |
 | **V-34** | **Deploy.** `deploy/` — setup.sh, three units, a backup timer, nginx on one origin. Both processes on loopback |
+| **V-35** | **Decisions › Gaps read the audit three times.** `artefact-audit.md` carries the original finding, a dated position after the work and the blocked remainder; every table was read and every row pushed, so each class appeared twice — red from the first, green from the second. 27 rows → 15, 12 open → 3, and the blocked three are now a state of their own rather than dropped |
 | **V-19/22** | Docked legends, routing legend above the fold, red retired from meaning "primary (write)" |
 
 ---
@@ -118,7 +119,7 @@ now reads 776. V-26 is closed by the dump, not by me.
 
 ## Integrity
 
-- **Numbering:** V-01 to V-34; done items keep their original id or carry V-D
+- **Numbering:** V-01 to V-35; done items keep their original id or carry V-D
 - **Reasoning** lives in `PLAN.md`; this file holds no argument, only state
 - **Anchors** were checked against the source by a second reader. Re-verify any
   that is more than a few commits old — this package moves daily
