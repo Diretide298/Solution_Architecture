@@ -225,6 +225,7 @@ export async function buildDomain(root, contracts = {}) {
       version: doc.version ?? 1,
       publisher: doc.publisher ?? null,
       publisherContract,
+      domain: doc.domain ?? null,
       description: doc.description ?? '',
       aggregate: doc.aggregate ?? null,
       emittedWhen: doc.emittedWhen ?? null,
@@ -281,8 +282,41 @@ export async function buildDomain(root, contracts = {}) {
     terminal.forEach(see);
 
     // ---- against the contract enum ----------------------------------------
-    const schema = schemasByContract.get(doc.contract ?? '')?.get(doc.enum ?? '') ?? null;
-    const enumValues = Array.isArray(schema?.enumValues) ? schema.enumValues : null;
+    // Two anchor shapes. The original names a top-level schema — `enum:
+    // OrderStatus`. The 31 models written to close CF-88's inline-enum backlog
+    // name a property inside one — `enum: Wallet.status` — because the values
+    // live on the property, not on a schema of their own. Reading only the
+    // first shape turned 31 correct models into errors saying they were
+    // "checked against nothing", which is both false and the exact accusation
+    // the file exists to make about real drift. describeProperties already
+    // captures the values, so the fix is a lookup, not new data.
+    const byName = schemasByContract.get(doc.contract ?? '');
+    let schema = byName?.get(doc.enumSchema ?? doc.enum ?? '') ?? null;
+    let enumValues = Array.isArray(schema?.enumValues) ? schema.enumValues : null;
+
+    // An inline anchor points at a property, not a schema — the values live on
+    // `Wallet.status`, not on a `WalletStatus` of its own. The package states
+    // which it is (`enumKind: inline` with `enumSchema` and `enumProperty`), so
+    // that is read first; the dotted string is parsed only as a fallback, for
+    // the models written before the vocabulary existed.
+    const inlineProperty =
+      doc.enumProperty ??
+      (doc.enumKind === 'inline' && doc.enum?.includes('.')
+        ? doc.enum.slice(doc.enum.lastIndexOf('.') + 1)
+        : null);
+
+    if (inlineProperty) {
+      const parent =
+        byName?.get(doc.enumSchema ?? doc.enum.slice(0, doc.enum.lastIndexOf('.'))) ?? null;
+      const property = (parent?.properties ?? []).find((p) => p.name === inlineProperty);
+      if (property) {
+        schema = { ...parent, inlineOn: property.name, dataType: property.type ?? null };
+        enumValues = Array.isArray(property.enumValues) ? property.enumValues : null;
+      } else {
+        schema = null;
+        enumValues = null;
+      }
+    }
     if (doc.enum && schemasByContract.size && !schema) {
       problems.push({
         severity: 'error',
@@ -428,6 +462,8 @@ export async function buildDomain(root, contracts = {}) {
       enumValues,
       owner: doc.owner ?? null,
       ownerContract: resolveContext(doc.owner),
+      // a domain lens this model is declared into, where the graph would miss it
+      domain: doc.domain ?? null,
       file: rel,
       initial,
       terminal,

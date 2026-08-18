@@ -188,7 +188,7 @@ Apply to every entry above. Derived from the matrix, MoM decisions and the Proje
 | # | Rule | Basis |
 |---|---|---|
 | 1 | **AI never writes to the transactional database.** Read-only, scoped by the caller's resolved permission set | An AI capability must not become a permission bypass |
-| 2 | **Tenant isolation is partition-level, never filter-level** | A forgotten filter is a cross-client breach; a missing collection is a loud failure |
+| 2 | **Tenant isolation is the cell where a cell holds one tenant, and a dedicated shard where it does not** | **Corrected 17 August, ADR-0021 and CF-97.** The original rule was right about shared placement for the wrong stated reason. A collection is per embedding model, not per tenant — a collection carries its own vector configuration and a shard cannot |
 | 3 | **All AI data stays in-jurisdiction** — vector stores, prompt logs, training data | Project Direction §3.3.10; CF-20 |
 | 4 | **No provider SDK calls in application code** | Provider swap must be configuration, not a rewrite |
 | 5 | **Every response carries trace ID, model version, token count and retrieval sources** | AI-65; cost attribution for CF-14 |

@@ -8,7 +8,6 @@
 id: F01
 name: Guest buys a ticket online
 actor: guest
-capability: C02
 wave: 1
 frequency: constant
 criticality: revenue
@@ -174,3 +173,10 @@ openQuestions:
   branch cannot be tested without them, and that branch is the one most worth testing.
 
   '
+primaryContract: catalogue
+contracts:
+- catalogue
+- orders
+- promotions
+- white-label
+- marketing-crm

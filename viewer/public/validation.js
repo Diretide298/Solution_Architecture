@@ -136,6 +136,10 @@ export const recordVerdict = (kind, id, verdict, note) =>
 export const validationSummary = (kind) =>
   call(`/api/validation${kind ? `?target_kind=${encodeURIComponent(kind)}` : ''}`);
 
+/** Every verdict ever recorded, plus the roster. The summary throws away the
+ *  disagreement, the revisions and the pace; this keeps them. */
+export const allVerdicts = () => call('/api/verdicts');
+
 // ── the block that goes in a view ────────────────────────────────────
 
 const el = (tag, className, text) => {
@@ -251,28 +255,65 @@ export function verdictBlock(kind, id, label = id) {
     note.placeholder = 'Why? A verdict with no reason gets rediscovered the hard way.';
     form.append(note);
 
+    // Pick, then submit — rather than one click recording a verdict outright.
+    //
+    // A single click used to write the row, which put "Rejected" one stray tap
+    // away on a page a reviewer is scrolling through, and gave no moment in
+    // which to write the reason. The verdicts are append-only, so a mistaken
+    // one cannot be taken back — only argued with by a later row. A deliberate
+    // second action is cheap next to that.
+    let chosen = null;
     const buttons = el('div', 'verdict-buttons');
     const message = el('span', 'verdict-message');
+
+    const submit = el('button', 'chip verdict-submit', 'Submit');
+    submit.type = 'button';
+    submit.disabled = true;
+
+    const setChosen = (value) => {
+      chosen = value;
+      for (const b of buttons.querySelectorAll('button')) {
+        b.classList.toggle('chosen', b.dataset.verdict === value);
+        b.setAttribute('aria-pressed', String(b.dataset.verdict === value));
+      }
+      submit.disabled = value === null;
+      // The label stays "Submit". The chosen chip is already lit and named, so
+      // repeating it on the button only made the button change width as you
+      // picked, which is movement that says nothing.
+      submit.classList.toggle('rejected', value === 'rejected');
+      message.textContent = '';
+    };
+
     for (const [value, text] of VERDICTS) {
       const button = el('button', `chip verdict-set ${value}`, text);
       button.type = 'button';
-      button.onclick = async () => {
-        for (const b of buttons.querySelectorAll('button')) b.disabled = true;
-        message.textContent = 'Recording…';
-        try {
-          await recordVerdict(kind, id, value, note.value);
-          note.value = '';
-          message.textContent = '';
-          load();
-        } catch (error) {
-          message.textContent = error.message;
-        } finally {
-          for (const b of buttons.querySelectorAll('button')) b.disabled = false;
-        }
-      };
+      button.dataset.verdict = value;
+      button.setAttribute('aria-pressed', 'false');
+      // clicking the chosen one again clears it, so a misclick costs nothing
+      button.onclick = () => setChosen(chosen === value ? null : value);
       buttons.append(button);
     }
-    form.append(buttons, message);
+
+    submit.onclick = async () => {
+      if (!chosen) return;
+      const all = [...buttons.querySelectorAll('button'), submit];
+      for (const b of all) b.disabled = true;
+      message.textContent = 'Recording…';
+      try {
+        await recordVerdict(kind, id, chosen, note.value);
+        note.value = '';
+        setChosen(null);
+        load();
+      } catch (error) {
+        message.textContent = error.message;
+        for (const b of all) b.disabled = false;
+        submit.disabled = !chosen;
+      }
+    };
+
+    const actions = el('div', 'verdict-actions-row');
+    actions.append(buttons, submit);
+    form.append(actions, message);
     formBox.append(form);
   };
 

@@ -305,6 +305,50 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
   font-variant-numeric: tabular-nums;
 }
 
+/* A key you have to scroll to reach is not a key — on arrival the chart was
+   four unexplained colours. The sheet lays its children out in a column so the
+   table can be sent after the legend without moving anything in the markup. */
+#routing-body { display: flex; flex-direction: column; }
+#routing-body .routing-table { order: 1; }
+#routing-body .inline-legend {
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 4px 18px;
+  margin: 4px 0 8px;
+}
+/* the trailing sentence is a note, not a swatch, so it takes its own line */
+#routing-body .inline-legend .legend-row:not(:has(.legend-dot)) {
+  flex-basis: 100%;
+  color: var(--text-faint);
+}
+/* a segment boundary you can see is the other half of telling the fills apart */
+#routing-body .routing-bar { gap: 2px; }
+
+/* app.js paints these fills from its own KINDS table, inline on each element,
+   so restating them from here means outranking the style attribute. The legend
+   dots come off the same table in the same order, which is why they go by
+   position — there is no class on them to go by. */
+#routing-body .routing-seg[title$="primary (write)"],
+#routing-body .inline-legend .legend-row:nth-child(1) .legend-dot {
+  background: var(--route-write) !important;
+}
+#routing-body .routing-seg[title$="primary (read)"],
+#routing-body .inline-legend .legend-row:nth-child(2) .legend-dot {
+  background: var(--route-primary) !important;
+}
+#routing-body .routing-seg[title$="replica"],
+#routing-body .inline-legend .legend-row:nth-child(3) .legend-dot {
+  background: var(--route-replica) !important;
+}
+#routing-body .routing-seg[title$="analytical"],
+#routing-body .inline-legend .legend-row:nth-child(4) .legend-dot {
+  background: var(--route-analytical) !important;
+}
+#routing-body .routing-seg[title$="primary (write)"] { color: var(--route-write-ink); }
+#routing-body .routing-seg[title$="primary (read)"] { color: var(--route-primary-ink); }
+#routing-body .routing-seg[title$="replica"] { color: var(--route-replica-ink); }
+#routing-body .routing-seg[title$="analytical"] { color: var(--route-analytical-ink); }
+
 /* an inferred link is a hint, not a fact — it should not read as one */
 .link-item.inferred .link-name { border-bottom: 1px dashed var(--text-faint); }
 .nav-pill.inferred { border-style: dashed; }
@@ -761,6 +805,14 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
   border: 1px solid var(--border); color: var(--text-dim); white-space: nowrap;
 }
 .lineage-routing { border-width: 1px; font-family: var(--mono); }
+/* Same four targets as the routing chart, so the same four colours — a chip
+   reading "primary" was outlined in the error red over here while the chart
+   was being talked out of it. app.js sets the border inline; the tip title is
+   the only thing on the element that says which target it is. */
+.lineage-routing[data-tip-title$="write"] { border-color: var(--route-write) !important; }
+.lineage-routing[data-tip-title$="primary"] { border-color: var(--route-primary) !important; }
+.lineage-routing[data-tip-title$="replica"] { border-color: var(--route-replica) !important; }
+.lineage-routing[data-tip-title$="analytical"] { border-color: var(--route-analytical) !important; }
 .lineage-offline { color: var(--satellite); border-color: color-mix(in srgb, var(--satellite) 40%, transparent); }
 .lineage-service { color: var(--layer); border-color: color-mix(in srgb, var(--layer) 34%, transparent); }
 
@@ -1169,10 +1221,50 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
   resize: vertical;
 }
 .verdict-note-input:focus { outline: none; border-color: var(--accent); }
-.verdict-buttons { display: flex; gap: 7px; margin-top: 8px; flex-wrap: wrap; }
+/* Pick, then submit. The chips select; the button on the right is what writes
+   the row. Verdicts are append-only, so a mistaken one cannot be withdrawn —
+   only argued with by a later row — and a deliberate second action is cheap
+   against that. The submit sits apart from the three, with a gap between, so
+   it never reads as a fourth verdict. */
+.verdict-actions-row {
+  display: flex; gap: 14px; margin-top: 8px;
+  align-items: center; flex-wrap: wrap; justify-content: space-between;
+}
+.verdict-buttons { display: flex; gap: 7px; flex-wrap: wrap; }
+.verdict-set { cursor: pointer; }
 .verdict-set.approved:hover { border-color: var(--ok, #4ade80); color: var(--ok, #4ade80); }
 .verdict-set.rejected:hover { border-color: #f87171; color: #f87171; }
 .verdict-set[class~="needs-work"]:hover { border-color: var(--warning, #fbbf24); color: var(--warning, #fbbf24); }
+
+/* Chosen, not yet recorded. Filled rather than outlined, so "selected" and
+   "submitted" never look alike. */
+.verdict-set.chosen.approved {
+  background: color-mix(in srgb, var(--ok, #4ade80) 20%, transparent);
+  border-color: var(--ok, #4ade80); color: var(--ok, #4ade80);
+}
+.verdict-set.chosen.rejected {
+  background: color-mix(in srgb, #f87171 20%, transparent);
+  border-color: #f87171; color: #f87171;
+}
+.verdict-set.chosen[class~="needs-work"] {
+  background: color-mix(in srgb, var(--warning, #fbbf24) 20%, transparent);
+  border-color: var(--warning, #fbbf24); color: var(--warning, #fbbf24);
+}
+
+.verdict-submit {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.verdict-submit:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.verdict-submit:disabled { opacity: 0.4; cursor: not-allowed; border-color: var(--border); color: var(--text-faint); }
+/* Recording a rejection is the one that is hardest to undo — it should not be
+   the same colour as recording an approval. */
+.verdict-submit.rejected:not(:disabled) { border-color: #f87171; color: #f87171; }
+.verdict-submit.rejected:hover:not(:disabled) { background: color-mix(in srgb, #f87171 16%, transparent); }
+
 .verdict-message { font-size: 11.5px; color: var(--text-faint); margin-left: 4px; }
 
 /* ── the account button and panel ──────────────────────────────────── */
@@ -1307,6 +1399,90 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
 .admin-bar-right { display: flex; align-items: center; gap: 12px; }
 .admin-who { font-size: 12px; color: var(--text-faint); }
 .admin-main { max-width: 940px; margin: 0 auto; padding: 22px 18px 60px; }
+
+/* ── review activity ────────────────────────────────────────────────── */
+/* Wider than the other standalone pages: this one carries a seven-column
+   reviewer table and a thirty-bar chart, and squeezing those into 940px to
+   match admin.html would cost more than the consistency is worth. */
+.reviews-main { max-width: 1180px; }
+
+.stat-strip {
+  display: grid; gap: 10px; margin-bottom: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.stat-card {
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--bg-panel); padding: 14px 16px;
+}
+.stat-value {
+  font-size: 27px; color: var(--text); line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  margin-top: 5px; font-size: 10px; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.stat-hint { margin-top: 5px; font-size: 11px; color: var(--text-dim); }
+
+.chart { width: 100%; height: 168px; display: block; color: var(--text-faint); }
+.chart-tick { font-size: 9px; fill: var(--text-faint); }
+.chart-legend { display: flex; gap: 14px; margin-top: 6px; }
+
+.reviews-filters { margin-bottom: 4px; }
+
+/* Disagreement. Amber down the side rather than red: two people reading the
+   same thing differently is the review working, not a fault. */
+.contested-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) 90px minmax(0, 1.4fr);
+  gap: 12px; align-items: center;
+  padding: 9px 11px; margin-bottom: 6px;
+  border: 1px solid var(--border);
+  border-left: 2px solid color-mix(in srgb, var(--warning) 60%, transparent);
+  border-radius: 7px; background: var(--bg-raised);
+}
+.contested-opinions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+
+.people-row {
+  display: grid; gap: 12px; align-items: center;
+  grid-template-columns: minmax(0, 1.5fr) 120px 110px 78px 130px 90px 110px;
+  padding: 9px 4px; border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text-dim);
+}
+.people-head {
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-faint); border-bottom-color: var(--text-faint);
+}
+.people-who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.people-name { color: var(--text); font-size: 12.5px; }
+.people-role { font-size: 10.5px; color: var(--text-faint); }
+.people-count { display: flex; align-items: center; gap: 8px; }
+.people-count b { color: var(--text); font-variant-numeric: tabular-nums; min-width: 26px; }
+.people-bar { flex: 1; height: 4px; border-radius: 2px; background: var(--bg-raised); overflow: hidden; }
+.people-bar-fill { display: block; height: 100%; background: var(--accent); }
+.people-mix { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bg-raised); }
+.people-mix-seg { display: block; height: 100%; }
+.people-num { font-variant-numeric: tabular-nums; font-size: 11.5px; }
+
+.response-row {
+  display: grid; gap: 12px; align-items: baseline;
+  grid-template-columns: 104px minmax(0, 1fr) 96px 150px;
+  padding: 8px 4px; border-bottom: 1px solid var(--border);
+}
+.response-row:hover { background: var(--bg-hover); }
+.response-note { display: block; font-size: 11.5px; color: var(--text-dim); line-height: 1.5; margin-top: 2px; }
+.response-note-empty { color: var(--text-faint); font-style: italic; }
+
+@media (max-width: 900px) {
+  /* The mix bar and the cadence are the first to go: on a narrow screen the
+     name, the count and the last-seen carry the story. */
+  .people-row { grid-template-columns: minmax(0, 1fr) 90px 80px; }
+  .people-row > :nth-child(n + 4) { display: none; }
+  .people-head > :nth-child(n + 4) { display: none; }
+  .response-row { grid-template-columns: 96px minmax(0, 1fr); }
+  .response-row > :nth-child(n + 3) { display: none; }
+  .contested-row { grid-template-columns: minmax(0, 1fr); }
+  .contested-opinions { justify-content: flex-start; }
+}
 
 /* ── sign-off overview ──────────────────────────────────────────────── */
 /* Four cards, one per kind of thing a verdict is about. The bar fills from

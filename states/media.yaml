@@ -5,6 +5,8 @@
 entity: Media asset
 contract: assets
 enum: MediaStatus
+enumKind: named
+enumSchema: MediaStatus
 owner: assets
 initial:
 - processing

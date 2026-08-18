@@ -1,0 +1,299 @@
+{
+ "scope": "platform",
+ "generated": "2026-08-18",
+ "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
+ "counts": {
+  "operations": 776,
+  "contracts": 25,
+  "tables": 287,
+  "relationships": 514,
+  "states": 80,
+  "events": 29,
+  "flows": 24,
+  "adrs": 25,
+  "screens": 376,
+  "platforms": 12,
+  "apps": 10
+ },
+ "metrics": {
+  "design": [
+   {
+    "name": "API data lineage resolved",
+    "done": 776,
+    "total": 776,
+    "percent": 100,
+    "note": "Every operation maps to the tables it reads and writes."
+   },
+   {
+    "name": "Operations declaring an auth model",
+    "done": 691,
+    "total": 776,
+    "percent": 89,
+    "note": "A permission or an explicit auth mode. None may be silent."
+   },
+   {
+    "name": "Screens defined, specified and given a purpose",
+    "done": 376,
+    "total": 376,
+    "percent": 100,
+    "note": "Loading, empty and error states written for each."
+   },
+   {
+    "name": "Configuration levels decided",
+    "done": 321,
+    "total": 321,
+    "percent": 100,
+    "note": "Every configurable value has a scope level. Venue is the floor (ADR-0018)."
+   },
+   {
+    "name": "Platforms with a unique name",
+    "done": 12,
+    "total": 12,
+    "percent": 100,
+    "note": "No two platforms share a name in any document."
+   },
+   {
+    "name": "Contracts touched by a flow",
+    "done": 25,
+    "total": 25,
+    "percent": 100,
+    "note": "Every contract appears in at least one journey."
+   },
+   {
+    "name": "State models",
+    "done": 80,
+    "total": 79,
+    "percent": 101,
+    "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
+   },
+   {
+    "name": "Tables with a relationship",
+    "done": 278,
+    "total": 287,
+    "percent": 97,
+    "note": "The remainder are partitions, platform-written tables and caches, each stating why."
+   },
+   {
+    "name": "Screens with operations",
+    "done": 363,
+    "total": 376,
+    "percent": 97,
+    "note": "The remainder are static, workshop-blocked, or navigation shells."
+   },
+   {
+    "name": "Requirements with a contract",
+    "done": 2778,
+    "total": 2990,
+    "percent": 93,
+    "note": "The remainder are blocked on three workshops."
+   },
+   {
+    "name": "Requirements with an artefact",
+    "done": 1848,
+    "total": 2072,
+    "percent": 89,
+    "note": "An artefact class covering the requirement, not just a contract."
+   },
+   {
+    "name": "Operations reaching a screen",
+    "done": 596,
+    "total": 776,
+    "percent": 77,
+    "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
+   },
+   {
+    "name": "Artefact classes",
+    "done": 12,
+    "total": 15,
+    "percent": 80,
+    "note": "Three remain: device and hardware, retention (CF-64), performance targets."
+   },
+   {
+    "name": "Flows",
+    "done": 24,
+    "total": 60,
+    "percent": 40,
+    "note": "60 is an estimate, not a commitment. Every flow written has found a defect."
+   }
+  ],
+  "build": [
+   {
+    "name": "Tables written",
+    "done": 0,
+    "total": 287,
+    "percent": 0,
+    "note": "DDL is generated when the design stops moving (ADR-0024)."
+   },
+   {
+    "name": "Sprint 0",
+    "done": 0,
+    "total": 11,
+    "percent": 0,
+    "note": "Repository, CI, migrations, seed data."
+   },
+   {
+    "name": "Code built",
+    "done": 0,
+    "total": 1,
+    "percent": 0,
+    "note": "Nothing has executed since 30 July."
+   }
+  ]
+ },
+ "headline": {
+  "design": 91,
+  "build": 0
+ },
+ "waves": {
+  "wave1": 149,
+  "wave2": 167,
+  "wave3": 60
+ },
+ "platformBreakdown": [
+  {
+   "code": "P01",
+   "name": "Guest Web",
+   "app": "guest-web",
+   "operator": "guest",
+   "screens": 35
+  },
+  {
+   "code": "P02",
+   "name": "Guest App",
+   "app": "guest-app",
+   "operator": "guest",
+   "screens": 65
+  },
+  {
+   "code": "P04",
+   "name": "Venue POS",
+   "app": "venue-pos",
+   "operator": "venue",
+   "screens": 10
+  },
+  {
+   "code": "P05",
+   "name": "Guest Kiosk",
+   "app": "guest-app",
+   "operator": "guest",
+   "screens": 15
+  },
+  {
+   "code": "P06",
+   "name": "Venue Staff App",
+   "app": "venue-staff-app",
+   "operator": "venue",
+   "screens": 50
+  },
+  {
+   "code": "P07",
+   "name": "Venue Scanner",
+   "app": "venue-scanner",
+   "operator": "venue",
+   "screens": 16
+  },
+  {
+   "code": "P08",
+   "name": "Venue Management",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "screens": 91
+  },
+  {
+   "code": "P09",
+   "name": "TICVAI Web",
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "screens": 37
+  },
+  {
+   "code": "P10",
+   "name": "Partner Web",
+   "app": "partner-web",
+   "operator": "partner",
+   "screens": 21
+  },
+  {
+   "code": "P11",
+   "name": "Accreditation Web",
+   "app": "accreditation-web",
+   "operator": "public",
+   "screens": 8
+  },
+  {
+   "code": "P12",
+   "name": "Venue Support",
+   "app": "venue-support-web",
+   "operator": "venue",
+   "screens": 8
+  },
+  {
+   "code": "P13",
+   "name": "Venue CMS",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "screens": 20
+  }
+ ],
+ "conflicts": {
+  "open": 18,
+  "closed": 85,
+  "withdrawn": 6,
+  "blocking": 0,
+  "byOwner": {
+   "Qossai + Allam": 3,
+   "Allam + counsel": 2,
+   "Chinmay + Qossai": 2,
+   "Dinesh + Qossai": 2,
+   "Chinmay + Dinesh": 1,
+   "Qossai + finance": 1,
+   "Chinmay \u2014 raise with Qossai": 1,
+   "Qossai": 1,
+   "Chinmay": 1,
+   "Both": 1,
+   "Qossai / Allam": 1,
+   "Qossai + Chinmay": 1,
+   "Chinmay \u2014 schedule": 1
+  },
+  "openIds": [
+   "CF-17",
+   "CF-21",
+   "CF-35",
+   "CF-40",
+   "CF-41",
+   "CF-48",
+   "CF-51",
+   "CF-57",
+   "CF-61",
+   "CF-64",
+   "CF-67",
+   "CF-69",
+   "CF-74",
+   "CF-83",
+   "CF-84",
+   "CF-85",
+   "CF-97",
+   "CF-100"
+  ]
+ },
+ "stores": [
+  "postgres",
+  "postgres-analytical",
+  "qdrant",
+  "redis"
+ ],
+ "openQuestions": [
+  {
+   "id": "CF-64",
+   "what": "Retention. Determines the database topology and is the most expensive open item to answer late."
+  },
+  {
+   "id": "CF-100",
+   "what": "Agent hours for the conversation queue. Blocks go-live, not build."
+  },
+  {
+   "id": "ADR-0021",
+   "what": "The embedding model, gated on a benchmark. The architecture holds whichever wins."
+  }
+ ]
+}

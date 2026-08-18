@@ -66,7 +66,10 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-002
+    - CMS-003
+    - CMS-004
     inferred: true
   wireframe:
     status: drafted
@@ -236,7 +239,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load. Editing is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-004
     inferred: true
   wireframe:
     status: drafted
@@ -434,7 +440,10 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -540,7 +549,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load. Editing is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -782,7 +794,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -824,7 +839,10 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -878,7 +896,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load. Editing is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -960,7 +981,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -993,7 +1017,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -1123,7 +1150,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -1170,7 +1200,10 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -1208,7 +1241,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -1241,7 +1277,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load. Editing is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -1319,7 +1358,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted
@@ -1361,7 +1403,10 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     inferred: true
   wireframe:
     status: drafted

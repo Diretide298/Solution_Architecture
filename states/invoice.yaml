@@ -5,6 +5,8 @@
 entity: Invoice
 contract: subscription
 enum: InvoiceStatus
+enumKind: named
+enumSchema: InvoiceStatus
 owner: control
 initial:
 - draft

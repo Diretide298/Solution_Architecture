@@ -8,7 +8,6 @@
 id: F21
 name: A ride queue fills and a guest is redirected
 actor: guest
-capability: C34
 wave: 2
 frequency: constant
 criticality: convenience
@@ -34,11 +33,14 @@ steps:
   - getWaitTimes
   outcome: With the age of each reading
 - step: 2
-  screen: GST-059
-  action: Picks something shorter
+  screen: GST-003
+  action: Picks something shorter from the attractions list
   operations:
   - getWaitTimes
-  outcome: Or joins a virtual queue for the long one
+  - listProducts
+  outcome: Or joins a virtual queue for the long one. **Repointed from GST-059 Plan My Day on 17 August
+    (CF-101)** — the itinerary planner is Wave 3 and this flow is Wave 2, and choosing a shorter queue
+    does not need a saved plan.
 - step: 3
   screen: BO-005
   action: A supervisor sees the queue building
@@ -104,3 +106,7 @@ exitStates:
 openQuestions:
 - Whether a guest may hold two virtual queue places at once. Allowing it means one guest occupies two
   positions while standing in neither.
+primaryContract: queue
+contracts:
+- queue
+- catalogue

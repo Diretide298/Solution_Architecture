@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 14 August 2026
-**Consolidates:** the cell-kind material in [ADR-0001](0001-cell-architecture-one-tenant-per-jurisdiction.md)
+**Consolidates:** the cell-kind material in [ADR-0001](0001-cell-architecture-one-tenant-per-jurisdiction.md), **whose split rule is superseded by ADR-0014**
 and [ADR-0014](0014-cell-per-region.md), both of which have been amended twice. This ADR is
 the operative statement; those two remain the record of how it got here.
 

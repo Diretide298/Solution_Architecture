@@ -7,7 +7,6 @@
 id: F16
 name: A venue opens for the first time
 actor: platformAdmin
-capability: C51
 wave: 1
 frequency: rare
 criticality: operational
@@ -107,3 +106,9 @@ exitStates:
   description: Venue exists, configured, and someone can sign in
 - state: deferred
   description: Awaiting a cell in a new region
+primaryContract: subscription
+contracts:
+- subscription
+- finance
+- tenancy
+- identity

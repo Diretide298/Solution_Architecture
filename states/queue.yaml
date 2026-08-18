@@ -5,6 +5,8 @@
 entity: Queue
 contract: queue
 enum: QueueStatus
+enumKind: named
+enumSchema: QueueStatus
 owner: queue
 initial:
 - closed

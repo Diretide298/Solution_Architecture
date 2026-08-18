@@ -5,6 +5,8 @@
 entity: Rollout
 contract: platform-ops
 enum: RolloutStatus
+enumKind: named
+enumSchema: RolloutStatus
 owner: control
 initial:
 - queued

@@ -5,6 +5,8 @@
 entity: Cart
 contract: orders
 enum: CartStatus
+enumKind: named
+enumSchema: CartStatus
 owner: orders
 initial:
 - active

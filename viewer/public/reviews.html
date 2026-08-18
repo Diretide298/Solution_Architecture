@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI — review activity</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">TICVAI</span>
+        <span class="brand-sub">review activity</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/validation.html">Sign-off</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main class="admin-main reviews-main">
+      <!-- The four numbers worth knowing before any filter is touched. -->
+      <section class="stat-strip" id="headline"></section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">Pace <span class="admin-count" id="pace-note"></span></h2>
+        <div id="pace"></div>
+      </section>
+
+      <!-- Disagreement is the reason this page exists rather than a list. Two
+           people reaching different verdicts on the same thing is the single
+           most useful signal a review produces, and a summary of current
+           verdicts has already discarded it. -->
+      <section class="admin-panel" id="contested-panel" hidden>
+        <h2 class="admin-heading">
+          Disagreement <span class="admin-count" id="contested-note"></span>
+        </h2>
+        <div id="contested"></div>
+      </section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">Reviewers <span class="admin-count" id="people-note"></span></h2>
+        <div id="people"></div>
+      </section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">Every response <span class="admin-count" id="rows-note"></span></h2>
+        <div class="signoff-controls reviews-filters">
+          <div class="seg" id="f-kind"></div>
+          <div class="seg" id="f-verdict"></div>
+          <select class="scope-select" id="f-person"></select>
+          <select class="scope-select" id="f-window"></select>
+          <input id="f-text" class="auth-input signoff-filter" type="text"
+                 placeholder="search notes, artefacts, people" />
+          <button class="chip" id="f-clear" type="button">Clear</button>
+          <button class="chip" id="f-export" type="button">Export CSV</button>
+        </div>
+        <p class="auth-error" id="error" hidden></p>
+        <div id="rows"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/reviews.js"></script>
+  </body>
+</html>

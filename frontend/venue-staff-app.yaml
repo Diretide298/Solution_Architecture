@@ -36,8 +36,8 @@ contracts:
 - workforce
 screenCount: 50
 byWave:
-  wave1: 27
-  wave2: 22
+  wave1: 29
+  wave2: 20
   wave3: 1
 screens:
 - id: EMP-001
@@ -130,6 +130,18 @@ screens:
   component: apps/venue-staff-app/src/routes/operations/OfflinePackageDetail.tsx
   wave: 1
   status: notStarted
+- id: EMP-019
+  name: AI assistant — home
+  route: /operations/ai-assistant-home
+  component: apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-020
+  name: AI assistant — answer
+  route: /operations/ai-assistant-answer
+  component: apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx
+  wave: 1
+  status: notStarted
 - id: EMP-021
   name: Roster
   route: /operations/roster
@@ -218,18 +230,6 @@ screens:
   name: Group scan
   route: /operations/group-scan
   component: apps/venue-staff-app/src/routes/operations/GroupScanDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-019
-  name: AI assistant — home
-  route: /operations/ai-assistant-home
-  component: apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx
-  wave: 2
-  status: notStarted
-- id: EMP-020
-  name: AI assistant — answer
-  route: /operations/ai-assistant-answer
-  component: apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx
   wave: 2
   status: notStarted
 - id: EMP-023

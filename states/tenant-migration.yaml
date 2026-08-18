@@ -5,6 +5,8 @@
 entity: Tenant migration
 contract: subscription
 enum: TenantMigrationStatus
+enumKind: named
+enumSchema: TenantMigrationStatus
 owner: control
 initial:
 - planned

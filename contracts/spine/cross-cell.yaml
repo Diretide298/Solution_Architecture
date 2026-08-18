@@ -123,9 +123,9 @@ paths:
   /guest-links:
     post:
       operationId: createGuestLink
+      x-ticvai-audience: [service]
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Link a guest's records across cells
       description: >
         Requires explicit recorded consent. The consent version is retained as the transfer
@@ -175,10 +175,10 @@ paths:
       operationId: getGuestLink
       x-ticvai-consumed-by:
         - "P02 GST-015 Memberships"
+      x-ticvai-audience: [service]
       x-ticvai-read-routing: replica
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Read a guest link
       description: >
         Returns which cells hold a record and the home cell. **Never returns personal data**
@@ -198,9 +198,9 @@ paths:
 
     delete:
       operationId: revokeGuestLink
+      x-ticvai-audience: [service]
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Sever a link on consent withdrawal
       description: >
         Entitlements already redeemed are unaffected — they happened. Un-redeemed delegated
@@ -210,6 +210,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -242,10 +244,10 @@ paths:
   /guest-links/resolve:
     get:
       operationId: resolveGuestLink
+      x-ticvai-audience: [service]
       x-ticvai-read-routing: replica
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Find the link for a local subject
       description: >
         Called by a cell holding a local subject that needs to know whether the guest exists
@@ -285,9 +287,9 @@ paths:
       operationId: propagateRedemptionRight
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
+      x-ticvai-audience: [service]
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Propagate a right from the issuing cell to a consuming cell
       description: >
         Cell-to-cell. Called by the issuing cell after an order completes for a product
@@ -331,6 +333,7 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-011 Delegated right"
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a redemption right
       tags: [redemption]
@@ -348,9 +351,9 @@ paths:
 
     delete:
       operationId: revokeRedemptionRight
+      x-ticvai-audience: [service]
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Revoke a right
       description: Called by the issuing cell on refund, cancellation or link severance.
       tags: [redemption]
@@ -358,6 +361,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Revoked }
         '409':
@@ -379,6 +384,7 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-004 Admitted"
         - "P07 SCN-011 Delegated right"
+      x-ticvai-audience: [staff]
       summary: Consume entries against a right, locally authoritative
       description: >
         Called by the consuming cell when a gate admits. **Authoritative locally** — it does
@@ -424,9 +430,9 @@ paths:
       operationId: reconcileRedemptions
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
+      x-ticvai-audience: [service]
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Report consumption back to the issuing cell
       description: >
         Batched, ordered, idempotent. Runs continuously while the link is up and catches up
@@ -439,6 +445,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -485,6 +493,7 @@ paths:
   /wallet-authorisations:
     post:
       operationId: authoriseWalletSpend
+      x-ticvai-audience: [staff]
       summary: Hold funds against the guest's home-cell balance
       description: >
         The card-authorisation pattern. Called by a consuming cell before accepting wallet
@@ -540,6 +549,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: captureWalletAuthorisation
+      x-ticvai-audience: [staff]
       summary: Capture a held amount
       description: >
         Capture may be less than the hold — a partial capture releases the remainder.
@@ -580,6 +590,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: releaseWalletAuthorisation
+      x-ticvai-audience: [staff]
       summary: Release a hold without capturing
       tags: [wallet]
       x-ticvai-permission: ORDER_CREATE
@@ -598,6 +609,7 @@ paths:
   /wallet-allocations:
     get:
       operationId: getWalletAllocation
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cross-cell wallet authorisation. Stale means double-spend across cells
       summary: The consuming cell's bounded offline allocation
       description: >
@@ -625,6 +637,7 @@ paths:
 
     put:
       operationId: setWalletAllocationPolicy
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: region
       summary: Set the allocation cap policy
       tags: [wallet]
@@ -632,6 +645,8 @@ paths:
       x-ticvai-scope-level: region
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -659,9 +674,9 @@ paths:
   /dsar/requests:
     post:
       operationId: createDsarRequest
+      x-ticvai-audience: [service]
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Raise a data subject request across every linked cell
       description: >
         Orchestrated from the Control Plane by `guestLinkId`, fanning out to each linked
@@ -707,10 +722,10 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getDsarRequest
+      x-ticvai-audience: [service]
       x-ticvai-read-routing: replica
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Track fan-out progress per cell
       tags: [dsar]
       x-ticvai-permission: null   # service-to-service. See x-ticvai-auth

@@ -8,7 +8,6 @@
 id: F18
 name: A guest plays an arcade game
 actor: guest
-capability: C61
 wave: 3
 frequency: constant
 criticality: convenience
@@ -90,3 +89,6 @@ openQuestions:
   that not deciding is a decision.
 - Whether a game card must be linked to a guest profile. Unlinked is simpler and means a lost card is
   lost money.
+primaryContract: games
+contracts:
+- games

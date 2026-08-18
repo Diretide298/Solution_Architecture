@@ -6,6 +6,7 @@
 
 | Page | Covers |
 |---|---|
+| [frontend-delivery.md](frontend-delivery.md) | Bundles by wave, per-platform shells, the offline bundle, performance budgets |
 | [cells-and-tenancy](cells-and-tenancy.md) | Cell = tenant × jurisdiction |
 | [hierarchy-and-authz](hierarchy-and-authz.md) | Seven levels, deny-overrides-allow |
 | [offline-and-sync](offline-and-sync.md) | Outbox, ordering, conflict policy |

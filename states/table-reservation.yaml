@@ -5,6 +5,8 @@
 entity: Table reservation
 contract: fnb
 enum: TableReservationStatus
+enumKind: named
+enumSchema: TableReservationStatus
 owner: fnb
 initial:
 - booked

@@ -5,16 +5,14 @@
 entity: Kitchen ticket
 contract: fnb
 enum: KitchenTicketStatus
+enumKind: named
+enumSchema: KitchenTicketStatus
 owner: fnb
 initial:
 - received
 terminal:
 - served
 - cancelled
-offlineReachable:
-- received
-- preparing
-- ready
 transitions:
 - from: received
   to: preparing
@@ -57,3 +55,7 @@ transitions:
   requiresApproval: true
 notes: '`recalled` is distinct from `cancelled`. One is food coming back to be fixed; the other is food
   nobody is paying for, and only the second raises a waste movement.'
+offlineReachable:
+- received
+- preparing
+- ready

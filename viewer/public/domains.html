@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI — domains</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/domains.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <!-- No sign-in gate. Every other standalone page reads verdicts, which are
+       personal and belong to an account; this one reads only the package, so
+       putting a door in front of it would cost a reader something and protect
+       nothing. -->
+  <body class="admin-page domains-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">TICVAI</span>
+        <span class="brand-sub">domains</span>
+      </div>
+      <div class="admin-bar-right">
+        <a class="chip" href="/validation.html">Sign-off</a>
+        <a class="chip" href="/reviews.html">Review activity</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main class="admin-main domains-main">
+      <!-- What the lens is and where it starts. The seed and the docs are
+           stated up front because a derived view that will not say what it
+           derived from is asking to be trusted rather than checked. -->
+      <section class="admin-panel lens-head">
+        <div class="seg lens-tabs" id="lens-tabs" hidden></div>
+        <h1 class="lens-title" id="lens-title">Reading the package…</h1>
+        <p class="lens-blurb" id="lens-blurb"></p>
+        <div class="lens-meta" id="lens-meta"></div>
+      </section>
+
+      <p class="auth-error" id="error" hidden></p>
+
+      <section class="stat-strip" id="headline"></section>
+
+      <!-- The finding, above the panes and outside the tabs. It is the reason
+           to open the page, and a reader who has to pick the right tab before
+           they see it will not see it. -->
+      <section class="finding-panel" id="finding" hidden></section>
+
+      <nav class="seg pane-tabs" id="pane-tabs"></nav>
+
+      <section class="admin-panel" id="pane-reach" hidden>
+        <h2 class="admin-heading">
+          Who can invoke it, what it touches, who can stop it
+          <span class="admin-count" id="reach-note"></span>
+        </h2>
+        <p class="pane-note" id="reach-lead"></p>
+        <div class="signoff-controls">
+          <div class="seg" id="reach-filter"></div>
+        </div>
+        <div class="reach-legend" id="reach-legend"></div>
+        <div id="reach"></div>
+      </section>
+
+      <section class="admin-panel" id="pane-members" hidden>
+        <h2 class="admin-heading">
+          Everything the lens gathered
+          <span class="admin-count" id="members-note"></span>
+        </h2>
+        <p class="pane-note" id="members-lead"></p>
+        <div id="members"></div>
+      </section>
+
+      <section class="admin-panel" id="pane-gaps" hidden>
+        <h2 class="admin-heading">
+          Where the graph and the tags disagree
+          <span class="admin-count" id="gaps-note"></span>
+        </h2>
+        <p class="pane-note" id="gaps-lead"></p>
+        <div id="gaps"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/domains.js"></script>
+  </body>
+</html>

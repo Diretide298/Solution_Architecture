@@ -95,6 +95,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Search the asset library
       description: >
@@ -158,6 +159,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an asset with derivatives and usage
       description: >
@@ -183,12 +185,15 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: Amend metadata, tags or rights
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -226,6 +231,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: Delete an asset
       description: >
         **Refused while the asset is referenced.** The response names every reference so the
@@ -236,6 +242,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Deleted }
         '409':
@@ -257,6 +265,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: Replace the file behind an asset
       description: >
         The reference is stable, so every surface using it updates at once. This is how a
@@ -301,6 +310,7 @@ paths:
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: Request a signed upload URL
       description: >
         Uploads go **direct to object storage**, not through this API. Large media passing
@@ -354,6 +364,7 @@ paths:
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: Confirm an upload and create the asset
       description: >
         Verifies the transfer, reads dimensions and duration, generates derivatives, and
@@ -404,6 +415,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List collections
       description: >
@@ -429,6 +441,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: Create a collection
       tags: [collection]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
@@ -464,6 +477,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Assets whose licence is expiring or expired
       description: >

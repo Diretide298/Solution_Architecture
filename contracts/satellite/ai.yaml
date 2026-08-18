@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — AI
   version: 1.0.0
-  x-ticvai-screen-count: 5
+  x-ticvai-screen-count: 12
   x-ticvai-module: "8 — Unified Operations Dashboard (AI)"
   x-ticvai-tier: satellite
   description: >
@@ -27,9 +27,14 @@ info:
     Claude and a local model are interchangeable at the operation level (8.4.21–8.4.25), and
     failover between them is a platform concern rather than a caller's (8.4.26).
 
-    **Tenant isolation is partition-level, never filter-level.** A knowledge collection belongs
-    to one tenant. **A forgotten filter is a cross-tenant breach; a missing collection is a loud
-    failure**, and the second is the one to design for.
+    **Tenant isolation is the cell where a cell holds one tenant, and a dedicated shard where it
+    does not** (ADR-0021). A collection is per embedding model, not per tenant — a collection
+    carries its own vector configuration and a shard cannot, so the split criterion is the model.
+
+    The rule this replaces said isolation must never be filter-level. **That was right about
+    shared placement for the wrong stated reason, and reasoning from it produced a cross-tenant
+    defect on 17 August (CF-97)** — which is why the corrected version lives here, in the file
+    servers and clients are generated from, rather than only in the ADR.
 
     **Read-only against the transactional core.** An AI capability must never become a
     permission bypass. Retrieval runs as the calling principal and returns only what that
@@ -67,12 +72,114 @@ tags:
     description: Providers, models and policy
 paths:
 
+  /ai-providers/{providerId}/credential:
+    parameters:
+      - name: providerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setAiCredential
+      x-ticvai-consumed-by:
+        - "P09 ADM-037 AI Provider & Credentials"
+      x-ticvai-audience: [staff]
+      summary: Store or rotate a provider key
+      description: >
+        **The key goes to the vault and never to the database.** The request carries the secret
+        once; what is stored is a `credentialRef`, and every read of this provider thereafter
+        returns the reference rather than the value.
+
+        **No surface ever holds a provider key.** A kiosk, an app and a browser all call TICVAI,
+        and TICVAI calls the provider — because a token that reaches a client is a token that
+        bills the tenant from somebody else's machine.
+
+        Rotation is the same operation. The previous key is revoked at the vault after a grace
+        window, so an in-flight request does not fail mid-answer.
+      tags: [ai]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [secret]
+              properties:
+                secret:
+                  type: string
+                  format: password
+                  description: >
+                    **Write-only, never returned, never logged, never in an `ai.interaction`.**
+                    Masked in any audit record of this call.
+                expiresAt: { type: string, format: date-time, nullable: true }
+                graceMinutes:
+                  type: integer
+                  default: 15
+                  description: How long the previous key stays valid, so in-flight requests survive.
+      responses:
+        '200':
+          description: Stored, with a reference and no secret
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiProvider' }
+
+  /ai-providers/{providerId}/test:
+    parameters:
+      - name: providerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: testAiProvider
+      x-ticvai-consumed-by:
+        - "P09 ADM-037 AI Provider & Credentials"
+      x-ticvai-audience: [staff]
+      summary: Check the key works before anyone relies on it
+      description: >
+        A minimal call against the provider, using the stored credential.
+
+        **Run before activating and on a schedule after.** A key that lapses silently takes the
+        assistant down with no error anyone reads — the failure surfaces as an assistant that
+        stopped answering, which is diagnosed slowly.
+
+        Costs a handful of tokens and **is billed to the tenant like any other call**, because
+        pretending otherwise would put a hole in the reconciliation.
+      tags: [ai]
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  model: { type: string }
+                  latencyMs: { type: integer }
+                  failureReason:
+                    type: string
+                    nullable: true
+                    enum: [invalidKey, expiredKey, quotaExceeded, modelUnavailable, unreachable, residencyRefused]
+                  verifiedAt: { type: string, format: date-time }
+
   /conversations:
     get:
       operationId: listAiConversations
       x-ticvai-consumed-by:
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
+      x-ticvai-audience: [staff]
       summary: A principal's conversation history
       description: >
         8.4.30. Retained because an assistant with no memory of yesterday is a search box, and
@@ -100,6 +207,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
+      x-ticvai-audience: [staff]
       summary: Open a conversation
       description: >
         Scoped to a module and a role, because the same question means different things to a
@@ -143,8 +251,14 @@ paths:
     post:
       operationId: sendAiMessage
       x-ticvai-consumed-by:
+        - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-032 AI Concierge – Chat"
+        - "P02 GST-033 AI Concierge – Contextual Help"
+        - "P02 GST-054 AI Optimized Itinerary"
+        - "P05 KSK-015 Assistant"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
+      x-ticvai-audience: [staff, guest]
       summary: Ask
       description: >
         **The central operation.** Natural language in, a grounded answer out, with its sources
@@ -211,6 +325,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-040 Knowledge base"
         - "P06 EMP-041 Training"
+      x-ticvai-audience: [staff]
       summary: Search meaning, not words
       description: >
         8.4.39. Across products, tickets, memberships, documents and knowledge collections.
@@ -227,6 +342,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -254,6 +371,7 @@ paths:
   /collections:
     get:
       operationId: listKnowledgeCollections
+      x-ticvai-audience: [staff]
       summary: Collections available to this tenant
       description: >
         **A collection belongs to exactly one tenant.** Isolation is partition-level, never a
@@ -277,6 +395,7 @@ paths:
 
     post:
       operationId: createKnowledgeCollection
+      x-ticvai-audience: [staff]
       summary: Create a collection
       description: >
         Approved enterprise knowledge sources (8.4.38) — operating procedures, policies, product
@@ -309,6 +428,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: ingestKnowledgeDocument
+      x-ticvai-audience: [staff]
       summary: Add a document
       description: >
         8.4.11. Chunked and embedded asynchronously — `status` moves through `processing`
@@ -339,6 +459,7 @@ paths:
   /generate/configuration:
     post:
       operationId: generateConfiguration
+      x-ticvai-audience: [staff]
       summary: Draft a configuration from a description
       description: >
         **The client's stated first priority (CF-57).** An admin says what they want and the
@@ -386,6 +507,7 @@ paths:
   /generate/venue-layout:
     post:
       operationId: generateVenueLayout
+      x-ticvai-audience: [staff]
       summary: Draft a seat map from an uploaded plan
       description: >
         Raised by Chinmay on 14 August as the near-term use case that needs no history: a venue
@@ -441,6 +563,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-068 Audit Log"
         - "P09 ADM-004 Platform Audit Log"
+      x-ticvai-audience: [staff]
       summary: Every prompt, response and action
       description: >
         8.1.2, 8.1.3, 8.3.55–8.3.57. The audit trail, and the reason it is a first-class
@@ -481,6 +604,7 @@ paths:
   /proposed-actions:
     get:
       operationId: listProposedActions
+      x-ticvai-audience: [staff]
       summary: What the assistant has proposed and nobody has decided
       description: >
         8.3.61–8.3.66. Pricing, promotional, operational and financial proposals wait here for
@@ -509,6 +633,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: decideProposedAction
+      x-ticvai-audience: [staff]
       summary: Approve or reject a proposal
       description: >
         **Approval is recorded here; execution happens in the owning contract under the
@@ -554,6 +679,9 @@ paths:
   /usage:
     get:
       operationId: getAiUsage
+      x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-audience: [staff]
       summary: Usage, cost and performance
       description: >
         8.1.7, 8.3.81–8.3.83. Tokens, cost and latency by tenant, venue, principal, provider and
@@ -584,6 +712,9 @@ paths:
   /providers:
     get:
       operationId: listAiProviders
+      x-ticvai-consumed-by:
+        - "P09 ADM-037 AI Provider & Credentials"
+      x-ticvai-audience: [staff]
       summary: Configured providers and their order
       description: >
         8.4.21–8.4.26. OpenAI, Gemini, Claude and a local model, several at once, with failover.
@@ -609,6 +740,9 @@ paths:
 
     put:
       operationId: setAiProvider
+      x-ticvai-consumed-by:
+        - "P09 ADM-037 AI Provider & Credentials"
+      x-ticvai-audience: [staff]
       summary: Configure a provider
       description: >
         **Region-scoped, because inference is a data transfer.** ADR-0009: a prompt containing
@@ -639,6 +773,9 @@ paths:
   /policy:
     get:
       operationId: getAiPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-audience: [staff]
       summary: What the assistant may do here
       description: >
         8.3.72–8.3.80. Which capabilities are enabled, which roles may use them, what is masked
@@ -659,6 +796,9 @@ paths:
 
     put:
       operationId: setAiPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-audience: [staff]
       summary: Set the policy
       description: >
         **Tenant sets the default; a venue may narrow it and never widen it** (8.4.4 and 8.4.5,
@@ -692,6 +832,7 @@ paths:
   /index-sources:
     get:
       operationId: listIndexSources
+      x-ticvai-audience: [staff]
       summary: What is indexed, and how current it is
       description: >
         **A source is declared once here, not implemented in twenty-two services.**
@@ -722,6 +863,7 @@ paths:
 
     put:
       operationId: setIndexSource
+      x-ticvai-audience: [staff]
       summary: Declare a source indexed
       description: >
         Names the table, the fields that carry retrievable text, the collection it lands in and
@@ -759,6 +901,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reindexSource
+      x-ticvai-audience: [staff]
       summary: Rebuild a source
       description: >
         Needed for three reasons and worth naming them: the embedding model changed, the
@@ -808,6 +951,7 @@ paths:
         schema: { type: string }
     delete:
       operationId: removeIndexEntry
+      x-ticvai-audience: [staff]
       summary: Remove one record from the index
       description: >
         **The erasure path.** When a subject is erased (`pii.erase_subject`) or a page is
@@ -821,6 +965,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
           description: Removed from both stores
@@ -829,6 +975,7 @@ paths:
   /index-jobs:
     get:
       operationId: listIndexJobs
+      x-ticvai-audience: [staff]
       summary: Indexing in flight and recently finished
       description: >
         Progress, failures and the count of records an index could not embed. **A source that
@@ -878,11 +1025,49 @@ components:
         priority:
           type: integer
           description: Failover order (8.4.26). Lower is tried first.
+        scopeLevel:
+          type: string
+          enum: [platform, tenant, venue]
+          description: >
+            **Where this provider configuration applies, and therefore whose token pays for it.**
+            A tenant-scoped provider means that tenant's usage bills against their own key at the
+            provider — **an independent reconciliation source against our own meter**, which is
+            the point of per-tenant tokens rather than one platform key.
+
+            `venue` exists for the case where one venue's volume justifies its own key, or where
+            a venue is billed separately from the rest of its tenant.
+        scopePath:
+          type: string
+          description: Resolved scope node. Nearest ancestor wins (ADR-0018).
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null only where `scopeLevel` is `platform`.
         credentialRef:
           type: string
           description: >
             A key-vault reference, never the key. A key typed into a form ends up in a
             screenshot.
+        credentialRotatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        credentialExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            Where the provider issues expiring keys. **A key that lapses silently takes the
+            assistant down without an error anyone reads** — the expiry is surfaced so it can be
+            chased before it bites.
+        lastVerifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When `testAiProvider` last confirmed the key works.
         endpoint: { type: string, nullable: true }
         residency:
           type: string
@@ -924,6 +1109,67 @@ components:
             type: string
             enum: [pricing, promotion, operational, financial, configuration]
         monthlyTokenCeiling: { type: integer, nullable: true }
+        ceilingBehaviour:
+          type: string
+          enum: [warn, warnThenDisable, block]
+          default: warn
+          description: >
+            **Decided 17 August: warn, and let the venue manager choose.** A cap that stops the
+            assistant mid-visit turns a cost control into a guest-facing outage, and the venue
+            has no warning it is about to happen.
+
+            At the ceiling a notification reaches the venue manager with the spend and the
+            remaining period, and **the assistant keeps answering until somebody decides
+            otherwise**. `warnThenDisable` and `block` exist for a tenant who asks for a hard
+            limit; neither is the default.
+        ceilingWarningPercent:
+          type: integer
+          default: 80
+          description: >
+            **Warn before the ceiling, not at it.** A manager told at 100% has already spent it;
+            one told at 80% can decide with a week left.
+        guestCapabilityScope:
+          type: array
+          description: >
+            **What a guest-facing assistant may help with, and nothing else** (2.1.28). Bounding
+            the capability is what makes the cost predictable and the safety posture tractable —
+            an assistant that answers anything is one that can be asked anything.
+          items:
+            type: string
+            enum: [ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding]
+        retrieveTopK:
+          type: integer
+          default: 30
+          description: How many chunks retrieval returns before reranking.
+        rerankTopK:
+          type: integer
+          nullable: true
+          default: 5
+          description: >
+            How many survive the rerank and reach the model. **Reranking reduces cost as well as
+            improving quality**, which is unusual — retrieval is cheap and the tokens sent to the
+            model are not.
+
+            Null disables reranking, and a venue with no rerank provider configured runs without
+            it rather than failing.
+        cacheAnswers:
+          type: boolean
+          default: true
+          description: >
+            **The largest cost lever available at a kiosk.** Guest questions are extraordinarily
+            repetitive — forty questions, thousands of times a day — where staff questions are
+            diverse.
+
+            **Invalidation runs on the same events that invalidate the index.** A cached answer
+            that outlives a price change has misled a guest on the venue's behalf, which is worse
+            than a slow one.
+        cacheTtlMinutes:
+          type: integer
+          default: 60
+          description: >
+            An upper bound on top of event invalidation, not instead of it. **The key carries
+            `scope_path`** — a cache keyed on the question alone is a cross-venue leak wearing a
+            performance hat.
         retainInteractionsDays:
           type: integer
           description: >
@@ -1037,6 +1283,25 @@ components:
         id: { type: string, format: uuid }
         conversationId: { type: string, format: uuid, nullable: true }
         principalId: { type: string, format: uuid }
+        audience:
+          type: string
+          enum: [staff, guest]
+          description: >
+            **Billing divides on this.** Staff usage is bounded by headcount; guest usage is bounded
+            by footfall and curiosity, and a venue cannot stop guests asking questions.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The guest, where the audience is `guest`. `principalId` is null in that case — **a guest
+            is not a principal**, and attributing their tokens to a staff member would be wrong twice.
+        billableToTenantId:
+          type: string
+          format: uuid
+          description: >
+            Resolved from `scopePath` at write time, not derived later. **Billing must not depend on
+            walking a scope tree that has since been reorganised.**
         scopePath: { type: string }
         capability: { type: string }
         prompt: { type: string }
@@ -1100,11 +1365,20 @@ components:
           items: { type: string }
         chunkStrategy:
           type: string
-          enum: [wholeRecord, paragraph, fixedTokens, section]
+          enum: [wholeRecord, paragraph, fixedTokens, section, semanticSection, parentChild]
           description: >
-            `wholeRecord` for a product description, `section` for a policy or an operating
-            procedure. A 40-page document embedded as one vector retrieves as one thing and
-            answers nothing precisely.
+            **Changes what is stored, so it cannot be altered without a reindex.**
+
+            `parentChild` retrieves on a small precise chunk and returns the parent section. **A
+            refund policy paragraph retrieved without its heading answers the wrong question
+            confidently**, which is the failure this exists to prevent.
+
+            `semanticSection` splits on meaning rather than length. `fixedTokens` cuts a rule in
+            half, and policies and FAQs are where that shows.
+        parentField:
+          type: string
+          nullable: true
+          description: Which field carries the parent context, where `chunkStrategy` is `parentChild`.
         isActive: { type: boolean }
         entryCount: { type: integer, readOnly: true }
         lastIndexedAt: { type: string, format: date-time, readOnly: true, nullable: true }
@@ -1141,6 +1415,16 @@ components:
           description: >
             A full rebuild writes here and swaps on completion. Reindexing in place leaves the
             assistant answering from a half-built index.
+        shardKey:
+          type: string
+          readOnly: true
+          description: >
+            **The tenant boundary on shared placement** (ADR-0021). A collection is shared by every
+            tenant using the same embedding model, and the shard is what separates them — set at
+            provisioning from the tenant, never from a request.
+
+            On dedicated placement there is one shard and this is still populated, because a
+            tenant moving from shared to dedicated moves a shard rather than being re-indexed.
         embeddingModel: { type: string }
         startedAt: { type: string, format: date-time }
         completedAt: { type: string, format: date-time, nullable: true }
@@ -1156,11 +1440,52 @@ components:
         scopeLevel: { type: string, enum: [tenant, region, venue] }
         scopePath: { type: string, readOnly: true }
         documentCount: { type: integer, readOnly: true }
+        shardKey:
+          type: string
+          readOnly: true
+          description: >
+            **The tenant boundary on shared placement** (ADR-0021). A collection is shared by every
+            tenant using the same embedding model, and the shard separates them — set at
+            provisioning from the tenant, never from a request.
+
+            On dedicated placement there is one shard and this is still populated, because a tenant
+            moving from shared to dedicated moves a shard rather than being re-indexed.
+        retrieval:
+          type: string
+          enum: [dense, hybrid]
+          default: hybrid
+          description: >
+            **Set at creation and not changeable.** A collection created dense-only cannot gain a
+            sparse index without a full rebuild, which is why this is a creation decision rather
+            than a query one.
+
+            Hybrid is the default because **a venue corpus is mostly proper nouns** — Yas
+            Waterworld, Bronze Annual Pass, a menu item name. Dense retrieval is good at meaning
+            and poor at exact tokens, and half our queries are exact tokens.
+        sparseModel:
+          type: string
+          nullable: true
+          description: The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise.
+        idfScope:
+          type: string
+          enum: [shard, tenant, venue]
+          default: tenant
+          description: >
+            **Which population the sparse score measures rarity against** (ADR-0021). Qdrant
+            computes IDF statistics shard-wide by default, so a term common at one venue and rare
+            at another gets one score for both. Shard-per-tenant fixes the cross-tenant case;
+            **inside a dedicated cell the shard is the whole tenant and venues share it**, which
+            is what this narrows.
         embeddingModel:
           type: string
           readOnly: true
           description: >
-            Recorded because **changing it invalidates every embedding in the collection**, and
+            **This is what decides how many collections exist** (ADR-0021). A collection carries
+            its own vector configuration and a shard cannot, so vectors from two models cannot
+            share one. A tenant that residency forces onto a local model therefore has its own
+            collection — forced by the model, not chosen for isolation.
+
+            Read-only because **changing it invalidates every embedding in the collection**, and
             a collection silently searched with mismatched vectors returns plausible nonsense.
         isActive: { type: boolean }
 
@@ -1226,7 +1551,7 @@ components:
 
     LayoutDraft:
       type: object
-      x-ticvai-persistence: "none — becomes a seating import job"
+      x-ticvai-persistence: "ai.layout_draft"
       required: [importJobId, status]
       properties:
         importJobId:

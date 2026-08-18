@@ -56,6 +56,13 @@ consumers:
   idempotencyKey: requestId
   onFailure: retry
   isCritical: false
+- context: cache
+  purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
+    invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
+    venue’s behalf, which is worse than a slow one
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message
 notes: '**The event that replaces four bespoke callbacks.** Each owning contract consumed its own approval
   signal before this existed; now there is one, and adding a fifth approval kind means adding a consumer

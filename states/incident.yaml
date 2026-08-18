@@ -5,6 +5,8 @@
 entity: Incident
 contract: maintenance
 enum: IncidentStatus
+enumKind: named
+enumSchema: IncidentStatus
 owner: maintenance
 initial:
 - reported

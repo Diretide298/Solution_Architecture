@@ -30,9 +30,13 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
-CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+# The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
+# outside the package, so every validator passed for whoever had that repo checked out and read
+# nothing for anyone working from the zip — which is the worst failure a checker can have, because
+# it is silent and it looks like success.
+CONTRACTS = ROOT / "contracts"
 if not CONTRACTS.exists():
-    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+    CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 if not CONTRACTS.exists():
     CONTRACTS = ROOT / "contracts"
 
@@ -41,7 +45,7 @@ WARNINGS: list[str] = []
 
 
 def load_vocabulary() -> tuple[set[str], set[str]]:
-    doc = yaml.safe_load((SCREENS / "_components.yaml").read_text())
+    doc = yaml.safe_load((SCREENS / "_components.yaml").read_text(encoding="utf-8"))
     return ({c["kind"] for c in doc.get("components", [])},
             {r["id"] for r in doc.get("regions", [])})
 
@@ -52,7 +56,7 @@ def load_operation_ids() -> set[str]:
         return ops
     for f in CONTRACTS.rglob("*.yaml"):
         try:
-            doc = yaml.safe_load(f.read_text())
+            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         except Exception:
             continue
         for item in (doc.get("paths") or {}).values():
@@ -83,7 +87,12 @@ SHORTNAMES: dict[str, str] = {}
 # sibling-attachment pass on 17 August put 659 staff operations onto guest screens — including
 # `applyManualDiscount` and `exchangeOrderLines` on a guest's own ticket list — and every other
 # checker passed, because each operation existed and resolved to a table.
-GUEST_PLATFORMS = {"P01", "P02", "P05", "P11"}
+# P11 Accreditation is `public`, not `guest`. An external reviewer signs in from outside the
+# organisation and holds a real permission — treating that surface as a guest surface is what
+# produced `decideApprovalRequest` marked `x-ticvai-guest-callable` on 17 August, which reads as
+# a guest approving their own refund. Public and guest are different audiences and the platform
+# declares which it is.
+GUEST_PLATFORMS = {"P01", "P02", "P05"}
 
 
 def check_guest_operations(name: str, code: str, screen: dict, staff_ops: set[str]) -> None:
@@ -137,7 +146,7 @@ def check_platform(name: str, p: dict) -> None:
 
 def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids: set[str]) -> None:
     name = path.name
-    doc = yaml.safe_load(path.read_text())
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
     check_platform(name, doc["platform"])
     offline_capable = doc["platform"].get("offlineCapable", False)
 
@@ -194,7 +203,7 @@ def load_staff_operations() -> set[str]:
         if not d.exists():
             continue
         for f in d.glob("*.yaml"):
-            doc = yaml.safe_load(f.read_text())
+            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
             for item in (doc.get("paths") or {}).values():
                 if not isinstance(item, dict):
                     continue
@@ -203,7 +212,7 @@ def load_staff_operations() -> set[str]:
                         # `x-ticvai-guest-callable` marks an operation a guest performs on
                         # their own data — createOrder, createPayment, acquireLease. The
                         # permission is for staff doing it on a guest's behalf at a till.
-                        if op.get("x-ticvai-permission") and not op.get("x-ticvai-guest-callable"):
+                        if op.get("x-ticvai-permission") and not "guest" in (op.get("x-ticvai-audience") or []):
                             out.add(op["operationId"])
     return out
 
@@ -221,7 +230,7 @@ def main() -> int:
 
     kinds, regions = load_vocabulary()
     ops = load_operation_ids()
-    all_ids = {s["id"] for f in files for s in yaml.safe_load(f.read_text())["screens"]}
+    all_ids = {s["id"] for f in files for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]}
 
     print(f"checking {len(files)} platform(s)")
     print(f"  {len(kinds)} component kinds, {len(regions)} regions, {len(ops)} operationIds\n")
@@ -230,7 +239,7 @@ def main() -> int:
 
     total = 0
     for f in files:
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         total += len(doc["screens"])
         check(f, kinds, regions, ops, all_ids)
         print(f"  {doc['platform']['code']}  {doc['platform']['name']:30} {len(doc['screens']):>3} screens")

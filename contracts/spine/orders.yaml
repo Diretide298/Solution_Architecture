@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 40
+  x-ticvai-screen-count: 43
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales"
   x-ticvai-requirements: 343
@@ -11,7 +11,7 @@ info:
     - "P04 POS"
     - "P01 Guest Web"
     - "P02 Guest App"
-    - "P03 Kiosk"
+    - "P05 Kiosk"
     - "P10 Partner Portal"
     - "P12 Support Console"
   description: >
@@ -25,7 +25,7 @@ info:
     | **Matrix domain** | 2 — Ticketing Sales |
     | **Requirements** | ~343 |
     | **Capabilities** | C02, C03, C04, C34, C47 |
-    | **Consumed by** | P04 POS · P01 Guest Web · P02 Guest App · P03 Kiosk · P10 Partner Portal · P12 Support Console |
+    | **Consumed by** | P04 POS · P01 Guest Web · P02 Guest App · P05 Kiosk · P10 Partner Portal · P12 Support Console |
 
     ## How to read this file
 
@@ -115,6 +115,7 @@ paths:
   /carts:
     post:
       operationId: createCart
+      x-ticvai-audience: [guest]
       summary: Start a cart
       description: >
         **A cart holds leases; an order holds money.** Different lifetimes, different failure
@@ -131,7 +132,6 @@ paths:
         channel.
       tags: [cart]
       x-ticvai-permission: null   # a guest session, or anonymous before one exists
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -146,7 +146,7 @@ paths:
               required: [venueId, channel]
               properties:
                 venueId: { type: string, format: uuid }
-                channel: { $ref: '#/components/schemas/SalesChannel' }
+                channel: { $ref: '../shared/common.yaml#/components/schemas/SalesChannel' }
                 subjectId: { type: string, format: uuid, nullable: true }
                 locale: { type: string }
       responses:
@@ -172,6 +172,7 @@ paths:
         - "P02 GST-053 Build Your Own Itinerary"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [guest, partner]
       summary: The cart, priced and checked, right now
       description: >
         2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about the
@@ -181,7 +182,6 @@ paths:
         can say *"your seats are held for 6 minutes"* rather than discovering it at checkout.
       tags: [cart]
       x-ticvai-permission: null   # the cart's own token or the guest who owns it
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -204,6 +204,7 @@ paths:
       operationId: abandonCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+      x-ticvai-audience: [guest]
       summary: Empty it deliberately
       description: >
         **Releases every lease immediately** rather than waiting for expiry. A guest who has
@@ -213,10 +214,11 @@ paths:
         someone who said no (22.3.6).
       tags: [cart]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
           description: Abandoned and leases released
@@ -230,13 +232,17 @@ paths:
     post:
       operationId: addCartLine
       x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-033 Shop"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P02 GST-050 Resource Booking – Cabana"
         - "P02 GST-053 Build Your Own Itinerary"
+        - "P02 GST-056 Bundle Package"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [guest, partner]
       summary: Add something
       description: >
         2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A
@@ -251,7 +257,6 @@ paths:
         of four may legitimately split.
       tags: [cart]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -291,6 +296,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [guest, partner]
       summary: Change a quantity
       description: >
         Increasing extends the lease and may fail on capacity; decreasing releases part of it.
@@ -298,7 +304,6 @@ paths:
         seats to sale now, not in twenty minutes.
       tags: [cart]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -330,14 +335,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [guest, partner]
       summary: Take something out
       description: Releases its lease immediately.
       tags: [cart]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Removed, and the cart re-priced
@@ -355,6 +362,7 @@ paths:
       operationId: extendCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+      x-ticvai-audience: [guest]
       summary: Give the guest more time
       description: >
         Extends every lease in the cart. **Capped, and the cap is configuration** — an
@@ -365,7 +373,6 @@ paths:
         than letting a guest discover the cap by hitting it.
       tags: [cart]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -393,6 +400,7 @@ paths:
       operationId: claimCart
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
+      x-ticvai-audience: [guest]
       summary: Attach an anonymous cart to a guest
       description: >
         2.1.31. **The operation that makes cross-channel work.** A guest who built a cart
@@ -404,7 +412,6 @@ paths:
         one. Lines that cannot be re-leased are reported rather than dropped silently.
       tags: [cart]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -432,6 +439,7 @@ paths:
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [guest, partner]
       summary: Turn the cart into an order
       description: >
         **Transfers the leases to the order rather than releasing and re-acquiring them.**
@@ -444,7 +452,6 @@ paths:
         **One cart, one order, one receipt** across ticketing, F&B and retail (14 August).
       tags: [cart]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -480,6 +487,7 @@ paths:
   /carts/abandoned:
     get:
       operationId: listAbandonedCarts
+      x-ticvai-audience: [staff]
       summary: Carts that lapsed without checking out
       description: >
         22.3.6 and 2.6.45. Feeds recovery campaigns.
@@ -509,11 +517,62 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/AbandonedCart' }
 
+  /payments/{paymentId}/void:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: voidPayment
+      x-ticvai-audience: [staff]
+      summary: Release an authorisation before it is captured
+      description: >
+        **Cheaper and cleaner than a refund, and the guest never sees a charge.** An authorisation
+        released the same day usually leaves no trace on a statement; a capture followed by a
+        refund leaves two lines and a phone call.
+
+        Only valid before capture. **A captured payment is refunded, not voided** — the money has
+        moved and pretending otherwise loses the audit trail.
+      tags: [orders]
+      x-ticvai-permission: PAYMENT_VOID
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum: [guestAbandoned, cashierError, priceCorrection, duplicateAuthorisation, systemError]
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Voided
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+        '409':
+          description: >
+            Already captured. **The response says so rather than failing generically**, because
+            the correct next action is a refund and the cashier needs to know that.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /orders:
     get:
       operationId: listOrders
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-030 Ticket Transfer"
+        - "P02 GST-018 Add to Calendar / Reminders"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
@@ -530,10 +589,12 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: replica
       summary: List orders
       tags: [order]
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-permission-escalated: ORDER_VIEW_OTHER   # where the orders are not the caller's own
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -576,8 +637,8 @@ paths:
 
     post:
       operationId: createOrder
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
@@ -596,6 +657,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, guest, partner]
       summary: Create an order
       description: >
         The client submits lines with the prices it quoted from its local bundle. **The
@@ -646,10 +708,13 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getOrder
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-013 Order Confirmation"
+        - "P02 GST-018 Add to Calendar / Reminders"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
+        - "P05 KSK-009 Ticket issued"
+        - "P05 KSK-011 Collect a booking"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-003 Queue Integration Setup"
@@ -664,6 +729,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: primary
       summary: Read an order
       tags: [order]
@@ -704,6 +770,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Park a sale and free the till
       description: >
         The guest has gone to fetch a wallet, or wants to add something after checking with
@@ -775,6 +842,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Bring a parked sale back to a till
       description: >
         Any till, not only the one that parked it — the cashier who took it may be on a break.
@@ -826,6 +894,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Apply a discount a cashier chose
       description: >
         Distinct from a promotion, which is a rule the platform evaluates. This is a person
@@ -889,6 +958,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Void an order
       description: >
         Only before settlement and only within the same shift. After that it is a refund —
@@ -948,6 +1018,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: List refunds against an order
       tags: [refund]
@@ -983,6 +1054,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Refund an order, wholly or in part
       description: >
         **Not offline-capable.** A refund touches the gateway and the ledger; both need the
@@ -1036,6 +1108,7 @@ paths:
       operationId: approveRefund
       x-ticvai-consumed-by:
         - "P08 BO-004 Manual Wait Time Entry"
+      x-ticvai-audience: [staff]
       summary: Approve a refund held for approval
       tags: [refund]
       x-ticvai-permission: ORDER_REFUND_APPROVE
@@ -1072,6 +1145,7 @@ paths:
       operationId: createBulkRefund
       x-ticvai-consumed-by:
         - "P08 BO-004 Manual Wait Time Entry"
+      x-ticvai-audience: [staff]
       summary: Refund every order against an event, performance or date
       description: >
         Cancellation handling. Always requires approval regardless of individual thresholds —
@@ -1124,9 +1198,9 @@ paths:
   /refund-requests:
     post:
       operationId: createRefundRequest
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
         - "P08 BO-028 Refund Approval Queue"
+      x-ticvai-audience: [guest]
       security:
         - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -1139,7 +1213,6 @@ paths:
         guest's order is rejected with 403, not queued for someone to notice later.
       tags: [refund]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1189,6 +1262,7 @@ paths:
         - "P08 BO-003 Queue Integration Setup"
         - "P08 BO-062 Venue Profile"
         - "P08 BO-065 Venue Configuration"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a venue's refund policy
       description: >
@@ -1213,6 +1287,7 @@ paths:
         - "P08 BO-003 Queue Integration Setup"
         - "P08 BO-062 Venue Profile"
         - "P08 BO-065 Venue Configuration"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Set a venue's refund policy
       tags: [policy]
@@ -1238,14 +1313,17 @@ paths:
   /payments:
     post:
       operationId: createPayment
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P02 GST-033 AI Concierge – Contextual Help"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
+        - "P05 KSK-007 Payment"
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-audience: [staff, guest, partner]
       summary: Take a payment against an order
       description: >
         Cash is offline-capable. Card, wallet and voucher are not — they need the gateway.
@@ -1289,12 +1367,13 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: inquirePaymentStatus
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+        - "P05 KSK-008 Payment unresolved"
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-audience: [staff, guest, partner]
       summary: Ask the provider what actually happened
       description: >
         The recovery path (12 Aug §12). A terminal charged the card and the response never
@@ -1308,6 +1387,8 @@ paths:
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Reconciled against the provider
@@ -1334,6 +1415,7 @@ paths:
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-audience: [staff, partner]
       summary: Record a tip against a payment
       description: >
         A separate operation rather than a line on the order, because a tip is not revenue —
@@ -1396,6 +1478,7 @@ paths:
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-audience: [staff, partner]
       summary: Capture a previously authorised payment
       tags: [payment]
       x-ticvai-permission: ORDER_CREATE
@@ -1429,6 +1512,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: convertReservation
+      x-ticvai-audience: [staff]
       summary: Convert a reservation into an order
       tags: [reservation]
       x-ticvai-permission: ORDER_CREATE
@@ -1456,6 +1540,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-014 Sync & reconciliation"
+      x-ticvai-audience: [staff]
       summary: Replay orders recorded offline
       description: >
         Ordered batch, processed in `sequence` order, stopping at the first entry that
@@ -1495,6 +1580,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-014 Sync & reconciliation"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Entries the server refused
       description: >
@@ -1550,6 +1636,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Add or remove lines on an existing order
       description: >
         Adding a line charges the difference; removing one refunds it under the venue's refund
@@ -1596,6 +1683,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: What is already on this media
       description: >
         Scanned at a counter before adding something. Shows what the guest holds so a cashier
@@ -1621,6 +1709,7 @@ paths:
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
+      x-ticvai-audience: [staff]
       summary: Add something to a ticket the guest already holds
       description: >
         A guest arrives, buys admission, and an hour later wants a locker. They scan the QR
@@ -1695,6 +1784,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Exchange lines for different products or dates
       description: >
         A date change, a tier upgrade, a different performance. **Settles only the
@@ -1752,6 +1842,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       summary: Move an order to another performance
       description: >
         The common case of an exchange, and worth its own operation because it is what a call
@@ -1802,8 +1893,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: reprintOrder
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-013 Order Confirmation"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
@@ -1820,6 +1911,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, guest, partner]
       summary: Reprint or resend tickets
       description: >
         Reprint count is recorded per line. Repeated reprints on one order is a signal worth
@@ -1877,6 +1969,7 @@ paths:
         - "P01 WEB-018 My Tickets"
         - "P01 WEB-019 Order History"
         - "P01 WEB-023 Membership Management"
+        - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-010 Booking Confirmation"
@@ -1889,6 +1982,7 @@ paths:
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-010 Print failure"
         - "P05 KSK-012 Booking found"
+      x-ticvai-audience: [guest]
       summary: Transfer tickets to another guest
       description: >
         Per-ticket, not whole-order — a family splitting tickets between two phones is the
@@ -1899,7 +1993,6 @@ paths:
         nobody can reach.
       tags: [order]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1952,11 +2045,12 @@ paths:
     post:
       operationId: claimTicketTransfer
       x-ticvai-consumed-by:
+        - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-014 Ticket Transfer"
+      x-ticvai-audience: [guest]
       summary: Claim transferred tickets
       tags: [order]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2011,6 +2105,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: primary
       summary: Full financial history of an order
       description: >
@@ -2032,6 +2127,10 @@ paths:
   /reservations:
     get:
       operationId: listReservations
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P02 GST-016 My Reservations"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: List reservations
       tags: [reservation]
@@ -2064,6 +2163,7 @@ paths:
 
     post:
       operationId: createReservation
+      x-ticvai-audience: [staff]
       summary: Hold without payment
       description: >
         A reservation is not an order. It holds capacity, expires, creates no entitlement
@@ -2099,6 +2199,11 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getReservation
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P02 GST-016 My Reservations"
+        - "P02 GST-017 Reservation Details"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary
       summary: Read a reservation
       tags: [reservation]
@@ -2116,6 +2221,11 @@ paths:
 
     delete:
       operationId: cancelReservation
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P02 GST-016 My Reservations"
+        - "P02 GST-017 Reservation Details"
+      x-ticvai-audience: [staff, guest]
       summary: Cancel a reservation
       description: Releases held capacity immediately rather than waiting for expiry.
       tags: [reservation]
@@ -2123,6 +2233,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Cancelled }
         '409':
@@ -2139,6 +2251,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: extendReservation
+      x-ticvai-audience: [staff]
       summary: Extend a reservation
       description: >
         Bounded by the venue's maximum, so a reservation cannot be renewed indefinitely
@@ -2174,6 +2287,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Partner credit position
       description: >
@@ -2198,6 +2312,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-audience: [staff, partner]
       summary: Set a partner credit limit
       description: >
         Reducing a limit below the amount already used is permitted — it stops further
@@ -2241,6 +2356,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-audience: [staff, partner]
       summary: Authorise an order beyond the credit limit
       description: >
         Supervisor override for a single order (2.7.39). Records the authorising principal,
@@ -2822,7 +2938,7 @@ components:
             Rotated on claim, so a link shared before signing in does not reach the account
             after.
         venueId: { type: string, format: uuid }
-        channel: { $ref: '#/components/schemas/SalesChannel' }
+        channel: { $ref: '../shared/common.yaml#/components/schemas/SalesChannel' }
         subjectId:
           type: string
           format: uuid
@@ -2929,7 +3045,6 @@ components:
             self-service adoption figures the operator will ask for within a month of launch.
         venueId: { type: string, format: uuid }
         scopePath: { type: string }
-        channel: { $ref: '#/components/schemas/Channel' }
         status: { $ref: '#/components/schemas/OrderStatus' }
         currency: { type: string, pattern: '^[A-Z]{3}$' }
         currencyScale: { type: integer, minimum: 0, maximum: 4 }

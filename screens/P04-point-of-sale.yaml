@@ -922,7 +922,10 @@ screens:
   navigation:
     entryFrom:
     - POS-002
-    exitTo: []
+    exitTo:
+    - POS-001
+    - POS-009
+    inferred: true
 - id: POS-008
   name: Reports
   module: Reports

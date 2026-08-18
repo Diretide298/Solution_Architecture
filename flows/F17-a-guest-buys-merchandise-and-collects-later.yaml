@@ -8,7 +8,6 @@
 id: F17
 name: A guest buys merchandise and collects later
 actor: guest
-capability: C06
 wave: 2
 frequency: daily
 criticality: revenue
@@ -98,3 +97,7 @@ exitStates:
 openQuestions:
 - Where collection happens and what hours it keeps. A shop-and-drop that can only be collected from
   the shop that sold it, during shop hours, is worse than carrying the bag.
+primaryContract: retail
+contracts:
+- retail
+- orders

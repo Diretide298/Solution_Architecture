@@ -392,9 +392,12 @@ Node ids are stable and live in the URL hash, so any operation or schema can be 
 - **Screen-to-screen sitemap** — `entryFrom`/`exitTo` are shown per screen and are clickable, but
   there is no whole-platform navigation graph. Worth building only once more of the 160 inferred
   navigation blocks are confirmed.
-- **The four platforms with no screen files** — P03, P06, P07 and P13. The sidebar note names them
-  and counts them from the deployment table rather than asserting a list, so it stays right as
-  they land. P02, P04 and P08 arrived in the 14 August drop; 179 screens are defined now.
+- **Platforms with no screen files** — none are left. The sidebar note counts them from the
+  deployment table rather than asserting a list, which is why it stayed right while they landed:
+  P02, P04 and P08 in the 14 August drop, the rest since. All twelve platform codes now have a
+  file and 376 screens are defined. The retired code this line used to name was the kiosk before
+  it was renumbered; naming a dead code anywhere in the tree is what `tools/check-package.py`
+  rule 11 exists to catch, so it is not repeated here.
 - **`docs/`** — the ADRs and registers are on disk but only ADR-0016 is surfaced, on Routing.
 - **A context-to-context graph of its own.** The Domain layer lists contexts in the sidebar and in
   the right pane; the *drawing* of them is the Contracts layer's Spine scope. That is deliberate —

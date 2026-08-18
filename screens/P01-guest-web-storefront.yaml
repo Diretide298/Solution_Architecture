@@ -19,7 +19,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 29
+  screenCount: 35
   app: guest-web
   appStatus: scaffolded
   packages:
@@ -145,6 +145,19 @@ screens:
     route: /discovery-and-browse/event-and-attraction-listing
     component: apps/guest-web/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx
     status: notStarted
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: Find something by name
+    trigger: onLoad
 - id: WEB-003
   name: Search Results
   module: Discovery & Browse
@@ -179,6 +192,15 @@ screens:
     - WEB-004
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: Find something by name
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
 - id: WEB-004
   name: Event / Attraction Detail
   module: Discovery & Browse
@@ -410,7 +432,25 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-005
+    - WEB-006
+    - WEB-007
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: listCatalogueBundles
+    contract: catalogue
+    purpose: List published bundles
+    trigger: onLoad
+  - operationId: getUpsellSuggestions
+    contract: promotions
+    purpose: Suggestions for a cart
+    trigger: onAction
 - id: WEB-009
   name: Wishlist
   module: Booking & Selection
@@ -472,6 +512,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-005
+    - WEB-006
+    - WEB-007
 - id: WEB-010
   name: Shopping Cart
   module: Cart & Checkout
@@ -787,6 +832,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-010
+    - WEB-011
+    - WEB-012
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-015
   name: Virtual Waiting Room
@@ -822,7 +872,22 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: joinQueue
+    contract: queue
+    purpose: Join a virtual queue
+    trigger: onAction
+  - operationId: getQueueEntry
+    contract: queue
+    purpose: Read a queue entry
+    trigger: onLoad
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
 - id: WEB-016
   name: Login / Register
   module: Account & Self-Service
@@ -942,6 +1007,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-017
+    - WEB-018
+    - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-017
   name: My Account Dashboard
@@ -1002,6 +1072,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-018
+    - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-018
   name: My Tickets
@@ -1039,6 +1114,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-017
+    - WEB-019
 - id: WEB-019
   name: Order History
   module: Account & Self-Service
@@ -1074,6 +1154,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-017
+    - WEB-018
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-020
   name: Profile & Preferences
@@ -1136,6 +1221,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-017
+    - WEB-018
 - id: WEB-021
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
@@ -1168,6 +1258,19 @@ screens:
     - WEB-023
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: getWallet
+    contract: retail
+    purpose: Read a guest wallet
+    trigger: onLoad
+  - operationId: listWalletTransactions
+    contract: retail
+    purpose: Wallet transaction history
+    trigger: onLoad
+  - operationId: getGiftCard
+    contract: retail
+    purpose: Check a gift card balance
+    trigger: onLoad
 - id: WEB-022
   name: Membership Plans
   module: Membership, Loyalty & Value
@@ -1200,6 +1303,15 @@ screens:
     - WEB-023
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  - operationId: getProduct
+    contract: catalogue
+    purpose: Read a product
+    trigger: onLoad
 - id: WEB-023
   name: Membership Management
   module: Membership, Loyalty & Value
@@ -1235,6 +1347,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-021
+    - WEB-022
+    - WEB-024
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-024
   name: Loyalty & Rewards
@@ -1469,6 +1586,11 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-025
+    - WEB-026
+    - WEB-027
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: WEB-029
   name: Error / Sold Out / Maintenance
@@ -1508,3 +1630,275 @@ screens:
     entryFrom:
     - WEB-001
     inferred: true
+    exitTo:
+    - WEB-001
+- id: WEB-030
+  name: Ticket Transfer
+  module: Ticketing
+  purpose: Send a ticket to someone else, and see what you have sent.
+  capability: C00
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  - operationId: claimTicketTransfer
+    contract: orders
+    purpose: Claim transferred tickets
+    trigger: onAction
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
+  states:
+    loading: Your transferable tickets
+    empty: Nothing transferable — already used, or not transferable by product rule
+    error: Could not load. **Transferring is blocked** — sending a ticket you could not read is sending
+      the wrong one
+  navigation:
+    exitTo:
+    - WEB-001
+    - WEB-031
+    - WEB-035
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /ticket-transfer
+    component: apps/guest-web/src/routes/TicketTransfer.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P01 Guest Web.dc.html#web-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August for parity with GST-014. **Not on the wireframe board** — needs drawing. CF-93.
+- id: WEB-031
+  name: My Reservations
+  module: Ticketing
+  purpose: What you have booked and not yet paid for.
+  capability: C00
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listReservations
+    contract: orders
+    purpose: List reservations
+    trigger: onLoad
+  - operationId: getReservation
+    contract: orders
+    purpose: Read a reservation
+    trigger: onLoad
+  - operationId: cancelReservation
+    contract: orders
+    purpose: Cancel a reservation
+    trigger: onAction
+  states:
+    loading: Reservations, soonest first
+    empty: Nothing reserved
+    error: Could not load. Cancelling is blocked
+  navigation:
+    exitTo:
+    - WEB-001
+    - WEB-030
+    - WEB-035
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /my-reservations
+    component: apps/guest-web/src/routes/MyReservations.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P01 Guest Web.dc.html#web-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.
+- id: WEB-032
+  name: Offers & Promotions
+  module: Promotions
+  purpose: What is on, and what applies to you.
+  capability: C00
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listPromotions
+    contract: promotions
+    purpose: List promotions
+    trigger: onLoad
+  - operationId: getPromotion
+    contract: promotions
+    purpose: Read a promotion
+    trigger: onLoad
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  states:
+    loading: Offers load
+    empty: Nothing running — said plainly rather than shown as an empty page
+    error: Could not load
+  navigation:
+    exitTo:
+    - WEB-001
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /offers-promotions
+    component: apps/guest-web/src/routes/OffersPromotions.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P01 Guest Web.dc.html#web-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.
+- id: WEB-033
+  name: Shop
+  module: Retail
+  purpose: Merchandise, browsable before you arrive.
+  capability: C00
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listMerchandise
+    contract: retail
+    purpose: List merchandise
+    trigger: onLoad
+  - operationId: lookupMerchandise
+    contract: retail
+    purpose: Price and stock check by barcode
+    trigger: onLoad
+  - operationId: reserveMerchandise
+    contract: retail
+    purpose: Reserve an item for collection
+    trigger: onAction
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  states:
+    loading: Products load
+    empty: Nothing available online at this venue
+    error: Could not load. **Reserving is blocked** — a reservation against unknown stock is a promise
+      we cannot keep
+  navigation:
+    exitTo:
+    - WEB-001
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /shop
+    component: apps/guest-web/src/routes/Shop.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P01 Guest Web.dc.html#web-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
+- id: WEB-034
+  name: Lost & Found
+  module: Support
+  purpose: Report something you left behind.
+  capability: C00
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listCases
+    contract: marketing-crm
+    purpose: List service cases
+    trigger: onLoad
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+  states:
+    loading: Your reports
+    empty: Nothing reported
+    error: Could not submit. **The report is kept** and retried
+  navigation:
+    exitTo:
+    - WEB-001
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /lost-found
+    component: apps/guest-web/src/routes/LostFound.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P01 Guest Web.dc.html#web-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August for parity with GST-034. **Not on the wireframe board** — needs drawing. CF-93.
+- id: WEB-035
+  name: Multi-Currency & Pricing
+  module: Ticketing
+  purpose: Compare prices in your own currency before you travel.
+  capability: C00
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listFxRates
+    contract: finance
+    purpose: The rates in force
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  states:
+    loading: Rates and prices
+    empty: One currency configured at this venue
+    error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
+      rate is worse than no rate
+  navigation:
+    exitTo:
+    - WEB-001
+    - WEB-030
+    - WEB-031
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /multi-currency-pricing
+    component: apps/guest-web/src/routes/MulticurrencyPricing.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P01 Guest Web.dc.html#web-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: 'Added 17 August for parity with GST-044 (CF-91: the matrix asks for this on the web). **Not
+    on the wireframe board** — needs drawing. CF-93.'

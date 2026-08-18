@@ -108,6 +108,7 @@ paths:
         - "P08 BO-031 Access Point Configuration"
         - "P08 BO-069 Asset Register"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List assets
       tags: [asset]
@@ -152,6 +153,7 @@ paths:
         - "P08 BO-031 Access Point Configuration"
         - "P08 BO-069 Asset Register"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-audience: [staff]
       summary: Register an asset
       description: >
         Rides, plant, vehicles, IT equipment, furniture. Where the asset backs a sellable
@@ -193,6 +195,7 @@ paths:
         - "P08 BO-031 Access Point Configuration"
         - "P08 BO-069 Asset Register"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an asset with history and documents
       description: >
@@ -217,12 +220,15 @@ paths:
         - "P08 BO-031 Access Point Configuration"
         - "P08 BO-069 Asset Register"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-audience: [staff]
       summary: Amend an asset
       tags: [asset]
       x-ticvai-permission: ASSET_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -253,6 +259,7 @@ paths:
         - "P08 BO-031 Access Point Configuration"
         - "P08 BO-069 Asset Register"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Find an asset by tag or QR
       description: >
@@ -290,6 +297,7 @@ paths:
         - "P08 BO-031 Access Point Configuration"
         - "P08 BO-069 Asset Register"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-audience: [staff]
       summary: Take an asset out of service or return it
       description: >
         **This closes the loop into operations.** Taking a ride out of service marks it on the
@@ -335,6 +343,7 @@ paths:
         - "P08 BO-031 Access Point Configuration"
         - "P08 BO-069 Asset Register"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Service history
       description: >
@@ -371,6 +380,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List work orders
       description: >
@@ -419,6 +429,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Raise a work order
       description: >
         Raised by anyone — a technician, a duty supervisor, a cashier who noticed a broken
@@ -461,6 +472,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a work order
       tags: [workOrder]
@@ -483,12 +495,15 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Assign, reprioritise or amend
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -522,6 +537,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Start, pause or stop work
       description: >
         The timer. Labour time drives cost and is the ground truth for how long jobs actually
@@ -579,6 +595,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Record parts consumed
       description: >
         Issues stock through the inventory movement ledger — one ledger, not a second parts
@@ -636,6 +653,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Cancel a work order
       description: >
         Raised in error, duplicated, or superseded by a larger job.
@@ -688,6 +706,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Complete a work order
       description: >
         Requires a resolution note and, where the category demands it, completion photographs.
@@ -743,6 +762,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Supervisor verification
       description: >
         Where the category requires it, a second person confirms the work. The verifier may
@@ -793,6 +813,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: The assignee takes the job
       description: >
         18.2.2. **Distinct from being assigned.** A supervisor assigns; a technician accepts,
@@ -804,7 +825,7 @@ paths:
       x-ticvai-permission: MAINTENANCE_EXECUTE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriteWins
+      x-ticvai-conflict-policy: lastWriterWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -832,6 +853,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: The assignee declines, with a reason
       description: >
         18.2.3. Wrong skill, wrong shift, wrong venue, or already being done by somebody else.
@@ -843,7 +865,7 @@ paths:
       x-ticvai-permission: MAINTENANCE_EXECUTE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriteWins
+      x-ticvai-conflict-policy: lastWriterWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -878,6 +900,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Work has begun
       description: >
         18.2.4. **Starts the clock**, which is what makes `recordWorkOrderTime` meaningful and
@@ -890,7 +913,7 @@ paths:
       x-ticvai-permission: MAINTENANCE_EXECUTE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriteWins
+      x-ticvai-conflict-policy: lastWriterWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -924,6 +947,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Stopped, and why
       description: >
         18.2.5. **The reason decides the state.** Waiting for a part moves to `awaitingParts`
@@ -935,7 +959,7 @@ paths:
       x-ticvai-permission: MAINTENANCE_EXECUTE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriteWins
+      x-ticvai-conflict-policy: lastWriterWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -975,13 +999,14 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Back to work
       description: 18.2.4 again, from the other side. Returns to `inProgress` from either paused state.
       tags: [maintenance]
       x-ticvai-permission: MAINTENANCE_EXECUTE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriteWins
+      x-ticvai-conflict-policy: lastWriterWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -1004,6 +1029,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Administratively closed
       description: >
         18.2.7. **Not the same as completing or verifying it.** Completion is the technician
@@ -1055,6 +1081,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Access Point Directory"
+      x-ticvai-audience: [staff]
       summary: Photo, video, document, note or signature
       description: >
         18.5.1–18.5.5. **Evidence, not decoration.** A photo of the fault before and the repair
@@ -1096,6 +1123,7 @@ paths:
       operationId: listMaintenancePlans
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List planned maintenance schedules
       tags: [planned]
@@ -1124,6 +1152,7 @@ paths:
       operationId: createMaintenancePlan
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
+      x-ticvai-audience: [staff]
       summary: Create a planned maintenance schedule
       description: >
         By elapsed time, by usage, or both — whichever comes first. A ride serviced every
@@ -1163,12 +1192,15 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateMaintenancePlan
+      x-ticvai-audience: [staff]
       summary: Amend or suspend a plan
       tags: [planned]
       x-ticvai-permission: ASSET_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1193,6 +1225,7 @@ paths:
       operationId: getDueMaintenance
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Planned tasks due or overdue
       description: >
@@ -1225,6 +1258,7 @@ paths:
       operationId: listInspectionTemplates
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List inspection templates
       description: >
@@ -1247,6 +1281,7 @@ paths:
       operationId: createInspectionTemplate
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: tenant
       summary: Create an inspection template
       description: >
@@ -1276,6 +1311,7 @@ paths:
       operationId: listInspections
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List completed inspections
       description: >
@@ -1322,6 +1358,7 @@ paths:
       operationId: submitInspection
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+      x-ticvai-audience: [staff]
       summary: Submit a completed inspection
       description: >
         Offline-capable and photo-first. A failed item may raise a work order automatically,
@@ -1364,6 +1401,7 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List incidents
       tags: [incident]
@@ -1407,6 +1445,7 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
+      x-ticvai-audience: [staff]
       summary: Report an incident
       description: >
         **An incident is not a work order.** It is something that happened to a person or a
@@ -1454,6 +1493,7 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an incident
       tags: [incident]
@@ -1478,6 +1518,7 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
+      x-ticvai-audience: [staff]
       summary: Investigate, escalate or close an incident
       description: >
         Closure requires findings and, where a corrective action was identified, a linked
@@ -1489,6 +1530,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1534,6 +1577,7 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
+      x-ticvai-audience: [staff]
       summary: Record notification to an external authority
       description: >
         Some incidents must be reported externally within a statutory window. This records

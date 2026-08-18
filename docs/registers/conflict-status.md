@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**90 conflicts raised — CF-01 to CF-87, plus CF-33a and one screen-level item.**
+**113 conflicts raised — CF-01 to CF-110, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -8,21 +8,20 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **16** |
+| OPEN — client | **17** |
 | OPEN — Softlabs | **1** |
-| CLOSED | **67** |
+| CLOSED | **89** |
 | WITHDRAWN | **6** |
-| **Total** | **90** |
+| **Total** | **113** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**17 open, 67 closed.**
+**18 open, 89 closed.**
 
 
-## Open — needs a client decision — 16
+## Open — needs a client decision — 17
 
 | ID | Issue | Owner |
 |---|---|---|
-| **CF-14** | AI concierge mechanism and token billing model. How AI usage is priced to tenants, and whether the concierge meters per interaction or per token | Both — workshop |
 | **CF-17** | Venue-map format and guidance standard. Which CAD or SVG conventions venues will supply, so the importer targets something real | Both |
 | **CF-35** | Biometric data is sensitive under PDPL — heightened protection, explicit consent, DPIA, stricter transfer rules. Affects Face Pass, facial readers and | Allam + counsel |
 | **CF-40** | Training & Knowledge Base and Employee Recognition have no provenance. Both appear in the employee app design reference and in neither the matrix nor  | Qossai / Allam |
@@ -38,6 +37,8 @@ register.
 | **CF-83** | Abandoned-cart recovery may not be lawful as specified, and I built it without asking. 22.3.6 and 2.6.45 require identifying incomplete purchases and  | Allam + counsel |
 | **CF-84** | Donation VAT treatment is unstated and it is a tax question. 1.1.128–1.1.133 require donation collection through all POS channels. I posted donations  | Qossai + finance |
 | **CF-85** | Four holding windows were set by me as defaults and all four are commercial decisions. Cart expiry and extension cap — how long a guest holds capacity | Qossai + Allam |
+| **CF-97** | A superseded ADR was cited as current, and nothing in the package could have stopped it. ADR-0021 reasoned from ADR-0001's *"Cell = Tenant × Jurisdict | Chinmay + Dinesh |
+| **CF-100** | Agent hours for the conversation queue are unstated, and the handover depends on them. Raised 17 August when CF-99 was closed. 22.8.5 requires seamles | Qossai + Allam |
 
 ## Open — Softlabs to resolve — 1
 
@@ -45,7 +46,7 @@ register.
 |---|---|---|
 | **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
 
-## Closed — 67
+## Closed — 89
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -61,6 +62,7 @@ register.
 | **CF-11** | Approval model depth |  |
 | **CF-12** | Universal Cashier landing screen |  |
 | **CF-13** | Guest app publishing | Client — Option C, tiered |
+| **CF-14** | Guest concierge in Phase 1, charged per token, capped as a warning rather than a stop — decided by Chinmay, 17 August. Closed. Three decisions and eac |  |
 | **CF-15** | Online-first vs offline-first POS catalogue |  |
 | **CF-16** | Reference manual undelivered |  |
 | **CF-18** | Dynamic bundle auto-discounting design. Closed 17 August — ADR-0019, and the gap was two things wearing one name. The contract could not express a dyn |  |
@@ -115,6 +117,27 @@ register.
 | **CF-82** | Three more concepts the matrix names and the contracts did not. Found by sweeping every repeated noun in the matrix against the operation and schema v |  |
 | **CF-86** | Two commercial surfaces had screens and no contract behind them. Partner agreements: `getB2bCredit`, `setB2bCreditLimit`, `getChannelAllocations` and  |  |
 | **CF-87** | A warning I chose to leave was hiding two defects. `check-states` reported that `states/entitlement.yaml` referenced `access.TicketStatus`, which does |  |
+| **CF-88** | The state checker had a blind spot covering 31 lifecycles. It collected enums declared as named schemas — `OrderStatus`, `WorkOrderStatus` — and never | Chinmay |
+| **CF-89** | ADR-0009 answered whether AI data may leave the country and never where the AI service runs. Raised by a question about folders that turned out to be  | Chinmay + Dinesh |
+| **CF-90** | AI had four lifecycles and no state model, found by asking whether it needed a folder. It does not — the package is organised by artefact kind — but t |  |
+| **CF-91** | Multi-currency was built on the app and the matrix asks for it on the website. 2.6.33 and 2.9.1 both name the website; neither names the app. Closed 1 |  |
+| **CF-92** | Eight guest-app screens had no requirement behind them. Closed 17 Aug, and it was my error: I searched the matrix and never the minutes. Seven of the  |  |
+| **CF-93** | Guest web and guest app had drifted apart and nobody decided they should. Closed 17 Aug: nine screens added, two operations written, fourteen marked g |  |
+| **CF-94** | Two AI isolation breaches, both invisible to every checker. `generateVenueLayout` wrote directly into `seating.import_job` — AI writing into a transac | Chinmay |
+| **CF-95** | Qdrant collection-per-tenant was wrong twice, and both were visible without new information. The rule *"tenant isolation is partition-level, never fil | Chinmay + Dinesh |
+| **CF-96** | Full recheck of screens, flows, states, events and contracts — five gaps no validator was looking for. All seven passed throughout. (1) The guest-perm |  |
+| **CF-98** | An orphan sweep across tables, permissions, events and schemas found four gaps no checker looks for. (1) Deposit boxes are nine requirements (5.8.1–5. | Chinmay |
+| **CF-99** | 22.8.5 live-agent handover — closed 17 August, and it was 26 requirements rather than one. Domain 22.8 is a whole omnichannel conversation platform: i |  |
+| **CF-101** | Eight flows stepped through screens from a later wave, and nothing checked it. Found 17 August while establishing that CF-100 was not a blocker. Corre |  |
+| **CF-102** | RAG optimisation: the contract shape that must exist before anything is indexed — landed 17 August, and one claim retracted. Seven of fourteen techniq | Chinmay |
+| **CF-103** | The rest of the optimisation work — landed 17 August, and two of my own defects with it. `cache:resolution` and `cache:idempotency` were declared as s | Chinmay |
+| **CF-104** | Full audit of contracts, spine, API, data, screens, journeys and derived artefacts — three findings, and the largest was a schema nobody defined. `Sal | Chinmay |
+| **CF-105** | External audit of the package found 21 contradictions; the six that mattered are closed, and five were mine from the same day. The worst was silent: s | Chinmay |
+| **CF-106** | The remaining 15 of the external audit's 21 contradictions — all closed, and four were losing data silently. Four duplicate YAML keys, where the loade | Chinmay |
+| **CF-107** | The archive unpacked as `ticvai-full/` beside the tree instead of into it, and the package was not self-contained. Two problems from the same cause. E | Chinmay |
+| **CF-108** | Two vocabularies for who may call an operation, collapsed into one — a decision rather than a patch, forced by the viewer's guest mode. `x-ticvai-auth | Chinmay |
+| **CF-109** | Vector store separation audited end to end, and the AI page now shows what AI is walled off from rather than only what it is. The separation holds at  | Chinmay |
+| **CF-110** | Step-by-step check of screens, APIs and the workbook — one real gap: the vector store and the four caches were in the workbook with no fields. They ap | Chinmay |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
 ## Withdrawn or absorbed — 6
@@ -132,7 +155,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-87, no gaps
+- **Numbering:** CF-01 to CF-110, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

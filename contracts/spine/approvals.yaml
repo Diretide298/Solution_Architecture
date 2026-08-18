@@ -71,10 +71,13 @@ paths:
   /approval-requests:
     get:
       operationId: listApprovalRequests
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-085 Approval Request"
+        - "P11 ACC-002 Registration Form"
+        - "P11 ACC-005 Accreditation Badge"
+        - "P11 ACC-007 Reviewer Application Detail"
+      x-ticvai-audience: [staff, public]
       summary: Requests awaiting a decision, or already decided
       description: >
         11.1.16. The approver's queue and the requester's history are the same list filtered
@@ -123,6 +126,7 @@ paths:
 
     post:
       operationId: createApprovalRequest
+      x-ticvai-audience: [staff]
       summary: Raise a request
       description: >
         Called by the contract that needs the authorisation, not by a person. `createRefund`
@@ -169,6 +173,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-085 Approval Request"
+      x-ticvai-audience: [staff]
       summary: Does this need approval, and from whom
       description: >
         **The operation every other contract calls.** It answers before the action, not after,
@@ -185,6 +190,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -215,10 +222,11 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: decideApprovalRequest
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-085 Approval Request"
+        - "P11 ACC-007 Reviewer Application Detail"
+      x-ticvai-audience: [staff, public]
       summary: Approve or reject
       description: >
         **Records an authorisation. Does not perform the action.** The requesting contract
@@ -289,6 +297,7 @@ paths:
       operationId: withdrawApprovalRequest
       x-ticvai-consumed-by:
         - "P08 BO-085 Approval Request"
+      x-ticvai-audience: [staff]
       summary: The requester takes it back
       description: >
         11.1.22. Distinct from a rejection: nobody refused it, and the analytics must not read
@@ -331,6 +340,7 @@ paths:
       operationId: escalateApprovalRequest
       x-ticvai-consumed-by:
         - "P08 BO-084 Approval Inbox"
+      x-ticvai-audience: [staff]
       summary: Move it up a level
       description: >
         11.1.5, 11.1.47. Usually automatic on an SLA breach; manual where a requester needs it
@@ -372,6 +382,7 @@ paths:
       operationId: resubmitApprovalRequest
       x-ticvai-consumed-by:
         - "P08 BO-085 Approval Request"
+      x-ticvai-audience: [staff]
       summary: Amend a rejected request and try again
       description: >
         11.1.23. **Creates a new request linked to the rejected one** rather than reopening it,
@@ -406,6 +417,7 @@ paths:
       operationId: listApprovalMatrices
       x-ticvai-consumed-by:
         - "P08 BO-086 Approval Matrix"
+      x-ticvai-audience: [staff]
       summary: What requires approval here
       description: >
         11.1.38–11.1.42. Resolves up the scope tree: tenant default, region override, venue
@@ -439,6 +451,7 @@ paths:
       operationId: setApprovalMatrix
       x-ticvai-consumed-by:
         - "P08 BO-086 Approval Matrix"
+      x-ticvai-audience: [staff]
       summary: Configure what requires approval
       description: >
         11.1.2. Rules are ordered and **the first match wins**, so adding a rule cannot silently
@@ -480,6 +493,7 @@ paths:
       operationId: listApprovalDelegations
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
+      x-ticvai-audience: [staff]
       summary: Who is standing in for whom
       description: 11.1.8–11.1.10.
       tags: [delegation]
@@ -501,6 +515,7 @@ paths:
       operationId: createApprovalDelegation
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
+      x-ticvai-audience: [staff]
       summary: Delegate approval authority
       description: >
         11.1.9. **Always time-bounded.** An open-ended delegation is an approver who quietly
@@ -511,6 +526,7 @@ paths:
         becomes the way around it.
       tags: [delegation]
       x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-permission-escalated: APPROVAL_DELEGATE   # delegating is distinct from deciding — CF-59a
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -543,6 +559,7 @@ paths:
       operationId: revokeApprovalDelegation
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
+      x-ticvai-audience: [staff]
       summary: End a delegation early
       description: >
         Requests already routed to the delegate stay with them. **Re-routing in flight would
@@ -552,6 +569,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
           description: Revoked
@@ -562,6 +581,7 @@ paths:
       operationId: getApprovalAnalytics
       x-ticvai-consumed-by:
         - "P08 BO-088 Approval Analytics"
+      x-ticvai-audience: [staff]
       summary: Volumes, times, rejections and bottlenecks
       description: >
         11.1.27, 11.1.67–11.1.71. Volume, median and p95 decision time, rejection rate,

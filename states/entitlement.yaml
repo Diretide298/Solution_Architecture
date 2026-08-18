@@ -5,6 +5,8 @@
 entity: Entitlement
 contract: access
 enum: TicketStatus
+enumKind: named
+enumSchema: TicketStatus
 owner: access
 initial:
 - issued
@@ -13,9 +15,6 @@ terminal:
 - expired
 - cancelled
 - surrendered
-offlineReachable:
-- issued
-- partiallyConsumed
 transitions:
 - from: issued
   to: partiallyConsumed
@@ -62,6 +61,9 @@ transitions:
   guard: Holder changed, state unchanged. A transfer moves who holds it, not where it is in its life
 notes: Modelled here rather than in a contract enum — `TicketStatus` in access is a projection carrying
   entriesUsed, not a stored status. This is the state the storage layer must hold.
+offlineReachable:
+- issued
+- partiallyConsumed
 openQuestions:
 - The states above are not currently a contract enum. Either access publishes one or this model describes
   something no API exposes, and the second is worse.

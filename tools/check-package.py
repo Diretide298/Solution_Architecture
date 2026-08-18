@@ -16,10 +16,27 @@ Checks:
   7. **No shared file is duplicated into spine or satellite.** Found on 17 August: three copies
      of `permissions.yaml`, and the satellite copy had already drifted four permissions behind.
      A duplicated vocabulary diverges silently, and each copy looks correct on its own.
-  8. Every operation declares either a permission or an `x-ticvai-auth` model. Fifty-four
+  8. Every operation declares either a permission or an `x-ticvai-audience`. Fifty-four
      carried `x-ticvai-permission: null` with no statement of what protected them instead —
      unauthenticated by accident is indistinguishable from unauthenticated by design.
-  9. Every contract names the requirement domain it serves, or states that it is cross-cutting.
+  9. No operation writes a table documented as a read-only projection.
+ 10. ADR status leads with one of four values. "Accepted — split rule superseded by ADR-0014"
+     read as live because it led with "Accepted".
+ 10. An ADR citing a superseded ADR names the supersession. On 17 August ADR-0021 reasoned from
+     a decision that three separate labels said no longer held.
+ 10. Every RAG source in the register exists and is reachable by an AI indexing operation in
+     the lineage. The register named eleven and the lineage agreed with none of them.
+ 10. Every `x-ticvai-*` marker uses a value from its closed set. `lastWriteWins` and
+     `lastWriterWins` coexisted on 17 August — one policy, two spellings — and every checker
+     passed because each value was individually plausible.
+ 10. AI isolation holds in the lineage, not just in prose: no AI operation writes outside its
+     own stores, no other contract writes an AI table, and every model-calling operation writes
+     an `ai.interaction`. Both halves were breached on 17 August with every checker passing.
+ 10. No document names a platform code that no longer exists. The kiosk was renumbered P03 to
+     P05 and `platform-deployment.md`, two contracts and the tooltips kept the old code for
+     days — every checker passed, because a stale code in prose resolves to nothing and breaks
+     nothing until someone reads it.
+ 10. Every contract names the requirement domain it serves, or states that it is cross-cutting.
      `platform-ops` reached a contract from a workshop without ever becoming a requirement
      (CF-49); this makes that visible rather than discoverable by accident.
  10. No derived table name carries a doubled suffix — `homepage_section_section` is a deriver
@@ -61,7 +78,7 @@ def main() -> int:
         for f in (C / tier).glob("*.yaml"):
             if f.name in shared:
                 continue
-            doc = yaml.safe_load(f.read_text())
+            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
             for item in (doc.get("paths") or {}).values():
                 if not isinstance(item, dict):
                     continue
@@ -70,7 +87,7 @@ def main() -> int:
                         ops.add(op["operationId"])
 
     H = ROOT / "handoff"
-    lin = json.loads((H / "api-data-lineage.json").read_text()) if (H / "api-data-lineage.json").exists() else {}
+    lin = json.loads((H / "api-data-lineage.json").read_text(encoding="utf-8")) if (H / "api-data-lineage.json").exists() else {}
     for x in sorted(set(lin) - ops):
         ERRORS.append(f"lineage has '{x}' which no contract defines")
     for x in sorted(ops - set(lin)):
@@ -82,7 +99,7 @@ def main() -> int:
         for f in (C / tier).glob("*.yaml"):
             if f.name in shared:
                 continue
-            info = (yaml.safe_load(f.read_text()) or {}).get("info", {})
+            info = (yaml.safe_load(f.read_text(encoding="utf-8")) or {}).get("info", {})
             mod = str(info.get("x-ticvai-module", ""))
             if not mod:
                 ERRORS.append(f"{f.stem}: no x-ticvai-module — the contract names no requirement domain")
@@ -91,19 +108,198 @@ def main() -> int:
                               "so a contract with no requirement behind it is visible rather than "
                               "discoverable by accident")
 
+    # 18. Duplicate keys inside one mapping. YAML keeps the last and discards the rest silently —
+    # no error, no warning, and the loss is invisible in a diff that only shows additions. On
+    # 17 August four existed: a description explaining ADR-0021's central rule was overwritten by
+    # a second one, and `x-ticvai-auth: guest` on three operations was discarded by a later
+    # `service`, which is a guest operation silently becoming a service one.
+    class _Dup(yaml.SafeLoader):
+        pass
+
+    _dupes: list[tuple[str, str, int, int]] = []
+
+    def _dup_mapping(loader, node, deep=False):
+        seen: dict = {}
+        for k, _ in node.value:
+            key = loader.construct_object(k, deep=deep)
+            if key in seen:
+                _dupes.append((loader.name, str(key), seen[key], k.start_mark.line + 1))
+            seen[key] = k.start_mark.line + 1
+        return yaml.SafeLoader.construct_mapping(loader, node, deep)
+
+    _Dup.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _dup_mapping)
+    for f in sorted(C.glob("*/*.yaml")):
+        _dupes.clear()
+        with f.open(encoding="utf-8") as fh:
+            yaml.load(fh, _Dup)
+        for _, key, first, again in _dupes:
+            ERRORS.append(f"{f.name}: key '{key}' defined at line {first} and redefined at "
+                          f"{again} — YAML keeps the last and discards the first without a word")
+
+    # 13. The x-ticvai-* vocabularies are closed sets. `lastWriteWins` and `lastWriterWins` were
+    # both in use on 17 August — one policy, two spellings, ten operations split between them, and
+    # every checker passed because each value was individually plausible.
+    VOCAB = {
+        "x-ticvai-conflict-policy": {"serverWins", "lastWriterWins", "append", "manualMerge"},
+        # Sourced from tenancy.ScopeLevel plus `platform`, which is above the tenant tree.
+        "x-ticvai-scope-level": {"platform", "tenant", "brand", "region", "venue", "department",
+                                 "subDepartment", "workstation"},
+        "x-ticvai-read-routing": {"primary", "replica", "analytical"},
+        # A partner and an external reviewer hold real permissions and are neither staff nor guests.
+        # Omitting them is what let P11 be treated as a guest surface on 17 August.
+        "x-ticvai-audience": {"staff", "guest", "partner", "public", "anonymous", "device", "service"},
+    }
+    for tier in ("spine", "satellite"):
+        for f in (C / tier).glob("*.yaml"):
+            if f.name in shared:
+                continue
+            for item in (yaml.safe_load(f.read_text(encoding="utf-8")).get("paths") or {}).values():
+                if not isinstance(item, dict):
+                    continue
+                for verb, op in item.items():
+                    if verb not in ("get", "post", "put", "patch", "delete") or not isinstance(op, dict):
+                        continue
+                    for key, allowed in VOCAB.items():
+                        val = op.get(key)
+                        if val is None:
+                            continue
+                        # `x-ticvai-audience` is a list; every other marker is a scalar. Both are
+                        # closed sets and both are checked the same way.
+                        for item in (val if isinstance(val, list) else [val]):
+                            if item not in allowed:
+                                ERRORS.append(f"{op['operationId']}: {key} contains '{item}', which "
+                                              f"is not in the closed set {sorted(allowed)}")
+                        continue
+                        if False:
+                            ERRORS.append(f"{op['operationId']}: {key} is '{val}', which is not in the "
+                                          f"closed set {sorted(allowed)}")
+
+    # 12. AI isolation, from ADR-0020. Two breaches existed on the day that ADR was written and
+    # every validator passed, because each operation existed and resolved to a real table.
+    # `generateVenueLayout` wrote into `seating.import_job` — AI writing into a transactional
+    # contract — and `askReportingQuestion` wrote no `ai.interaction` despite being brought under
+    # governance the same day.
+    lin_path = H / "api-data-lineage.json"
+    if lin_path.exists():
+        lineage = json.loads(lin_path.read_text(encoding="utf-8"))
+        GOVERNED_OUTSIDE_AI = {"askReportingQuestion", "saveNaturalLanguageQuery"}
+        CALLS_A_MODEL = {"sendAiMessage", "semanticSearch", "generateConfiguration",
+                         "generateVenueLayout", "decideProposedAction", "askReportingQuestion"}
+        for op, v in lineage.items():
+            is_ai = str(v.get("contract")) == "ai"
+            writes = v.get("writes") or []
+            ai_writes = [t for t in writes if t.startswith("ai.") or t.startswith("qdrant")]
+            if is_ai:
+                # A cache is not the transactional core. ADR-0020's rule is about writing into
+                # another contract's tables; every `cache:*` entry is derived from something already
+                # read, invalidated by an event already consumed, and losable without consequence —
+                # nothing treats one as a source of truth. Listing two by name was too narrow and
+                # broke the moment `cache:idempotency` reached every write.
+                outside = [t for t in writes
+                           if not (t.startswith("ai.") or t.startswith("qdrant")
+                                   or t.startswith("cache:"))]
+                if outside:
+                    ERRORS.append(f"{op}: an AI operation writes {outside} outside its own stores — "
+                                  "AI is read-only against the transactional core (ADR-0020)")
+            elif ai_writes and op not in GOVERNED_OUTSIDE_AI:
+                ERRORS.append(f"{op} ({v.get('contract')}) writes {ai_writes} — only the AI contract "
+                              "and the governed reporting pair may write an AI table")
+            if op in CALLS_A_MODEL and "ai.interaction" not in writes:
+                ERRORS.append(f"{op} calls a model and writes no ai.interaction — requirement 8.3.55 "
+                              "is satisfied in prose and not in the data")
+
+    # 17. A table documented as a read-only projection must have no writers. `platform.tenant`
+    # is described in the schema reference as "read-only projection of control.tenant" and three
+    # operations wrote it on 17 August — a projection with writers is a second master.
+    PROJECTIONS = {"platform.tenant"}
+    proj_lin = H / "api-data-lineage.json"
+    if proj_lin.exists():
+        lineage3 = json.loads(proj_lin.read_text(encoding="utf-8"))
+        for op, v in lineage3.items():
+            for t in (v.get("writes") or []):
+                if t in PROJECTIONS:
+                    ERRORS.append(f"{op} writes {t}, which is a read-only projection — a projection "
+                                  "with a writer is a second master")
+
+    # 16. ADR status is a closed set of four. Six spellings were in use on 17 August, and one of
+    # them — "Accepted — split rule superseded by ADR-0014" — read as live because it led with
+    # "Accepted". Reasoning from that ADR produced a cross-tenant isolation defect (CF-97).
+    ADR_STATUS = ("Accepted", "Accepted in part", "Proposed", "Superseded")
+    adr_dir2 = ROOT / "docs" / "adr"
+    if adr_dir2.exists():
+        import re as _re4
+        for f in sorted(adr_dir2.glob("0*.md")):
+            m = _re4.search(r"^\*\*Status:\*\* *(.+)$", f.read_text(encoding="utf-8"), _re4.M)
+            if not m:
+                ERRORS.append(f"{f.name}: no Status line")
+                continue
+            raw = m.group(1).strip()
+            # The state must be the FIRST token and unadorned. Stripping asterisks before the
+            # comparison is what let `**Status:** **Superseded**` pass here on 17 August while
+            # the viewer's parser returned null for it — the emphasis added to make the state
+            # unmissable to a reader made it invisible to everything that reads the field.
+            if not re.match(r"^[A-Za-z]", raw):
+                ERRORS.append(f"{f.name}: status starts with '{raw[:12]}' — the state must be the "
+                              "first token and must not be wrapped in emphasis, or a parser that "
+                              "reads the first word gets a marker instead of a state")
+                continue
+            if not raw.startswith(ADR_STATUS):
+                ERRORS.append(f"{f.name}: status starts '{raw[:40]}', which is not one of "
+                              f"{list(ADR_STATUS)} — a status must lead with its state, not bury it")
+
+    # 15. An ADR citing a superseded ADR must name the supersession. ADR-0021 reasoned from
+    # ADR-0001's decision sentence on 17 August while ADR-0001's own status line, the ADR index,
+    # and ADR-0014 all said that decision no longer held. Everything was labelled; the reading
+    # skipped the labels, and a label nobody reads is not a control.
+    adr_dir = ROOT / "docs" / "adr"
+    if adr_dir.exists():
+        superseded = {}
+        for f in adr_dir.glob("0*.md"):
+            # Only the Status line of the ADR's own header counts. A document that merely
+            # discusses supersession is not itself superseded.
+            for ln in f.read_text(encoding="utf-8").split("\n")[:8]:
+                if ln.startswith("**Status:**") and ("uperseded" in ln or "mended" in ln):
+                    superseded[f.name[:4]] = f.name
+                    break
+        for f in adr_dir.glob("0*.md"):
+            text = f.read_text(encoding="utf-8")
+            for num in sorted(superseded):
+                if f.name[:4] == num:
+                    continue
+                if f"ADR-{num}" not in text:
+                    continue
+                near = [ln for ln in text.split("\n") if f"ADR-{num}" in ln]
+                if not any("upersed" in ln or "amend" in ln or "no longer" in ln for ln in near):
+                    ERRORS.append(f"{f.name} cites ADR-{num}, which is superseded or amended, "
+                                  "without saying so on any line that mentions it")
+
+    # 11. no document names a platform code that no longer exists
+    import re as _re
+    real_codes = {yaml.safe_load(f.read_text(encoding="utf-8"))["platform"]["code"]
+                  for f in (ROOT / "screens").glob("P*.yaml")}
+    for f in list(ROOT.rglob("*.md")) + list((ROOT / "contracts").rglob("*.yaml")):
+        if "repos" in str(f):
+            continue
+        try:
+            text = f.read_text(encoding="utf-8")
+        except Exception:  # noqa: BLE001
+            continue
+        for code in sorted(set(_re.findall(r"\bP\d\d\b", text)) - real_codes):
+            ERRORS.append(f"{f.name}: names platform code {code}, which no screen file defines")
+
     # 9. every operation declares how it is authenticated
     for tier in ("spine", "satellite"):
         for f in (C / tier).glob("*.yaml"):
             if f.name in shared:
                 continue
-            doc = yaml.safe_load(f.read_text())
+            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
             for item in (doc.get("paths") or {}).values():
                 if not isinstance(item, dict):
                     continue
                 for verb, op in item.items():
                     if verb not in ("get", "post", "put", "patch", "delete") or not isinstance(op, dict):
                         continue
-                    if not op.get("x-ticvai-permission") and not op.get("x-ticvai-auth"):
+                    if not op.get("x-ticvai-permission") and not op.get("x-ticvai-audience"):
                         ERRORS.append(f"{op['operationId']}: no permission and no x-ticvai-auth — "
                                       "an operation with neither is unauthenticated by accident")
 
@@ -127,12 +323,31 @@ def main() -> int:
             if len(parts) > 1 and parts[-1] == parts[-2]:
                 ERRORS.append(f"table '{t}' has a doubled suffix — a deriver defect, not a table")
 
+    # 14. Every table the RAG source register names must exist, must be reachable by an AI
+    # indexing operation in the lineage, and must have an invalidating event. On 17 August the
+    # register named eleven sources and the lineage said AI read none of them — the register was
+    # a document describing something the data did not agree had happened.
+    rag_path = H / "rag-index-sources.md"
+    rag_lin = H / "api-data-lineage.json"
+    if rag_path.exists() and rag_lin.exists():
+        import re as _re2
+        lineage2 = json.loads(rag_lin.read_text(encoding="utf-8"))
+        sources = set(_re2.findall(r"^\| `([a-z_]+\.[a-z_]+)` \|", rag_path.read_text(encoding="utf-8"), _re2.M))
+        indexed = {t for op, v in lineage2.items()
+                   if str(v.get("contract")) == "ai" for t in (v.get("reads") or [])}
+        for t in sorted(sources - indexed):
+            ERRORS.append(f"RAG source {t} is declared in the register and no AI operation reads it "
+                          "in the lineage")
+        if tables:
+            for t in sorted(sources - tables):
+                ERRORS.append(f"RAG source {t} does not exist in the schema reference")
+
     # 3 + 5. screens, apps
     sids: set[str] = set()
     apps: set[str] = set()
     plats: set[str] = set()
     for f in (ROOT / "screens").glob("P*.yaml"):
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         apps.add(doc["platform"]["app"])
         plats.add(doc["platform"]["code"])
         for s in doc["screens"]:
@@ -141,16 +356,16 @@ def main() -> int:
                 if (o := a.get("operationId")) and ops and o not in ops:
                     ERRORS.append(f"screen {s['id']} calls '{o}', which does not exist")
     if (H / "screen-index.json").exists():
-        idx = json.loads((H / "screen-index.json").read_text())
+        idx = json.loads((H / "screen-index.json").read_text(encoding="utf-8"))
         for x in sorted(set(idx) ^ sids):
             ERRORS.append(f"screen-index and screens/ disagree about '{x}'")
-    mans = {yaml.safe_load(f.read_text())["app"] for f in (ROOT / "frontend").glob("*.yaml")}
+    mans = {yaml.safe_load(f.read_text(encoding="utf-8"))["app"] for f in (ROOT / "frontend").glob("*.yaml")}
     for a in sorted(apps ^ mans):
         ERRORS.append(f"app '{a}' appears in screens or manifests but not both")
 
     # 4. tooltips
     if (H / "tooltips.json").exists():
-        T = json.loads((H / "tooltips.json").read_text())
+        T = json.loads((H / "tooltips.json").read_text(encoding="utf-8"))
         contracts = {f.stem for tier in ("spine", "satellite")
                      for f in (C / tier).glob("*.yaml") if f.name not in shared}
         for c in sorted(contracts ^ set(T.get("contracts", {}))):
@@ -166,9 +381,9 @@ def main() -> int:
     for f in (ROOT / "states").glob("*.yaml"):
         if f.name == "_schema.yaml":
             continue
-        for t in yaml.safe_load(f.read_text())["transitions"]:
+        for t in yaml.safe_load(f.read_text(encoding="utf-8"))["transitions"]:
             emitted |= set(t.get("emits") or [])
-    defined = {yaml.safe_load(f.read_text())["name"] for f in (ROOT / "events").glob("*.yaml")
+    defined = {yaml.safe_load(f.read_text(encoding="utf-8"))["name"] for f in (ROOT / "events").glob("*.yaml")
                if f.name != "_schema.yaml"}
     for e in sorted(emitted - defined):
         ERRORS.append(f"a state model emits '{e}' with no event definition")

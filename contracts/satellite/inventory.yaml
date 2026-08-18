@@ -110,6 +110,7 @@ paths:
       operationId: listInventoryItems
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List inventory items
       tags: [item]
@@ -152,6 +153,7 @@ paths:
       operationId: createInventoryItem
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
       summary: Create an inventory item
       description: >
         `costingMethod` is fixed at creation and cannot change once movements exist. Changing
@@ -191,6 +193,7 @@ paths:
       operationId: getInventoryItem
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an item with stock position
       tags: [item]
@@ -210,12 +213,15 @@ paths:
       operationId: updateInventoryItem
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
       summary: Amend an item
       tags: [item]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -248,6 +254,7 @@ paths:
       operationId: lookupInventoryItem
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Look up by barcode or SKU
       description: >
@@ -285,6 +292,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-049 Stock Levels"
         - "P08 BO-050 Stock Count"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Stock on hand by item and location
       tags: [stock]
@@ -323,6 +331,7 @@ paths:
       operationId: listStockLocations
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List stock locations
       description: Stores, bars, kitchens, retail floors, cellars.
@@ -344,6 +353,7 @@ paths:
       operationId: createStockLocation
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
       summary: Create a stock location
       tags: [stock]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -378,6 +388,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-049 Stock Levels"
         - "P08 BO-050 Stock Count"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Stock value by location and category
       description: >
@@ -408,6 +419,7 @@ paths:
       operationId: listStockMovements
       x-ticvai-consumed-by:
         - "P08 BO-082 Stock Movements"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The movement ledger
       description: >
@@ -454,6 +466,7 @@ paths:
       operationId: createStockMovement
       x-ticvai-consumed-by:
         - "P08 BO-082 Stock Movements"
+      x-ticvai-audience: [staff]
       summary: Record an issue, return or adjustment
       description: >
         Depletion is real-time and therefore **not offline-capable**. An issue recorded
@@ -493,6 +506,7 @@ paths:
       operationId: listStockCounts
       x-ticvai-consumed-by:
         - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List stock counts
       tags: [count]
@@ -527,6 +541,7 @@ paths:
       operationId: startStockCount
       x-ticvai-consumed-by:
         - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
       summary: Start a stock count
       description: >
         **Blind by default.** The expected figure is not returned to the counting device — a
@@ -566,6 +581,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: submitCountLines
+      x-ticvai-audience: [staff]
       summary: Submit counted quantities
       description: >
         Offline-capable and batched. A storekeeper counts a cellar with no signal and
@@ -622,6 +638,7 @@ paths:
       operationId: getCountVariance
       x-ticvai-consumed-by:
         - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Variance between counted and expected
       description: >
@@ -654,6 +671,7 @@ paths:
       operationId: cancelStockCount
       x-ticvai-consumed-by:
         - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
       summary: Abandon a count
       description: >
         Refused once counting has started — a partially counted location must be finished or recounted, because abandoning it leaves movements frozen.
@@ -692,6 +710,7 @@ paths:
       operationId: recountStockCount
       x-ticvai-consumed-by:
         - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
       summary: Send a count back to be recounted
       description: >
         The alternative to accepting a variance. A large discrepancy is more often a miscount than a loss, and recounting is cheaper than investigating.
@@ -730,6 +749,7 @@ paths:
       operationId: postStockCount
       x-ticvai-consumed-by:
         - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
       summary: Post a count and adjust stock
       description: >
         Generates adjustment movements for every variance and posts the value to the stock
@@ -767,6 +787,7 @@ paths:
       operationId: listStockTransfers
       x-ticvai-consumed-by:
         - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List transfers
       tags: [transfer]
@@ -798,6 +819,7 @@ paths:
       operationId: createStockTransfer
       x-ticvai-consumed-by:
         - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
       summary: Send stock to another location
       description: >
         Two-phase. Dispatch decrements the source and puts the quantity in transit; receipt
@@ -838,6 +860,7 @@ paths:
       operationId: closeTransferShort
       x-ticvai-consumed-by:
         - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
       summary: Close a transfer accepting the balance will not arrive
       description: >
         **Writes off stock that left one location and reached no other.** Requires approval, because without this state a partially received transfer stays open and the stock figure is wrong at both ends.
@@ -876,6 +899,7 @@ paths:
       operationId: receiveStockTransfer
       x-ticvai-consumed-by:
         - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
       summary: Receive a transfer
       description: >
         Received quantities may differ from dispatched. The difference is a transit
@@ -918,6 +942,7 @@ paths:
       operationId: listRequisitions
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List requisitions
       tags: [requisition]
@@ -952,6 +977,7 @@ paths:
       operationId: createRequisition
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       summary: Raise a requisition
       description: >
         Step one of the chain. Raised by a department, approved by its head, then converted
@@ -981,6 +1007,7 @@ paths:
       operationId: getSuggestedRequisitions
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Draft requisitions from reorder points
       description: >
@@ -1019,6 +1046,7 @@ paths:
       operationId: rejectRequisition
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       summary: Reject a requisition
       description: >
         Refused with a reason. The requester may copy it into a new draft rather than losing the detail.
@@ -1057,6 +1085,7 @@ paths:
       operationId: returnRequisition
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       summary: Return a requisition for more information
       description: >
         **Not a rejection.** Sent back so the requester can amend rather than start again — without this state every incomplete request is a refusal and the requisition queue stops moving.
@@ -1095,6 +1124,7 @@ paths:
       operationId: cancelRequisition
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       summary: Cancel a requisition
       description: >
         Withdrawn by the requester, or abandoned in draft.
@@ -1133,6 +1163,7 @@ paths:
       operationId: approveRequisition
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       summary: Approve or reject a requisition
       description: >
         Departmental approval. The approver may amend quantities downward but not upward —
@@ -1182,6 +1213,7 @@ paths:
       operationId: listSuppliers
       x-ticvai-consumed-by:
         - "P08 BO-083 Suppliers"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List suppliers
       tags: [supplier]
@@ -1210,6 +1242,7 @@ paths:
       operationId: createSupplier
       x-ticvai-consumed-by:
         - "P08 BO-083 Suppliers"
+      x-ticvai-audience: [staff]
       summary: Create a supplier
       tags: [supplier]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1240,6 +1273,7 @@ paths:
       operationId: recordQuotation
       x-ticvai-consumed-by:
         - "P08 BO-083 Suppliers"
+      x-ticvai-audience: [staff]
       summary: Record a supplier quotation
       description: >
         Quotations are compared before a purchase order is raised (10 Aug §5.4). Recording
@@ -1274,6 +1308,7 @@ paths:
       operationId: compareQuotations
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Compare quotations for a requisition
       description: >
@@ -1297,6 +1332,7 @@ paths:
       operationId: listPurchaseOrders
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List purchase orders
       tags: [purchaseOrder]
@@ -1331,6 +1367,7 @@ paths:
       operationId: createPurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       summary: Raise a purchase order
       description: >
         Requires an approved requisition and a selected quotation. Raising one without either
@@ -1369,6 +1406,7 @@ paths:
       operationId: getPurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a purchase order with receipt progress
       tags: [purchaseOrder]
@@ -1394,6 +1432,7 @@ paths:
       operationId: sendPurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       summary: Issue the order to the supplier
       description: >
         Raised and sent are different states because a raised order is still ours to change and a sent one is not.
@@ -1423,6 +1462,7 @@ paths:
       operationId: acknowledgePurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       summary: Record the supplier acknowledgement
       description: >
         Optional in practice — goods often arrive without one, which is not an error. Recorded when it happens because a supplier who never acknowledges is a supplier performance figure.
@@ -1461,6 +1501,7 @@ paths:
       operationId: closePurchaseOrderShort
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       summary: Close an order accepting the balance will not arrive
       description: >
         **Writes off a committed cost**, so it needs approval. Without this state a partially received order stays open indefinitely and the committed-cost figure is permanently wrong.
@@ -1499,6 +1540,7 @@ paths:
       operationId: cancelPurchaseOrder
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       summary: Cancel a purchase order
       description: Partially received orders are closed short rather than cancelled.
       tags: [purchaseOrder]
@@ -1530,6 +1572,7 @@ paths:
       operationId: listGoodsReceipts
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List goods receipts
       tags: [receipt]
@@ -1561,6 +1604,7 @@ paths:
       operationId: createGoodsReceipt
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       summary: Receive goods against a purchase order
       description: >
         Partial receipts are normal and expected. Over-receipt beyond the configured
@@ -1603,6 +1647,7 @@ paths:
       operationId: rejectReceivedGoods
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
       summary: Reject received goods
       description: >
         Quality failure, damage, wrong item, expiry too near. Reverses the stock increment

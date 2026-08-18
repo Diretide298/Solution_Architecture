@@ -1,0 +1,14 @@
+import puppeteer from 'puppeteer-core';
+const V='http://localhost:4173', API='http://localhost:8787';
+const b=await puppeteer.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:'new',args:['--no-sandbox']});
+const p=await b.newPage(); await p.setViewport({width:1500,height:1000});
+await p.goto(`${V}/invite.html`,{waitUntil:'domcontentloaded'});
+await p.evaluate(a=>localStorage.setItem('ticvai-api',a),API);
+await p.evaluate(async a=>fetch(`${a}/api/auth/login`,{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({email:'chinmay.parab@softlabsgroup.com',password:'the-first-administrator'})}),API);
+await p.goto(V,{waitUntil:'domcontentloaded'});
+await p.waitForSelector('#layers button',{timeout:30000});
+await new Promise(r=>setTimeout(r,4500));
+await p.evaluate(()=>document.querySelector('#layers button[data-layer="backend"]').click());
+await new Promise(r=>setTimeout(r,2800));
+await p.screenshot({path:process.argv[2]});
+await b.close();

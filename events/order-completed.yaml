@@ -29,5 +29,9 @@ consumers:
   onFailure: retry
   isCritical: false
 retention: 30 days after publication
-notes: Distinct from order.paid. Paid is money; completed is delivery, and the gap between them is where
-  fulfilment failures live.
+notes: 'Distinct from order.paid. Paid is money; completed is delivery, and the gap between them is
+  where fulfilment failures live.
+
+
+  **Deliberately non-critical.** A lost post-visit campaign is a missed opportunity, not a failure a
+  guest experiences.'

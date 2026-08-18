@@ -5,6 +5,8 @@
 entity: Parking entitlement
 contract: access
 enum: ParkingEntitlementStatus
+enumKind: named
+enumSchema: ParkingEntitlementStatus
 owner: access
 initial:
 - pending

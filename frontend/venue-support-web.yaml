@@ -27,8 +27,21 @@ contracts:
 - white-label
 screenCount: 8
 byWave:
-  wave3: 8
+  wave2: 2
+  wave3: 6
 screens:
+- id: SUP-004
+  name: Conversation Queue
+  route: /general/conversation-queue
+  component: apps/venue-support-web/src/routes/general/ConversationQueueList.tsx
+  wave: 2
+  status: notStarted
+- id: SUP-005
+  name: Live Chat Workspace
+  route: /general/live-chat-workspace
+  component: apps/venue-support-web/src/routes/general/LiveChatWorkspaceDetail.tsx
+  wave: 2
+  status: notStarted
 - id: SUP-001
   name: Agent Login
   route: /general/agent-login
@@ -45,18 +58,6 @@ screens:
   name: Availability & Routing Settings
   route: /general/availability-and-routing-settings
   component: apps/venue-support-web/src/routes/general/AvailabilityAndRoutingSettingsForm.tsx
-  wave: 3
-  status: notStarted
-- id: SUP-004
-  name: Conversation Queue
-  route: /general/conversation-queue
-  component: apps/venue-support-web/src/routes/general/ConversationQueueList.tsx
-  wave: 3
-  status: notStarted
-- id: SUP-005
-  name: Live Chat Workspace
-  route: /general/live-chat-workspace
-  component: apps/venue-support-web/src/routes/general/LiveChatWorkspaceDetail.tsx
   wave: 3
   status: notStarted
 - id: SUP-006

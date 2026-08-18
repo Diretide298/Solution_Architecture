@@ -8,7 +8,6 @@
 id: F15
 name: A part is needed and ordered
 actor: technician
-capability: C31
 wave: 2
 frequency: weekly
 criticality: operational
@@ -109,3 +108,8 @@ exitStates:
   description: Awaiting delivery, asset out of service
 - state: escalated
   description: Superseded by replacement
+primaryContract: maintenance
+contracts:
+- maintenance
+- inventory
+- approvals

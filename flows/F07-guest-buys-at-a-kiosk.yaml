@@ -8,7 +8,6 @@
 id: F07
 name: Guest buys at a kiosk
 actor: guest
-capability: C01
 wave: 2
 frequency: constant
 criticality: revenue
@@ -30,7 +29,8 @@ steps:
   screen: KSK-001
   action: Touches the attract loop
   operations: []
-  outcome: Wakes to language selection
+  outcome: Wakes to language selection **Calls nothing** — the attract loop is idle video until somebody
+    touches it.
 - step: 2
   screen: KSK-002
   action: Chooses a language
@@ -124,3 +124,9 @@ exitStates:
   description: Timed out, lease released
 - state: escalated
   description: Staff called to an unresolved payment
+primaryContract: catalogue
+contracts:
+- catalogue
+- orders
+- white-label
+- promotions

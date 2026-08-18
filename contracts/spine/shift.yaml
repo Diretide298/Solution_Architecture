@@ -111,6 +111,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
       summary: List shifts
       tags: [shift]
@@ -162,6 +163,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Open a shift
       description: >
         Fails if another shift is already open on this workstation. Where the venue is
@@ -197,6 +199,184 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /deposit-boxes:
+    get:
+      operationId: listDepositBoxes
+      x-ticvai-audience: [staff]
+      summary: Cash boxes and who holds them
+      description: >
+        5.8.1. **A deposit box is allocated to a cashier, not to a till.** A cashier moving between
+        workstations takes their float with them, and a workstation used by three people in a day
+        has three boxes through it.
+
+        That separation is what makes a variance attributable to a person rather than to a
+        counter.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - name: openOnly
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Boxes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DepositBox' }
+
+    post:
+      operationId: allocateDepositBox
+      x-ticvai-audience: [staff]
+      summary: Give a cashier a box and a float
+      description: >
+        5.8.1 and 5.8.3. **The opening float may be a total or a denomination breakdown** — the
+        14 August MoM found POS-001 offered only denominations, and a supervisor handing over a
+        counted bag should not have to re-count it into fields.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DepositBox' }
+      responses:
+        '201':
+          description: Allocated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepositBox' }
+
+  /deposit-boxes/{boxId}/adjust-float:
+    parameters:
+      - name: boxId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: adjustDepositBoxFloat
+      x-ticvai-audience: [staff]
+      summary: Change the initial fund
+      description: >
+        5.8.4. **Gated on a right the cashier does not have**, because a cashier who can raise
+        their own opening float can cover a shortfall by declaring one.
+      tags: [shift]
+      x-ticvai-permission: CASH_ADD
+      x-ticvai-permission-escalated: DEPOSIT_BOX_MODIFY_OTHER   # where the box is not the caller's own
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, reason]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Adjusted, and recorded against the person who authorised it
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepositBox' }
+
+  /deposit-boxes/{boxId}/withdraw:
+    parameters:
+      - name: boxId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: withdrawFromDepositBox
+      x-ticvai-audience: [staff]
+      summary: A supervisor takes cash out mid-shift
+      description: >
+        5.8.8. **A mid-day skim, and it is not a variance.** Cash removed from a till for banking
+        must reduce the expected close figure, or every busy cashier ends the day apparently
+        short by the amount that was taken from them.
+
+        Two people sign: the supervisor taking it and the cashier it came from.
+      tags: [shift]
+      x-ticvai-permission: CASH_LIFT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, witnessPrincipalId]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                witnessPrincipalId: { type: string, format: uuid }
+                reason: { type: string, enum: [banking, safeDrop, changeOrder, other] }
+                note: { type: string, maxLength: 300 }
+      responses:
+        '201':
+          description: Withdrawn, and the expected close figure reduced
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepositBox' }
+
+  /deposit-boxes/close:
+    post:
+      operationId: closeDepositBoxes
+      x-ticvai-audience: [staff]
+      summary: Close one box or all of them
+      description: >
+        5.8.6. **Automated close-out of one or more boxes.** A venue closing at 23:00 with forty
+        tills does not close them one at a time, and a box whose holder has gone home still has to
+        be reconciled.
+
+        A box closed without its holder present is flagged rather than blocked — **the cash is
+        counted by somebody, and who counted it is the record that matters.**
+      tags: [shift]
+      x-ticvai-permission: SHIFT_CLOSE
+      x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # closing a box whose holder is not the caller
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                boxIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                allOpenAtVenue: { type: boolean }
+      responses:
+        '200':
+          description: Closed, with a variance per box
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DepositBox' }
+
   /shifts/current:
     get:
       operationId: getCurrentShift
@@ -212,6 +392,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
       tags: [shift]
@@ -251,6 +432,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Read a shift
       tags: [shift]
@@ -287,6 +469,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Approve a shift opening outside tolerance
       description: >
         A float that does not match the venue's expected amount holds the shift in
@@ -340,6 +523,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Reopen a shift closed in error
       description: >
         A cashier who closed the wrong till, or a count submitted before the drawer was
@@ -405,6 +589,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Suspend a shift so another user can log in
       description: >
         The break mechanism. The float and the shift stay intact; the workstation becomes
@@ -458,6 +643,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Resume a suspended shift
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
@@ -505,6 +691,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Blind close-out
       description: >
         The operator submits a counted denomination breakdown. The expected figure is not
@@ -516,6 +703,7 @@ paths:
         Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
+      x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -560,6 +748,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Accept an over/short beyond the threshold
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
@@ -609,6 +798,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Open the drawer without a sale
       description: >
         Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
@@ -670,6 +860,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Lifts, adds and the opening float
       tags: [cash]
@@ -701,6 +892,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
       summary: Record a cash lift or add
       description: >
         A lift removes cash from an open float mid-shift without closing it — the supervisor
@@ -745,6 +937,60 @@ components:
         - pendingClosure     # awaiting SHIFT_APPROVE_CLOSE where configured
         - closed
         - autoClosed         # closed by the inactivity job, supervisor notified
+
+    DepositBoxStatus:
+      type: string
+      enum: [allocated, open, suspended, closing, closed, reconciled]
+
+    DepositBox:
+      type: object
+      x-ticvai-persistence: "orders.deposit_box"
+      description: >
+        5.8. **Allocated to a cashier, not to a workstation.** A cashier moving between tills takes
+        their float with them, which is what makes a variance attributable to a person.
+      required: [cashierPrincipalId, venueId, openingFloat]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        cashierPrincipalId: { type: string, format: uuid }
+        cashierName: { type: string, readOnly: true }
+        venueId: { type: string, format: uuid }
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Where it is being used now. **Changes during a shift; the box does not.**
+        shiftId: { type: string, format: uuid, nullable: true }
+        status: { $ref: '#/components/schemas/DepositBoxStatus' }
+        openingFloat: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        openingDenominations:
+          type: array
+          description: >
+            5.8.3. **Either this or a total** — a supervisor handing over a counted bag should not
+            have to re-count it into fields. POS-001 offered only denominations until 14 August.
+          items:
+            type: object
+            properties:
+              denomination: { type: number }
+              count: { type: integer }
+        withdrawnTotal:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          readOnly: true
+          description: >
+            **Reduces the expected close figure.** Cash skimmed for banking is not a shortfall, and
+            a system that treats it as one makes every busy cashier look short.
+        expectedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        countedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        closedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Flagged where it is not the holder.** A box closed without its holder present is
+            allowed — the cash is counted by somebody, and who counted it is the record.
+        allocatedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time, nullable: true }
 
     Denomination:
       x-ticvai-persistence: "none — reference data in region_settings"

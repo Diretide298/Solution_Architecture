@@ -1,6 +1,10 @@
 from_table,from_column,to_table,edge_kind,how,cross_schema,required
 access.access_point,venue_id,platform.scope_node,ambient,convention,yes,yes
 access.blacklist,added_by_principal_id,identity.principal,ambient,role,yes,yes
+access.parking_entitlement,facility_id,access.parking_facility,reference,declared,,yes
+access.parking_entitlement,order_id,orders.sales_order,reference,declared,yes,yes
+access.parking_entitlement,subject_id,pii.subject,ambient,declared,yes,yes
+access.parking_facility,venue_id,platform.scope_node,ambient,declared,yes,yes
 access.scan_event,access_point_id,access.access_point,reference,name,,yes
 access.scan_event,device_id,platform.device,reference,name,yes,
 access.scan_event,operator_principal_id,identity.principal,ambient,convention,yes,
@@ -15,6 +19,7 @@ ai.index_source,collection_id,ai.knowledge_collection,reference,declared,,yes
 ai.interaction,conversation_id,ai.conversation,reference,declared,,yes
 ai.interaction,principal_id,identity.principal,ambient,declared,yes,yes
 ai.knowledge_document,collection_id,ai.knowledge_collection,child,child,,yes
+ai.layout_draft,asset_id,assets.media_asset,reference,declared,yes,yes
 ai.message,conversation_id,ai.conversation,child,child,,yes
 ai.policy,tenant_id,platform.tenant,ambient,declared,yes,yes
 ai.proposed_action,decided_by_principal_id,identity.principal,ambient,declared,yes,yes
@@ -38,6 +43,8 @@ catalogue.alternative_code,product_id,catalogue.product,reference,implied by pat
 catalogue.alternative_code,variant_id,catalogue.variant,reference,convention,,
 catalogue.attribute_axis,product_id,catalogue.product,reference,implied by path,,
 catalogue.channel_allocation,envelope_id,catalogue.envelope,reference,implied by path,,
+catalogue.donation_campaign,liability_account_id,ledger.account,reference,declared,yes,yes
+catalogue.donation_campaign,venue_id,platform.scope_node,ambient,declared,yes,yes
 catalogue.entitlement_template,admission_profile_id,access.admission_profile,reference,name,yes,
 catalogue.envelope,performance_id,catalogue.performance,reference,convention,,yes
 catalogue.envelope,seat_category_id,seating.seat_category,reference,name,yes,
@@ -58,6 +65,8 @@ catalogue.product,entitlement_template_id,catalogue.entitlement_template,referen
 catalogue.product,venue_id,platform.scope_node,ambient,convention,yes,yes
 catalogue.published_bundle,venue_id,platform.scope_node,ambient,convention,yes,yes
 catalogue.variant,product_id,catalogue.product,reference,convention,,yes
+catalogue.waitlist_entry,performance_id,catalogue.performance,reference,declared,,yes
+catalogue.waitlist_entry,subject_id,pii.subject,ambient,declared,yes,yes
 control.cell,region_id,platform.scope_node,ambient,convention,yes,yes
 control.cell,tenant_id,platform.tenant,ambient,convention,yes,yes
 control.cell_cluster,region_id,platform.scope_node,ambient,declared,yes,yes
@@ -72,6 +81,8 @@ control.migration_plan_cell,migration_plan_id,control.migration_plan,child,child
 control.migration_run,canary_cell_id,control.cell,reference,prefix-qualified,,
 control.migration_run,plan_id,control.plan,reference,convention,,yes
 control.migration_run,started_by_principal_id,identity.principal,ambient,role,yes,
+control.partner_agreement,approval_request_id,approvals.request,reference,declared,yes,yes
+control.partner_agreement,partner_id,platform.tenant,ambient,declared,yes,yes
 control.release,plan_id,control.plan,reference,declared,,yes
 control.rollout,approved_by_principal_id,identity.principal,ambient,role,yes,
 control.rollout,release_id,control.release,reference,manual,,yes
@@ -116,6 +127,9 @@ fnb.recipe,menu_item_id,fnb.menu_item,reference,convention,,yes
 fnb.recipe_ingredient,inventory_item_id,inventory.item,reference,convention,yes,yes
 fnb.recipe_ingredient,recipe_id,fnb.recipe,child,child,,yes
 fnb.table,outlet_id,platform.outlet,reference,implied by path,yes,
+fnb.table_reservation,outlet_id,platform.outlet,reference,declared,yes,yes
+fnb.table_reservation,subject_id,pii.subject,ambient,declared,yes,yes
+fnb.table_reservation,table_visit_id,fnb.table_visit,reference,declared,,yes
 fnb.table_session,outlet_id,platform.outlet,reference,convention,yes,yes
 fnb.table_session,subject_id,pii.subject,ambient,convention,yes,
 fnb.table_session,table_id,fnb.table,child,convention,,yes
@@ -261,6 +275,7 @@ maintenance.work_order,source_plan_id,control.plan,reference,prefix-qualified,ye
 maintenance.work_order,venue_id,platform.scope_node,ambient,convention,yes,yes
 maintenance.work_order_attachment,asset_ref,assets.media_asset,reference,declared,yes,yes
 maintenance.work_order_attachment,work_order_id,maintenance.work_order,child,child,,yes
+marketing.agent_availability,principal_id,identity.principal,ambient,declared,yes,yes
 marketing.campaign,created_by_principal_id,identity.principal,ambient,role,yes,
 marketing.campaign,segment_id,marketing.segment,reference,convention,,yes
 marketing.campaign,venue_id,platform.scope_node,ambient,convention,yes,
@@ -273,10 +288,19 @@ marketing.case_message,case_id,marketing.case,child,implied by path,,
 marketing.consent_purpose,tenant_id,platform.tenant,ambient,declared,yes,yes
 marketing.consent_record,recorded_by_principal_id,identity.principal,ambient,role,yes,
 marketing.consent_record,subject_id,pii.subject,ambient,convention,yes,yes
+marketing.conversation,assigned_principal_id,identity.principal,ambient,declared,yes,yes
+marketing.conversation,case_id,marketing.case,reference,declared,,yes
+marketing.conversation,subject_id,pii.subject,ambient,declared,yes,yes
+marketing.conversation,venue_id,platform.scope_node,ambient,declared,yes,yes
+marketing.conversation_message,ai_interaction_id,ai.interaction,reference,declared,yes,yes
+marketing.conversation_message,conversation_id,marketing.conversation,child,child,,yes
 marketing.guest_device,subject_id,pii.subject,ambient,convention,yes,yes
 marketing.guest_profile,guest_link_id,platform.guest_link,reference,name,yes,
 marketing.guest_profile,segment_id,marketing.segment,reference,implied by path,,
 marketing.guest_profile,subject_id,pii.subject,ambient,convention,yes,yes
+marketing.kiosk_assist_session,cart_id,orders.cart,reference,declared,yes,yes
+marketing.kiosk_assist_session,device_id,platform.device,reference,declared,yes,yes
+marketing.kiosk_assist_session,staff_principal_id,identity.principal,ambient,declared,yes,yes
 marketing.loyalty_position,programme_id,marketing.loyalty_programme,child,manual,,yes
 marketing.loyalty_position,subject_id,pii.subject,ambient,convention,yes,yes
 marketing.loyalty_programme,points_liability_account_id,ledger.account,reference,prefix-qualified,yes,
@@ -298,10 +322,21 @@ marketing.wishlist_item,performance_id,catalogue.performance,reference,conventio
 marketing.wishlist_item,subject_id,pii.subject,ambient,convention,yes,yes
 marketing.wishlist_item,variant_id,catalogue.variant,reference,convention,yes,yes
 orders.b2b_credit,account_id,ledger.account,reference,convention,yes,yes
+orders.cart,subject_id,pii.subject,ambient,declared,yes,yes
+orders.cart,venue_id,platform.scope_node,ambient,declared,yes,yes
+orders.cart_line,cart_id,orders.cart,child,child,,yes
+orders.cart_line,lease_id,catalogue.inventory_lease,reference,declared,yes,yes
+orders.cart_line,variant_id,catalogue.variant,reference,declared,yes,yes
 orders.cash_count_line,shift_id,orders.shift,child,child,,yes
 orders.cash_movement,authorised_by_principal_id,identity.principal,ambient,role,yes,yes
 orders.cash_movement,shift_id,orders.shift,reference,name,,yes
 orders.credit_override,b2b_credit_id,orders.b2b_credit,reference,declared,,yes
+orders.deposit_box,cashier_principal_id,identity.principal,ambient,declared,yes,yes
+orders.deposit_box,shift_id,orders.shift,reference,declared,yes,yes
+orders.deposit_box,venue_id,platform.scope_node,ambient,declared,yes,yes
+orders.deposit_box,workstation_id,platform.workstation,reference,declared,yes,yes
+orders.donation_line,campaign_id,catalogue.donation_campaign,reference,declared,yes,yes
+orders.donation_line,order_id,orders.sales_order,child,child,,yes
 orders.no_sale_event,shift_id,orders.shift,child,child,,yes
 orders.order_discount,order_id,orders.sales_order,child,child,,yes
 orders.order_line,lease_id,catalogue.inventory_lease,reference,manual,yes,
@@ -332,6 +367,10 @@ orders.ticket_transfer,to_subject_id,pii.subject,ambient,prefix-qualified,yes,
 pii.subject_biometric,subject_id,pii.subject,ambient,DDL foreign key,,
 pii.subject_contact,subject_id,pii.subject,ambient,DDL foreign key,,
 pii.subject_document,subject_id,pii.subject,ambient,DDL foreign key,,
+platform.audit_read,principal_id,identity.principal,ambient,declared,yes,yes
+platform.audit_read,subject_id,pii.subject,ambient,declared,yes,yes
+platform.audit_record,principal_id,identity.principal,ambient,declared,yes,yes
+platform.audit_record,scope_node_id,platform.scope_node,ambient,declared,yes,yes
 platform.device,workstation_id,platform.workstation,reference,name,,yes
 platform.device_heartbeat,device_id,platform.device,child,DDL foreign key,,
 platform.dsar_request,guest_link_id,platform.guest_link,reference,name,,yes
@@ -363,6 +402,7 @@ promotions.allocation_component,variant_id,catalogue.variant,reference,conventio
 promotions.allocation_component,venue_id,platform.scope_node,ambient,convention,yes,
 promotions.allocation_split,bundle_id,promotions.bundle,reference,name,,yes
 promotions.bundle,venue_id,platform.scope_node,ambient,convention,yes,yes
+promotions.bundle_choice_group,bundle_id,promotions.bundle,child,child,,yes
 promotions.bundle_component,variant_id,catalogue.variant,reference,convention,yes,yes
 promotions.bundle_component,venue_id,platform.scope_node,ambient,convention,yes,
 promotions.coupon_campaign,venue_id,platform.scope_node,ambient,convention,yes,yes

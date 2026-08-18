@@ -21,14 +21,16 @@ packages:
 - api-client
 contracts:
 - ai
+- cross-cell
 - identity
 - platform-ops
 - reporting
 - subscription
+- tenancy
 - white-label
-screenCount: 36
+screenCount: 37
 byWave:
-  wave1: 10
+  wave1: 11
   wave2: 16
   wave3: 10
 screens:
@@ -90,6 +92,12 @@ screens:
   name: Database Migration Console
   route: /general/database-migration-console
   component: apps/ticvai-web/src/routes/general/DatabaseMigrationConsoleDetail.tsx
+  wave: 1
+  status: notStarted
+- id: ADM-037
+  name: AI Provider & Credentials
+  route: /ai/providers
+  component: apps/ticvai-web/src/routes/AiProviderCredentials.tsx
   wave: 1
   status: notStarted
 - id: ADM-003

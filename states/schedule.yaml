@@ -5,6 +5,8 @@
 entity: Content schedule
 contract: white-label
 enum: ScheduleState
+enumKind: named
+enumSchema: ScheduleState
 owner: whitelabel
 initial:
 - draft

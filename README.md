@@ -2,11 +2,14 @@
 
 Generated 17 August 2026
 
-**737 operations · 278 tables · 364 screens · 45 state models · 26 events · 18 ADRs**
+**776 operations · 287 tables · 376 screens · 80 state models · 29 events · 24 flows · 25 ADRs**
 
-**Conflicts: 79 raised, 0 blocking.** See `conflict-status.md`.
+**Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
 ---
+
+**New here? Read [docs/principles.md](docs/principles.md) first.** The design principles, with
+provenance and what each one rules out — including the six that were wrong first.
 
 ## Start here
 
@@ -14,76 +17,44 @@ Generated 17 August 2026
 |---|---|
 | **`COVERAGE.md`** | What is here and what is not, against the whole build |
 | **`conflict-status.md`** | Every conflict and its state, one line each |
-| **`wireframes/TICVAI Wireframe Boards.dc.html`** | 12 boards, 364 screens. Open in a browser |
+| **`wireframes/TICVAI Wireframe Boards.dc.html`** | 12 boards, 376 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | 278 tables, 2,025 columns, nine sheets |
-| **`handoff/services-and-procedures.md`** | Where each operation gets its data. 23 services, ten procedures |
-| **`docs/active/ai-scope-for-confirmation.md`** | AI scope, for the client to confirm |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | 287 tables, 2,025 columns, nine sheets |
+| **`handoff/ai-index.md`** | Where every AI artefact lives |
+| **`docs/active/workshop-packs.md`** | The three blocked domains, prepared |
 
 ## Folders
 
 | | |
 |---|---|
-| `contracts/` | **737 operations** across 25 files — 246 spine, 443 satellite |
-| `screens/` | 347 definitions across 12 platforms |
+| `contracts/` | **776 operations** across 25 files — 267 spine, 470 satellite |
+| `screens/` | 364 definitions across 12 platforms, all specified |
 | `frontend/` | 10 app manifests, with build readiness |
-| `states/` · `events/` | 45 state models · 26 events, cross-checked |
-| `flows/` | 15 user journeys with their unhappy paths |
-| `wireframes/` | 12 platform boards, linked to the definitions both ways |
-| `handoff/` | Schema workbook · lineage · storage design · registers · tooltips |
-| `docs/` | 18 ADRs, conflict register, decisions |
-| `tools/` | **Seven validators** and two generators |
-| `repos/` | The six git repositories |
+| `states/` · `events/` | 80 state models · 29 events, cross-checked |
+| `flows/` | 23 user journeys with 137 unhappy paths |
+| `handoff/` | Registers, indexes and the schema workbook |
+| `docs/` | Architecture, 25 ADRs, the conflict register |
+| `tools/` | **7 validators** and two generators |
+| `wireframes/` | 12 boards from Claude Code, linked to every definition |
+| `sources/` | The matrix, the minutes, the client design references |
 
-    python3 tools/check-screens.py    check-frontend      check-flows
-    python3 tools/check-states.py     check-config-scope  check-wireframes
-    python3 tools/check-package.py    # the layers against each other
-    python3 tools/build-cf-index.py   link-screens-contracts
+## Validating
 
----
+    cd ticvai-full
+    python3 tools/check-screens.py        check-frontend      check-flows
+    python3 tools/check-states.py         check-config-scope  check-wireframes
+    python3 tools/check-package.py        # the layers against each other
 
-## Naming
+Six report zero warnings. `check-states` reports a backlog of lifecycles declared inline on a
+property with no state model — **found on 17 August when the checker's own blind spot was
+fixed**, and they are under-specified rather than wrong.
 
-**Platforms and apps are named by who operates them.** `guest-*` is what a visitor touches,
-`venue-*` is what venue staff run, `ticvai-web` is the only one we operate. That is the
-question that matters at 9pm on a Saturday, because it answers who is supposed to fix it.
+## What this is
 
-Ten platforms map to one app each. Two apps serve two platforms and say so.
+A design package. **776 operations, 287 tables and 376 screens are specified and none of it
+has been executed** — no SQL is written, no code is built, and every number above is an
+assertion until something runs.
 
-## Two levels of done
-
-**Every screen is defined — 347 of 347.** Purpose, route, navigation, enough to draw.
-
-**All 347 have their states written.** That is what a developer builds from, and it is why only two
-apps — `venue-scanner` and `venue-pos` — currently clear the bar.
-
----
-
-## No migrations, deliberately
-
-The SQL was removed. **The schema workbook is the working artefact** while the design settles.
-Writing DDL against a moving design produces migrations that must be rewritten, and a
-forward-only migration cannot be rewritten. What the six migrations held beyond the column
-list is in `handoff/storage-design.md`.
-
----
-
-## State
-
-| | Done | Total |
-|---|---|---|
-| **API operations** | **707** | — |
-| API data lineage resolved | 707 | 707 |
-| Requirements with a contract | 2,778 | 2,990 |
-| Configuration levels decided | 321 | 321 |
-| Tables designed | 266 | — |
-| Tables written | 0 | deliberate |
-| **Screens defined** | **364** | 364 |
-| **Screens specified** | **364** | 364 |
-| Screens with operations | 290 | 347 |
-| Operations reaching a screen | 567 | 707 |
-| Flows | 15 | ~60 |
-| Sprint 0 | 0 | 11 |
-
-**Nothing has been executed.** No build, no `psql`, no pipeline.
+The fastest way to test that is `venue-scanner`: 376 screens, fully specified, offline-mandatory,
+and one flow with eight branches.

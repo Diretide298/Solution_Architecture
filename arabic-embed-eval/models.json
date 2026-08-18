@@ -1,0 +1,113 @@
+{
+  "_comment": [
+    "Every candidate considered, in one place, so the same harness runs on this",
+    "laptop and on a server without editing code. `vram_fp16_gb` is weights only:",
+    "params x 2 bytes. Encoding needs headroom on top of that, which preflight.py",
+    "applies as `overhead` rather than burying it in the number.",
+    "",
+    "`status` is the truth as of 2026-08-17 and is checked, not assumed —",
+    "see 00-FINDINGS-before-harness.md for how."
+  ],
+  "overhead": 1.25,
+
+  "models": {
+    "qwen3-8b": {
+      "hf_id": "Qwen/Qwen3-Embedding-8B", "kind": "st",
+      "params_b": 8.0, "vram_fp16_gb": 16.0, "dims": 4096,
+      "license": "apache-2.0", "status": "ok",
+      "note": "strongest open multilingual retriever on the list"
+    },
+    "gte-qwen2-7b": {
+      "hf_id": "Alibaba-NLP/gte-Qwen2-7B-instruct", "kind": "st",
+      "params_b": 7.6, "vram_fp16_gb": 15.2, "dims": 3584,
+      "license": "apache-2.0", "status": "ok",
+      "note": "needs trust_remote_code"
+    },
+    "qwen3-4b": {
+      "hf_id": "Qwen/Qwen3-Embedding-4B", "kind": "st",
+      "params_b": 4.0, "vram_fp16_gb": 8.0, "dims": 2560,
+      "license": "apache-2.0", "status": "ok",
+      "note": "quality/compute balance — the biggest that fits a 12 GB card"
+    },
+    "qwen3-0.6b": {
+      "hf_id": "Qwen/Qwen3-Embedding-0.6B", "kind": "st",
+      "params_b": 0.6, "vram_fp16_gb": 1.2, "dims": 1024,
+      "license": "apache-2.0", "status": "ok",
+      "note": "fast/cheap floor"
+    },
+    "bge-m3": {
+      "hf_id": "BAAI/bge-m3", "kind": "st",
+      "params_b": 0.57, "vram_fp16_gb": 1.1, "dims": 1024,
+      "license": "mit", "status": "ok",
+      "note": "multilingual + hybrid retrieval; your original pick"
+    },
+    "e5-large": {
+      "hf_id": "intfloat/multilingual-e5-large", "kind": "st",
+      "params_b": 0.56, "vram_fp16_gb": 1.1, "dims": 1024,
+      "license": "mit", "status": "ok",
+      "note": "the baseline Swan-Large was measured against — anchors our numbers to published ones"
+    },
+    "nomic-v1.5": {
+      "hf_id": "nomic-ai/nomic-embed-text-v1.5", "kind": "st",
+      "params_b": 0.137, "vram_fp16_gb": 0.3, "dims": 768,
+      "license": "apache-2.0", "status": "ok",
+      "note": "English-leaning; thin on Arabic"
+    },
+    "bge-large-en": {
+      "hf_id": "BAAI/bge-large-en-v1.5", "kind": "st",
+      "params_b": 0.335, "vram_fp16_gb": 0.7, "dims": 1024,
+      "license": "mit", "status": "english-only",
+      "note": "English-only — cannot serve the Arabic half of the index"
+    },
+    "e5-large-v2": {
+      "hf_id": "intfloat/e5-large-v2", "kind": "st",
+      "params_b": 0.335, "vram_fp16_gb": 0.7, "dims": 1024,
+      "license": "mit", "status": "english-only",
+      "note": "English-only — not the multilingual e5"
+    },
+
+    "jina-v3": {
+      "hf_id": "jinaai/jina-embeddings-v3", "kind": "st",
+      "params_b": 0.572, "vram_fp16_gb": 1.1, "dims": 1024,
+      "license": "cc-by-nc-4.0", "status": "licence-blocked",
+      "note": "weights are public but NON-COMMERCIAL. Self-hosting in a paid product is not licensed. Their API, or drop it."
+    },
+    "swan-large": {
+      "hf_id": "UBC-NLP/Swan-Large", "kind": "st",
+      "params_b": 7.0, "vram_fp16_gb": 14.0, "dims": 4096,
+      "license": "unknown", "status": "unavailable",
+      "note": "NO PUBLIC CHECKPOINT. github.com/UBC-NLP/swan is a 404 and no Swan model exists on HF. Not substituted."
+    },
+
+    "openai-3-large": {
+      "hf_id": "text-embedding-3-large", "kind": "openai",
+      "vram_fp16_gb": 0, "dims": 3072, "price_per_m": 0.13,
+      "env": "OPENAI_API_KEY", "status": "ok",
+      "note": "54.9% MIRACL vs 3-small's 44.0% — the gap matters for the Arabic half"
+    },
+    "openai-3-small": {
+      "hf_id": "text-embedding-3-small", "kind": "openai",
+      "vram_fp16_gb": 0, "dims": 1536, "price_per_m": 0.02,
+      "env": "OPENAI_API_KEY", "status": "ok",
+      "note": "6.5x cheaper, materially worse on Arabic"
+    },
+    "cohere-v4": {
+      "hf_id": "embed-v4.0", "kind": "cohere",
+      "vram_fp16_gb": 0, "dims": 1024,
+      "env": "COHERE_API_KEY", "status": "no-key",
+      "note": "API only, no weights"
+    },
+    "voyage-3-large": {
+      "hf_id": "voyage-3-large", "kind": "voyage",
+      "vram_fp16_gb": 0, "dims": 1024,
+      "env": "VOYAGE_API_KEY", "status": "no-key",
+      "note": "API only, no weights"
+    },
+    "gemini-embed-2": {
+      "hf_id": "gemini-embedding-002", "kind": "gemini",
+      "vram_fp16_gb": 0, "dims": 3072,
+      "env": "GEMINI_API_KEY", "status": "no-key",
+      "note": "API only, no weights"
+    }
+  }
+}

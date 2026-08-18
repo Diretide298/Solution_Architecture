@@ -5,6 +5,8 @@
 entity: Stock transfer
 contract: inventory
 enum: TransferStatus
+enumKind: named
+enumSchema: TransferStatus
 owner: inventory
 initial:
 - dispatched

@@ -105,6 +105,135 @@ tags:
 
 paths:
   # ---------------------------------------------------------------- tenants
+  /ai-usage/settle:
+    post:
+      operationId: settleAiUsage
+      x-ticvai-audience: [staff]
+      summary: Turn metered AI interactions into a billable usage record
+      description: >
+        **The link between the meter and the invoice, and it did not exist.** It lives in
+        `subscription` rather than `ai` because **AI meters and subscription bills** — an AI
+        operation writing a billing record would break the read-only rule in ADR-0020, which is
+        how this landed in the wrong contract on 17 August. `ai.interaction`
+        recorded tokens and cost per call; `recordUsage` wrote a billing line; nothing joined them.
+
+        Runs per tenant per period, aggregating from the interaction log and writing one
+        `control.usage_record` per audience — **staff and guest billed as separate lines**, because
+        they behave differently and a venue needs to see which one moved.
+
+        **Reads the primary, not the analytical replica.** `ai.interaction` sits on the analytical
+        store (ADR-0020) and replica lag at period close would invoice a number that changes after
+        it is sent.
+      tags: [subscription]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tenantId, periodStart, periodEnd]
+              properties:
+                tenantId: { type: string, format: uuid }
+                periodStart: { type: string, format: date }
+                periodEnd: { type: string, format: date }
+      responses:
+        '200':
+          description: Settled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tenantId: { type: string, format: uuid }
+                  periodStart: { type: string, format: date }
+                  periodEnd: { type: string, format: date }
+                  lines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        audience: { type: string, enum: [staff, guest] }
+                        interactions: { type: integer }
+                        promptTokens: { type: integer }
+                        completionTokens: { type: integer }
+                        providerCost:
+                          allOf:
+                            - $ref: '../shared/common.yaml#/components/schemas/Money'
+                          description: What the provider charged us.
+                        billedAmount:
+                          allOf:
+                            - $ref: '../shared/common.yaml#/components/schemas/Money'
+                          description: >
+                            What the tenant is charged. **Separate from cost**, so a margin, a
+                            floor or a cap can be applied without losing what it actually cost.
+                  capApplied:
+                    type: boolean
+                    description: >
+                      **Whether a cap or fair-use limit bit in this period.** A tenant cannot stop
+                      guests asking questions, so an uncapped per-token charge is a bill they
+                      cannot control — see CF-14.
+        '409':
+          description: >
+            Already settled for this period. **Settling twice would invoice twice**, and the
+            idempotency key alone does not protect a re-run with a different key.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /subscriptions/{subscriptionId}/cancel:
+    parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: cancelSubscription
+      x-ticvai-audience: [staff]
+      summary: Terminate a tenant subscription
+      description: >
+        **Always a decision, never a timer.** A `pastDue` subscription continues to serve
+        indefinitely (CF-61: degrade, never stop) and only a person ends it.
+
+        The effective date matters: terminating at period end is ordinary, terminating
+        immediately closes a venue that may have guests inside it.
+      tags: [subscription]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, effective]
+              properties:
+                reason: { type: string, enum: [tenantRequested, nonPayment, breachOfTerms, migrated, other] }
+                effective: { type: string, enum: [immediately, atPeriodEnd, onDate] }
+                effectiveDate: { type: string, format: date }
+                dataRetentionDays:
+                  type: integer
+                  description: >
+                    How long the cell is kept before decommissioning. **A tenant who returns
+                    within the window keeps their data**; beyond it they do not.
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+
   /partner-agreements:
     get:
       operationId: listPartnerAgreements
@@ -113,6 +242,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
+      x-ticvai-audience: [staff, partner]
       summary: Commercial agreements with B2B partners
       description: >
         2.7.32. **The object every other partner operation assumes and none of them had.** Credit
@@ -147,6 +277,7 @@ paths:
       operationId: createPartnerAgreement
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
+      x-ticvai-audience: [staff]
       summary: Agree commercial terms with a partner
       description: >
         2.7.31, 2.7.32, 2.7.36. Net rates or commission, credit terms, which products, which
@@ -184,6 +315,7 @@ paths:
       operationId: updatePartnerAgreement
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
+      x-ticvai-audience: [staff]
       summary: Amend, suspend or terminate
       description: >
         **Amending creates a version; it does not overwrite.** An order placed last week was
@@ -210,6 +342,7 @@ paths:
   /partner-registrations:
     post:
       operationId: registerPartner
+      x-ticvai-audience: [anonymous]
       summary: A business applies to become a partner
       description: >
         2.7.33. **Self-registration with approval**, not an account somebody creates by hand.
@@ -217,7 +350,6 @@ paths:
         decision with a threshold and an approver.
       tags: [subscription]
       x-ticvai-permission: null   # a prospective partner, before any account exists
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -256,6 +388,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
+      x-ticvai-audience: [staff, partner]
       summary: What the partner earned and what is owed
       description: >
         2.7.13, 2.7.40. **Per period, and reconcilable to the orders behind it** — a statement a
@@ -298,6 +431,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List tenants
       tags: [tenant]
@@ -343,6 +477,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Create a tenant
       description: >
         Creates the record only. **No cell exists until a region is provisioned** — a tenant
@@ -392,6 +527,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a tenant with cells and subscription
       tags: [tenant]
@@ -421,12 +557,15 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Amend tenant details
       tags: [tenant]
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -466,6 +605,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Suspend a tenant
       description: >
         Graceful and reversible. Data is retained, cells stay provisioned, and the behaviour
@@ -520,6 +660,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Lift a suspension
       tags: [tenant]
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -560,6 +701,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Begin termination
       description: >
         Deliberately harder to reach than suspension. Starts a retention window during which
@@ -612,6 +754,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List subscription plans
       tags: [plan]
@@ -633,6 +776,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
       summary: Create a subscription plan
       description: >
         A plan bundles licensed modules, entitlement limits and a cell tier. Plans are
@@ -668,6 +812,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a plan
       tags: [plan]
@@ -688,6 +833,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
       summary: Publish a new version of a plan
       description: >
         Existing subscribers remain on their version until migrated deliberately. A pricing
@@ -733,6 +879,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read the current subscription
       tags: [subscription]
@@ -762,6 +909,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Assign or change a subscription
       description: >
         Upgrades take effect immediately. **Downgrades are checked first**: if the target
@@ -816,6 +964,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Preview the effect of a plan change
       description: >
         What would change, what would break, and the prorated amount. Run before committing —
@@ -825,6 +974,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -858,6 +1009,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # gates module enablement. Stale grants access to an unlicensed module
       summary: What a tenant is licensed to use
       description: >
@@ -897,6 +1049,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: License a module outside the plan
       description: >
         A module or limit increase sold separately. Add-ons survive a plan change unless
@@ -934,12 +1087,15 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Remove an add-on
       tags: [licensing]
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -982,6 +1138,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Usage against licensed limits
       description: >
@@ -1020,6 +1177,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List a tenant's cells
       description: One per region (ADR-0014), with placement, tier and health.
@@ -1051,6 +1209,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Provision a cell for a region
       description: >
         Every region is its own cell. **Jurisdiction is enforced here, not trusted**: a region
@@ -1107,6 +1266,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a cell
       tags: [cell]
@@ -1133,6 +1293,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
       summary: Change a cell's tier
       description: >
         Promotion from shared to dedicated is a migration, not a setting. Returns a job to
@@ -1183,6 +1344,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
       summary: Begin decommissioning a cell
       description: >
         **Refused while any tenant remains on it.** Migrate them first — `planTenantMigration` exists for exactly this.
@@ -1228,6 +1390,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
       summary: Halt a decommission
       description: >
         Returns the cell to active.
@@ -1274,6 +1437,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
       summary: Load against headroom
       description: >
         **Capacity is driven by traffic and concurrent users, not by tenant count.** A shared
@@ -1303,6 +1467,7 @@ paths:
   /cell-clusters:
     get:
       operationId: listCellClusters
+      x-ticvai-audience: [staff]
       summary: Clusters in a region
       description: >
         A cluster is one or more identical cells serving a region. Scaling out is **launching
@@ -1333,6 +1498,7 @@ paths:
 
     post:
       operationId: launchCellCluster
+      x-ticvai-audience: [staff]
       summary: Launch an identical cluster
       description: >
         Provisions a cell identical in shape, region and schema version to an existing one, so
@@ -1387,6 +1553,7 @@ paths:
         schema: { type: string }
     post:
       operationId: rollbackTenantMigration
+      x-ticvai-audience: [staff]
       summary: Roll a cutover back
       description: >
         Possible only because the source is retained rather than dropped. Returns traffic to the original cell.
@@ -1418,6 +1585,7 @@ paths:
   /tenant-migrations:
     get:
       operationId: listTenantMigrations
+      x-ticvai-audience: [staff]
       summary: Tenant moves between cells
       tags: [cell]
       x-ticvai-permission: PLATFORM_CELL_VIEW
@@ -1443,6 +1611,7 @@ paths:
 
     post:
       operationId: planTenantMigration
+      x-ticvai-audience: [staff]
       summary: Plan moving a tenant to another cell
       description: >
         **The upgrade path a tenant buys.** A client on shared infrastructure who later wants
@@ -1501,6 +1670,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: executeTenantMigration
+      x-ticvai-audience: [staff]
       summary: Move the tenant
       description: >
         Copies the tenant's data to the target, verifies row counts and checksums, re-points
@@ -1560,6 +1730,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Cell health and schema version
       description: >
@@ -1594,6 +1765,7 @@ paths:
         - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
         - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Provisioning, migration and maintenance jobs
       tags: [cell]
@@ -1639,6 +1811,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Metered usage for a period
       description: >
@@ -1674,9 +1847,9 @@ paths:
   /usage-records:
     post:
       operationId: recordUsage
+      x-ticvai-audience: [service]
       security:
         - serviceAuth: []
-      x-ticvai-auth: service
       summary: Record metered usage
       description: >
         Called by cells. Idempotent on the record ID, and batched — a cell reporting every
@@ -1722,6 +1895,7 @@ paths:
         schema: { type: string }
     post:
       operationId: recordInvoicePayment
+      x-ticvai-audience: [staff]
       summary: Record payment against an invoice
       description: >
         Settles it. Late settlement clears `overdue` — the state was a flag, not a penalty.
@@ -1759,6 +1933,7 @@ paths:
         schema: { type: string }
     post:
       operationId: disputeInvoice
+      x-ticvai-audience: [staff]
       summary: Raise a dispute
       description: >
         **The clock stops.** A tenant querying an invoice should not accrue overdue status while somebody looks into it.
@@ -1795,6 +1970,7 @@ paths:
         schema: { type: string }
     post:
       operationId: resolveInvoiceDispute
+      x-ticvai-audience: [staff]
       summary: Resolve a dispute
       description: >
         Returns the invoice to issued, with the terms clock resuming from the resolution rather than the original date.
@@ -1831,6 +2007,7 @@ paths:
         schema: { type: string }
     post:
       operationId: cancelInvoice
+      x-ticvai-audience: [staff]
       summary: Cancel or credit an invoice
       description: >
         **Credited, never deleted.** An invoice a tenant has seen and queried must remain visible with its outcome, or the next conversation starts from nothing.
@@ -1879,6 +2056,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List subscription invoices
       description: >
@@ -1923,6 +2101,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       summary: Generate an invoice for a period
       description: >
         Prices the metered usage against the subscription's plan version. Idempotent per
@@ -2014,7 +2193,7 @@ components:
         creditLimit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         allowedChannels:
           type: array
-          items: { $ref: '#/components/schemas/SalesChannel' }
+          items: { $ref: '../shared/common.yaml#/components/schemas/SalesChannel' }
         allowedVenueIds:
           type: array
           items: { type: string, format: uuid }

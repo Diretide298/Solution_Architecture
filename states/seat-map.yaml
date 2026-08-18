@@ -5,6 +5,8 @@
 entity: Seat map
 contract: seating
 enum: SeatMapStatus
+enumKind: named
+enumSchema: SeatMapStatus
 owner: seating
 initial:
 - draft

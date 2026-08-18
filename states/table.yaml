@@ -5,6 +5,8 @@
 entity: Table
 contract: fnb
 enum: TableStatus
+enumKind: named
+enumSchema: TableStatus
 owner: fnb
 initial:
 - free

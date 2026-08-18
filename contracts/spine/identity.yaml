@@ -104,11 +104,14 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [anonymous, partner]
+      tags: [identity]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       summary: Authenticate and open a session
       security: []
       requestBody:
@@ -145,11 +148,14 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
         - "P06 EMP-002 Select venue & role"
+      x-ticvai-audience: [staff]
+      tags: [identity]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       summary: Choose a role for a multi-role session
       description: >
         Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with
@@ -177,11 +183,14 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [staff]
+      tags: [identity]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       summary: Rotate the access token
       security: []
       requestBody:
@@ -208,14 +217,17 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
         - "P06 EMP-046 Sign out"
+      x-ticvai-audience: [staff]
+      tags: [identity]
       security:
         - bearerAuth: []
       x-ticvai-self-scoped: principal
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       summary: Close the current session
       responses:
         '204': { description: Session closed }
@@ -231,6 +243,8 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [staff, partner]
+      tags: [identity]
       x-ticvai-permission: SESSION_FORCE_LOGOUT
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -241,6 +255,7 @@ paths:
         displaces a second login — an operator who went home still logged in would
         otherwise be locked out until token expiry.
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
         - name: sessionId
           in: path
           required: true
@@ -271,12 +286,13 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [staff, partner]
+      tags: [identity]
       x-ticvai-read-routing: primary
       security:
         - bearerAuth: []
       x-ticvai-self-scoped: principal
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -298,6 +314,7 @@ paths:
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
         - "P13 CMS-019 User Access"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: List principals
       tags: [administration]
@@ -334,6 +351,7 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
+      x-ticvai-audience: [staff, partner]
       summary: Create a principal
       tags: [administration]
       x-ticvai-permission: USER_MANAGE
@@ -372,6 +390,7 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Read a principal
       tags: [administration]
@@ -392,6 +411,7 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
+      x-ticvai-audience: [staff, partner]
       summary: Update or deactivate a principal
       description: >
         Deactivation invalidates any live session immediately. Additive changes take effect
@@ -401,6 +421,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -428,6 +450,7 @@ paths:
         - "P08 BO-054 Role Assignment"
         - "P09 ADM-021 Platform Role Management"
         - "P13 CMS-019 User Access"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List roles
       description: >
@@ -460,6 +483,7 @@ paths:
         - "P06 EMP-002 Select venue & role"
         - "P08 BO-054 Role Assignment"
         - "P09 ADM-021 Platform Role Management"
+      x-ticvai-audience: [staff]
       summary: Create a role
       tags: [administration]
       x-ticvai-permission: ROLE_MANAGE
@@ -491,6 +515,7 @@ paths:
       operationId: listGrants
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: List grants for a principal or role
       tags: [administration]
@@ -524,6 +549,7 @@ paths:
       operationId: createGrant
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+      x-ticvai-audience: [staff, partner]
       summary: Assign a grant
       description: >
         Resolution is deny-overrides-allow. A DENY at any node suppresses the permission at
@@ -566,6 +592,7 @@ paths:
       operationId: deleteGrant
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+      x-ticvai-audience: [staff, partner]
       summary: Remove a grant
       description: >
         Removing an ALLOW takes effect at next login. Removing it from a principal with a
@@ -576,6 +603,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Removed }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
@@ -583,6 +612,7 @@ paths:
   /permissions/resolve:
     post:
       operationId: resolvePermissions
+      x-ticvai-audience: [staff]
       summary: Simulate a principal's effective permissions
       description: >
         Runs the resolution algorithm without a login. Answers *what would this person
@@ -593,6 +623,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -640,13 +672,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [anonymous]
       summary: Create a guest account
       description: >
         Email or mobile. Verification follows via OTP; the account exists but is unverified
         until then, and an unverified account may browse but not transact.
       tags: [guestAuth]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -679,6 +711,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [anonymous]
       summary: Request a one-time code
       description: >
         Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source
@@ -688,10 +721,11 @@ paths:
         way; only the message differs, and only the owner receives it.
       tags: [guestAuth]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security: []
       requestBody:
         required: true
@@ -727,13 +761,15 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [anonymous]
       summary: Verify a one-time code and issue a session
       tags: [guestAuth]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security: []
       requestBody:
         required: true
@@ -766,6 +802,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [anonymous]
       summary: Sign in with Apple or Google
       description: >
         Where the provider's verified email matches an existing account, the identities are
@@ -773,10 +810,11 @@ paths:
         an unverified email from a provider is not proof of ownership.
       tags: [guestAuth]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security: []
       requestBody:
         required: true
@@ -809,6 +847,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [anonymous]
       summary: Sign in with a national identity provider
       description: >
         OAuth authorisation-code exchange. Returns a verified identity, so an account created
@@ -818,10 +857,11 @@ paths:
         critical path.
       tags: [guestAuth]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security: []
       requestBody:
         required: true
@@ -856,11 +896,11 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [guest, partner]
       x-ticvai-read-routing: primary
       summary: Read the current guest session
       tags: [guestAuth]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -880,6 +920,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [guest]
       summary: End a guest session
       description: >
         Ends this device's session. `allDevices` revokes every session for the subject, which
@@ -887,7 +928,6 @@ paths:
         wants.
       tags: [guestAuth]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -907,6 +947,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [guest]
       summary: Attach a guest checkout to an account
       description: >
         A guest who bought without an account, then registered. Orders matching the verified
@@ -917,7 +958,6 @@ paths:
         it.
       tags: [guestAuth]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -956,6 +996,7 @@ paths:
   /auth/guest/account:
     delete:
       operationId: deleteGuestAccount
+      x-ticvai-audience: [guest]
       summary: Self-service account deletion
       description: >
         Raises an erasure request rather than deleting immediately. PII is removed from the
@@ -964,7 +1005,6 @@ paths:
         Where the guest is linked across cells, the request fans out (ADR-0010).
       tags: [guestAuth]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1005,12 +1045,12 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [anonymous, partner]
       x-ticvai-read-routing: replica
       summary: Identity providers configured for this tenant
       description: Called before the login screen renders, so it is unauthenticated.
       tags: [sso]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1035,11 +1075,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [anonymous]
       x-ticvai-read-routing: replica
       summary: Begin an SSO flow
       tags: [sso]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1072,6 +1112,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [anonymous]
       summary: Exchange an SSO code for a session
       description: >
         Group-to-role mapping is applied here. **A group with no mapping grants nothing** —
@@ -1079,10 +1120,11 @@ paths:
         becomes a way to mint access nobody configured.
       tags: [sso]
       x-ticvai-permission: null   # no session yet — this is how one is obtained
-      x-ticvai-auth: anonymous
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security: []
       requestBody:
         required: true
@@ -1125,6 +1167,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read SSO configuration
       tags: [sso]
@@ -1155,6 +1198,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: tenant
       summary: Configure an identity provider
       description: >
@@ -1198,11 +1242,11 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Enrolled MFA methods
       tags: [mfa]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1221,6 +1265,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [staff]
       summary: Enrol an MFA method
       description: >
         Returns a secret or challenge to complete enrolment. **The method is not active until
@@ -1228,7 +1273,6 @@ paths:
         account.
       tags: [mfa]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1265,14 +1309,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [staff]
       summary: Complete enrolment
       tags: [mfa]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: principal
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1299,6 +1345,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [staff]
       summary: Remove an MFA method
       description: >
         Refused where it is the only active method and the principal's role requires MFA.
@@ -1306,11 +1353,12 @@ paths:
         account holder gets to make.
       tags: [mfa]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: principal
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Removed }
         '409':
@@ -1322,6 +1370,7 @@ paths:
   /auth/mfa/challenge:
     post:
       operationId: createMfaChallenge
+      x-ticvai-audience: [staff]
       summary: Step-up authentication for a sensitive action
       description: >
         Issues a short-lived token proving a factor was presented just now. Consumed by
@@ -1332,11 +1381,12 @@ paths:
         keyboard now, and for those actions the difference matters.
       tags: [mfa]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: principal
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1371,14 +1421,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience: [staff]
       summary: Complete a step-up challenge
       tags: [mfa]
       x-ticvai-permission: null   # a staff session, before or without a role-scoped grant
-      x-ticvai-auth: session
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: principal
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1412,6 +1464,7 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: primary
       summary: List active sessions
       description: >
@@ -1456,6 +1509,7 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Agent Login"
+      x-ticvai-audience: [staff, partner]
       summary: Revoke every session in scope
       description: >
         Incident response. Requires step-up authentication and a reason, and is recorded

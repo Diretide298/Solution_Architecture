@@ -8,10 +8,14 @@
 // which schemas become tables, not which operations touch them — so the viewer
 // was right not to guess it, and wrong only in having nothing to show.
 //
-//   api-data-lineage.json   654 operations -> tables read, tables written,
+//   api-data-lineage.json   every operation -> tables read, tables written,
 //                           service, routing, scope, permission, offline
-//   screen-index.json       347 screens -> board anchor, operations, services,
+//   screen-index.json       every screen -> board anchor, operations, services,
 //                           tables, stored procedures, wave
+//
+// Counts are deliberately not written here. They were, and they rotted: this
+// comment said 654 operations and 347 screens against a package that had moved
+// to 776 and 376. A number in a comment is a claim nothing checks.
 //
 // wireframes/LINKAGE.md draws the whole chain in one line, and it is worth
 // keeping in view because every hop is a different file:

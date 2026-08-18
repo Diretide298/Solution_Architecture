@@ -8,7 +8,6 @@
 id: F11
 name: Guest orders food to a lounger
 actor: guest
-capability: C05
 wave: 2
 frequency: constant
 criticality: convenience
@@ -117,3 +116,7 @@ exitStates:
   description: Held at the outlet for collection
 - state: abandoned
   description: Cancelled before acceptance and refunded
+primaryContract: fnb
+contracts:
+- fnb
+- orders

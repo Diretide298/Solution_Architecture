@@ -5,6 +5,8 @@
 entity: Report execution
 contract: reporting
 enum: ExecutionStatus
+enumKind: named
+enumSchema: ExecutionStatus
 owner: reporting
 initial:
 - queued

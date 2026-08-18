@@ -17,7 +17,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 36
+  screenCount: 37
   app: ticvai-web
   appStatus: not scaffolded
   packages:
@@ -98,6 +98,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-002
+    - ADM-003
+    - ADM-004
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-002
   name: Platform Dashboard
@@ -327,6 +331,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: listAiInteractions
     contract: ai
@@ -837,6 +845,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-009
   name: Tenant Billing & Invoicing
@@ -952,6 +964,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-010
   name: Usage Metering
@@ -1066,6 +1082,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-011
   name: Licence & Seat Management
@@ -1181,6 +1201,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-012
   name: Tenant Isolation & Resource Pool
@@ -1363,6 +1387,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-014
   name: Auto-Scaling Configuration
@@ -1395,6 +1423,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: getCellCapacity
     contract: subscription
@@ -1455,6 +1487,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: getTenantLicences
     contract: subscription
@@ -1735,6 +1771,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-017
   name: Domain & Certificate Management
@@ -1768,6 +1808,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: getTenantConfig
     contract: white-label
@@ -2127,6 +2171,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-019
   name: Global Configuration & Defaults
@@ -2160,6 +2208,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: listPlans
     contract: subscription
@@ -2224,6 +2276,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-021
   name: Platform Role Management
@@ -2263,6 +2319,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-022
   name: Release & Version Management
@@ -2434,6 +2494,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-025
   name: Tenant Upgrade Scheduler
@@ -2475,6 +2539,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-026
   name: End-of-Support Notice Management
@@ -2516,6 +2584,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-027
   name: Database Migration Console
@@ -2617,6 +2689,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-029
   name: Deployment Monitor
@@ -2698,6 +2774,10 @@ screens:
     - ADM-002
     - ADM-023
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
@@ -2730,6 +2810,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: getCellCapacity
     contract: subscription
@@ -2791,6 +2875,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: listDashboards
     contract: reporting
@@ -2840,6 +2928,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: getCellHealth
     contract: subscription
@@ -2929,6 +3021,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 - id: ADM-034
   name: Archival Job Monitor
@@ -2961,6 +3057,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: listCellJobs
     contract: subscription
@@ -3020,6 +3120,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: listSupportNotices
     contract: platform-ops
@@ -3061,6 +3165,10 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
   apis:
   - operationId: publishSupportNotice
     contract: platform-ops
@@ -3071,3 +3179,54 @@ screens:
     purpose: End-of-support notices
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+- id: ADM-037
+  name: AI Provider & Credentials
+  module: AI
+  purpose: Configure which model a tenant uses, hold the key, and prove it works before anyone relies
+    on it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  apis:
+  - operationId: listAiProviders
+    contract: ai
+    purpose: Configured providers and their order
+    trigger: onLoad
+  - operationId: setAiProvider
+    contract: ai
+    purpose: Configure a provider
+    trigger: onAction
+  - operationId: setAiCredential
+    contract: ai
+    purpose: Store or rotate a provider key
+    trigger: onAction
+  - operationId: testAiProvider
+    contract: ai
+    purpose: Check the key works before anyone relies on it
+    trigger: onAction
+  states:
+    loading: Providers by scope, with the level each resolves from
+    empty: No provider configured — **the assistant is off, not broken**, and the screen says which
+    error: '**Could not load. Saving is blocked.** A provider saved over an unread one can point a tenant
+      at a model in the wrong jurisdiction'
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: ticvai-web
+    route: /ai/providers
+    component: apps/ticvai-web/src/routes/AiProviderCredentials.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P09 Admin Web.dc.html#adm-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
+    a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
+    board.**

@@ -21,15 +21,24 @@ payload:
   type: timestamp
 consumers:
 - context: ai
-  purpose: Index or remove the description
+  purpose: Index or remove the description. **A delisted product stays searchable.** The removal half
+    is what makes this critical — recommending something a guest cannot buy is worse than not recommending
+    it
   idempotencyKey: merchandiseId + publishedAt
-  onFailure: retry
-  isCritical: false
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: reporting
   purpose: Product dimension
   idempotencyKey: merchandiseId + publishedAt
   onFailure: retry
   isCritical: false
+- context: cache
+  purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
+    invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
+    venue’s behalf, which is worse than a slow one
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication
 notes: 'Withdrawal travels on the same event rather than a second one. A separate withdrawn event is
   one a consumer can forget to subscribe to, and the failure is a shop still advertising something it

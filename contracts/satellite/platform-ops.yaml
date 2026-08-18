@@ -78,12 +78,59 @@ tags:
 
 paths:
   # ---------------------------------------------------------------- releases
+  /rollouts/{rolloutId}/cells/{cellId}/skip:
+    parameters:
+      - name: rolloutId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: skipRolloutCell
+      x-ticvai-audience: [staff]
+      summary: Exclude a cell from this wave
+      description: >
+        An on-premise cell TICVAI cannot reach, a venue in a blackout window, or a tenant who
+        asked to be held back.
+
+        **Recorded, not silent.** A cell skipped and forgotten runs an old version indefinitely,
+        and the drift is discovered when an API it does not have is called.
+      tags: [platform-ops]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [onPremise, blackoutWindow, tenantRequested, unreachable, knownIncompatibility] }
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Skipped, and recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
   /releases:
     get:
       operationId: listReleases
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List releases
       tags: [release]
@@ -120,6 +167,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience: [staff]
       summary: Cut a release
       description: >
         A release names the component versions that ship together and the migrations they
@@ -161,6 +209,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a release with its rollout state
       tags: [release]
@@ -187,6 +236,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience: [staff]
       summary: Reject a release back a stage
       description: >
         Staging promotion is where a bad release is stopped, and stopping it needs to be as easy as promoting it.
@@ -226,6 +276,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience: [staff]
       summary: Withdraw a release
       description: >
         Distinct from a rollback. The rollout state handles the mechanics of reversing a deployment; this records the decision that the artefact should never ship again.
@@ -265,6 +316,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience: [staff]
       summary: Promote a release to the next environment
       description: >
         Dev to staging to production, in order. Skipping an environment is refused.
@@ -326,6 +378,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Whether a release can be promoted, and what blocks it
       description: >
@@ -349,6 +402,7 @@ paths:
       operationId: listRollouts
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List rollouts
       description: >
@@ -389,6 +443,7 @@ paths:
       operationId: getRollout
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Rollout progress per cell
       description: >
@@ -418,6 +473,7 @@ paths:
       operationId: startRollout
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience: [staff]
       summary: Start or continue a rollout
       description: >
         Begins at the canary and continues from it once held. **The canary should be a dedicated cell or the smallest shared one** — a canary that is itself a busy shared cell risks many tenants (ADR-0001).
@@ -456,6 +512,7 @@ paths:
       operationId: pauseRollout
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience: [staff]
       summary: Halt a rollout in progress
       description: >
         Stops before the next cell. Cells already updated stay updated — this is a pause, not
@@ -493,6 +550,7 @@ paths:
       operationId: rollbackRollout
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience: [staff]
       summary: Roll a rollout back
       description: >
         Reverts application versions and, where the release carried migrations, runs their
@@ -542,6 +600,7 @@ paths:
       operationId: listMigrations
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The migration register
       description: >
@@ -581,6 +640,7 @@ paths:
       operationId: planMigration
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience: [staff]
       summary: Plan a migration run without applying it
       description: >
         **The safety step.** Computes, against actual cell state rather than assumption: which
@@ -594,6 +654,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -625,6 +687,7 @@ paths:
       operationId: applyMigration
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience: [staff]
       summary: Apply a planned migration run
       description: >
         Takes a plan id, so what is applied is what was reviewed. A plan computed against
@@ -686,6 +749,7 @@ paths:
       operationId: getMigrationRun
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Migration run progress per cell
       tags: [migration]
@@ -711,6 +775,7 @@ paths:
       operationId: rollbackMigrationRun
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience: [staff]
       summary: Roll a migration run back
       description: >
         Runs each migration's rollback section in reverse order against the cells that
@@ -749,6 +814,7 @@ paths:
       operationId: getVersionSkew
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Schema and application version across every cell
       description: >
@@ -773,6 +839,7 @@ paths:
       operationId: listEnvironments
       x-ticvai-consumed-by:
         - "P09 ADM-028 Environment Registry"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The environment registry
       tags: [environment]
@@ -793,6 +860,7 @@ paths:
       operationId: registerEnvironment
       x-ticvai-consumed-by:
         - "P09 ADM-028 Environment Registry"
+      x-ticvai-audience: [staff]
       summary: Register an environment
       tags: [environment]
       x-ticvai-permission: PLATFORM_RELEASE_MANAGE
@@ -819,6 +887,7 @@ paths:
       operationId: listUpgradeSchedules
       x-ticvai-consumed-by:
         - "P09 ADM-025 Tenant Upgrade Scheduler"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Scheduled tenant upgrades
       description: >
@@ -843,6 +912,7 @@ paths:
       operationId: scheduleTenantUpgrade
       x-ticvai-consumed-by:
         - "P09 ADM-025 Tenant Upgrade Scheduler"
+      x-ticvai-audience: [staff]
       summary: Schedule or defer a tenant upgrade
       tags: [notice]
       x-ticvai-permission: PLATFORM_RELEASE_MANAGE
@@ -876,6 +946,7 @@ paths:
         - "P09 ADM-026 End-of-Support Notice Management"
         - "P09 ADM-035 Support & Escalation Console"
         - "P09 ADM-036 Platform Notification Broadcast"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: End-of-support notices
       tags: [notice]
@@ -899,6 +970,7 @@ paths:
         - "P09 ADM-026 End-of-Support Notice Management"
         - "P09 ADM-035 Support & Escalation Console"
         - "P09 ADM-036 Platform Notification Broadcast"
+      x-ticvai-audience: [staff]
       summary: Publish an end-of-support notice
       description: >
         Names the version, the date support ends, and which tenants are affected. Affected

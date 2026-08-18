@@ -13,7 +13,7 @@ you say in a standup; the full name is what you put in a document.
 |---|---|---|---|---|---|---|
 | P01 | **Guest Web** | Storefront | guest-app | web | `guest-web` | yes |
 | P02 | **Guest App** | Mobile | guest-app | mobileApp | `guest-app` | yes |
-| P03 | **Guest Kiosk** | Self-Service | guest-app | kiosk | `guest-app` | yes |
+| P05 | **Guest Kiosk** | Self-Service | guest-app | kiosk | `guest-app` | yes |
 | P04 | **Staff POS** | Terminal and Tablet | staff | posTerminal | `venue-pos` | yes |
 | P06 | **Staff App** | Operations | staff | mobileApp | `venue-staff-app` | yes |
 | P07 | **Staff Scanner** | Access Control | staff | handheld | `venue-scanner` | yes |
@@ -30,7 +30,7 @@ you say in a standup; the full name is what you put in a document.
 |---|---|---|---|---|
 | P01 | Guest Web — Storefront | browser | CDN + edge | continuous |
 | P02 | Guest App — Mobile | iOS / Android native | App Store + Play, tenant developer account | fortnightly, gated by review |
-| P03 | Guest Kiosk — Self-Service | kiosk hardware, kiosk-mode shell | device management push | monthly, out of hours |
+| P05 | Guest Kiosk — Self-Service | kiosk hardware, kiosk-mode shell | device management push | monthly, out of hours |
 | P04 | Staff POS — Terminal and Tablet | POS terminal — Windows or Android | device management push | monthly, never during trading |
 | P06 | Staff App — Operations | iOS / Android native | MDM, not a public store | fortnightly |
 | P07 | Staff Scanner — Access Control | rugged handheld — Android | MDM | monthly, never on an event day |
@@ -47,7 +47,7 @@ you say in a standup; the full name is what you put in a document.
 |---|---|---|---|---|
 | P01 | Guest Web — Storefront | public internet, unmanaged | no | no |
 | P02 | Guest App — Mobile | mobile data, intermittent | no | **yes** |
-| P03 | Guest Kiosk — Self-Service | venue LAN, generally reliable | no | no |
+| P05 | Guest Kiosk — Self-Service | venue LAN, generally reliable | no | no |
 | P04 | Staff POS — Terminal and Tablet | venue LAN with expected outages | **mandatory** | no |
 | P06 | Staff App — Operations | venue wifi, dead zones expected | yes | no |
 | P07 | Staff Scanner — Access Control | must function with none | **mandatory** | no |
@@ -64,7 +64,7 @@ you say in a standup; the full name is what you put in a document.
 |---|---|---|---|---|
 | P01 | Guest Web — Storefront | 29 | 29 | 29 |
 | P02 | Guest App — Mobile | 60 | 62 | 62 |
-| P03 | Guest Kiosk — Self-Service | — | — | — |
+| P05 | Guest Kiosk — Self-Service | — | — | — |
 | P04 | Staff POS — Terminal and Tablet | — | 10 | 10 |
 | P06 | Staff App — Operations | 50 | — | — |
 | P07 | Staff Scanner — Access Control | — | — | — |

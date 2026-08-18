@@ -33,9 +33,13 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 STATES = ROOT / "states"
 EVENTS = ROOT / "events"
-CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+# The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
+# outside the package, so every validator passed for whoever had that repo checked out and read
+# nothing for anyone working from the zip — which is the worst failure a checker can have, because
+# it is silent and it looks like success.
+CONTRACTS = ROOT / "contracts"
 if not CONTRACTS.exists():
-    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+    CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
@@ -51,7 +55,7 @@ def check_duplicate_paths() -> None:
     import re as _re
     for f in list((CONTRACTS / "spine").glob("*.yaml")) + list((CONTRACTS / "satellite").glob("*.yaml")):
         seen: set[str] = set()
-        for m in _re.finditer(r"^  (/[^\s:]*):\s*$", f.read_text(), _re.M):
+        for m in _re.finditer(r"^  (/[^\s:]*):\s*$", f.read_text(encoding="utf-8"), _re.M):
             if m.group(1) in seen:
                 ERRORS.append(f"{f.name}: path '{m.group(1)}' declared twice — YAML keeps the "
                               "last and drops the first, silently")
@@ -65,11 +69,21 @@ def load_contracts() -> tuple[dict[str, list[str]], set[str]]:
     if not CONTRACTS.exists():
         return enums, ops
     for f in list((CONTRACTS / "spine").glob("*.yaml")) + list((CONTRACTS / "satellite").glob("*.yaml")):
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         ctx = f.stem
         for name, sch in ((doc.get("components") or {}).get("schemas") or {}).items():
-            if isinstance(sch, dict) and sch.get("type") == "string" and "enum" in sch:
+            if not isinstance(sch, dict):
+                continue
+            if sch.get("type") == "string" and "enum" in sch:
                 enums[f"{ctx}.{name}"] = sch["enum"]
+            # A lifecycle declared inline on a property rather than as a named enum. Thirty-one
+            # of these existed on 17 August and the checker had never seen one, because it only
+            # looked for schemas called *Status. `Payment.status` and `Refund.status` are two of
+            # them — an object's lifecycle is a lifecycle wherever it is written down.
+            for pname, prop in (sch.get("properties") or {}).items():
+                if (isinstance(prop, dict) and "enum" in prop
+                        and pname.lower() in ("status", "state")):
+                    enums[f"{ctx}.{name}.{pname}"] = prop["enum"]
         for item in (doc.get("paths") or {}).values():
             if isinstance(item, dict):
                 for verb, op in item.items():
@@ -87,15 +101,22 @@ def main() -> int:
 
     catalogued = {}
     for f in event_files:
-        e = yaml.safe_load(f.read_text())
+        e = yaml.safe_load(f.read_text(encoding="utf-8"))
         catalogued[e["name"]] = e
 
     emitted: dict[str, list[str]] = {}
     print(f"checking {len(state_files)} state model(s) and {len(event_files)} event(s)")
     print(f"  against {len(enums)} contract enums and {len(ops)} operations\n")
 
+    modelled = {f"{d['contract']}.{d['enum']}"
+                for d in (yaml.safe_load(f.read_text(encoding="utf-8")) for f in state_files)}
+    for key, values in sorted(enums.items()):
+        if key in modelled or key.count(".") < 2:
+            continue
+        WARNINGS.append(f"{key} is a lifecycle with {len(values)} states and no state model")
+
     for f in state_files:
-        d = yaml.safe_load(f.read_text())
+        d = yaml.safe_load(f.read_text(encoding="utf-8"))
         name = f.name
         key = f"{d['contract']}.{d['enum']}"
         states = {t["from"] for t in d["transitions"]} | {t["to"] for t in d["transitions"]}

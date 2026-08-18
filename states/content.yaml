@@ -5,6 +5,8 @@
 entity: White-label content
 contract: white-label
 enum: ContentStatus
+enumKind: named
+enumSchema: ContentStatus
 owner: whitelabel
 initial:
 - draft

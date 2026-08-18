@@ -22,8 +22,12 @@ packages:
 - api-client
 contracts:
 - access
+- ai
 - catalogue
+- cross-cell
+- finance
 - fnb
+- games
 - identity
 - marketing-crm
 - orders
@@ -31,12 +35,11 @@ contracts:
 - queue
 - retail
 - seating
-- tenancy
 - white-label
-screenCount: 76
+screenCount: 80
 byWave:
-  wave1: 20
-  wave2: 39
+  wave1: 21
+  wave2: 42
   wave3: 17
 screens:
 - id: GST-001
@@ -159,6 +162,12 @@ screens:
   component: apps/guest-app/src/routes/general/MaintenanceUpgradePageDetail.tsx
   wave: 1
   status: notStarted
+- id: GST-063
+  name: Search
+  route: /search
+  component: apps/guest-app/src/routes/Search.tsx
+  wave: 1
+  status: notStarted
 - id: GST-011
   name: Wallet Overview
   route: /general/wallet-overview
@@ -199,6 +208,12 @@ screens:
   name: Interactive Map
   route: /general/interactive-map
   component: apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx
+  wave: 2
+  status: notStarted
+- id: GST-022
+  name: Attraction Wait Times
+  route: /general/attraction-wait-times
+  component: apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx
   wave: 2
   status: notStarted
 - id: GST-024
@@ -309,6 +324,12 @@ screens:
   component: apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx
   wave: 2
   status: notStarted
+- id: GST-064
+  name: Loyalty & Rewards
+  route: /loyalty-rewards
+  component: apps/guest-app/src/routes/LoyaltyRewards.tsx
+  wave: 2
+  status: notStarted
 - id: KSK-001
   name: Attract Loop
   route: /sell/attract-loop
@@ -393,6 +414,12 @@ screens:
   component: apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx
   wave: 2
   status: notStarted
+- id: KSK-015
+  name: Assistant
+  route: /kiosk/assistant
+  component: apps/guest-app/src/routes/Assistant.tsx
+  wave: 2
+  status: notStarted
 - id: GST-018
   name: Add to Calendar / Reminders
   route: /general/add-to-calendar-reminders
@@ -403,12 +430,6 @@ screens:
   name: Saved Items / Wishlist
   route: /general/saved-items-wishlist
   component: apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx
-  wave: 3
-  status: notStarted
-- id: GST-022
-  name: Attraction Wait Times
-  route: /general/attraction-wait-times
-  component: apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx
   wave: 3
   status: notStarted
 - id: GST-023
@@ -493,5 +514,11 @@ screens:
   name: Shop & Drop Collection
   route: /in-venue-experience/shop-and-drop-collection
   component: apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+  wave: 3
+  status: notStarted
+- id: GST-065
+  name: Newsletter & Preferences
+  route: /newsletter-preferences
+  component: apps/guest-app/src/routes/NewsletterPreferences.tsx
   wave: 3
   status: notStarted

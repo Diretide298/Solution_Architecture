@@ -5,6 +5,8 @@
 entity: Release
 contract: platform-ops
 enum: ReleaseStatus
+enumKind: named
+enumSchema: ReleaseStatus
 owner: control
 initial:
 - draft

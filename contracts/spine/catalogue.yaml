@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 44
+  x-ticvai-screen-count: 45
   x-ticvai-tier: spine
   x-ticvai-module: "1 — Ticketing Catalogue"
   x-ticvai-requirements: 312
@@ -12,7 +12,7 @@ info:
     - "P04 POS"
     - "P01 Guest Web"
     - "P02 Guest App"
-    - "P03 Kiosk"
+    - "P05 Kiosk"
     - "P10 Partner Portal"
   description: >
     ## What this contract covers
@@ -25,7 +25,7 @@ info:
     | **Matrix domain** | 1 — Ticketing Catalogue |
     | **Requirements** | ~312 |
     | **Capabilities** | C20, C79, C80, C81, C84, C85, C102, C103, C104 |
-    | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App · P03 Kiosk · P10 Partner Portal |
+    | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App · P05 Kiosk · P10 Partner Portal |
 
     ## How to read this file
 
@@ -113,10 +113,68 @@ tags:
 
 paths:
   # ---------------------------------------------------------------- products
+  /search:
+    get:
+      operationId: searchCatalogue
+      x-ticvai-consumed-by:
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-003 Search Results"
+        - "P02 GST-063 Search"
+      x-ticvai-audience: [guest]
+      summary: Find something by name
+      description: >
+        **The guest app browses by category and cannot search.** On a venue with two hundred
+        products that is the difference between finding a thing and giving up.
+
+        Distinct from `semanticSearch`, which is AI and retrieves from documents. This is a
+        keyword search over the sellable catalogue, and it works with no AI configured — a
+        venue without an assistant still needs a search box.
+
+        Scoped to what is on sale at the venue and channel, so a guest never finds a product
+        they cannot buy.
+      tags: [catalogue]
+      x-ticvai-permission: null   # anyone browsing
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 2 }
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { type: string, enum: [product, event, attraction, bundle, membership, merchandise, menuItem] }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string, format: uuid }
+                    kind: { type: string }
+                    name: { type: string }
+                    summary: { type: string }
+                    fromPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                    isAvailable:
+                      type: boolean
+                      description: >
+                        **Shown rather than filtered out.** A guest searching for a sold-out
+                        attraction should learn it is sold out, not that it does not exist.
+
   /donation-campaigns:
     get:
       operationId: listDonationCampaigns
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-audience: [staff]
       summary: Campaigns a guest can give to
       description: >
         1.1.128–1.1.133. **Multiple campaigns may run at once and a single transaction may give
@@ -138,6 +196,7 @@ paths:
 
     post:
       operationId: createDonationCampaign
+      x-ticvai-audience: [staff]
       summary: Create a campaign
       description: >
         Fixed amounts, a free amount, or round-up (1.1.129). **The amounts are configuration, not
@@ -174,6 +233,7 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateDonationCampaign
+      x-ticvai-audience: [staff]
       summary: Amend or close a campaign
       description: >
         **Closing does not reverse donations already given.** A campaign that ended still has
@@ -200,6 +260,7 @@ paths:
   /waitlist-entries:
     get:
       operationId: listWaitlistEntries
+      x-ticvai-audience: [staff]
       summary: Who is waiting for capacity
       description: >
         1.1.25. **Not the same as a queue** (ADR-0012). A queue is people standing at a ride; a
@@ -225,6 +286,7 @@ paths:
 
     post:
       operationId: joinWaitlist
+      x-ticvai-audience: [guest]
       summary: Ask to be told if capacity frees up
       description: >
         1.1.25, 4.9.17. **Offered only where the session is genuinely sold out** — a waitlist on
@@ -234,7 +296,6 @@ paths:
         anyone else, because holding capacity for a waitlist is the same as not releasing it.
       tags: [catalogue]
       x-ticvai-permission: null   # a guest, before or after signing in
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -267,13 +328,15 @@ paths:
         schema: { type: string, format: uuid }
     delete:
       operationId: leaveWaitlist
+      x-ticvai-audience: [guest]
       summary: Stop waiting
       tags: [catalogue]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
           description: Left
@@ -286,6 +349,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: offerWaitlistCapacity
+      x-ticvai-audience: [staff]
       summary: Tell a waiting guest that capacity appeared
       description: >
         Triggered when a cart expires, an order is refunded, or capacity is added.
@@ -310,15 +374,36 @@ paths:
   /products:
     get:
       operationId: listProducts
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-003 Search Results"
+        - "P01 WEB-022 Membership Plans"
+        - "P01 WEB-035 Multi-Currency & Pricing"
+        - "P02 GST-002 Explore Categories"
+        - "P02 GST-003 Attractions List"
+        - "P02 GST-005 What's On"
+        - "P02 GST-015 Memberships"
+        - "P02 GST-021 Interactive Map"
+        - "P02 GST-038 Digital Companion Mode"
+        - "P02 GST-044 Multi-Currency & Pricing"
+        - "P02 GST-050 Resource Booking – Cabana"
+        - "P02 GST-051 Plan Your Adventure – Start"
+        - "P02 GST-052 Suggested Itineraries"
+        - "P02 GST-053 Build Your Own Itinerary"
+        - "P02 GST-054 AI Optimized Itinerary"
+        - "P02 GST-058 Resource Availability (Cabana)"
+        - "P02 GST-059 Plan My Day – In Progress"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-003 What are you buying"
+        - "P05 KSK-015 Assistant"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: replica
       summary: List products
       description: >
@@ -365,6 +450,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Create a product
       tags: [product]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -395,8 +481,11 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getProduct
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-004 Event / Attraction Detail"
+        - "P01 WEB-022 Membership Plans"
+        - "P02 GST-004 Attraction Details"
+        - "P02 GST-006 Event / Exhibition Details"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
         - "P06 EMP-034 Walk-up sale"
@@ -404,6 +493,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: replica
       summary: Read a product
       tags: [product]
@@ -428,12 +518,15 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Update a product
       tags: [product]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -464,6 +557,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Set the attribute axes for a product
       description: >
         Attributes are axes that generate sellable variants. Changing them triggers variant
@@ -522,15 +616,17 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listProductVariants
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-004 Choose tickets"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: replica
       summary: List generated variants
       tags: [product]
@@ -562,6 +658,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: List price lists
       tags: [pricing]
@@ -593,6 +690,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Create a price list
       tags: [pricing]
       x-ticvai-permission: PRICE_CONFIGURE
@@ -625,6 +723,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: List prices in a list
       tags: [pricing]
@@ -653,6 +752,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Set prices in bulk
       description: >
         Currency must match the region's currency and scale. A price in a currency the
@@ -702,6 +802,7 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List events
       tags: [event]
@@ -733,6 +834,7 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
       summary: Create an event
       tags: [event]
       x-ticvai-permission: EVENT_CONFIGURE
@@ -761,13 +863,17 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listPerformances
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-004 Event / Attraction Detail"
+        - "P02 GST-005 What's On"
+        - "P02 GST-007 Select Date & Time"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Session Calendar"
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: List performances of an event
       tags: [event]
@@ -805,6 +911,7 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
       summary: Create performances, singly or by schedule
       tags: [event]
       x-ticvai-permission: PERFORMANCE_CONFIGURE
@@ -840,6 +947,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: List capacity envelopes
       tags: [capacity]
@@ -873,6 +981,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
       summary: Create a capacity envelope
       tags: [capacity]
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -906,6 +1015,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: primary
       summary: Capacity allocated to each channel
       description: >
@@ -936,6 +1046,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
       summary: Allocate envelope capacity across channels
       description: >
         Allocations may not exceed envelope capacity in total. An unallocated remainder forms
@@ -992,6 +1103,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
       summary: Return unsold channel allocation to the general pool
       description: >
         The standard mechanism for freeing distribution holds close to a performance. May be
@@ -1027,11 +1139,14 @@ paths:
   /catalogue/bundles:
     get:
       operationId: listCatalogueBundles
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
+        - "P02 GST-052 Suggested Itineraries"
+        - "P02 GST-056 Bundle Package"
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: List published bundles
       tags: [bundle]
@@ -1053,6 +1168,7 @@ paths:
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff]
       summary: Compute, sign and publish a catalogue bundle
       description: >
         Snapshots current catalogue state for a venue, signs it, and publishes it for
@@ -1104,6 +1220,7 @@ paths:
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Pull the current bundle for this workstation's venue
       description: >
@@ -1150,6 +1267,7 @@ paths:
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff]
       summary: Report that a workstation applied a bundle
       description: >
         Lets the back office see which terminals are current and which are drifting toward
@@ -1185,6 +1303,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # a stale lease list oversells contended capacity
       summary: List leases
       description: >
@@ -1224,10 +1343,11 @@ paths:
 
     post:
       operationId: acquireLease
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-005 Choose a session"
         - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff, guest]
       summary: Acquire an inventory lease
       description: >
         Grants the caller N units of a capacity envelope for a TTL. The holder may sell
@@ -1274,10 +1394,10 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     delete:
       operationId: releaseLease
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
       summary: Return unsold units
       description: >
         Consumed units are reported and retained; the remainder returns to the pool
@@ -1287,6 +1407,8 @@ paths:
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1315,6 +1437,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
       summary: Extend a lease TTL
       description: >
         Reports consumption so far and extends the hold. A holder renews while the link is
@@ -1362,6 +1485,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
       summary: Reclaim a stranded lease
       description: >
         Supervisor action for a lease held by a terminal that has died. Reported consumption
@@ -1396,10 +1520,18 @@ paths:
   /availability:
     get:
       operationId: getAvailability
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Session Selection"
+        - "P02 GST-004 Attraction Details"
+        - "P02 GST-007 Select Date & Time"
+        - "P02 GST-050 Resource Booking – Cabana"
+        - "P02 GST-058 Resource Availability (Cabana)"
         - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-004 Choose tickets"
+        - "P05 KSK-005 Choose a session"
+        - "P05 KSK-015 Assistant"
         - "P10 PTR-007 Availability Search"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: primary
       summary: Live remaining capacity
       description: >
@@ -1465,6 +1597,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Move a product through its lifecycle
       description: >
         Draft → review → approved → live → withdrawn → archived.
@@ -1532,6 +1665,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: External identifiers for a product
       description: >
@@ -1561,6 +1695,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Set external identifiers
       tags: [product]
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1605,6 +1740,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Resolve a partner code to a product
       description: >
@@ -1642,6 +1778,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Read a price list
       tags: [pricing]
@@ -1662,6 +1799,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Amend a price list
       description: >
         Currency and scale are immutable once prices exist. Changing them would silently
@@ -1671,6 +1809,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1707,6 +1847,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
       summary: Copy a price list, optionally with an adjustment
       description: >
         Next season's prices from this season's, uplifted by a percentage. The alternative is
@@ -1761,6 +1902,7 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an event
       tags: [event]
@@ -1784,12 +1926,15 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
       summary: Amend an event
       tags: [event]
       x-ticvai-permission: EVENT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1816,14 +1961,15 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getPerformance
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P02 GST-006 Event / Exhibition Details"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Session Calendar"
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: Read a performance
       tags: [event]
@@ -1848,6 +1994,7 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
       summary: Amend a performance
       description: >
         Moving a performance that has sold tickets is refused. Use cancellation, which
@@ -1858,6 +2005,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1897,6 +2046,7 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
       summary: Cancel a performance
       description: >
         Stops sales, notifies every holder, and queues a bulk refund for approval. The refund
@@ -1946,6 +2096,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
       summary: Amend an envelope
       description: >
         Capacity may be increased freely. Reducing it below what has already sold is refused —
@@ -1955,6 +2106,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1982,6 +2135,7 @@ paths:
       operationId: listEntitlementTemplates
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List entitlement templates
       description: >
@@ -2006,6 +2160,7 @@ paths:
       operationId: createEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Create an entitlement template
       tags: [entitlement]
@@ -2035,6 +2190,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: suspendEntitlement
+      x-ticvai-audience: [staff]
       summary: Suspend or reinstate an entitlement
       description: >
         Fraud, a chargeback, a behavioural ban. Denies at the gate with a stated reason rather
@@ -2205,7 +2361,7 @@ components:
         channels:
           type: array
           description: 1.1.133. Where it may be solicited — POS, kiosk, web, app.
-          items: { $ref: '#/components/schemas/SalesChannel' }
+          items: { $ref: '../shared/common.yaml#/components/schemas/SalesChannel' }
         isActive: { type: boolean }
         validFrom: { type: string, format: date-time }
         validTo: { type: string, format: date-time, nullable: true }

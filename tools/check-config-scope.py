@@ -26,9 +26,13 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+# The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
+# outside the package, so every validator passed for whoever had that repo checked out and read
+# nothing for anyone working from the zip — which is the worst failure a checker can have, because
+# it is silent and it looks like success.
+CONTRACTS = ROOT / "contracts"
 if not CONTRACTS.exists():
-    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+    CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
@@ -62,7 +66,7 @@ def main() -> int:
     by_scope: dict[str, int] = {}
 
     for f in files:
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         for path, item in (doc.get("paths") or {}).items():
             if not isinstance(item, dict):
                 continue

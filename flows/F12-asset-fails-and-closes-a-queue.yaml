@@ -8,7 +8,6 @@
 id: F12
 name: Asset fails and closes a queue
 actor: technician
-capability: C31
 wave: 2
 frequency: weekly
 criticality: safety
@@ -108,3 +107,6 @@ exitStates:
   description: Awaiting parts, asset out of service
 - state: escalated
   description: Safety incident referred
+primaryContract: maintenance
+contracts:
+- maintenance

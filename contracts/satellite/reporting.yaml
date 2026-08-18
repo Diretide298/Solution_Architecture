@@ -114,6 +114,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: analytical
       summary: List available report definitions
       description: >
@@ -160,6 +161,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       summary: Create a custom report definition
       description: >
         The self-service builder. A definition names its data source, columns, filters,
@@ -213,6 +215,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: analytical
       summary: Read a report definition
       tags: [catalogue]
@@ -239,6 +242,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       summary: Publish a new version of a definition
       description: >
         Definitions are versioned. Historic executions keep the version they ran against, so
@@ -248,6 +252,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -271,6 +277,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       summary: Retire a report definition
       description: >
         Retired rather than deleted where executions or schedules reference it. History must
@@ -280,6 +287,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Retired }
         '409':
@@ -291,6 +300,7 @@ paths:
   /report-fields:
     get:
       operationId: listReportFields
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Fields available for a data source
       description: >
@@ -334,6 +344,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       summary: Run a report
       description: >
         Executes against the **reporting replica**, never the primary.
@@ -377,6 +388,7 @@ paths:
   /report-executions:
     get:
       operationId: listReportExecutions
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: List executions
       tags: [execution]
@@ -418,6 +430,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getReportExecution
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Execution status and result
       description: >
@@ -438,12 +451,15 @@ paths:
 
     delete:
       operationId: cancelReportExecution
+      x-ticvai-audience: [staff]
       summary: Cancel a running execution
       tags: [execution]
       x-ticvai-permission: REPORT_VIEW_VENUE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Cancelled }
         '409':
@@ -460,6 +476,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getReportResult
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Paged result rows
       tags: [execution]
@@ -486,6 +503,7 @@ paths:
   /report-schedules:
     get:
       operationId: listReportSchedules
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: List scheduled reports
       tags: [schedule]
@@ -512,6 +530,7 @@ paths:
 
     post:
       operationId: createReportSchedule
+      x-ticvai-audience: [staff]
       summary: Schedule a report
       description: >
         Runs under the **owner's** permissions, not the recipients'. A schedule is a standing
@@ -551,12 +570,15 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateReportSchedule
+      x-ticvai-audience: [staff]
       summary: Amend, pause or resume a schedule
       tags: [schedule]
       x-ticvai-permission: REPORT_SCHEDULE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -580,12 +602,15 @@ paths:
 
     delete:
       operationId: deleteReportSchedule
+      x-ticvai-audience: [staff]
       summary: Delete a schedule
       tags: [schedule]
       x-ticvai-permission: REPORT_SCHEDULE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Deleted }
 
@@ -598,6 +623,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: exportReportResult
+      x-ticvai-audience: [staff]
       summary: Export a completed result
       description: >
         Asynchronous. Returns a signed, expiring download link once ready.
@@ -607,6 +633,7 @@ paths:
         event someone should own.
       tags: [export]
       x-ticvai-permission: REPORT_EXPORT
+      x-ticvai-permission-escalated: REPORT_EXPORT_PII   # where the export contains personal data (ADR-0023)
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -649,6 +676,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
       operationId: getReportExport
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Export status and download link
       tags: [export]
@@ -670,6 +698,7 @@ paths:
       operationId: listDashboards
       x-ticvai-consumed-by:
         - "P09 ADM-031 Security & Compliance Dashboard"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: List dashboards
       tags: [dashboard]
@@ -690,6 +719,7 @@ paths:
       operationId: createDashboard
       x-ticvai-consumed-by:
         - "P09 ADM-031 Security & Compliance Dashboard"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: tenant
       summary: Create a dashboard
       description: >
@@ -730,6 +760,7 @@ paths:
       operationId: getDashboard
       x-ticvai-consumed-by:
         - "P09 ADM-031 Security & Compliance Dashboard"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Read a dashboard with tile data
       tags: [dashboard]
@@ -754,6 +785,7 @@ paths:
       operationId: updateDashboard
       x-ticvai-consumed-by:
         - "P09 ADM-031 Security & Compliance Dashboard"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: tenant
       summary: Update a dashboard
       tags: [dashboard]
@@ -761,6 +793,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -786,6 +820,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-ai-capability: naturalLanguageQuery
       summary: Natural-language reporting query
       description: >
@@ -812,6 +847,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -855,6 +892,7 @@ paths:
         - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
       summary: Save a natural-language answer as a report definition
       description: >
         Turns a one-off question into something schedulable. The generated query becomes the

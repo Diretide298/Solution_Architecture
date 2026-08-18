@@ -5,6 +5,8 @@
 entity: Shift variance review
 contract: finance
 enum: VarianceReviewStatus
+enumKind: named
+enumSchema: VarianceReviewStatus
 owner: ledger
 initial:
 - notRequired

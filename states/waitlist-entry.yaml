@@ -5,6 +5,8 @@
 entity: Waitlist entry
 contract: catalogue
 enum: WaitlistStatus
+enumKind: named
+enumSchema: WaitlistStatus
 owner: catalogue
 initial:
 - waiting

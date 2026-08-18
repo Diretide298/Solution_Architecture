@@ -8,7 +8,6 @@
 id: F20
 name: A manager asks a question and gets an answer
 actor: venueManager
-capability: C57
 wave: 1
 frequency: daily
 criticality: operational
@@ -89,3 +88,7 @@ exitStates:
   description: Proposed a change, awaiting approval
 - state: abandoned
   description: Nothing to retrieve
+primaryContract: reporting
+contracts:
+- reporting
+- ai

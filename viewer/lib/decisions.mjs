@@ -2,7 +2,7 @@
 //
 // Everything else the viewer reads is a machine-readable artefact: contracts,
 // YAML, a workbook, CSV. This folder is prose, and prose is where the reasons
-// live. 18 ADRs say *why* the shape is the shape; the registers say what was
+// live. The ADRs say *why* the shape is the shape; the registers say what was
 // counted; `architecture/specs/permission-resolution.md` states the authorisation
 // rule the whole platform rests on.
 //
@@ -46,6 +46,13 @@ function field(text, key) {
   return match ? match[1].replace(/\s+/g, ' ').trim() : null;
 }
 
+/** `Proposed · 17 August 2026` — the date six ADRs write inline rather than as
+ *  a field of its own. Long form only, which is the only form in use here. */
+function dateFromStatus(status) {
+  const m = /(\d{1,2}\s+[A-Za-z]+\s+\d{4})/.exec(status ?? '');
+  return m ? m[1] : null;
+}
+
 /** Every pipe table in a document, as { headers, rows }. */
 function tables(text) {
   const out = [];
@@ -65,11 +72,55 @@ function tables(text) {
   return out;
 }
 
+/**
+ * A block sitting under a lead-in sentence, flattened into that sentence: a
+ * blockquote loses its `>` and joins up, a list becomes its items separated by
+ * `; `. Inline emphasis is left as written — lead paragraphs already carry it
+ * (sprint-1.md bolds a number mid-sentence) and the pages that show them cope.
+ */
+function payload(block) {
+  const lines = block.split('\n');
+  if (block.startsWith('>')) return lines.map((l) => l.replace(/^\s*>\s?/, '').trim()).join(' ');
+  if (!/^\s*(?:[-*+]|\d+[.)])\s/.test(block)) return block;
+  const items = [];
+  for (const line of lines) {
+    const item = /^\s*(?:[-*+]|\d+[.)])\s+(.*)$/.exec(line);
+    // a wrapped line continues the item above it rather than starting a new one
+    if (item) items.push(item[1].trim());
+    else if (items.length) items[items.length - 1] += ` ${line.trim()}`;
+  }
+  // '; ' between items, except after one that already closed itself — sprint-1's
+  // bullets are full sentences and ".;" is not punctuation
+  return items.reduce((out, item) =>
+    out ? `${out}${/[.!?]$/.test(out) ? ' ' : '; '}${item}` : item, '');
+}
+
 /** The lead paragraph — the sentence a document opens with, minus its heading. */
 function lead(text) {
   const body = text.replace(/^#[^\n]*\n/, '');
-  const para = body.split(/\n\s*\n/).find((p) => p.trim() && !/^[#|>*-]/.test(p.trim()));
-  return para ? para.trim().replace(/\s+/g, ' ').slice(0, 400) : '';
+  const blocks = body.split(/\n\s*\n/).map((b) => b.trim());
+  const at = blocks.findIndex((b) => b && !/^[#|>*-]/.test(b));
+  if (at < 0) return '';
+  let para = blocks[at];
+  // A paragraph ending in ':' is a promise, and what it promises is the block
+  // below — which is exactly the shape the filter above just skipped. ADR-0012
+  // opens its decision with "TICVAI builds:" and numbers the four things
+  // underneath; ADR-0016 says a cost was named "plainly:" and then quotes it.
+  // Stopping at the paragraph break printed the setup and dropped the point.
+  if (para.endsWith(':')) {
+    const next = blocks.slice(at + 1).find((b) => b && !/^([-*_])\1{2,}$/.test(b));
+    // A table is not a sentence. Its meaning is in the columns, and every
+    // one-line rendering of one reads worse than the bare colon does — ADR-0012's
+    // context table would flatten to "Q1; Q2; Q3". Deliberately left dangling.
+    if (next && !/^[|#]/.test(next) && !next.startsWith('```')) para += ` ${payload(next)}`;
+  }
+  const flat = para.replace(/\s+/g, ' ');
+  if (flat.length <= 400) return flat;
+  // Nothing reached the cap while a lead stopped at the colon; ADR-0012's four
+  // numbered items and sprint-1's bullets both pass it. A hard cut lands
+  // mid-word — "venue management carr" — which reads as corruption rather than
+  // as a limit, so the cut falls back to the last whole word and says so.
+  return `${flat.slice(0, 399).replace(/\s+\S*$/, '')}…`;
 }
 
 /** Markdown emphasis off a table cell. Not for data — `*` is a real value in a grant. */
@@ -170,13 +221,32 @@ async function readAdrs(root, problems) {
     const text = await readFile(path.join(dir, file), 'utf8').catch(() => '');
     if (!text) continue;
     const id = file.slice(0, 4);
-    const heading = /^#\s*ADR-\d+:\s*(.+)$/im.exec(text) ?? /^#\s*(.+)$/m.exec(text);
+    // ADR-0001..0015 head with a colon, 0016..0024 with an em dash. Matching
+    // only the colon left the fallback capturing the whole heading including
+    // the id, which app.js then prints a second time. Splitting on the first
+    // colon instead is worse, not better: ADR-0021 is
+    // "# ADR-0021 — Qdrant: one collection per embedding model", so a colon
+    // split silently drops the word the title is about.
+    const heading = /^#\s*(?:ADR-\d+\s*[:—–-]\s*)?(.+)$/im.exec(text);
     const status = field(text, 'Status');
     // "Accepted — split rule superseded by ADR-0014; isolation claim amended"
     // is one status line making three statements. The verdict is the first word;
     // the rest is the qualifier, and it is the part worth reading.
-    const verdict = status ? (/^\s*([A-Za-z]+)/.exec(status)?.[1] ?? null) : null;
-    const qualifier = status && verdict ? status.slice(verdict.length).replace(/^[\s—–-]+/, '') : '';
+    //
+    // The emphasis has to come off first. ADR-0001 was rewritten to
+    // "**Superseded** by ADR-0014 and ADR-0017" precisely so its supersession
+    // could not be missed, and a first-word match that cannot see past the
+    // asterisks returned null — which made `qualifier` empty, which made
+    // `partlySuperseded` false on every ADR, which removed the `part` badge
+    // that was the only signal the viewer had. The edit that made the
+    // supersession unmissable in the file made it invisible in the tool.
+    // tools/check-package.py:190 has always stripped emphasis before the same
+    // test, which is why the checker passed while the viewer did not.
+    const plainStatus = status ? status.replace(/[*_`]/g, '') : null;
+    const verdict = plainStatus ? (/^\s*([A-Za-z]+)/.exec(plainStatus)?.[1] ?? null) : null;
+    const qualifier = plainStatus && verdict
+      ? plainStatus.slice(plainStatus.indexOf(verdict) + verdict.length).replace(/^[\s—–·-]+/, '')
+      : '';
     const supersededBy = [...(status ?? '').matchAll(/ADR-(\d{4})/g)].map((m) => m[1]);
 
     if (status && !/accepted|superseded|proposed|withdrawn/i.test(status)) {
@@ -206,16 +276,28 @@ async function readAdrs(root, problems) {
       // — it reads as current in a list and is not current in the part that matters
       supersededBy,
       partlySuperseded: Boolean(qualifier && /supersede/i.test(qualifier)),
-      date: field(text, 'Date'),
+      // ADR-0019..0024 stopped writing a **Date:** field and put the date
+      // inline after a `·` in the status line instead. Both shapes are read,
+      // because six ADRs with no date is not a smaller problem than one.
+      date: field(text, 'Date') ?? dateFromStatus(plainStatus),
       closes: field(text, 'Closes'),
       withdraws: field(text, 'Withdraws'),
       constrains: (field(text, 'Constrains') ?? '').split('·').map((s) => s.trim()).filter(Boolean),
+      // Which domain lens this belongs to, stated rather than inferred. An ADR
+      // is prose and reaches nothing, so the graph can only match it on mention
+      // — and ADR-0021 decides how AI vectors are partitioned while discussing
+      // Qdrant and RLS, naming no operation in its summary. Declaration is the
+      // only thing that finds it.
+      domains: (field(text, 'Domains') ?? '').split(/[·,]/).map((s) => s.trim().toLowerCase()).filter(Boolean),
       supersedes: field(text, 'Supersedes'),
       decision: decision ? lead(`#\n${decision[1]}`) : lead(text),
       lead: lead(text),
-      // an ADR that was amended after acceptance is worth flagging in the list,
-      // because the accepted date is then not the date of what it now says
-      amended: /^##\s*Amendment/im.test(text),
+      // An ADR revised after acceptance is worth flagging, because the accepted
+      // date is then not the date of what it now says. Matching only
+      // "## Amendment" missed three same-day revisions written as "## Addendum",
+      // "# Addendum" and "# History" — including ADR-0020's, which records two
+      // cross-tenant defects found and fixed. Those read as never revised.
+      amended: /^#{1,3}\s*(Amendment|Addendum|History|Revision)/im.test(text),
       bytes: text.length,
     });
   }

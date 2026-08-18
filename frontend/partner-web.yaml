@@ -28,6 +28,7 @@ contracts:
 - promotions
 - reporting
 - seating
+- subscription
 screenCount: 21
 byWave:
   wave2: 11

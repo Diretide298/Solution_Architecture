@@ -65,6 +65,7 @@ paths:
         - "P06 EMP-022 My rota"
         - "P06 EMP-023 Swap request"
         - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
       summary: The rota
       description: >
         18.9.2. A supervisor sees the venue; a steward sees themselves. **The same operation,
@@ -107,6 +108,7 @@ paths:
         - "P06 EMP-022 My rota"
         - "P06 EMP-023 Swap request"
         - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
       summary: Put someone on the rota
       description: >
         Refused where the person already has an overlapping assignment, or lacks the role the
@@ -152,6 +154,7 @@ paths:
         - "P06 EMP-022 My rota"
         - "P06 EMP-023 Swap request"
         - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
       summary: Move or cancel an assignment
       tags: [rota]
       x-ticvai-permission: WORKFORCE_MANAGE
@@ -185,6 +188,7 @@ paths:
         - "P06 EMP-022 My rota"
         - "P06 EMP-023 Swap request"
         - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
       summary: Ask someone to take your shift
       description: >
         `EMP-023`. **Routes through `approvals`** rather than implementing its own — the
@@ -224,6 +228,7 @@ paths:
         - "P06 EMP-024 Clock in / out"
         - "P06 EMP-025 Break management"
         - "P08 BO-056 Time & Attendance"
+      x-ticvai-audience: [staff]
       summary: Who was here
       description: >
         18.9.1. **Against the rota, not on its own.** A list of clock-ins says nothing; a list
@@ -262,6 +267,7 @@ paths:
         - "P06 EMP-024 Clock in / out"
         - "P06 EMP-025 Break management"
         - "P08 BO-056 Time & Attendance"
+      x-ticvai-audience: [staff]
       summary: Clock in, clock out, or take a break
       description: >
         18.9.1 and `EMP-024`, `EMP-025`. **Offline-capable and timestamped on the device**, then
@@ -324,6 +330,7 @@ paths:
         - "P06 EMP-024 Clock in / out"
         - "P06 EMP-025 Break management"
         - "P08 BO-056 Time & Attendance"
+      x-ticvai-audience: [staff]
       summary: A supervisor corrects a record
       description: >
         Forgotten clock-outs and phones that died. **The original is kept and the amendment is
@@ -363,6 +370,7 @@ paths:
         - "P06 EMP-039 Announcements"
         - "P06 EMP-047 Emergency mode"
         - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
       summary: What staff have been told
       description: 18.9.3 and 18.9.5. `EMP-039`.
       tags: [announcements]
@@ -393,6 +401,7 @@ paths:
         - "P06 EMP-039 Announcements"
         - "P06 EMP-047 Emergency mode"
         - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
       summary: Tell staff something
       description: >
         18.9.3, 18.9.4, `EMP-038`. Targeted by venue, department or role.
@@ -438,6 +447,7 @@ paths:
         - "P06 EMP-039 Announcements"
         - "P06 EMP-047 Emergency mode"
         - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
       summary: Confirm you have read it
       description: >
         Queued offline. **An emergency acknowledgement that needs a network is one that does not
@@ -468,6 +478,7 @@ paths:
         - "P06 EMP-039 Announcements"
         - "P06 EMP-047 Emergency mode"
         - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
       summary: Who has acknowledged, and who has not
       description: >
         **The second list is the one that matters.** For an operational notice it measures

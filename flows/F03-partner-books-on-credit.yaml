@@ -5,7 +5,6 @@
 id: F03
 name: Partner books on credit
 actor: partner
-capability: C34
 wave: 2
 frequency: daily
 criticality: revenue
@@ -63,3 +62,7 @@ exitStates:
   description: Order raised on credit, vouchers issued
 - state: escalated
   description: Awaiting a credit override decision
+primaryContract: orders
+contracts:
+- orders
+- catalogue

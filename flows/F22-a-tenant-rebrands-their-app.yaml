@@ -8,7 +8,6 @@
 id: F22
 name: A tenant rebrands their app
 actor: venueManager
-capability: C71
 wave: 2
 frequency: rare
 criticality: operational
@@ -114,3 +113,7 @@ exitStates:
   description: Published to web, app awaits a store release
 - state: abandoned
   description: Rolled back
+primaryContract: white-label
+contracts:
+- white-label
+- assets

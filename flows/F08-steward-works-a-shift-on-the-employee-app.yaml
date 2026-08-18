@@ -8,7 +8,6 @@
 id: F08
 name: Steward works a shift on the employee app
 actor: supervisor
-capability: C11
 wave: 2
 frequency: daily
 criticality: operational
@@ -131,3 +130,9 @@ openQuestions:
 - '**CF-71 closed 17 August.** A task in this app is a work order — 18.2.x is Work Order Inbox, Accept,
   Reject, Start, Pause. Seven lifecycle operations were added to `maintenance` and rota, attendance
   and announcements went to a new `workforce` contract.'
+primaryContract: maintenance
+contracts:
+- maintenance
+- identity
+- shift
+- workforce

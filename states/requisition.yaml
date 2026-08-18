@@ -5,6 +5,8 @@
 entity: Requisition
 contract: inventory
 enum: RequisitionStatus
+enumKind: named
+enumSchema: RequisitionStatus
 owner: inventory
 initial:
 - draft

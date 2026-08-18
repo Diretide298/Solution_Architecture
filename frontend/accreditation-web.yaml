@@ -19,6 +19,7 @@ packages:
 - design-tokens
 - ui
 contracts:
+- approvals
 - queue
 screenCount: 8
 byWave:

@@ -69,6 +69,24 @@ components:
       schema: { type: string }
 
   schemas:
+
+    # ---------------------------------------------------------------------------------------
+    # `x-ticvai-audience` says WHO may call an operation. One field, a list, closed set:
+    # staff · guest · partner · public · anonymous · device · service.
+    #
+    # A list because the answer is genuinely plural. `cancelReservation` is called by staff
+    # cancelling anyone's and by a guest cancelling their own — the same operation, two audiences,
+    # and a scalar forces one of them to be a lie.
+    #
+    # **Audience and permission are orthogonal.** Audience says who may call; permission says what
+    # a staff caller must hold. `[staff, guest]` keeps its permission for the staff case and
+    # resolves to the caller's own data for a guest.
+    #
+    # Replaces `x-ticvai-auth` and `x-ticvai-guest-callable`, which answered the same question
+    # differently on 105 operations with only three carrying both (ADR-0025). `public` and
+    # `partner` did not exist in either, which is why an accreditation reviewer holding a real
+    # permission was classified as a guest.
+    # ---------------------------------------------------------------------------------------
     Money:
       type: object
       required: [amount, currency, scale]
@@ -86,6 +104,23 @@ components:
           type: integer
           minimum: 0
           maximum: 4
+
+    SalesChannel:
+      type: string
+      description: >
+        **Where a sale originated.** Referenced by `orders`, `catalogue` and `subscription` and
+        defined by none of them until 17 August — four `$ref`s pointing at nothing, which every
+        parser accepted because a missing local schema is not a YAML error.
+
+        Distinct from the platform code. **A channel is a commercial surface; a platform is a
+        codebase.** `guestApp` and `kiosk` are one app (ADR-0006) and two channels, because a
+        price list may be offered on one and not the other and the reporting must separate them.
+
+        `agent` is a sale made by a person on a guest's behalf — a call centre or a guest services
+        desk — and it is a channel rather than a POS because **the money and the attribution
+        differ even when the screen does not.**
+      enum: [web, guestApp, kiosk, pos, agent, partner, api, mobilePos]
+
 
     ScopeLevel:
       type: string

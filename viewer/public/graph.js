@@ -470,6 +470,17 @@ export class Graph {
       const rim = this.directed ? link.target.r * Math.min(1.8, Math.max(0.55, k)) + 2 : 0;
       const tip = { x: b.x - Math.cos(angle) * rim, y: b.y - Math.sin(angle) * rim };
 
+      // The head is filled outside the stroke's save/restore, so it cannot read
+      // strokeStyle back off the context — by then the restore has handed it
+      // back whatever was last set unsaved, which is the label halo. Both the
+      // line and the head read this instead. Keep the fill out here: inside, it
+      // would inherit the shadow an active link sets and bloom.
+      const stroke = active
+        ? link.color ?? (isLight ? 'rgba(124,58,237,.75)' : 'rgba(167,139,250,.75)')
+        : hasFocus
+          ? (isLight ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.035)')
+          : link.color ?? (isLight ? 'rgba(0,0,0,.11)' : 'rgba(255,255,255,.09)');
+
       ctx.save();
       if (active && this.directed) {
         ctx.shadowColor = link.color ?? (isLight ? 'rgba(124,58,237,.6)' : 'rgba(167,139,250,.6)');
@@ -481,14 +492,7 @@ export class Graph {
       ctx.lineWidth = link.width
         ? link.width * (active ? 2 : 1) * Math.min(1.7, Math.max(0.6, k))
         : Math.min(3.5, 0.5 + Math.log2(link.weight + 1) * 0.55) * Math.min(1.6, k);
-      if (active) {
-        ctx.strokeStyle = link.color ?? (isLight ? 'rgba(124,58,237,.75)' : 'rgba(167,139,250,.75)');
-      } else if (hasFocus) {
-        ctx.strokeStyle = isLight ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.035)';
-      } else {
-        ctx.strokeStyle =
-          link.color ?? (isLight ? 'rgba(0,0,0,.11)' : 'rgba(255,255,255,.09)');
-      }
+      ctx.strokeStyle = stroke;
       ctx.stroke();
       ctx.restore();
 
@@ -499,7 +503,7 @@ export class Graph {
         ctx.lineTo(tip.x - size * Math.cos(angle - 0.4), tip.y - size * Math.sin(angle - 0.4));
         ctx.lineTo(tip.x - size * Math.cos(angle + 0.4), tip.y - size * Math.sin(angle + 0.4));
         ctx.closePath();
-        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fillStyle = stroke;
         ctx.fill();
       }
     }
@@ -541,6 +545,10 @@ export class Graph {
         (k > 0.85 || node.type === 'file' || selected || node === this.hoverNode || node.degree > 12);
 
       if (labelWorthy) {
+        // Saved because the halo is a stroke in the background colour, and
+        // anything that read strokeStyle back off the context a frame later
+        // would paint itself out.
+        ctx.save();
         const label = node.name.length > 30 ? node.name.slice(0, 29) + '…' : node.name;
         ctx.globalAlpha = faded ? 0.2 : 1;
         ctx.font = `${node.type === 'file' ? '600 ' : ''}${Math.max(9, 11 * k)}px ui-sans-serif, system-ui, sans-serif`;
@@ -552,6 +560,7 @@ export class Graph {
         ctx.strokeText(label, p.x, y);
         ctx.fillStyle = selected || node === this.hoverNode ? text : dim;
         ctx.fillText(label, p.x, y);
+        ctx.restore();
       }
       ctx.globalAlpha = 1;
     }

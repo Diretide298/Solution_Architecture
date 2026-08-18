@@ -111,6 +111,32 @@ const splitTables = (cell) =>
     .map((s) => s.trim())
     .filter((s) => s && s !== '—' && s !== '-');
 
+/**
+ * A block sitting under a lead-in sentence, flattened into that sentence: a
+ * blockquote loses its `>` and joins up, a list becomes its items separated by
+ * `; `. Emphasis is left alone here because stripMarkdown runs afterwards.
+ *
+ * decisions.mjs `lead()` does the same job for docs/ and had the same flaw.
+ * They are kept apart because each reader owns its own markdown handling, so a
+ * change to either belongs in both.
+ */
+function flattenBlock(block) {
+  const lines = block.split('\n');
+  if (block.startsWith('>')) return lines.map((l) => l.replace(/^\s*>\s?/, '').trim()).join(' ');
+  if (!/^\s*(?:[-*+]|\d+[.)])\s/.test(block)) return block;
+  const items = [];
+  for (const line of lines) {
+    const item = /^\s*(?:[-*+]|\d+[.)])\s+(.*)$/.exec(line);
+    // a wrapped line continues the item above it rather than starting a new one
+    if (item) items.push(item[1].trim());
+    else if (items.length) items[items.length - 1] += ` ${line.trim()}`;
+  }
+  // '; ' between items, except after one that already closed itself — a bullet
+  // that is a full sentence should not be followed by ".;"
+  return items.reduce((out, item) =>
+    out ? `${out}${/[.!?]$/.test(out) ? ' ' : '; '}${item}` : item, '');
+}
+
 /** Just enough to render an ADR heading and lede as plain text. */
 const stripMarkdown = (text) =>
   text
@@ -403,7 +429,16 @@ export async function buildBackend(root, contractSchemas = []) {
       .map((p) => p.trim())
       .filter((p) => p && !p.startsWith('#') && !/^[-=*_\s]+$/.test(p));
     // the status line is metadata; the decision is the paragraph after it
-    const decision = paragraphs.find((p) => !/^\*{0,2}status/i.test(p)) ?? paragraphs[0] ?? '';
+    const at = paragraphs.findIndex((p) => !/^\*{0,2}status/i.test(p));
+    let decision = paragraphs[at] ?? paragraphs[0] ?? '';
+    // ADR-0016 opens by saying ADR-0005 "named the cost plainly:" and then
+    // quotes the cost. The paragraph on its own is the setup without the point,
+    // so a lead-in ending in ':' takes the block below it as well. A table is
+    // excluded: its meaning is in the columns and no one-line rendering keeps it.
+    const promised = at >= 0 ? paragraphs[at + 1] : null;
+    if (decision.endsWith(':') && promised && !/^[|#]/.test(promised) && !promised.startsWith('```')) {
+      decision += ` ${flattenBlock(promised)}`;
+    }
     const record = {
       file: `backend/${entry.name}`,
       title: stripMarkdown(heading),
@@ -622,6 +657,52 @@ export async function buildBackend(root, contractSchemas = []) {
       });
     }
   }
+
+  // ---- schemas the Tables sheet uses and the Modules sheet never lists ----
+  // Eight of them: ai, approvals and workforce, which are real Postgres
+  // schemas, plus four cache:* and qdrant:knowledge, which are not Postgres at
+  // all. Anything built from `modules` alone drew a database with those eight
+  // missing — and because the entity view's scope picker was built from that
+  // list, clicking an AI table set a scope the renderer rejected and silently
+  // fell back to the first schema alphabetically. The click looked broken.
+  const listed = new Set(modules.map((m) => m.name));
+  const unlisted = new Map();
+  for (const t of tables) {
+    if (listed.has(t.module)) continue;
+    const row = unlisted.get(t.module) ?? { tables: 0, columns: 0 };
+    row.tables += 1;
+    row.columns += (columns[t.name] ?? []).length;
+    unlisted.set(t.module, row);
+  }
+  for (const [name, row] of unlisted) {
+    modules.push({
+      name,
+      tables: row.tables,
+      columns: row.columns,
+      migration: null,
+      status: null,
+      what: null,
+      why: null,
+      contract: null,
+      operations: null,
+      tier: null,
+      out: null,
+      in: null,
+      cross: null,
+      written: false,
+      // counted from the tables that name it, not read from the sheet
+      unlisted: true,
+    });
+    problems.push({
+      severity: 'warning',
+      kind: 'backend-module-not-listed',
+      file: workbookName,
+      message:
+        `${row.tables} tables name schema ${name}, which has no row on the Modules sheet` +
+        (row.columns ? '' : ' — and no rows on the Columns sheet either'),
+    });
+  }
+  modules.sort((a, b) => a.name.localeCompare(b.name));
 
   // the sheet carries explanatory prose below the table, which lands in the
   // first column — a row is only data if all four counts are numbers

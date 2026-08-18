@@ -69,6 +69,10 @@ screens:
   navigation:
     isEntryPoint: true
     inferred: true
+    exitTo:
+    - ACC-002
+    - ACC-003
+    - ACC-004
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
@@ -141,6 +145,10 @@ screens:
     entryFrom:
     - ACC-001
     inferred: true
+    exitTo:
+    - ACC-001
+    - ACC-002
+    - ACC-004
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: Application Review & Submit — the screen a person opens when they need to deal with application

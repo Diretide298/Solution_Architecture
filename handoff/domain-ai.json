@@ -1,0 +1,973 @@
+{
+ "domain": "ai",
+ "derivedFrom": "closure over contracts, states, events, lineage, screens, flows and docs",
+ "note": "Nothing in this file is hand-typed. Regenerate with `python3 tools/derive-domain.py ai` after any change.",
+ "operations": {
+  "askReportingQuestion": {
+   "path": "/reports/ask",
+   "verb": "POST",
+   "summary": "Natural-language reporting query",
+   "permission": "REPORT_VIEW_VENUE",
+   "guestCallable": false,
+   "scopeLevel": "venue",
+   "foreignContract": "reporting"
+  },
+  "createAiConversation": {
+   "path": "/conversations",
+   "verb": "POST",
+   "summary": "Open a conversation",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "createKnowledgeCollection": {
+   "path": "/collections",
+   "verb": "POST",
+   "summary": "Create a collection",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "decideProposedAction": {
+   "path": "/proposed-actions/{actionId}/decide",
+   "verb": "POST",
+   "summary": "Approve or reject a proposal",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "generateConfiguration": {
+   "path": "/generate/configuration",
+   "verb": "POST",
+   "summary": "Draft a configuration from a description",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "generateVenueLayout": {
+   "path": "/generate/venue-layout",
+   "verb": "POST",
+   "summary": "Draft a seat map from an uploaded plan",
+   "permission": "CAPACITY_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getAiPolicy": {
+   "path": "/policy",
+   "verb": "GET",
+   "summary": "What the assistant may do here",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "getAiUsage": {
+   "path": "/usage",
+   "verb": "GET",
+   "summary": "Usage, cost and performance",
+   "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "ingestKnowledgeDocument": {
+   "path": "/collections/{collectionId}/documents",
+   "verb": "POST",
+   "summary": "Add a document",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiConversations": {
+   "path": "/conversations",
+   "verb": "GET",
+   "summary": "A principal's conversation history",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listAiInteractions": {
+   "path": "/interactions",
+   "verb": "GET",
+   "summary": "Every prompt, response and action",
+   "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiProviders": {
+   "path": "/providers",
+   "verb": "GET",
+   "summary": "Configured providers and their order",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "region"
+  },
+  "listIndexJobs": {
+   "path": "/index-jobs",
+   "verb": "GET",
+   "summary": "Indexing in flight and recently finished",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listIndexSources": {
+   "path": "/index-sources",
+   "verb": "GET",
+   "summary": "What is indexed, and how current it is",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listKnowledgeCollections": {
+   "path": "/collections",
+   "verb": "GET",
+   "summary": "Collections available to this tenant",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listProposedActions": {
+   "path": "/proposed-actions",
+   "verb": "GET",
+   "summary": "What the assistant has proposed and nobody has decided",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "reindexSource": {
+   "path": "/index-sources/{sourceId}/reindex",
+   "verb": "POST",
+   "summary": "Rebuild a source",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "removeIndexEntry": {
+   "path": "/index-sources/{sourceId}/entries/{entryId}",
+   "verb": "DELETE",
+   "summary": "Remove one record from the index",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "saveNaturalLanguageQuery": {
+   "path": "/reports/ask/{conversationId}/save",
+   "verb": "POST",
+   "summary": "Save a natural-language answer as a report definition",
+   "permission": "REPORT_MANAGE",
+   "guestCallable": false,
+   "scopeLevel": "venue",
+   "foreignContract": "reporting"
+  },
+  "semanticSearch": {
+   "path": "/search",
+   "verb": "POST",
+   "summary": "Search meaning, not words",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "sendAiMessage": {
+   "path": "/conversations/{conversationId}/messages",
+   "verb": "POST",
+   "summary": "Ask",
+   "permission": "AI_USE",
+   "guestCallable": true,
+   "scopeLevel": "venue"
+  },
+  "setAiCredential": {
+   "path": "/ai-providers/{providerId}/credential",
+   "verb": "PUT",
+   "summary": "Store or rotate a provider key",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "setAiPolicy": {
+   "path": "/policy",
+   "verb": "PUT",
+   "summary": "Set the policy",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "setAiProvider": {
+   "path": "/providers",
+   "verb": "PUT",
+   "summary": "Configure a provider",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "region"
+  },
+  "setIndexSource": {
+   "path": "/index-sources",
+   "verb": "PUT",
+   "summary": "Declare a source indexed",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "testAiProvider": {
+   "path": "/ai-providers/{providerId}/test",
+   "verb": "POST",
+   "summary": "Check the key works before anyone relies on it",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  }
+ },
+ "schemas": [
+  "AiCapability",
+  "AiConversation",
+  "AiInteraction",
+  "AiMessage",
+  "AiPolicy",
+  "AiProvider",
+  "AiProviderKind",
+  "AiSource",
+  "AiUsageReport",
+  "GeneratedConfiguration",
+  "IndexJob",
+  "IndexSource",
+  "KnowledgeCollection",
+  "KnowledgeDocument",
+  "LayoutDraft",
+  "Problem",
+  "ProposedAction",
+  "SearchResult"
+ ],
+ "enums": [
+  "AiCapability",
+  "AiProviderKind",
+  "ApprovalStatus",
+  "CaseStatus",
+  "ContentStatus",
+  "ConversationState",
+  "IndexJob.status",
+  "KnowledgeDocument.status",
+  "LayoutDraft.status",
+  "MediaStatus",
+  "ProductLifecycleState",
+  "ProposedAction.status",
+  "ScheduleState"
+ ],
+ "states": [
+  {
+   "file": "ai-index-job.yaml",
+   "entity": "AI index job",
+   "contract": "ai",
+   "enum": "IndexJob.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-knowledge-document.yaml",
+   "entity": "AI knowledge document",
+   "contract": "ai",
+   "enum": "KnowledgeDocument.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-layout-draft.yaml",
+   "entity": "AI layout draft",
+   "contract": "ai",
+   "enum": "LayoutDraft.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-proposed-action.yaml",
+   "entity": "AI proposed action",
+   "contract": "ai",
+   "enum": "ProposedAction.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "approval-request.yaml",
+   "entity": "Approval request",
+   "contract": "approvals",
+   "enum": "ApprovalStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "approval.granted"
+   ],
+   "emits": [
+    "approval.granted",
+    "approval.rejected"
+   ]
+  },
+  {
+   "file": "case.yaml",
+   "entity": "Service case",
+   "contract": "marketing-crm",
+   "enum": "CaseStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "marketing.caseClosed"
+   ],
+   "emits": [
+    "marketing.caseClosed"
+   ]
+  },
+  {
+   "file": "content.yaml",
+   "entity": "White-label content",
+   "contract": "white-label",
+   "enum": "ContentStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "whitelabel.contentPublished"
+   ],
+   "emits": [
+    "whitelabel.contentPublished"
+   ]
+  },
+  {
+   "file": "conversation.yaml",
+   "entity": "Conversation",
+   "contract": "marketing-crm",
+   "enum": "ConversationState",
+   "foreignContract": true,
+   "reachedVia": [
+    "conversation.handedOver"
+   ],
+   "emits": [
+    "conversation.handedOver"
+   ]
+  },
+  {
+   "file": "media.yaml",
+   "entity": "Media asset",
+   "contract": "assets",
+   "enum": "MediaStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "assets.documentIndexed"
+   ],
+   "emits": [
+    "assets.documentIndexed"
+   ]
+  },
+  {
+   "file": "product.yaml",
+   "entity": "Product",
+   "contract": "catalogue",
+   "enum": "ProductLifecycleState",
+   "foreignContract": true,
+   "reachedVia": [
+    "catalogue.productPublished"
+   ],
+   "emits": [
+    "catalogue.productPublished"
+   ]
+  },
+  {
+   "file": "schedule.yaml",
+   "entity": "Content schedule",
+   "contract": "white-label",
+   "enum": "ScheduleState",
+   "foreignContract": true,
+   "reachedVia": [
+    "whitelabel.contentPublished"
+   ],
+   "emits": [
+    "whitelabel.contentPublished"
+   ]
+  }
+ ],
+ "events": [
+  {
+   "name": "ai.ceilingApproaching",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
+  {
+   "name": "approval.granted",
+   "publisher": "approvals",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "assets.documentIndexed",
+   "publisher": "assets",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "catalogue.productPublished",
+   "publisher": "catalogue",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "conversation.handedOver",
+   "publisher": "marketing",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "fnb.menuPublished",
+   "publisher": "fnb",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "maintenance.templatePublished",
+   "publisher": "maintenance",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "marketing.caseClosed",
+   "publisher": "marketing",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "reporting.definitionPublished",
+   "publisher": "reporting",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "retail.merchandisePublished",
+   "publisher": "retail",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "whitelabel.contentPublished",
+   "publisher": "whitelabel",
+   "role": "consumes",
+   "critical": true
+  }
+ ],
+ "tables": {
+  "reads": [
+   "ai.chunk_ref",
+   "ai.conversation",
+   "ai.index_entry",
+   "ai.index_job",
+   "ai.index_source",
+   "ai.interaction",
+   "ai.knowledge_collection",
+   "ai.knowledge_document",
+   "ai.message",
+   "ai.policy",
+   "ai.proposed_action",
+   "ai.provider",
+   "assets.media_asset",
+   "cache:answer",
+   "cache:embedding",
+   "cache:idempotency",
+   "catalogue.entitlement_template",
+   "catalogue.product",
+   "fnb.menu_item",
+   "maintenance.inspection_template",
+   "marketing.case",
+   "marketing.conversation_message",
+   "qdrant:knowledge",
+   "reporting.report_definition",
+   "retail.merchandise",
+   "whitelabel.content_page",
+   "whitelabel.faq_entry",
+   "whitelabel.policy"
+  ],
+  "writes": [
+   "ai.conversation",
+   "ai.index_entry",
+   "ai.index_job",
+   "ai.index_source",
+   "ai.interaction",
+   "ai.knowledge_collection",
+   "ai.knowledge_document",
+   "ai.layout_draft",
+   "ai.message",
+   "ai.policy",
+   "ai.proposed_action",
+   "ai.provider",
+   "cache:answer",
+   "cache:embedding",
+   "cache:idempotency",
+   "qdrant:knowledge"
+  ],
+  "byStore": {
+   "postgres": [
+    "ai.chunk_ref",
+    "ai.index_entry",
+    "ai.index_job",
+    "ai.index_source",
+    "ai.knowledge_collection",
+    "ai.knowledge_document",
+    "ai.layout_draft",
+    "ai.policy",
+    "ai.proposed_action",
+    "ai.provider",
+    "assets.media_asset",
+    "catalogue.entitlement_template",
+    "catalogue.product",
+    "fnb.menu_item",
+    "maintenance.inspection_template",
+    "marketing.case",
+    "marketing.conversation_message",
+    "reporting.report_definition",
+    "retail.merchandise",
+    "whitelabel.content_page",
+    "whitelabel.faq_entry",
+    "whitelabel.policy"
+   ],
+   "postgres-analytical": [
+    "ai.conversation",
+    "ai.interaction",
+    "ai.message"
+   ],
+   "redis": [
+    "cache:answer",
+    "cache:embedding",
+    "cache:idempotency"
+   ],
+   "qdrant": [
+    "qdrant:knowledge"
+   ]
+  },
+  "inboundKeys": [
+   {
+    "from": "marketing.conversation_message",
+    "column": "ai_interaction_id",
+    "to": "ai.interaction"
+   }
+  ]
+ },
+ "screens": [
+  {
+   "id": "GST-031",
+   "name": "AI Concierge \u2013 Home",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 2,
+   "operations": [
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "GST-032",
+   "name": "AI Concierge \u2013 Chat",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 2,
+   "operations": [
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "GST-033",
+   "name": "AI Concierge \u2013 Contextual Help",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 2,
+   "operations": [
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "GST-054",
+   "name": "AI Optimized Itinerary",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 3,
+   "operations": [
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "POS-008",
+   "name": "Reports",
+   "platform": "P04",
+   "platformName": "Venue POS",
+   "wave": 2,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "KSK-015",
+   "name": "Assistant",
+   "platform": "P05",
+   "platformName": "Guest Kiosk",
+   "wave": 2,
+   "operations": [
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "EMP-019",
+   "name": "AI assistant \u2014 home",
+   "platform": "P06",
+   "platformName": "Venue Staff App",
+   "wave": 1,
+   "operations": [
+    "createAiConversation",
+    "listAiConversations",
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "EMP-020",
+   "name": "AI assistant \u2014 answer",
+   "platform": "P06",
+   "platformName": "Venue Staff App",
+   "wave": 1,
+   "operations": [
+    "createAiConversation",
+    "listAiConversations",
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "EMP-040",
+   "name": "Knowledge base",
+   "platform": "P06",
+   "platformName": "Venue Staff App",
+   "wave": 2,
+   "operations": [
+    "semanticSearch"
+   ]
+  },
+  {
+   "id": "EMP-041",
+   "name": "Training",
+   "platform": "P06",
+   "platformName": "Venue Staff App",
+   "wave": 3,
+   "operations": [
+    "semanticSearch"
+   ]
+  },
+  {
+   "id": "BO-029",
+   "name": "Report Builder",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 2,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "BO-058",
+   "name": "Reporting Home",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 1,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "BO-059",
+   "name": "Sales Reports",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 1,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "BO-060",
+   "name": "Attendance & Footfall",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 2,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "BO-061",
+   "name": "Scheduled Reports",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "BO-068",
+   "name": "Audit Log",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 2,
+   "operations": [
+    "listAiInteractions"
+   ]
+  },
+  {
+   "id": "BO-091",
+   "name": "AI Policy & Spend",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 1,
+   "operations": [
+    "getAiPolicy",
+    "getAiUsage",
+    "setAiPolicy"
+   ]
+  },
+  {
+   "id": "ADM-004",
+   "name": "Platform Audit Log",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 2,
+   "operations": [
+    "listAiInteractions"
+   ]
+  },
+  {
+   "id": "ADM-037",
+   "name": "AI Provider & Credentials",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 1,
+   "operations": [
+    "listAiProviders",
+    "setAiCredential",
+    "setAiProvider",
+    "testAiProvider"
+   ]
+  },
+  {
+   "id": "PTR-018",
+   "name": "Reports & Sales Performance",
+   "platform": "P10",
+   "platformName": "Partner Web",
+   "wave": 3,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "SUP-008",
+   "name": "Agent Performance & SLA View",
+   "platform": "P12",
+   "platformName": "Venue Support",
+   "wave": 3,
+   "operations": [
+    "askReportingQuestion",
+    "saveNaturalLanguageQuery"
+   ]
+  }
+ ],
+ "flows": [
+  {
+   "id": "F20",
+   "name": "A manager asks a question and gets an answer",
+   "wave": 1,
+   "operations": [
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "F24",
+   "name": "A guest asks the assistant and ends up with a person",
+   "wave": 2,
+   "operations": [
+    "sendAiMessage"
+   ]
+  }
+ ],
+ "documents": [
+  {
+   "file": "docs/active/ai-scope-for-confirmation.md",
+   "title": "AI scope \u2014 for confirmation",
+   "status": "",
+   "mentions": 1
+  },
+  {
+   "file": "docs/active/optimisation-assessment.md",
+   "title": "Optimisation assessment \u2014 RAG, caching, backend, frontend",
+   "status": "",
+   "mentions": 4
+  },
+  {
+   "file": "docs/active/optimisation-plan.md",
+   "title": "Optimisation adoption plan",
+   "status": "",
+   "mentions": 3
+  },
+  {
+   "file": "docs/adr/0007-hybrid-repository-topology.md",
+   "title": "ADR-0007: Hybrid repository topology",
+   "status": "Accepted",
+   "mentions": 1
+  },
+  {
+   "file": "docs/adr/0020-ai-isolation-boundary.md",
+   "title": "ADR-0020 \u2014 Where AI runs, and what it is isolated from",
+   "status": "Proposed \u00b7 17 August 2026",
+   "mentions": 14
+  },
+  {
+   "file": "docs/adr/0021-qdrant-partitioning.md",
+   "title": "ADR-0021 \u2014 Qdrant: one collection per embedding model, tenant is the shard, scope is the filter",
+   "status": "Proposed \u00b7 17 August 2026",
+   "mentions": 4
+  },
+  {
+   "file": "docs/adr/0023-pii-separation.md",
+   "title": "ADR-0023 \u2014 Personal data lives apart from the append-only ledger",
+   "status": "Accepted \u00b7 17 August 2026, recording a decision already impl",
+   "mentions": 3
+  },
+  {
+   "file": "docs/architecture/README.md",
+   "title": "Architecture",
+   "status": "",
+   "mentions": 1
+  },
+  {
+   "file": "docs/architecture/ai-credentials.md",
+   "title": "AI provider credentials \u2014 where the key lives and who can reach it",
+   "status": "",
+   "mentions": 4
+  }
+ ],
+ "conflicts": [
+  {
+   "id": "CF-61",
+   "open": true,
+   "section": "Open \u2014 needs a client decision"
+  },
+  {
+   "id": "CF-74",
+   "open": true,
+   "section": "Open \u2014 needs a client decision"
+  },
+  {
+   "id": "CF-57",
+   "open": true,
+   "section": "Open \u2014 needs a client decision"
+  },
+  {
+   "id": "CF-41",
+   "open": true,
+   "section": "Open \u2014 needs a client decision"
+  },
+  {
+   "id": "CF-109",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-107",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-106",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-105",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-14",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-96",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-94",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-92",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-93",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-90",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-89",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-88",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-59",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-80",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-78",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-76",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-73",
+   "open": false,
+   "section": "Resolved in the 17 August working session"
+  },
+  {
+   "id": "CF-20",
+   "open": false,
+   "section": "By research or architecture"
+  },
+  {
+   "id": "CF-43",
+   "open": false,
+   "section": "By correcting an artefact"
+  }
+ ],
+ "counts": {
+  "operations": 26,
+  "schemas": 18,
+  "states": 11,
+  "events": 11,
+  "tables": 29,
+  "screens": 21,
+  "flows": 2,
+  "documents": 9,
+  "openConflicts": 4
+ }
+}

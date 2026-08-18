@@ -30,6 +30,13 @@ consumers:
   idempotencyKey: productId + publishedAt
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: ai
+  purpose: Re-embed the description. **`catalogue.product` is one of the eleven RAG sources and the
+    busiest** — a product renamed or repriced with a stale index means the assistant answers with yesterday’s
+    catalogue, confidently
+  idempotencyKey: productId+version
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: marketing
   purpose: Make it available to campaigns and segments
   idempotencyKey: productId + publishedAt
@@ -40,7 +47,18 @@ consumers:
   idempotencyKey: productId + publishedAt
   onFailure: retry
   isCritical: false
+- context: cache
+  purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
+    invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
+    venue’s behalf, which is worse than a slow one
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication
 notes: '**The white-label consumer is critical** because a product live in the catalogue and absent
   from the bundle is a product a POS cannot sell — and the terminal will show nothing rather than an
-  error.'
+  error.
+
+
+  **The AI consumer was missing until 17 August**, so the two highest-traffic RAG sources went stale
+  silently — the index had no idea a product had changed and nothing anywhere would have said so.'

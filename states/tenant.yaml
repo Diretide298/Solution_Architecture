@@ -5,6 +5,8 @@
 entity: Tenant
 contract: subscription
 enum: TenantStatus
+enumKind: named
+enumSchema: TenantStatus
 owner: control
 initial:
 - onboarding

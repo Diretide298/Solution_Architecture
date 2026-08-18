@@ -5,7 +5,6 @@
 id: F04
 name: Platform admin ships a release
 actor: platformAdmin
-capability: C96
 wave: 2
 frequency: weekly
 criticality: operational
@@ -73,3 +72,6 @@ exitStates:
   description: Rollout paused mid-wave, cells at mixed versions with a stated reason
 - state: failed
   description: Rolled back. Only possible where every migration in the release is reversible
+primaryContract: platform-ops
+contracts:
+- platform-ops

@@ -5,6 +5,8 @@
 entity: Game
 contract: games
 enum: GameStatus
+enumKind: named
+enumSchema: GameStatus
 owner: games
 initial:
 - inService

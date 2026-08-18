@@ -9,7 +9,9 @@
 
 ## Context
 
-A cell serves one tenant in one jurisdiction (ADR-0001). CF-31 asked whether a guest-app's
+A cell serves one tenant in one jurisdiction (ADR-0001 — **superseded in part by ADR-0014**, which
+allows several tenants on a shared cell; the entitlement ownership rule below is unaffected because
+it turns on the *home cell*, not on how many tenants share one). CF-31 asked whether a guest-app's
 entitlements, wallet, membership and identity are confined to one cell, or span them.
 
 Four features depend on the answer:

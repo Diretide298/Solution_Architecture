@@ -20,7 +20,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 90
+  screenCount: 91
   app: venue-management-web
   appStatus: scaffolded
   packages:
@@ -503,7 +503,7 @@ screens:
   module: Queue Management
   purpose: Watch queues during operation and call parties forward.
   capability: C05
-  wave: 2
+  wave: 1
   layout:
     template: dashboard
     regions:
@@ -616,6 +616,8 @@ screens:
     exitTo:
     - EMP-032
     fromFlows: true
+  notes: 'Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1
+    flow cannot step through a Wave 2 screen.'
 - id: BO-006
   name: Parking Configuration
   module: Parking
@@ -654,6 +656,8 @@ screens:
     entryFrom:
     - BO-001
     inferred: true
+    exitTo:
+    - BO-001
   apis:
   - operationId: listAccessPoints
     contract: access
@@ -689,7 +693,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-008
+    - BO-009
+    - BO-010
     inferred: true
   implementation:
     app: venue-management-web
@@ -762,7 +770,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-009
+    - BO-010
     inferred: true
   implementation:
     app: venue-management-web
@@ -808,7 +820,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-010
     inferred: true
   implementation:
     app: venue-management-web
@@ -869,7 +885,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -962,7 +982,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1011,7 +1035,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1092,7 +1120,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load. Editing is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1149,7 +1181,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1222,7 +1258,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1300,7 +1340,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1378,7 +1422,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1435,7 +1483,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1488,7 +1540,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1645,7 +1701,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load. Editing is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1686,7 +1746,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1776,7 +1840,11 @@ screens:
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1866,7 +1934,11 @@ screens:
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1915,7 +1987,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -1968,7 +2044,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2057,7 +2137,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load. Editing is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2139,7 +2223,11 @@ screens:
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2176,7 +2264,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2345,7 +2437,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2407,7 +2503,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2453,7 +2553,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2498,7 +2602,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2559,7 +2667,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2620,7 +2732,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2701,7 +2817,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2751,7 +2871,11 @@ screens:
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2820,7 +2944,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -2994,7 +3122,11 @@ screens:
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3080,7 +3212,11 @@ screens:
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3166,7 +3302,11 @@ screens:
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3227,7 +3367,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3305,7 +3449,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3358,7 +3506,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3412,7 +3564,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3552,7 +3708,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3593,7 +3753,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3634,7 +3798,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3710,7 +3878,7 @@ screens:
   module: Venue Operations
   purpose: Book in what actually arrived.
   capability: C00
-  wave: 3
+  wave: 2
   layout:
     template: detail
     regions:
@@ -3738,7 +3906,9 @@ screens:
     board: wireframes/P08 Staff Web Back Office.dc.html#bo-052
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. Pulled
+    to Wave 2 (CF-101). Requisitions are Wave 1 and receipt was Wave 3 — **the end of the chain arriving
+    two waves after the start.**
   apis:
   - operationId: createGoodsReceipt
     contract: inventory
@@ -3798,7 +3968,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3847,7 +4021,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3888,7 +4066,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3937,7 +4119,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -3982,7 +4168,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4090,7 +4280,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4159,7 +4353,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4256,7 +4454,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4326,7 +4528,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4375,7 +4581,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4452,7 +4662,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4526,7 +4740,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4576,7 +4794,11 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4625,7 +4847,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4657,7 +4883,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4694,7 +4924,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4771,7 +5005,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4860,7 +5098,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4905,7 +5147,11 @@ screens:
     empty: Nothing matches. Distinguishes an empty filter from an empty dataset
     error: Could not load . Actions on the list are disabled
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4958,7 +5204,11 @@ screens:
     empty: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-007
+    - BO-008
+    - BO-009
     inferred: true
   implementation:
     app: venue-management-web
@@ -4986,7 +5236,7 @@ screens:
   module: Finance
   purpose: Accounts, cost centres and legal entities.
   capability: C00
-  wave: 2
+  wave: 1
   layout:
     template: list
     regions:
@@ -5047,13 +5297,14 @@ screens:
     board: wireframes/P08 Staff Web Back Office.dc.html#bo-001
     designReference: designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
-    board** — needs drawing.
+    board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts
+    blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.
 - id: BO-075
   name: Account Mapping
   module: Finance
   purpose: Which product or movement posts to which account.
   capability: C00
-  wave: 2
+  wave: 1
   layout:
     template: list
     regions:
@@ -5110,7 +5361,7 @@ screens:
     board: wireframes/P08 Staff Web Back Office.dc.html#bo-001
     designReference: designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
-    board** — needs drawing.
+    board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense.
 - id: BO-076
   name: Revenue Recognition
   module: Finance
@@ -5147,7 +5398,11 @@ screens:
     error: Could not load. **Running recognition is blocked** — a run against an unread balance posts
       numbers nobody checked
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-074
+    - BO-075
+    - BO-077
     inferred: true
   implementation:
     app: venue-management-web
@@ -5196,7 +5451,11 @@ screens:
     empty: No variances — reported as a result
     error: Could not load. Setting a rate is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-074
+    - BO-075
+    - BO-076
     inferred: true
   implementation:
     app: venue-management-web
@@ -5321,7 +5580,11 @@ screens:
     error: '**Could not load. Posting is blocked.** A count posted against an unread expected figure
       is not a count'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-078
+    - BO-080
+    - BO-081
     inferred: true
   implementation:
     app: venue-management-web
@@ -5370,7 +5633,11 @@ screens:
     empty: Nothing in transit
     error: Could not load. Receipt is blocked
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-078
+    - BO-079
+    - BO-081
     inferred: true
   implementation:
     app: venue-management-web
@@ -5431,7 +5698,11 @@ screens:
     empty: Nothing stocked at this venue
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-078
+    - BO-079
+    - BO-080
     inferred: true
   implementation:
     app: venue-management-web
@@ -5473,7 +5744,11 @@ screens:
     error: Could not load. **Recording a movement is blocked** — a movement against an unknown level
       produces a wrong level
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-078
+    - BO-079
+    - BO-080
     inferred: true
   implementation:
     app: venue-management-web
@@ -5518,7 +5793,11 @@ screens:
     empty: No suppliers — a blocking gap before the first purchase order
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-078
+    - BO-079
+    - BO-080
     inferred: true
   implementation:
     app: venue-management-web
@@ -5665,7 +5944,11 @@ screens:
     error: '**Could not load. Saving is blocked** — a matrix saved over an unread one silently loosens
       a control'
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-084
+    - BO-085
+    - BO-087
     inferred: true
   implementation:
     app: venue-management-web
@@ -5711,7 +5994,11 @@ screens:
     error: Could not load. **Creating is blocked** — a delegation created blind could exceed the delegator’s
       own authority
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-084
+    - BO-085
+    - BO-086
     inferred: true
   implementation:
     app: venue-management-web
@@ -5748,7 +6035,11 @@ screens:
     empty: No requests in the period
     error: Could not load
   navigation:
-    exitTo: []
+    exitTo:
+    - BO-001
+    - BO-084
+    - BO-085
+    - BO-086
     inferred: true
   implementation:
     app: venue-management-web
@@ -5881,3 +6172,49 @@ screens:
     designReference: designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+- id: BO-091
+  name: AI Policy & Spend
+  module: AI
+  purpose: What the assistant may do here, what it has cost, and what happens at the ceiling.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  apis:
+  - operationId: getAiPolicy
+    contract: ai
+    purpose: What the assistant may do here
+    trigger: onLoad
+  - operationId: setAiPolicy
+    contract: ai
+    purpose: Set the policy
+    trigger: onAction
+  - operationId: getAiUsage
+    contract: ai
+    purpose: Usage, cost and performance
+    trigger: onLoad
+  states:
+    loading: Policy with the level each value resolves from, then spend against the ceiling
+    empty: No policy at this level — the inherited one applies and is labelled (ADR-0018)
+    error: Could not load. **Editing is blocked** — a ceiling saved over an unread one could be lower
+      than what has already been spent
+  navigation:
+    exitTo: []
+    inferred: true
+  implementation:
+    app: venue-management-web
+    route: /ai/policy
+    component: apps/venue-management-web/src/routes/AiPolicySpend.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P08 Staff Web Back Office.dc.html#bo-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August. **Staff and guest spend shown separately** — a venue can manage the first
+    and cannot stop guests asking questions. At the ceiling the manager decides whether to continue;
+    the assistant does not stop on its own (CF-14).

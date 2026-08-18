@@ -5,6 +5,8 @@
 entity: Asset
 contract: maintenance
 enum: AssetStatus
+enumKind: named
+enumSchema: AssetStatus
 owner: maintenance
 initial:
 - inService

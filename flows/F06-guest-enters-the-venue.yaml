@@ -8,7 +8,6 @@
 id: F06
 name: Guest enters the venue
 actor: gateOperator
-capability: C03
 wave: 1
 frequency: constant
 criticality: revenue
@@ -51,7 +50,8 @@ steps:
   screen: SCN-003
   action: Waits at the ready screen
   operations: []
-  outcome: The loop. The device sits here all day
+  outcome: The loop. The device sits here all day **Calls nothing** — the ready screen is idle by design,
+    which is what makes the next scan instant.
 - step: 5
   screen: SCN-004
   action: Scans and admits
@@ -121,3 +121,9 @@ exitStates:
   description: Denied and referred to a supervisor
 - state: deferred
   description: Admitted offline, reconciliation pending
+primaryContract: access
+contracts:
+- access
+- identity
+- shift
+- orders

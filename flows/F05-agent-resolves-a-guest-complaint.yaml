@@ -5,7 +5,6 @@
 id: F05
 name: Agent resolves a guest complaint
 actor: agent
-capability: C32
 wave: 3
 frequency: hourly
 criticality: operational
@@ -62,3 +61,6 @@ exitStates:
   description: Case resolved with findings recorded
 - state: escalated
   description: Passed to a supervisor with a reason
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

@@ -5,6 +5,8 @@
 entity: Rota assignment
 contract: workforce
 enum: RotaStatus
+enumKind: named
+enumSchema: RotaStatus
 owner: workforce
 initial:
 - planned

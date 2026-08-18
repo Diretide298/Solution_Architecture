@@ -54,7 +54,7 @@ def main() -> int:
     n_links = 0
 
     for f in sorted(SCREENS.glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         p = doc["platform"]
         code = p["code"]
         defined[code] = {s["id"] for s in doc["screens"]}
@@ -95,7 +95,7 @@ def main() -> int:
 
     # 7. cross-platform reach resolves
     for f in sorted(SCREENS.glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         for r in (doc["platform"].get("reachesOtherPlatforms") or []):
             tgt, _, anc = r["board"].partition("#")
             tn = tgt.split("/")[-1]
@@ -106,7 +106,7 @@ def main() -> int:
 
     # 6. design references resolve
     for f in sorted(SCREENS.glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         code = doc["platform"]["code"]
         for ref in (doc["platform"].get("designReferences") or []):
             if not (ROOT / ref["path"]).exists():

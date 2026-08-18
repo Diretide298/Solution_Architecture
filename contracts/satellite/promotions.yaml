@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 15
+  x-ticvai-screen-count: 18
   x-ticvai-tier: satellite
   x-ticvai-module: "4 — Bundles and Promotions"
   x-ticvai-requirements: 229
@@ -108,13 +108,55 @@ tags:
 
 paths:
   # ---------------------------------------------------------------- promotions
+  /vouchers/{voucherId}/void:
+    parameters:
+      - name: voucherId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: voidVoucher
+      x-ticvai-audience: [staff]
+      summary: Cancel a voucher
+      description: >
+        Issued in error, or fraud. **Voiding a partly-used voucher does not reverse what was
+        already spent** — that redemption happened and the goods left.
+
+        A voucher could be created and redeemed and never voided until 17 August.
+      tags: [promotions]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [issuedInError, fraud, campaignCancelled, duplicated] }
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Voided
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Voucher' }
+
   /promotions:
     get:
       operationId: listPromotions
       x-ticvai-consumed-by:
+        - "P01 WEB-032 Offers & Promotions"
+        - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: replica
       summary: List promotions
       tags: [promotion]
@@ -155,6 +197,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       summary: Create a promotion
       description: >
         Created in `draft`. A draft promotion never evaluates — publishing is the act that
@@ -192,9 +235,12 @@ paths:
     get:
       operationId: getPromotion
       x-ticvai-consumed-by:
+        - "P01 WEB-032 Offers & Promotions"
+        - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: replica
       summary: Read a promotion
       tags: [promotion]
@@ -216,6 +262,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       summary: Amend a promotion
       description: >
         Amending a live promotion changes behaviour mid-sale. Conditions and discount are
@@ -226,6 +273,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -263,6 +312,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       summary: Pause a live promotion
       description: >
         **Carts already priced keep their price.** A guest mid-checkout is not repriced — the discount they were shown is the one they pay.
@@ -303,6 +353,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       summary: End a promotion early
       description: >
         Distinct from expiry. `expired` means it ran its course; `ended` means somebody decided, and the register should be able to answer which after a bad month.
@@ -343,6 +394,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       summary: Pull a scheduled promotion before it starts
       description: >
         Returns it to draft. Nothing has priced against it yet, so nothing needs honouring.
@@ -374,6 +426,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       summary: Publish a promotion
       description: >
         Runs conflict analysis first. A promotion that stacks with an existing one to produce
@@ -410,6 +463,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Analyse stacking against live promotions
       description: >
@@ -439,6 +493,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: analytical
       summary: Redemption count and discount given
       description: >
@@ -462,6 +517,7 @@ paths:
       operationId: listCouponCampaigns
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List coupon campaigns
       description: >
@@ -493,6 +549,7 @@ paths:
       operationId: createCouponCampaign
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
       summary: Create a coupon campaign
       tags: [coupon]
       x-ticvai-permission: PRICE_CONFIGURE
@@ -523,6 +580,7 @@ paths:
       operationId: listCouponCodes
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List generated codes
       tags: [coupon]
@@ -554,6 +612,7 @@ paths:
       operationId: generateCouponCodes
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
       summary: Generate codes in bulk
       description: >
         Up to fifty thousand at a time. Generation is asynchronous and the batch is exported
@@ -604,7 +663,9 @@ paths:
         schema: { type: string }
     get:
       operationId: getCouponCode
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # single-use enforcement. Replica lag permits a second redemption
       summary: Look up a code
       description: >
@@ -631,6 +692,7 @@ paths:
         schema: { type: string }
     post:
       operationId: assignCoupon
+      x-ticvai-audience: [staff]
       summary: Assign a coupon to a named guest
       description: >
         Allocates an issued code to a subject. Only that guest may redeem it, which is the difference between a campaign code and a service-recovery one.
@@ -667,6 +729,7 @@ paths:
         schema: { type: string }
     post:
       operationId: voidCouponCode
+      x-ticvai-audience: [staff]
       summary: Void a code
       description: Cancellation, fraud, or a batch issued in error.
       tags: [coupon]
@@ -701,6 +764,7 @@ paths:
   /voucher-batches:
     get:
       operationId: listVoucherBatches
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List voucher batches
       description: >
@@ -730,6 +794,7 @@ paths:
 
     post:
       operationId: createVoucherBatch
+      x-ticvai-audience: [staff]
       summary: Issue a voucher batch
       description: >
         Issuing vouchers creates a liability, not revenue. Recognition happens on redemption,
@@ -761,6 +826,7 @@ paths:
         schema: { type: string }
     post:
       operationId: redeemVoucher
+      x-ticvai-audience: [staff]
       summary: Redeem voucher value against an order
       description: >
         Partial redemption leaves a residual balance where the batch permits it. Where it
@@ -798,6 +864,7 @@ paths:
   /bundles:
     get:
       operationId: listBundles
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List bundles
       tags: [bundle]
@@ -827,6 +894,7 @@ paths:
 
     post:
       operationId: createBundle
+      x-ticvai-audience: [staff]
       summary: Create a bundle
       description: >
         A bundle is a product whose price differs from the sum of its parts. **The allocation
@@ -866,7 +934,9 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getBundle
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P02 GST-056 Bundle Package"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: Read a bundle with components and allocation
       tags: [bundle]
@@ -884,6 +954,7 @@ paths:
 
     patch:
       operationId: updateBundle
+      x-ticvai-audience: [staff]
       summary: Amend a bundle
       description: >
         Components and allocation are immutable once the bundle has been sold. Historic
@@ -894,6 +965,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -922,6 +995,7 @@ paths:
   /allocation-splits:
     get:
       operationId: listAllocationSplits
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List allocation split definitions
       description: >
@@ -955,6 +1029,7 @@ paths:
   /allocation-splits/preview:
     post:
       operationId: previewAllocationSplit
+      x-ticvai-audience: [staff]
       summary: Preview how an amount divides
       description: >
         Distributes to the minor unit and returns the exact figure each component receives.
@@ -968,6 +1043,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -998,6 +1075,7 @@ paths:
   /upsell-rules:
     get:
       operationId: listUpsellRules
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List upsell and cross-sell rules
       tags: [upsell]
@@ -1027,6 +1105,7 @@ paths:
 
     post:
       operationId: createUpsellRule
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: region
       summary: Create an upsell rule
       description: >
@@ -1060,12 +1139,15 @@ paths:
         schema: { type: string, format: uuid }
     delete:
       operationId: deleteUpsellRule
+      x-ticvai-audience: [staff]
       summary: Remove an upsell rule
       tags: [upsell]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Removed }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
@@ -1073,6 +1155,10 @@ paths:
   /upsell-suggestions:
     post:
       operationId: getUpsellSuggestions
+      x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
+        - "P02 GST-048 Upsell / Cross-Sell"
+      x-ticvai-audience: [staff, guest]
       summary: Suggestions for a cart
       description: >
         Rule-based today. Where the recommendation engine is enabled it augments this rather
@@ -1083,6 +1169,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1119,11 +1207,18 @@ paths:
   /promotions/evaluate:
     post:
       operationId: evaluatePromotions
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
       x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
+        - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-032 Offers & Promotions"
+        - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P05 KSK-006 Review"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, guest, partner]
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       summary: Evaluate promotions against a cart
       description: >
         Returns the applied discount **and the working** — which rules matched, which did
@@ -1724,6 +1819,8 @@ components:
 
     PromotionEvaluation:
       x-ticvai-persistence: "none — computed"
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       type: object
       required: [totalDiscount, lines, applied, rejected]
       properties:

@@ -4,12 +4,13 @@
 # The scanner half is offline, which is what makes the dispute at step 7 possible.
 #
 # Validated by tools/check-flows.py.
+#
+# Moved to Wave 2 on 17 August (CF-101). **The partner portal is entirely Wave 2** — a Wave 1 flow through a Wave 2 platform means the flow was mis-waved, not the platform.
 
 id: F10
 name: Partner books, uses and settles
 actor: partner
-capability: C41
-wave: 1
+wave: 2
 frequency: weekly
 criticality: revenue
 platforms:
@@ -116,3 +117,8 @@ exitStates:
 openQuestions:
 - Unused allocation at expiry — released or forfeited — is a contract term with no default in the platform.
   It needs a per-partner setting.
+primaryContract: orders
+contracts:
+- orders
+- access
+- finance

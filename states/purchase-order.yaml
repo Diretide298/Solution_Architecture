@@ -5,6 +5,8 @@
 entity: Purchase order
 contract: inventory
 enum: PurchaseOrderStatus
+enumKind: named
+enumSchema: PurchaseOrderStatus
 owner: inventory
 initial:
 - raised

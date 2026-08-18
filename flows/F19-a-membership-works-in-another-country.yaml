@@ -8,7 +8,6 @@
 id: F19
 name: A membership works in another country
 actor: guest
-capability: C31
 wave: 2
 frequency: weekly
 criticality: revenue
@@ -108,3 +107,8 @@ exitStates:
 openQuestions:
 - Who refunds a pass used in two regions, and out of whose revenue. CF-31 named the mechanism and not
   the money.
+primaryContract: cross-cell
+contracts:
+- cross-cell
+- access
+- catalogue

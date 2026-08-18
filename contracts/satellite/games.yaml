@@ -87,6 +87,7 @@ paths:
       operationId: issueGameCard
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+      x-ticvai-audience: [staff]
       summary: Issue or activate a game card
       description: >
         Physical cards are pre-printed and activated at sale; digital cards live in the guest
@@ -125,6 +126,7 @@ paths:
       operationId: getGameCard
       x-ticvai-consumed-by:
         - "P02 GST-026 Retail / Merchandise"
+      x-ticvai-audience: [guest]
       x-ticvai-read-routing: primary
       summary: Read a card's balances
       description: >
@@ -132,7 +134,6 @@ paths:
         blip — the balance may be stale, which is why spend is reconciled on sync.
       tags: [card]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -158,6 +159,7 @@ paths:
       operationId: loadGameCredits
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+      x-ticvai-audience: [staff]
       summary: Load credits onto a card
       description: >
         Creates a liability, not revenue. Recognition happens as credits are played, or as
@@ -201,6 +203,7 @@ paths:
         schema: { type: string }
     post:
       operationId: transferGameCard
+      x-ticvai-audience: [staff]
       summary: Move balances to another card
       description: >
         A damaged or lost card. The source is blocked and its balances move whole — split
@@ -243,6 +246,7 @@ paths:
       operationId: listGames
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List games
       tags: [game]
@@ -268,6 +272,7 @@ paths:
 
     post:
       operationId: createGame
+      x-ticvai-audience: [staff]
       summary: Register a game
       description: >
         Bound to an asset where one exists, so a machine taken out of service by maintenance
@@ -301,6 +306,7 @@ paths:
       operationId: updateGame
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [staff]
       summary: Amend a game
       description: >
         Changing credit cost or payout mid-session is refused where plays are in flight — a
@@ -310,6 +316,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -336,6 +344,7 @@ paths:
       operationId: recordGamePlay
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [guest]
       summary: Record a play
       description: >
         Posted by the machine's card reader. Deducts credits and awards points in one
@@ -347,14 +356,12 @@ paths:
         reconciliation rather than silently accepted.
       tags: [play]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
       security:
         - apiKeyAuth: []
         - serviceAuth: []
-      x-ticvai-auth: service
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -380,6 +387,7 @@ paths:
       operationId: syncGamePlays
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [device]
       summary: Replay plays recorded offline
       description: >
         Ordered batch per reader, idempotent on the play ID. Plays that would overdraw a card
@@ -387,14 +395,12 @@ paths:
         and the record should say so.
       tags: [play]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
-      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       security:
         - apiKeyAuth: []
         - serviceAuth: []
-      x-ticvai-auth: service
       requestBody:
         required: true
         content:
@@ -431,6 +437,7 @@ paths:
   /prizes:
     get:
       operationId: listPrizes
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The prize catalogue
       description: >
@@ -467,6 +474,7 @@ paths:
 
     post:
       operationId: createPrize
+      x-ticvai-audience: [staff]
       summary: Add a prize
       description: >
         Links to a merchandise item, so redemption depletes retail stock through the
@@ -494,6 +502,7 @@ paths:
   /prize-redemptions:
     post:
       operationId: redeemPrize
+      x-ticvai-audience: [staff]
       summary: Redeem points for a prize
       description: >
         Deducts points and issues the prize, depleting stock in one transaction.
@@ -548,6 +557,7 @@ paths:
         schema: { type: string }
     post:
       operationId: adjustGameCard
+      x-ticvai-audience: [staff]
       summary: Manually adjust credits or points
       description: >
         A machine that swallowed a play, a goodwill gesture, a correction. Requires a reason

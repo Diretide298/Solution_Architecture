@@ -5,6 +5,8 @@
 entity: Service case
 contract: marketing-crm
 enum: CaseStatus
+enumKind: named
+enumSchema: CaseStatus
 owner: marketing
 initial:
 - open

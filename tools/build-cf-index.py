@@ -41,7 +41,7 @@ OWNER = re.compile(r"Chinmay|Dinesh|Qossai|Allam|Finance|Chitrangi|counsel|Contr
 def parse() -> list[dict]:
     section = None
     rows = []
-    for line in REGISTER.read_text().split("\n"):
+    for line in REGISTER.read_text(encoding="utf-8").split("\n"):
         if line.startswith("## "):
             section = line[3:].strip()
         elif line.startswith("### "):
@@ -121,7 +121,7 @@ def main() -> int:
             "- **Counts** are generated from the rows, so this file and the register's summary",
             "  cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.\n"]
 
-    INDEX.write_text("\n".join(out) + "\n")
+    INDEX.write_text("\n".join(out) + "\n", encoding="utf-8")
     print(f"{INDEX.name}: {len(rows)} conflicts")
     for k in ORDER:
         print(f"  {counts.get(k, 0):>3}  {STATE[k]}")

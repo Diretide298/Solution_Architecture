@@ -115,6 +115,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List queues
       description: >
@@ -159,6 +160,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       summary: Create a queue
       description: >
         Bound to an attraction and, where one exists, to an asset — so a ride taken out of
@@ -200,6 +202,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a queue with live position
       tags: [queue]
@@ -225,12 +228,15 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       summary: Amend queue configuration
       tags: [queue]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -269,6 +275,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       summary: Open, pause or close a queue
       description: >
         Pausing holds existing positions and stops new joins — the right response to a
@@ -309,7 +316,9 @@ paths:
     post:
       operationId: joinQueue
       x-ticvai-consumed-by:
+        - "P01 WEB-015 Virtual Waiting Room"
         - "P02 GST-023 Virtual Queue / Join Queue"
+      x-ticvai-audience: [guest]
       summary: Join a virtual queue
       description: >
         Guest-facing. Returns a position, a party number and a return window.
@@ -322,7 +331,6 @@ paths:
         here rather than at the ride, which is a much better place to find out.
       tags: [entry]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -361,7 +369,9 @@ paths:
     get:
       operationId: getQueueEntry
       x-ticvai-consumed-by:
+        - "P01 WEB-015 Virtual Waiting Room"
         - "P02 GST-023 Virtual Queue / Join Queue"
+      x-ticvai-audience: [guest]
       x-ticvai-read-routing: primary
       summary: Read a queue entry
       description: >
@@ -370,7 +380,6 @@ paths:
         load problem.
       tags: [entry]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -390,14 +399,16 @@ paths:
       operationId: leaveQueue
       x-ticvai-consumed-by:
         - "P02 GST-023 Virtual Queue / Join Queue"
+      x-ticvai-audience: [guest]
       summary: Leave a queue
       tags: [entry]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security:
         - guestAuth: []
         - bearerAuth: []
@@ -417,6 +428,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: redeemQueueEntry
+      x-ticvai-audience: [staff]
       summary: Admit a party at the ride
       description: >
         Scanned at the attraction. **Offline-capable**, like every other gate operation — a
@@ -463,6 +475,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: overrideQueueEntry
+      x-ticvai-audience: [staff]
       summary: Admit against a failed redemption
       description: >
         Late arrival, a guest whose phone died, a genuine system fault. Records the
@@ -508,6 +521,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       summary: Call the next parties forward
       description: >
         Advances the queue by a cycle. Notifies each called party through their app and, where
@@ -563,6 +577,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: List entries in a queue
       description: Operator view. Position order, with no-shows and expiries visible.
@@ -596,9 +611,16 @@ paths:
     get:
       operationId: getWaitTimes
       x-ticvai-consumed-by:
+        - "P01 WEB-015 Virtual Waiting Room"
+        - "P02 GST-003 Attractions List"
+        - "P02 GST-004 Attraction Details"
+        - "P02 GST-021 Interactive Map"
         - "P02 GST-022 Attraction Wait Times"
+        - "P02 GST-038 Digital Companion Mode"
         - "P02 GST-046 Branded Queue / Waiting Room"
         - "P02 GST-051 Plan Your Adventure – Start"
+        - "P02 GST-053 Build Your Own Itinerary"
+        - "P02 GST-054 AI Optimized Itinerary"
         - "P02 GST-059 Plan My Day – In Progress"
         - "P06 EMP-031 Queue monitor"
         - "P06 EMP-032 Manual wait entry"
@@ -608,6 +630,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
         - "P11 ACC-006 Reviewer Queue"
+      x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Wait times across a venue
       description: >
@@ -619,7 +642,6 @@ paths:
         sensor or from someone's guess.
       tags: [waitTime]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -659,6 +681,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+      x-ticvai-audience: [staff]
       summary: Manually set a wait time
       description: >
         Operator override, and the fallback where no sensor feed exists. A manual figure is
@@ -696,6 +719,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List configured sensor feeds
       description: >
@@ -720,6 +744,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Configure a sensor feed
       description: >
@@ -756,6 +781,7 @@ paths:
   /queue-feeds/readings:
     post:
       operationId: submitQueueReading
+      x-ticvai-audience: [device]
       summary: Inbound sensor reading
       description: >
         **The integration surface.** A venue's camera or people-counting system posts here,
@@ -769,14 +795,12 @@ paths:
         everyone downstream.
       tags: [feed]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
-      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       security:
         - apiKeyAuth: []
         - serviceAuth: []
-      x-ticvai-auth: service
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -817,6 +841,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
       summary: Test a feed before trusting it
       description: >
         Attempts one exchange with the configured source and reports what came back — reachable,
@@ -832,6 +857,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Test complete. Check `succeeded` — a reachable source that returns nonsense is a failure
@@ -851,6 +878,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Feed health
       description: >
@@ -873,6 +901,7 @@ paths:
   /signage/queue-board:
     get:
       operationId: getSignageQueueBoard
+      x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
       summary: Wait-time board for a display
       description: >
@@ -881,7 +910,6 @@ paths:
         interpret anything.
       tags: [signage]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
-      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -908,6 +936,7 @@ paths:
   /signage/queue-calls:
     get:
       operationId: getSignageQueueCalls
+      x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
       summary: Currently called party numbers
       description: >
@@ -915,7 +944,6 @@ paths:
         returns only what changed since the supplied cursor.
       tags: [signage]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
-      x-ticvai-auth: device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins

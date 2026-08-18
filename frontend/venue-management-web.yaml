@@ -22,11 +22,13 @@ packages:
 - api-client
 contracts:
 - access
+- ai
 - approvals
 - assets
 - catalogue
 - finance
 - fnb
+- games
 - identity
 - inventory
 - maintenance
@@ -42,11 +44,11 @@ contracts:
 - tenancy
 - white-label
 - workforce
-screenCount: 110
+screenCount: 111
 byWave:
-  wave1: 41
-  wave2: 64
-  wave3: 5
+  wave1: 45
+  wave2: 62
+  wave3: 4
 screens:
 - id: BO-001
   name: Queue Directory
@@ -70,6 +72,12 @@ screens:
   name: Manual Wait Time Entry
   route: /queue-management/manual-wait-time-entry
   component: apps/venue-management-web/src/routes/queue-management/ManualWaitTimeEntryForm.tsx
+  wave: 1
+  status: notStarted
+- id: BO-005
+  name: Queue Monitor
+  route: /queue-management/queue-monitor
+  component: apps/venue-management-web/src/routes/queue-management/QueueMonitorDashboard.tsx
   wave: 1
   status: notStarted
 - id: BO-007
@@ -258,6 +266,18 @@ screens:
   component: apps/venue-management-web/src/routes/venue-operations/VenueConfigurationDetail.tsx
   wave: 1
   status: notStarted
+- id: BO-074
+  name: Chart of Accounts
+  route: /finance/chart-of-accounts
+  component: apps/venue-management-web/src/routes/finance/ChartOfAccounts.tsx
+  wave: 1
+  status: notStarted
+- id: BO-075
+  name: Account Mapping
+  route: /finance/account-mapping
+  component: apps/venue-management-web/src/routes/finance/AccountMapping.tsx
+  wave: 1
+  status: notStarted
 - id: BO-078
   name: Requisitions
   route: /inventory/requisitions
@@ -294,11 +314,11 @@ screens:
   component: apps/venue-management-web/src/routes/finance/PeriodClose.tsx
   wave: 1
   status: notStarted
-- id: BO-005
-  name: Queue Monitor
-  route: /queue-management/queue-monitor
-  component: apps/venue-management-web/src/routes/queue-management/QueueMonitorDashboard.tsx
-  wave: 2
+- id: BO-091
+  name: AI Policy & Spend
+  route: /ai/policy
+  component: apps/venue-management-web/src/routes/AiPolicySpend.tsx
+  wave: 1
   status: notStarted
 - id: BO-006
   name: Parking Configuration
@@ -438,6 +458,12 @@ screens:
   component: apps/venue-management-web/src/routes/venue-operations/PurchaseOrdersDetail.tsx
   wave: 2
   status: notStarted
+- id: BO-052
+  name: Goods Receipt
+  route: /venue-operations/goods-receipt
+  component: apps/venue-management-web/src/routes/venue-operations/GoodsReceiptDetail.tsx
+  wave: 2
+  status: notStarted
 - id: BO-055
   name: Rota & Scheduling
   route: /venue-operations/rota-scheduling
@@ -496,18 +522,6 @@ screens:
   name: Lost & Found Register
   route: /venue-operations/lost-found-register
   component: apps/venue-management-web/src/routes/venue-operations/LostFoundRegisterDetail.tsx
-  wave: 2
-  status: notStarted
-- id: BO-074
-  name: Chart of Accounts
-  route: /finance/chart-of-accounts
-  component: apps/venue-management-web/src/routes/finance/ChartOfAccounts.tsx
-  wave: 2
-  status: notStarted
-- id: BO-075
-  name: Account Mapping
-  route: /finance/account-mapping
-  component: apps/venue-management-web/src/routes/finance/AccountMapping.tsx
   wave: 2
   status: notStarted
 - id: BO-076
@@ -677,12 +691,6 @@ screens:
   route: /white-label/change-log
   component: apps/venue-management-web/src/routes/white-label/ChangeLogDetail.tsx
   wave: 2
-  status: notStarted
-- id: BO-052
-  name: Goods Receipt
-  route: /venue-operations/goods-receipt
-  component: apps/venue-management-web/src/routes/venue-operations/GoodsReceiptDetail.tsx
-  wave: 3
   status: notStarted
 - id: BO-057
   name: Training & Certification

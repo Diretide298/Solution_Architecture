@@ -5,6 +5,8 @@
 entity: Approval request
 contract: approvals
 enum: ApprovalStatus
+enumKind: named
+enumSchema: ApprovalStatus
 owner: approvals
 initial:
 - draft

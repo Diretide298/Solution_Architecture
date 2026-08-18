@@ -1,7 +1,14 @@
 # ADR-0001: Cell architecture — one tenant per jurisdiction
 
-**Status:** Accepted — split rule **superseded by [ADR-0014](0014-cell-per-region.md)**;
-isolation claim **amended 14 August 2026**  
+**Status:** Superseded by [ADR-0014](0014-cell-per-region.md) and [ADR-0017](0017-deployment-models.md)  
+**Retired:** 17 August 2026. **Kept for its Context and Alternatives, which are history rather than
+decision.** Its Decision — *Cell = Tenant × Jurisdiction* — is replaced by ADR-0014's *Cell =
+Tenant × Region*, and two of its Consequences are broken by the shared cell, as the section below
+records.
+
+**Do not cite the Decision section of this ADR.** It read as live to a careful reader on
+17 August because the status line led with "Accepted", and reasoning from it produced a
+cross-tenant isolation defect in ADR-0021 (CF-97).  
 **Date:** 12 August 2026
 
 ## Context

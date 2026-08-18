@@ -28,7 +28,7 @@ platform:
     deviceOwnership: venue-owned, unattended
     networkAssumption: venue LAN, generally reliable
     releaseCadence: monthly, out of hours
-  screenCount: 14
+  screenCount: 15
   wireframeBoard: wireframes/P05 Guest Kiosk.dc.html
   designReferences:
   - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
@@ -337,6 +337,48 @@ screens:
     contract: orders
     purpose: Take a payment against an order
     trigger: onAction
+- id: KSK-008
+  name: Payment unresolved
+  module: Sell
+  purpose: Handle the state that has nobody standing next to it.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Inquiry in progress
+    empty: Not applicable
+    error: '**The important screen.** A card charged with no response. It inquires rather than retries,
+      and prints nothing until it knows'
+    offline: Not applicable
+  navigation:
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest-app
+    route: /sell/payment-unresolved
+    component: apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: Ask the provider what actually happened
+    trigger: onAction
 - id: KSK-009
   name: Ticket issued
   module: Sell
@@ -356,7 +398,10 @@ screens:
     error: Print failed — falls through to KSK-010
     offline: Not applicable
   navigation:
-    exitTo: []
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
     inferred: true
   wireframe:
     status: drafted
@@ -379,111 +424,6 @@ screens:
     contract: orders
     purpose: Read an order
     trigger: onLoad
-- id: KSK-011
-  name: Collect a booking
-  module: Sell
-  purpose: Turn a reference into media.
-  capability: C00
-  wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-  states:
-    loading: Reference entry
-    empty: Not applicable
-    error: Lookup unavailable
-    offline: Not available
-  navigation:
-    exitTo: []
-    inferred: true
-  wireframe:
-    status: drafted
-    owner: wireframe board
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
-  implementation:
-    app: guest-app
-    route: /sell/collect-a-booking
-    component: apps/guest-app/src/routes/sell/CollectABookingDetail.tsx
-    status: notStarted
-- id: KSK-012
-  name: Booking found
-  module: Sell
-  purpose: Confirm it is the right booking, then print.
-  capability: C00
-  wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-  states:
-    loading: Booking detail
-    empty: No booking for that reference
-    error: Not found. Offers KSK-013
-    offline: Not available
-  navigation:
-    exitTo: []
-    inferred: true
-  wireframe:
-    status: drafted
-    owner: wireframe board
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
-  implementation:
-    app: guest-app
-    route: /sell/booking-found
-    component: apps/guest-app/src/routes/sell/BookingFoundDetail.tsx
-    status: notStarted
-  apis:
-  - operationId: transferOrderTickets
-    contract: orders
-    purpose: Transfer tickets to another guest
-    trigger: onAction
-- id: KSK-008
-  name: Payment unresolved
-  module: Sell
-  purpose: Handle the state that has nobody standing next to it.
-  capability: C00
-  wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-  states:
-    loading: Inquiry in progress
-    empty: Not applicable
-    error: '**The important screen.** A card charged with no response. It inquires rather than retries,
-      and prints nothing until it knows'
-    offline: Not applicable
-  navigation:
-    exitTo: []
-    inferred: true
-  wireframe:
-    status: drafted
-    owner: wireframe board
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
-  implementation:
-    app: guest-app
-    route: /sell/payment-unresolved
-    component: apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx
-    status: notStarted
 - id: KSK-010
   name: Print failure
   module: Sell
@@ -524,6 +464,92 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+- id: KSK-011
+  name: Collect a booking
+  module: Sell
+  purpose: Turn a reference into media.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Reference entry
+    empty: Not applicable
+    error: Lookup unavailable
+    offline: Not available
+  navigation:
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest-app
+    route: /sell/collect-a-booking
+    component: apps/guest-app/src/routes/sell/CollectABookingDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: lookupShopAndDrop
+    contract: retail
+    purpose: Find a guest's dropped goods
+    trigger: onLoad
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+- id: KSK-012
+  name: Booking found
+  module: Sell
+  purpose: Confirm it is the right booking, then print.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Booking detail
+    empty: No booking for that reference
+    error: Not found. Offers KSK-013
+    offline: Not available
+  navigation:
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
+    inferred: true
+  wireframe:
+    status: drafted
+    owner: wireframe board
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: guest-app
+    route: /sell/booking-found
+    component: apps/guest-app/src/routes/sell/BookingFoundDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
 - id: KSK-013
   name: Call staff
   module: Sell
@@ -543,7 +569,10 @@ screens:
     error: '**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner'
     offline: Shows the counter location
   navigation:
-    exitTo: []
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
     inferred: true
   wireframe:
     status: drafted
@@ -557,6 +586,11 @@ screens:
     route: /sell/call-staff
     component: apps/guest-app/src/routes/sell/CallStaffDetail.tsx
     status: notStarted
+  apis:
+  - operationId: endKioskAssist
+    contract: marketing-crm
+    purpose: Stop assisting
+    trigger: onAction
 - id: KSK-014
   name: Out of service
   module: Sell
@@ -591,3 +625,60 @@ screens:
     route: /sell/out-of-service
     component: apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx
     status: notStarted
+- id: KSK-015
+  name: Assistant
+  module: AI
+  purpose: Help a guest choose and pay, and nothing else.
+  capability: C00
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  apis:
+  - operationId: sendAiMessage
+    contract: ai
+    purpose: Ask
+    trigger: onAction
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Live remaining capacity
+    trigger: onLoad
+  - operationId: handoverToAgent
+    contract: marketing-crm
+    purpose: Pass an assistant conversation to a person
+    trigger: onAction
+  states:
+    loading: Answers stream. **The purchase flow stays on screen behind it** — the assistant helps with
+      the task rather than replacing it
+    empty: —
+    error: '**Falls back to Call staff** (KSK-013), not to an error. A guest stuck at a kiosk with a
+      broken assistant needs a person, and there is one in the building'
+  navigation:
+    exitTo:
+    - SUP-004
+    inferred: true
+    fromFlows: true
+  implementation:
+    app: guest-app
+    route: /kiosk/assistant
+    component: apps/guest-app/src/routes/Assistant.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with
+    no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
+    and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
+    why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Wave
+    2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a
+    guest through ticket selection and checkout cannot ship before the screens that do the selecting
+    and the checking out.'

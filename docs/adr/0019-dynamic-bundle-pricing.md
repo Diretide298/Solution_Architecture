@@ -1,6 +1,6 @@
 # ADR-0019 — A dynamic bundle has a fixed price and a variable allocation
 
-**Status:** Decided · 17 August 2026
+**Status:** Proposed · 17 August 2026
 **Closes:** CF-18
 **Requirements:** 3.5.10, 7.4.48
 

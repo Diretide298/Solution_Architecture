@@ -5,6 +5,8 @@
 entity: Seat import job
 contract: seating
 enum: ImportJobStatus
+enumKind: named
+enumSchema: ImportJobStatus
 owner: seating
 initial:
 - parsing

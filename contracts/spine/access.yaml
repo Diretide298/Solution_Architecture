@@ -135,6 +135,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-audience: [staff]
       summary: Validate media at an access point and admit or deny
       description: >
         The access point is inherited from the session's workstation and is not a request
@@ -173,11 +174,148 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
+  /face-pass/enrolments:
+    post:
+      operationId: enrolFacePass
+      x-ticvai-audience: [staff, guest]
+      summary: Register a facial profile against an entitlement
+      description: >
+        3.2.43. **Registrable only through the app, a ticket counter or the annual pass counter** —
+        never at a gate, and never at a kiosk. The requirement names the three surfaces and the
+        omission is the point: enrolment is a considered act with consent attached, not something
+        done in a queue.
+
+        **One facial profile may not be associated with more than one annual pass.** The refusal is
+        explicit rather than a unique constraint, because the reason matters to the person at the
+        counter — a duplicate means either a mistake or a pass being shared.
+
+        **Consent is captured in the same transaction and is not implied by enrolment.** Under
+        PDPL a biometric is a special category, and a consent record written afterwards is a
+        consent record for something that already happened.
+
+        **A minor's consent is given by a guardian**, and the guardian is recorded. The
+        child-protection journey (3.2.12) sits above this.
+
+        No image is stored — a template is. **The template cannot reconstruct the face**, and that
+        is the property that makes retention defensible at all (CF-35, CF-64).
+      tags: [access]
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subjectId, entitlementId, template, capturedAt, consent, source]
+              properties:
+                subjectId: { type: string, format: uuid }
+                entitlementId: { type: string, format: uuid }
+                template:
+                  type: string
+                  format: password
+                  description: >
+                    **Write-only, never returned.** A template, not an image — the derived vector
+                    a matcher compares against, from which no face can be reconstructed.
+                capturedAt: { type: string, format: date-time }
+                source:
+                  type: string
+                  enum: [guestApp, ticketCounter, annualPassCounter]
+                  description: >
+                    **The three surfaces 3.2.43 allows.** A gate and a kiosk are absent
+                    deliberately.
+                consent:
+                  type: object
+                  required: [purposeId, givenAt]
+                  properties:
+                    purposeId: { type: string, format: uuid }
+                    givenAt: { type: string, format: date-time }
+                    guardianSubjectId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                      description: Required where the subject is a minor.
+                    guardianRelationship: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Enrolled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FacePassEnrolment' }
+        '409':
+          description: >
+            **This face is already on another annual pass.** Returned with the reason and without
+            naming the other pass — a counter agent needs to know it is a duplicate, not whose.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: Capture quality too low to enrol. Retake rather than store something that will not match.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /face-pass/enrolments/{enrolmentId}:
+    parameters:
+      - name: enrolmentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getFacePassEnrolment
+      x-ticvai-audience: [staff, guest]
+      summary: Whether a pass has a face registered, and when
+      description: >
+        **Returns metadata and never the template.** Whether one exists, when it was captured,
+        which surface enrolled it, and the consent behind it.
+      tags: [access]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Enrolment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FacePassEnrolment' }
+
+    delete:
+      operationId: revokeFacePass
+      x-ticvai-audience: [staff, guest]
+      summary: Remove a facial profile
+      description: >
+        Withdrawn by the guest, ended with the pass, or erased under a DSAR.
+
+        **The template is destroyed, not flagged.** A biometric marked inactive is a biometric
+        still held, and under PDPL that is the same as holding it — which is why this is a delete
+        rather than a status change.
+
+        **The entitlement survives.** A guest who withdraws their face still has their annual pass
+        and enters another way (3.2.9 allows the check to be deactivated per ticket type).
+      tags: [access]
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Destroyed
+
   /parking-facilities:
     get:
       operationId: listParkingFacilities
       x-ticvai-consumed-by:
+        - "P02 GST-028 Parking – Reservation Confirmed"
         - "P08 BO-006 Parking Configuration"
+      x-ticvai-audience: [staff, guest]
       summary: Car parks at a venue, and how each integrates
       description: >
         3.2.30 and CF-52, settled 14 August. **Three integration modes**, and the mode decides
@@ -201,6 +339,7 @@ paths:
       operationId: setParkingFacility
       x-ticvai-consumed-by:
         - "P08 BO-006 Parking Configuration"
+      x-ticvai-audience: [staff]
       summary: Configure a car park and its integration
       description: >
         **The mode is the decision, and the three are not variations of one thing.**
@@ -242,6 +381,8 @@ paths:
       operationId: createParkingEntitlement
       x-ticvai-consumed-by:
         - "P02 GST-027 Parking – Reserve & Pay"
+        - "P02 GST-028 Parking – Reservation Confirmed"
+      x-ticvai-audience: [service]
       summary: A guest bought parking
       description: >
         **Pushes the plate to the parking system where the mode is `plateWhitelist`**, and that
@@ -252,7 +393,6 @@ paths:
         that will not open is a staffed problem rather than a refund.
       tags: [access]
       x-ticvai-permission: null   # created by the order that bought it
-      x-ticvai-auth: service
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -287,6 +427,7 @@ paths:
       operationId: updateParkingEntitlement
       x-ticvai-consumed-by:
         - "P02 GST-027 Parking – Reserve & Pay"
+      x-ticvai-audience: [guest]
       summary: Change the plate, or revoke
       description: >
         **A guest changing car is the common case** and it must work after purchase — someone
@@ -296,7 +437,6 @@ paths:
         plate still opens the barrier is a car park giving away spaces.
       tags: [access]
       x-ticvai-permission: null
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -339,6 +479,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-audience: [staff]
       summary: Admit against a failed validation
       description: >
         Records the overriding principal, the original denial reason and a mandatory
@@ -409,6 +550,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read-only validity check without admitting
       description: >
@@ -465,6 +607,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-audience: [staff]
       summary: Replay scans recorded offline
       description: >
         Ordered batch. The server processes in `sequence` order and stops at the first
@@ -530,6 +673,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List scan events
       tags: [sync]
@@ -595,6 +739,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Entitlement and rule set for offline validation
       description: >
@@ -646,6 +791,7 @@ paths:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       summary: Set the operating mode of an access point
       description: >
         Podium operation. Changes what the gate does, not who may pass it.
@@ -683,6 +829,7 @@ paths:
         - "P07 SCN-016 Gate mode"
         - "P08 BO-006 Parking Configuration"
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List access points
       tags: [accessPoint]
@@ -716,6 +863,7 @@ paths:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       summary: Create an access point
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -749,6 +897,7 @@ paths:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an access point
       tags: [accessPoint]
@@ -770,12 +919,15 @@ paths:
         - "P07 SCN-016 Gate mode"
         - "P08 BO-006 Parking Configuration"
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       summary: Update an access point
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -808,6 +960,7 @@ paths:
       operationId: listAdmissionProfiles
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List admission profiles
       description: >
@@ -838,6 +991,7 @@ paths:
       operationId: createAdmissionProfile
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Create an admission profile
       tags: [accessPoint]
@@ -869,6 +1023,7 @@ paths:
       operationId: updateAdmissionProfile
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Update an admission profile
       description: >
@@ -879,6 +1034,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -898,6 +1055,7 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-010 Blacklisted"
         - "P08 BO-033 Blacklist Management"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # a removed-too-late blacklist entry admits someone barred
       summary: List blacklisted media
       tags: [accessPoint]
@@ -926,6 +1084,7 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-010 Blacklisted"
         - "P08 BO-033 Blacklist Management"
+      x-ticvai-audience: [staff]
       summary: Blacklist a media code
       description: >
         Denies outright regardless of entitlement state. Included in the offline package so
@@ -966,12 +1125,15 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-010 Blacklisted"
         - "P08 BO-033 Blacklist Management"
+      x-ticvai-audience: [staff]
       summary: Remove a blacklist entry
       tags: [accessPoint]
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204': { description: Removed }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
@@ -1001,6 +1163,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-audience: [staff]
       summary: Admit a group on one read
       description: >
         A school party or tour group entering on a single credential. Partial admission is
@@ -1059,6 +1222,7 @@ paths:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       summary: Set a geofence for handheld validation
       description: >
         Constrains where a handheld may validate for this access point. A roaming scanner used
@@ -1111,6 +1275,34 @@ components:
         antiPassbackEnabled: { type: boolean, default: false }
         requiresExitBeforeReentry: { type: boolean, default: false }
         driver: { type: string }
+
+    FacePassEnrolment:
+      type: object
+      x-ticvai-persistence: "pii.subject_biometric"
+      description: >
+        3.2.43. **Metadata about a facial profile. Never the profile.**
+      required: [id, subjectId, entitlementId, source, capturedAt]
+      properties:
+        id: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid }
+        entitlementId: { type: string, format: uuid }
+        source: { type: string, enum: [guestApp, ticketCounter, annualPassCounter] }
+        capturedAt: { type: string, format: date-time }
+        consentPurposeId: { type: string, format: uuid }
+        consentGivenAt: { type: string, format: date-time }
+        guardianSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Where the subject is a minor (3.2.12).
+        isActive: { type: boolean, readOnly: true }
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **Bounded by the entitlement it belongs to.** A face outliving the pass it was enrolled
+            for is a biometric held for no stated purpose, which CF-64 has to settle.
 
     ParkingIntegrationMode:
       type: string

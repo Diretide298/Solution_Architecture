@@ -18,6 +18,7 @@ import { buildDomain } from './lib/domain.mjs';
 import { buildLineage } from './lib/lineage.mjs';
 import { buildTooltips } from './lib/tooltips.mjs';
 import { buildDecisions } from './lib/decisions.mjs';
+import { buildDomains } from './lib/domains.mjs';
 import { extractFrame } from './lib/wireframes.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -43,6 +44,7 @@ let domain = null;
 let lineage = null;
 let tooltips = null;
 let decisions = null;
+let domains = null;
 let indexing = null;
 
 // ---- the boot payload, and what is held back from it -----------------------
@@ -148,6 +150,27 @@ async function refreshIndex(reason = 'startup') {
         }),
       ]);
 
+      // A domain lens gathers one subject across every other payload, so it is
+      // the only build that needs all of them — it goes last, after the lineage
+      // has joined the operations to the tables and the screens to both.
+      // The declared half of every lens, as the package now ships it: one
+      // sidecar keyed `kind:id`, regenerated with the dump rather than edited
+      // into sixty files. Absent is fine — the lens then derives and says so.
+      const markers = await readFile(path.join(ROOT, 'handoff/domain-markers.json'), 'utf8')
+        .then(JSON.parse)
+        .catch(() => null);
+
+      domains = buildDomains({
+        markers,
+        operations: index.nodes.filter((n) => n.type === 'operation'),
+        machines: domain.machines ?? [],
+        events: domain.events ?? [],
+        screens: journeys.screens ?? [],
+        adrs: decisions.adrs ?? [],
+        lineage,
+        journeys,
+      });
+
       const { stats } = index;
       const j = journeys.stats;
       const b = backend.stats;
@@ -161,7 +184,10 @@ async function refreshIndex(reason = 'startup') {
           `lineage ${lineage?.stats.resolved ?? 0}/${lineage?.stats.operations ?? 0} resolved · ` +
           `${tooltips?.stats.total ?? 0} tips | ` +
           `decisions ${decisions?.stats.adrs ?? 0} ADRs · ` +
-          `${decisions?.stats.vectorsPassed ?? 0}/${decisions?.stats.vectors ?? 0} vectors ` +
+          `${decisions?.stats.vectorsPassed ?? 0}/${decisions?.stats.vectors ?? 0} vectors | ` +
+          `lenses ${(domains?.lenses ?? [])
+            .map((l) => `${l.key} ${l.stats.total} (${l.stats.gaps} undeclared)`)
+            .join(' · ') || 'none'} ` +
           `(${Date.now() - started}ms)`
       );
     } catch (err) {
@@ -314,6 +340,11 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/decisions') {
       if (!decisions) await refreshIndex('on demand');
       return sendCachedJson(res, req, 'decisions', decisions);
+    }
+
+    if (url.pathname === '/api/domains') {
+      if (!domains) await refreshIndex('on demand');
+      return sendCachedJson(res, req, 'domains', domains);
     }
 
     if (url.pathname === '/api/file' || url.pathname === '/api/tree') {

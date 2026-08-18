@@ -5,12 +5,13 @@
 # accreditation is an entitlement, which is the position worth testing.
 #
 # Validated by tools/check-flows.py.
+#
+# Moved to Wave 3 (CF-101). **Accreditation is workshop-blocked and entirely Wave 3** (CF-21). This flow was written as a proposal to take into that workshop, which is a Wave 3 activity.
 
 id: F23
 name: A contractor gets a badge and uses it
 actor: contractor
-capability: C12
-wave: 1
+wave: 3
 frequency: weekly
 criticality: safety
 platforms:
@@ -107,3 +108,7 @@ openQuestions:
 - Who runs a background check, and against what. 12.1.x implies verification and names no provider (CF-21).
 - Whether an accreditation grants zones directly or names an admission profile that does. Decides whether
   this is 25 operations or 40.
+primaryContract: approvals
+contracts:
+- approvals
+- access

@@ -5,6 +5,8 @@
 entity: Stock count
 contract: inventory
 enum: CountStatus
+enumKind: named
+enumSchema: CountStatus
 owner: inventory
 initial:
 - open

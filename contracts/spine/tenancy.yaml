@@ -109,6 +109,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List scope nodes visible to the session
       tags: [scope]
@@ -150,6 +151,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
+      x-ticvai-audience: [staff]
       summary: Create a scope node
       tags: [scope]
       x-ticvai-permission: SCOPE_MANAGE
@@ -186,6 +188,7 @@ paths:
       operationId: getScopeNode
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a scope node
       tags: [scope]
@@ -205,6 +208,7 @@ paths:
       operationId: updateScopeNode
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
+      x-ticvai-audience: [staff]
       summary: Rename or deactivate a scope node
       description: >
         Deactivating a node causes every permission query at or beneath it to resolve to
@@ -214,6 +218,8 @@ paths:
       x-ticvai-scope-level: brand
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -241,6 +247,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getRegionSettings
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read region settings
       description: >
@@ -261,6 +268,7 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: updateRegionSettings
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: region
       summary: Update region settings
       description: >
@@ -296,6 +304,7 @@ paths:
   /workstations:
     get:
       operationId: listWorkstations
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List workstations
       tags: [workstation]
@@ -335,6 +344,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getWorkstation
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a workstation
       description: >
@@ -359,6 +369,7 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: configureWorkstation
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Configure a workstation
       tags: [workstation]
@@ -387,6 +398,7 @@ paths:
       operationId: listOutlets
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
+      x-ticvai-audience: [staff]
       summary: List outlets
       description: >
         A point of sale within a venue — a shop, a restaurant, a bar, a kiosk cluster. F&B,
@@ -421,6 +433,7 @@ paths:
       operationId: createOutlet
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
+      x-ticvai-audience: [staff]
       summary: Create an outlet
       tags: [workstation]
       x-ticvai-permission: REGION_CONFIGURE
@@ -456,12 +469,15 @@ paths:
       operationId: updateOutlet
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
+      x-ticvai-audience: [staff]
       summary: Amend an outlet
       tags: [workstation]
       x-ticvai-permission: REGION_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -485,6 +501,7 @@ paths:
   /sale-boards:
     get:
       operationId: listSaleBoards
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List sale boards
       description: >
@@ -513,6 +530,7 @@ paths:
 
     post:
       operationId: createSaleBoard
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Create a sale board
       description: >
@@ -551,6 +569,7 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: updateSaleBoard
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Update a sale board
       description: >
@@ -561,6 +580,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -579,6 +600,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List registered devices
       description: >
@@ -617,6 +639,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
+      x-ticvai-audience: [staff]
       summary: Register a device
       description: >
         Binds a device to a workstation and names the driver. Drivers are built to open
@@ -654,6 +677,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: recordDeviceHeartbeat
+      x-ticvai-audience: [device]
       summary: Device heartbeat and status
       description: >
         Reports reachability and consumables — paper low, drawer open, reader offline. A
@@ -661,7 +685,6 @@ paths:
         before a queue forms than during one.
       tags: [workstation]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
-      x-ticvai-auth: device
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -957,6 +980,8 @@ components:
 
     Workstation:
       x-ticvai-persistence: "platform.workstation"
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       type: object
       required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone]
       properties:

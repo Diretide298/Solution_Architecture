@@ -21,18 +21,20 @@ packages:
 - api-client
 contracts:
 - catalogue
+- finance
 - identity
 - marketing-crm
 - orders
 - promotions
+- queue
 - retail
 - seating
 - white-label
-screenCount: 29
+screenCount: 35
 byWave:
-  wave1: 18
-  wave2: 8
-  wave3: 3
+  wave1: 20
+  wave2: 11
+  wave3: 4
 screens:
 - id: WEB-001
   name: Home / Landing
@@ -142,6 +144,18 @@ screens:
   component: apps/guest-web/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx
   wave: 1
   status: notStarted
+- id: WEB-030
+  name: Ticket Transfer
+  route: /ticket-transfer
+  component: apps/guest-web/src/routes/TicketTransfer.tsx
+  wave: 1
+  status: notStarted
+- id: WEB-035
+  name: Multi-Currency & Pricing
+  route: /multi-currency-pricing
+  component: apps/guest-web/src/routes/MulticurrencyPricing.tsx
+  wave: 1
+  status: notStarted
 - id: WEB-007
   name: Seat Map Selection
   route: /booking-and-selection/seat-map-selection
@@ -190,6 +204,24 @@ screens:
   component: apps/guest-web/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx
   wave: 2
   status: notStarted
+- id: WEB-031
+  name: My Reservations
+  route: /my-reservations
+  component: apps/guest-web/src/routes/MyReservations.tsx
+  wave: 2
+  status: notStarted
+- id: WEB-032
+  name: Offers & Promotions
+  route: /offers-promotions
+  component: apps/guest-web/src/routes/OffersPromotions.tsx
+  wave: 2
+  status: notStarted
+- id: WEB-033
+  name: Shop
+  route: /shop
+  component: apps/guest-web/src/routes/Shop.tsx
+  wave: 2
+  status: notStarted
 - id: WEB-009
   name: Wishlist
   route: /booking-and-selection/wishlist
@@ -206,5 +238,11 @@ screens:
   name: Survey & Feedback
   route: /engagement-and-support/survey-and-feedback
   component: apps/guest-web/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx
+  wave: 3
+  status: notStarted
+- id: WEB-034
+  name: Lost & Found
+  route: /lost-found
+  component: apps/guest-web/src/routes/LostFound.tsx
   wave: 3
   status: notStarted

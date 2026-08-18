@@ -377,7 +377,10 @@ screens:
     offline: 'Identical offline, with one difference: a denial the bundle cannot explain shows `unknown
       to this device` rather than inventing a reason'
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -440,7 +443,10 @@ screens:
     offline: '**Available offline and recorded locally.** An override that cannot happen without a network
       is an override that never happens at a gate'
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -502,7 +508,10 @@ screens:
     error: Group could not be resolved
     offline: Fully offline. Admits what is valid and states the shortfall
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -565,7 +574,10 @@ screens:
     offline: Searches the bundle only. A reference issued after the last sync will not be found, and
       the screen says so rather than denying
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -627,7 +639,10 @@ screens:
     error: Search unavailable
     offline: Bundle only, and the bundle age is shown beside the results
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -689,7 +704,10 @@ screens:
     error: Not applicable
     offline: Blacklist ships in the bundle. **A blacklist that only works online is not a blacklist**
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -736,7 +754,10 @@ screens:
     offline: '**Not available offline.** A delegated right issued in another region cannot be verified
       from a local bundle, and admitting on trust is how a pass gets used twice in two countries'
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -778,7 +799,10 @@ screens:
     error: Bundle missing or expired. The device refuses to scan rather than admitting blind
     offline: This is the screen. Bundle age, scans journalled, last sync attempt
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -840,7 +864,10 @@ screens:
     error: Journal unreadable — the most serious failure on the device
     offline: The journal is the offline record. It is why an offline admit is recoverable
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted
@@ -1039,7 +1066,10 @@ screens:
     offline: '**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding
       (CF-33)'
   navigation:
-    exitTo: []
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
   wireframe:
     status: drafted

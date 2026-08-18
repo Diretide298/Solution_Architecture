@@ -8,7 +8,6 @@
 id: F13
 name: Month end closes
 actor: financeController
-capability: C21
 wave: 2
 frequency: monthly
 criticality: financial
@@ -115,3 +114,7 @@ exitStates:
   description: Close abandoned, period reopened for correction
 - state: escalated
   description: Unbalanced and referred
+primaryContract: finance
+contracts:
+- finance
+- shift

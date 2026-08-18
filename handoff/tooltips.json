@@ -12,7 +12,7 @@
    "operations": 45,
    "module": "1 \u2014 Ticketing Catalogue",
    "title": "TICVAI Catalogue & Entitlement",
-   "tip": "## What this contract covers **Defines what can be sold and what it grants.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 1 \u2014 Ticketing Catalogue | | **Requirements** | ~312 | | **Capabilities** | C20, C79, C80, C81, C84, C85, C102, C103, C104 | | **Consumed by** | P08 Venue Back Office \u00b7 P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App \u00b7 P03 Kiosk \u00b7 P10 Partner Portal | ## How to read this "
+   "tip": "## What this contract covers **Defines what can be sold and what it grants.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 1 \u2014 Ticketing Catalogue | | **Requirements** | ~312 | | **Capabilities** | C20, C79, C80, C81, C84, C85, C102, C103, C104 | | **Consumed by** | P08 Venue Back Office \u00b7 P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App \u00b7 P05 Kiosk \u00b7 P10 Partner Portal | ## How to read this "
   },
   "cross-cell": {
    "tier": "spine",
@@ -40,7 +40,7 @@
    "operations": 38,
    "module": "2 \u2014 Ticketing Sales",
    "title": "TICVAI Order & Payment",
-   "tip": "## What this contract covers **Money moves here. One atomic transaction with entitlement and ledger.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 2 \u2014 Ticketing Sales | | **Requirements** | ~343 | | **Capabilities** | C02, C03, C04, C34, C47 | | **Consumed by** | P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App \u00b7 P03 Kiosk \u00b7 P10 Partner Portal \u00b7 P12 Support Console | ## How to read this file"
+   "tip": "## What this contract covers **Money moves here. One atomic transaction with entitlement and ledger.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 2 \u2014 Ticketing Sales | | **Requirements** | ~343 | | **Capabilities** | C02, C03, C04, C34, C47 | | **Consumed by** | P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App \u00b7 P05 Kiosk \u00b7 P10 Partner Portal \u00b7 P12 Support Console | ## How to read this file"
   },
   "shift": {
    "tier": "spine",
@@ -289,7 +289,7 @@
   },
   "access.scan_event_unassigned": {
    "columns": 0,
-   "tip": "Default partition. Catches scans whose venue matches no configured partition, so a misconfiguration is loud rather than silently lossy. No columns of its own \u2014 it inherits from the parent."
+   "tip": "default partition"
   },
   "assets.media_asset": {
    "columns": 21,
@@ -849,7 +849,7 @@
   },
   "orders.sales_order_unassigned": {
    "columns": 0,
-   "tip": "Default partition. Same purpose as the scan-event one: an order for an unconfigured venue lands somewhere visible instead of failing."
+   "tip": "default partition"
   },
   "orders.shift": {
    "columns": 22,
@@ -1185,11 +1185,11 @@
   },
   "approvals.request": {
    "columns": 0,
-   "tip": "One request per action needing authorisation. The subject is a reference, never a copy \u2014 a copy goes stale between raising and deciding"
+   "tip": "One request per action needing authorisation. The subject is a reference, never a copy"
   },
   "approvals.decision": {
    "columns": 0,
-   "tip": "Every decision at every level. Immutable once complete \u2014 an approval is evidence"
+   "tip": "Every decision at every level. **Immutable once the request completes** \u2014 an approval is evidence"
   },
   "approvals.matrix": {
    "columns": 0,
@@ -1201,7 +1201,7 @@
   },
   "approvals.delegation": {
    "columns": 0,
-   "tip": "Standing in for an approver. Always time-bounded, and never lets a delegate approve what the delegator raised"
+   "tip": "Standing in for an approver. Always time-bounded \u2014 an open-ended delegation is one nobody remembers"
   },
   "approvals.escalation": {
    "columns": 0,
@@ -1213,7 +1213,7 @@
   },
   "ai.conversation": {
    "columns": 0,
-   "tip": "A thread, scoped to a principal and a module"
+   "tip": "A thread, scoped to a principal and a module. **Analytical store, not the transactional primary** (ADR-0020) \u2014 append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
   },
   "ai.index_entry": {
    "columns": 0,
@@ -1229,11 +1229,11 @@
   },
   "ai.interaction": {
    "columns": 0,
-   "tip": "The audit record. **Retention is unresolved (CF-64)** \u2014 a prompt may carry personal data"
+   "tip": "The audit record. **Retention is unresolved (CF-64)** \u2014 a prompt may carry personal data. **Analytical store, not the transactional primary** (ADR-0020) \u2014 append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
   },
   "ai.knowledge_collection": {
    "columns": 0,
-   "tip": "Metadata only. **One collection per tenant \u2014 isolation is partition-level, never a filter**"
+   "tip": "A collection in the vector store. **One per embedding model** \u2014 a collection carries its own vector config and a shard cannot, so two models cannot share one (ADR-0021). Carries the shard key, which is the tenant boundary on shared placement"
   },
   "ai.knowledge_document": {
    "columns": 0,
@@ -1241,7 +1241,7 @@
   },
   "ai.message": {
    "columns": 0,
-   "tip": "Prompt and response with sources, provider, model, tokens and latency"
+   "tip": "Prompt and response with sources, provider, model, tokens and latency. **Analytical store, not the transactional primary** (ADR-0020) \u2014 append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
   },
   "ai.policy": {
    "columns": 0,
@@ -1254,14 +1254,6 @@
   "ai.provider": {
    "columns": 0,
    "tip": "Configured providers, models and failover order. Credentials are a vault reference, never a key"
-  },
-  "qdrant:tenant_{id}_catalogue": {
-   "columns": 0,
-   "tip": "Product, membership and pass descriptions, embedded for semantic search (8.4.39)"
-  },
-  "qdrant:tenant_{id}_knowledge": {
-   "columns": 0,
-   "tip": "One collection per tenant. Chunk text, its embedding, and the payload that carries scope_path"
   },
   "control.release": {
    "columns": 0,
@@ -1382,6 +1374,50 @@
   "control.partner_agreement": {
    "columns": 0,
    "tip": "Net rate or commission, credit terms, validity. **Versioned** \u2014 an order placed last week used last week\u2019s rate"
+  },
+  "ai.layout_draft": {
+   "columns": 0,
+   "tip": "A generated seat layout awaiting review. **Ends at previewReady and writes nothing to the seat map** \u2014 the draft enters seating.import_job at its existing human commit step (ADR-0020)"
+  },
+  "qdrant:knowledge": {
+   "columns": 0,
+   "tip": "**One collection per embedding model** (ADR-0021) \u2014 a collection is the only Qdrant container that can carry its own vector configuration, and a shard cannot. Tenants sharing a model share this collection, separated by shard key and scope_path payload; a tenant forced onto a local model by residency"
+  },
+  "orders.deposit_box": {
+   "columns": 0,
+   "tip": "A cashier\u2019s cash box. **Allocated to a person, not a workstation** \u2014 a cashier moving between tills takes their float, which is what makes a variance attributable. withdrawnTotal reduces the expected close: cash skimmed for banking is not a shortfall"
+  },
+  "marketing.agent_availability": {
+   "columns": 0,
+   "tip": "Available, busy, away or offline, with a concurrency limit. **Expires** \u2014 an agent who forgets to go offline is one conversations queue for"
+  },
+  "marketing.conversation": {
+   "columns": 0,
+   "tip": "A live session with somebody waiting. **Not a case** \u2014 a case is a ticket measured in hours, this is measured in seconds. A conversation may create a case; it is not one"
+  },
+  "marketing.conversation_message": {
+   "columns": 0,
+   "tip": "One message. The sender is resolved, never declared, and **the assistant is labelled as one** \u2014 a guest talking to a bot that presents as a person is a complaint waiting to happen"
+  },
+  "marketing.kiosk_assist_session": {
+   "columns": 0,
+   "tip": "A staff member acting on a kiosk session remotely (2.1.25). **The guest can always see it and always end it** \u2014 assistance a guest cannot stop is surveillance"
+  },
+  "cache:answer": {
+   "columns": 0,
+   "tip": "**Question, scope and locale to an answer.** The largest cost lever at a kiosk, where forty questions repeat thousands of times a day. **Invalidated by the same events that invalidate the index** \u2014 a cached answer that outlives a price change has misled a guest on the venue\u2019s behalf. **`scope_path` "
+  },
+  "cache:embedding": {
+   "columns": 0,
+   "tip": "Content hash and model to a vector. **A tenant editing fifty of twenty thousand chunks re-embeds fifty.** Invalidation is trivial because the key changes when the content does"
+  },
+  "cache:idempotency": {
+   "columns": 0,
+   "tip": "Seen idempotency keys. **Every write carries one as of 17 August and nothing said where the record lived or how long it was kept** \u2014 a key store that forgets too early lets a replay through, which is the defect the key exists to prevent. Retention must exceed the longest offline window (ADR-0013) **"
+  },
+  "cache:resolution": {
+   "columns": 0,
+   "tip": "Scope and permission resolution, tenant configuration, price lists. **Read on every request and changed rarely** \u2014 `resolvePermissions` reads five tables on every authorised call"
   }
  },
  "platforms": {
@@ -1521,7 +1557,7 @@
  "adrs": {
   "0001": {
    "title": "Cell architecture \u2014 one tenant per jurisdiction",
-   "tip": "**Cell = Tenant \u00d7 Jurisdiction.** One isolated deployment \u2014 own cloud environment, cluster and database \u2014 per tenant per jurisdiction. Placement is a **Region** attribute: `shared` | `dedicated:{cloud}:{region}` | `client_hosted:{endpoint}`. A tenant may be mixed across regions."
+   "tip": "**Superseded** by ADR-0014 and ADR-0017. Kept for its Context and Alternatives. Do not cite its Decision section \u2014 reasoning from it produced a cross-tenant isolation defect on 17 August (CF-97)."
   },
   "0002": {
    "title": "Authorisation is user-driven, not workstation-driven",
@@ -1594,6 +1630,26 @@
   "0019": {
    "title": "A dynamic bundle has a fixed price and a variable allocation",
    "tip": "The guest picks; the total does not move. Allocation across the chosen components is proportional to list price at sale and frozen on the order line."
+  },
+  "0020": {
+   "title": "Where AI runs, and what it is isolated from",
+   "tip": "Retrieval and the index stay in the cell; inference is a call out and only the prompt leaves; the AI logs move off the transactional primary. ADR-0009 answered the legal question and never this one."
+  },
+  "0021": {
+   "title": "Qdrant \u2014 one collection per embedding model, tenant is the shard, scope is the filter",
+   "tip": "The split criterion is the embedding model, not the tenant \u2014 a shard inherits the collection vector config and cannot differ. Tenants share a collection, separated by shard and payload; residency-forced local models get their own."
+  },
+  "0022": {
+   "title": "Conflict policy is declared per operation, from a closed set of four",
+   "tip": "## Why this is written late **Every one of the 755 operations already carries `x-ticvai-conflict-policy`.** The decision was made in practice, applied consistently, and never recorded \u2014 so the taxonomy existed only as a "
+  },
+  "0023": {
+   "title": "Personal data lives apart from the append-only ledger",
+   "tip": "## Why this is written late **The separation is built and complete.** Four `pii.*` tables, ten operations touching `ledger.entry`, fifteen touching `pii.*`, and \u2014 verified 17 August \u2014 **zero operations touching both.** I"
+  },
+  "0024": {
+   "title": "The contract is the deliverable, and it is written before anything else",
+   "tip": "## Why this is written late **It is the decision the whole package rests on and it was never stated.** As of 17 August: **755 operations, 279 tables, 373 screens, 76 state models, 27 events, and zero lines of SQL.** That"
   }
  },
  "validators": {
@@ -1655,6 +1711,12 @@
   },
   "notification-catalogue": {
    "tip": "Event to audience to channel to consent. The three silences are decisions, listed so a reader can tell decided-against from forgotten."
+  },
+  "ai-index": {
+   "tip": "Where every AI artefact lives. AI has no folder \u2014 the package is organised by artefact kind \u2014 so this is the index that replaces one."
+  },
+  "ai-credentials": {
+   "tip": "One provider key per tenant, optionally per venue. No surface ever holds one \u2014 every surface calls TICVAI and TICVAI calls the provider."
   }
  },
  "terms": {
@@ -1865,6 +1927,36 @@
    "steps": 5,
    "branches": 6,
    "tip": "A contractor needs access to a plant room for a week, and a steward at a service gate must be able to check it."
+  }
+ },
+ "states": {
+  "IndexJob.status": {
+   "entity": "AI index job",
+   "contract": "ai",
+   "states": 6,
+   "transitions": 8,
+   "tip": "`recordsFailed` is the number to watch rather than the status. **A job that completes having silently failed on 3% of its rows is a search that silently misses 3% of the answers**, and nothing else in the system will say so. A full rebuild "
+  },
+  "KnowledgeDocument.status": {
+   "entity": "AI knowledge document",
+   "contract": "ai",
+   "states": 4,
+   "transitions": 6,
+   "tip": "`processing` is the state most systems omit and the one that breaks things. **An upload completes before its chunks exist**, and a screen showing \"added\" too early sends a user searching for something that is not there yet. Deletion is not "
+  },
+  "LayoutDraft.status": {
+   "entity": "AI layout draft",
+   "contract": "ai",
+   "states": 3,
+   "transitions": 2,
+   "tip": "Deliberately short, and it ends at `previewReady` rather than at a seat map. **The generated layout is a proposal into `seating.import_job`**, which already has a human commit step \u2014 because a seat manifest is always wrong the first time in"
+  },
+  "ProposedAction.status": {
+   "entity": "AI proposed action",
+   "contract": "ai",
+   "states": 5,
+   "transitions": 5,
+   "tip": "`approved` is not terminal and must not be treated as done. `rejectionRate` in the usage report counts rejections against proposals, and it is the number that says whether the assistant is worth having. **No path back from `rejected`.** A r"
   }
  }
 }

@@ -549,6 +549,35 @@ def summary(target_kind: Optional[str] = None):
     return {"counts": counts, "items": [VerdictOut(**dict(r)) for r in rows]}
 
 
+@app.get("/api/verdicts")
+def verdicts(account: dict = Depends(require_account)):
+    """Every verdict ever recorded, newest first — not one row per artefact.
+
+    The summary above answers "where does this stand", which is what a sign-off
+    report needs. This answers "what has everyone been doing", which is a
+    different question and cannot be derived from the first: a summary of
+    current verdicts has already thrown away the disagreement, the revisions and
+    the pace, and those are most of what tells you whether a review is going
+    well.
+
+    Signed in only. Who reviewed what, and how fast, is not public.
+    """
+    rows = db.all_rows(
+        """SELECT v.id, v.target_kind, v.target_id, v.verdict, v.note,
+                  v.created_at AS at, v.account_id,
+                  a.name AS by, a.email AS by_email, a.role AS by_role, a.active AS by_active
+             FROM verdict v JOIN account a ON a.id = v.account_id
+            ORDER BY v.id DESC"""
+    )
+    people = db.all_rows(
+        "SELECT id, email, name, role, active, created_at FROM account ORDER BY id"
+    )
+    return {
+        "verdicts": [dict(r) for r in rows],
+        "accounts": [dict(p) for p in people],
+    }
+
+
 @app.get("/api/health")
 def health():
     accounts = db.one("SELECT COUNT(*) AS n FROM account")["n"]

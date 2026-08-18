@@ -106,6 +106,10 @@ screens:
   navigation:
     isEntryPoint: true
     inferred: true
+    exitTo:
+    - SUP-002
+    - SUP-003
+    - SUP-004
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -158,6 +162,14 @@ screens:
     contract: marketing-crm
     purpose: Assign, reprioritise or resolve a case
     trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
+  - operationId: setAgentAvailability
+    contract: marketing-crm
+    purpose: An agent goes available, away or offline
+    trigger: onAction
   implementation:
     app: venue-support-web
     route: /general/agent-dashboard
@@ -167,6 +179,10 @@ screens:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-003
+    - SUP-004
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -201,14 +217,23 @@ screens:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-004
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: setAgentAvailability
+    contract: marketing-crm
+    purpose: An agent goes available, away or offline
+    trigger: onAction
 - id: SUP-004
   name: Conversation Queue
   module: TODO
   purpose: Find the right one quickly, and act on it without opening it.
-  wave: 3
+  wave: 2
   layout:
     template: list
     regions:
@@ -253,6 +278,18 @@ screens:
     contract: marketing-crm
     purpose: Assign, reprioritise or resolve a case
     trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
+  - operationId: claimConversation
+    contract: marketing-crm
+    purpose: An agent takes it
+    trigger: onAction
+  - operationId: transferConversation
+    contract: marketing-crm
+    purpose: Pass it to another agent or queue
+    trigger: onAction
   implementation:
     app: venue-support-web
     route: /general/conversation-queue
@@ -266,12 +303,14 @@ screens:
     inferred: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101).
+    **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace
+    move; the rest of the console stays Wave 3.
 - id: SUP-005
   name: Live Chat Workspace
   module: TODO
   purpose: Work with live chat workspace for this venue.
-  wave: 3
+  wave: 2
   layout:
     template: detail
     regions:
@@ -315,6 +354,22 @@ screens:
     contract: marketing-crm
     purpose: Reopen a resolved case
     trigger: onAction
+  - operationId: getConversation
+    contract: marketing-crm
+    purpose: One conversation and everything before it
+    trigger: onLoad
+  - operationId: sendConversationMessage
+    contract: marketing-crm
+    purpose: Say something, as a guest or an agent
+    trigger: onAction
+  - operationId: closeConversation
+    contract: marketing-crm
+    purpose: End it
+    trigger: onAction
+  - operationId: transferConversation
+    contract: marketing-crm
+    purpose: Pass it to another agent or queue
+    trigger: onAction
   implementation:
     app: venue-support-web
     route: /general/live-chat-workspace
@@ -331,7 +386,9 @@ screens:
     flowDerived: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
+    with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting
+    can wait.
 - id: SUP-006
   name: Knowledge Base Search
   module: TODO
@@ -570,6 +627,10 @@ screens:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -630,6 +691,10 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
   implementation:
     app: venue-support-web
     route: /general/agent-performance-and-sla-view
@@ -639,6 +704,10 @@ screens:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.

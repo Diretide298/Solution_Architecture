@@ -5,6 +5,8 @@
 entity: Work order
 contract: maintenance
 enum: WorkOrderStatus
+enumKind: named
+enumSchema: WorkOrderStatus
 owner: maintenance
 initial:
 - open
@@ -12,10 +14,6 @@ terminal:
 - cancelled
 - closed
 - verified
-offlineReachable:
-- inProgress
-- paused
-- completed
 transitions:
 - from: open
   to: assigned
@@ -118,3 +116,7 @@ notes: '`verified` is terminal and `completed` is not. A safety-critical asset r
   **`updateWorkOrder` used to do six jobs.** Assign, start, pause, resume, block on parts and reopen
   were all one PATCH, so the state model could not say which operation caused which move and neither
   could an audit. Seven named operations replaced it on 17 August (CF-71).'
+offlineReachable:
+- inProgress
+- paused
+- completed

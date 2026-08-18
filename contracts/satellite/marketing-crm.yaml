@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 37
+  x-ticvai-screen-count: 49
   x-ticvai-tier: satellite
   x-ticvai-module: "20 — Marketing & CRM"
   x-ticvai-requirements: 319
@@ -105,6 +105,472 @@ tags:
 
 paths:
   # ---------------------------------------------------------------- guests
+  /conversations:
+    get:
+      operationId: listConversations
+      x-ticvai-consumed-by:
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff]
+      summary: The omnichannel inbox
+      description: >
+        22.8.1. WhatsApp, web chat, in-app, email and SMS in one queue.
+
+        **A conversation is not a case.** A case is a ticket — created, assigned, resolved,
+        closed, measured in hours. A conversation is a live session with somebody waiting, and its
+        service level is measured in seconds. The support screens were wired to `listCases` until
+        17 August, which made every message a case update and left the queue, the routing and the
+        agent state with nowhere to live.
+
+        A conversation may *create* a case (22.8.12). It is not one.
+      tags: [marketing]
+      x-ticvai-permission: CASE_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - name: state
+          in: query
+          schema: { $ref: '#/components/schemas/ConversationState' }
+        - name: assignedToMe
+          in: query
+          schema: { type: boolean }
+        - name: channel
+          in: query
+          schema: { $ref: '#/components/schemas/ConversationChannel' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Conversation' }
+
+  /conversations/{conversationId}:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getConversation
+      x-ticvai-consumed-by:
+        - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff]
+      summary: One conversation and everything before it
+      description: >
+        22.8.2 and 22.8.3. **The whole history, across channels and sessions** — a guest who asked
+        on WhatsApp last week and is now in the app is one person with one thread.
+
+        Identity resolves from phone, email, membership number or a signed-in session, and a
+        conversation with none of those is anonymous and stays that way rather than being guessed
+        at.
+      tags: [marketing]
+      x-ticvai-permission: CASE_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Conversation with its messages
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conversation' }
+
+  /conversations/{conversationId}/messages:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: sendConversationMessage
+      x-ticvai-consumed-by:
+        - "P02 GST-032 AI Concierge – Chat"
+        - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, guest]
+      summary: Say something, as a guest or an agent
+      description: >
+        22.8.20. Text, images, PDFs, QR codes and tickets.
+
+        **The sender is resolved, not declared.** A guest session sends as the guest; an agent
+        session sends as that agent; the assistant sends as the assistant and is labelled as one —
+        **a guest talking to a bot that presents as a person is a complaint waiting for the moment
+        they find out.**
+      tags: [marketing]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string, maxLength: 4000 }
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      assetId: { type: string, format: uuid }
+                      kind: { type: string, enum: [image, video, document, ticket, qr, paymentLink] }
+      responses:
+        '201':
+          description: Sent
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationMessage' }
+
+  /conversations/{conversationId}/handover:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: handoverToAgent
+      x-ticvai-consumed-by:
+        - "P02 GST-032 AI Concierge – Chat"
+        - "P05 KSK-015 Assistant"
+      x-ticvai-audience: [guest]
+      summary: Pass an assistant conversation to a person
+      description: >
+        22.8.5. **The requirement that turns the concierge into a support channel** — somebody has
+        to be on the other end.
+
+        **The whole thread goes with it, and the guest does not repeat themselves.** A handover
+        that loses context is worse than no assistant at all, because the guest has already spent
+        the effort once.
+
+        Triggered by the guest asking, by the assistant refusing or failing, by sentiment
+        (22.8.16), or by a capability outside `guestCapabilityScope` — **an assistant bounded to
+        ticket selection and checkout will meet questions it may not answer, and this is where
+        those go.**
+
+        **Where no agent is available it says so** and offers a case instead. Queuing a guest for
+        a person who is not there is the failure this operation exists to avoid.
+      tags: [marketing]
+      x-ticvai-permission: null   # the guest may ask for a person; the assistant may hand over
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum: [guestRequested, assistantRefused, assistantFailed, outOfScope, negativeSentiment, complexIntent, paymentIssue]
+                summary:
+                  type: string
+                  description: >
+                    **The assistant's own summary of what the guest wants**, so the agent opens
+                    with context rather than reading a transcript while somebody waits.
+                preferredQueueId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Queued for an agent, with a position and a wait estimate
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conversation' }
+        '409':
+          description: >
+            **No agent available.** Returns the reason and offers a case, rather than queuing a
+            guest for somebody who is not there.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /conversations/{conversationId}/claim:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: claimConversation
+      x-ticvai-consumed-by:
+        - "P12 SUP-004 Conversation Queue"
+      x-ticvai-audience: [staff]
+      summary: An agent takes it
+      description: >
+        22.8.17, 22.8.18. **Claiming is what stops two agents answering the same guest**, which
+        happens on a busy queue and reads as chaos from the guest's side.
+      tags: [marketing]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Claimed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conversation' }
+        '409':
+          description: Already claimed by another agent
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /conversations/{conversationId}/transfer:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: transferConversation
+      x-ticvai-consumed-by:
+        - "P12 SUP-004 Conversation Queue"
+        - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff]
+      summary: Pass it to another agent or queue
+      description: >
+        22.8.17. **The context travels again** — a guest transferred twice should still not have
+        repeated themselves.
+      tags: [marketing]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                toPrincipalId: { type: string, format: uuid }
+                toQueueId: { type: string, format: uuid }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Transferred
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conversation' }
+
+  /conversations/{conversationId}/close:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: closeConversation
+      x-ticvai-consumed-by:
+        - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff]
+      summary: End it
+      description: >
+        Resolved, abandoned by the guest, or timed out. **Abandoned and resolved are different
+        numbers** and a service-level report that merges them is measuring nothing.
+      tags: [marketing]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome]
+              properties:
+                outcome: { type: string, enum: [resolved, caseRaised, abandonedByGuest, timedOut, spam] }
+                caseId: { type: string, format: uuid, nullable: true }
+      responses:
+        '200':
+          description: Closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conversation' }
+
+  /agent-availability:
+    put:
+      operationId: setAgentAvailability
+      x-ticvai-consumed-by:
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-003 Availability & Routing Settings"
+      x-ticvai-audience: [staff]
+      summary: An agent goes available, away or offline
+      description: >
+        22.8.18. **Routing depends on this and `SUP-003` had no operation behind it** until
+        17 August.
+
+        An agent who forgets to go offline is an agent conversations queue for. **Availability
+        expires** rather than persisting through a closed laptop.
+      tags: [marketing]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: lastWriterWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [state]
+              properties:
+                state: { type: string, enum: [available, busy, away, offline] }
+                maxConcurrent:
+                  type: integer
+                  description: How many conversations this agent takes at once. **Three is not three times one.**
+                queueIds:
+                  type: array
+                  items: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /kiosk-assists:
+    post:
+      operationId: startKioskAssist
+      x-ticvai-audience: [staff]
+      summary: A staff member helps a guest at a kiosk, remotely
+      description: >
+        2.1.25. *"Authorized staff shall be able to remotely assist guests using self-service
+        kiosks, troubleshoot issues, and support checkout completion."*
+
+        **The other half of `KSK-013 Call staff`**, which was a button that called nothing.
+
+        The staff member acts **on the kiosk's session, under their own permission** — a cashier
+        completing a guest's checkout is a staff action on a guest cart, and it is recorded as
+        theirs. The guest sees who is helping and can end it; **remote assistance a guest cannot
+        see or stop is surveillance.**
+      tags: [marketing]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deviceId]
+              properties:
+                deviceId: { type: string, format: uuid }
+                cartId: { type: string, format: uuid, nullable: true }
+                reason: { type: string, enum: [guestCalled, healthAlert, stuckSession, paymentIssue, proactive] }
+      responses:
+        '201':
+          description: Session started, and visible on the kiosk
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KioskAssistSession' }
+
+  /kiosk-assists/{sessionId}/end:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: endKioskAssist
+      x-ticvai-consumed-by:
+        - "P05 KSK-013 Call staff"
+      x-ticvai-audience: [device]
+      summary: Stop assisting
+      description: >
+        Ended by the staff member, by the guest, or by a timeout. **The guest can always end it**,
+        and the record says who did.
+      tags: [marketing]
+      x-ticvai-permission: null   # the guest at the kiosk may end it too
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Ended
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KioskAssistSession' }
+
+  /loyalty/position:
+    get:
+      operationId: getLoyaltyPosition
+      x-ticvai-consumed-by:
+        - "P02 GST-036 Loyalty & Rewards"
+        - "P02 GST-064 Loyalty & Rewards"
+      x-ticvai-audience: [guest]
+      summary: A guest's points, tier and what is within reach
+      description: >
+        158 loyalty requirements, eleven naming the app, and **no operation returned a guest
+        their own balance**.
+
+        Returns the points, the tier, and **how far from the next one** — the last is what makes
+        a loyalty scheme change behaviour, and a screen showing only a number does not.
+      tags: [marketing]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Position
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subjectId: { type: string, format: uuid }
+                  programmeId: { type: string, format: uuid }
+                  pointsBalance: { type: integer }
+                  pointsPending:
+                    type: integer
+                    description: Earned and not yet cleared — a purchase inside the refund window.
+                  tier: { type: string }
+                  nextTier: { type: string, nullable: true }
+                  pointsToNextTier: { type: integer, nullable: true }
+                  expiringPoints: { type: integer }
+                  expiringAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: >
+                      **Points that lapse unannounced are a complaint.** The date is returned so
+                      the interface can warn before it happens.
+
   /guests:
     get:
       operationId: searchGuests
@@ -112,6 +578,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Search guest profiles
       description: >
@@ -159,11 +626,12 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getGuestProfile
-      x-ticvai-guest-callable: true   # a guest session resolves this to their own record; the permission is for staff reading anyone's
       x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: Read a guest profile
       description: >
@@ -171,6 +639,7 @@ paths:
         orders, open cases, loyalty position.
       tags: [guest]
       x-ticvai-permission: GUEST_VIEW
+      x-ticvai-permission-escalated: GUEST_VIEW_PII   # where the response includes a document or biometric
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -188,12 +657,15 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff]
       summary: Amend a guest profile
       tags: [guest]
       x-ticvai-permission: GUEST_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -228,6 +700,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff]
       summary: Merge a duplicate profile into this one
       description: >
         Orders, cases, loyalty and consent transfer to the surviving profile. **Consent does
@@ -274,11 +747,11 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getGuestConsents
-      x-ticvai-guest-callable: true   # a guest session resolves this to their own record; the permission is for staff reading anyone's
       x-ticvai-consumed-by:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # sending against a withdrawn consent is a compliance failure
       summary: Read a guest's consent state
       description: >
@@ -309,7 +782,9 @@ paths:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
         - "P02 GST-039 Profile"
+        - "P02 GST-065 Newsletter & Preferences"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [guest]
       security:
         - guestAuth: []
         - bearerAuth: []
@@ -329,7 +804,6 @@ paths:
         `recordedByPrincipalId` — consent captured by proxy has to be attributable.
       tags: [consent]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -364,6 +838,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Full consent history
       description: Every decision in sequence. This is what a regulator asks to see.
@@ -392,7 +867,10 @@ paths:
   /consent-purposes:
     get:
       operationId: listConsentPurposes
-      x-ticvai-guest-callable: true   # a guest session resolves this to their own record; the permission is for staff reading anyone's
+      x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P02 GST-065 Newsletter & Preferences"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: Configured consent purposes
       tags: [consent]
@@ -411,6 +889,7 @@ paths:
 
     put:
       operationId: setConsentPurposes
+      x-ticvai-audience: [staff]
       summary: Configure consent purposes
       description: >
         Each purpose names the channels it covers, whether it is required for service, and
@@ -446,6 +925,7 @@ paths:
   /consent/suppression-list:
     get:
       operationId: getSuppressionList
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # a complaint that has not replicated results in another send
       summary: Addresses suppressed from all sending
       description: >
@@ -475,6 +955,7 @@ paths:
 
     post:
       operationId: addSuppression
+      x-ticvai-audience: [staff]
       summary: Suppress an address
       tags: [consent]
       x-ticvai-permission: GUEST_MANAGE
@@ -522,6 +1003,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [guest]
       x-ticvai-read-routing: replica
       summary: Read a guest's saved items
       description: >
@@ -534,7 +1016,6 @@ paths:
         feature is broken.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -560,13 +1041,13 @@ paths:
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
+      x-ticvai-audience: [guest]
       summary: Save an item
       description: >
         Idempotent on the variant — saving twice is one entry, not two. The count matters to
         the guest and to demand signals, so a double tap must not inflate it.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -622,14 +1103,16 @@ paths:
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
+      x-ticvai-audience: [guest]
       summary: Remove a saved item
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security:
         - guestAuth: []
       responses:
@@ -655,6 +1138,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [guest]
       summary: A guest's registered devices
       description: >
         Here rather than in tenancy. `platform.device` is staff hardware bound to a
@@ -663,7 +1147,6 @@ paths:
         That makes it guest engagement.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -691,6 +1174,7 @@ paths:
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
+      x-ticvai-audience: [guest]
       summary: Register a device for push
       description: >
         Called on install and again whenever the provider rotates the token — which happens
@@ -701,7 +1185,6 @@ paths:
         for the purpose; this only records where a message could go.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -753,6 +1236,7 @@ paths:
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
+      x-ticvai-audience: [guest]
       summary: Revoke a device registration
       description: >
         Sign-out, uninstall, or a guest removing a device they no longer have. Revoked rather
@@ -760,11 +1244,12 @@ paths:
         dead token gets retried indefinitely.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security:
         - guestAuth: []
       responses:
@@ -775,6 +1260,7 @@ paths:
   /segments:
     get:
       operationId: listSegments
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List segments
       tags: [segment]
@@ -801,6 +1287,7 @@ paths:
 
     post:
       operationId: createSegment
+      x-ticvai-audience: [staff]
       summary: Create a segment
       description: >
         **A definition, not a list.** Evaluated when used, so it cannot go stale. A
@@ -838,6 +1325,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: previewSegment
+      x-ticvai-audience: [staff]
       summary: Estimate segment size and reachability
       description: >
         Returns the matching count, and separately the **reachable** count per channel after
@@ -849,6 +1337,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Preview
@@ -864,6 +1354,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listSegmentMembers
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List guests currently matching a segment
       description: Evaluated live. Useful for spot-checking a definition before use.
@@ -895,6 +1386,7 @@ paths:
       operationId: listCampaigns
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List campaigns
       tags: [campaign]
@@ -926,6 +1418,7 @@ paths:
       operationId: createCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Create a campaign
       description: >
         Created in draft. One-off, scheduled, or triggered by an event such as a booking, a
@@ -960,6 +1453,7 @@ paths:
       operationId: getCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a campaign with performance
       tags: [campaign]
@@ -979,6 +1473,7 @@ paths:
       operationId: updateCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Amend, pause or resume a campaign
       description: >
         Content and audience are editable only in draft. A live campaign may be paused,
@@ -989,6 +1484,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1023,6 +1520,7 @@ paths:
       operationId: testSendCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Send a test to named recipients
       description: >
         Renders with sample personalisation. Bypasses consent because the recipients are
@@ -1071,6 +1569,7 @@ paths:
       operationId: launchCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Launch or schedule a campaign
       description: >
         Evaluates the segment, applies consent and suppression, and queues the send. The
@@ -1123,6 +1622,7 @@ paths:
       operationId: pauseCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Pause a campaign mid-send
       description: >
         Halts sending. **Recipients already sent to are not unsent** — pausing stops the next message, not the last one.
@@ -1163,6 +1663,7 @@ paths:
       operationId: unscheduleCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Pull a scheduled campaign before it sends
       description: >
         Returns it to draft. Distinct from stopping: nothing has been sent, so there is no partial audience to reason about.
@@ -1192,6 +1693,7 @@ paths:
       operationId: stopCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Stop a campaign mid-send
       description: >
         Halts remaining sends immediately. Messages already dispatched cannot be recalled,
@@ -1229,6 +1731,7 @@ paths:
       operationId: getCampaignPerformance
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Delivery and engagement
       description: >
@@ -1252,6 +1755,7 @@ paths:
       operationId: listMessageTemplates
       x-ticvai-consumed-by:
         - "P12 SUP-007 Canned Response Management"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List message templates
       tags: [message]
@@ -1283,6 +1787,7 @@ paths:
       operationId: createMessageTemplate
       x-ticvai-consumed-by:
         - "P12 SUP-007 Canned Response Management"
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: tenant
       summary: Create a message template
       description: >
@@ -1318,10 +1823,10 @@ paths:
       operationId: sendTransactionalMessage
       x-ticvai-consumed-by:
         - "P10 PTR-004 Notifications"
+      x-ticvai-audience: [service, partner]
       security:
         - serviceAuth: []
         - bearerAuth: []
-      x-ticvai-auth: service
       summary: Send a transactional message
       description: >
         Booking confirmations, reminders, service updates. **Transactional messages are not
@@ -1370,6 +1875,7 @@ paths:
       operationId: getMessageStatus
       x-ticvai-consumed-by:
         - "P10 PTR-004 Notifications"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Delivery status of one message
       tags: [message]
@@ -1390,6 +1896,8 @@ paths:
     get:
       operationId: listCases
       x-ticvai-consumed-by:
+        - "P01 WEB-034 Lost & Found"
+        - "P02 GST-040 Help & Support"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-073 Lost & Found Register"
@@ -1397,6 +1905,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, guest, partner]
       x-ticvai-read-routing: replica
       summary: List service cases
       tags: [case]
@@ -1436,6 +1945,8 @@ paths:
     post:
       operationId: createCase
       x-ticvai-consumed-by:
+        - "P01 WEB-034 Lost & Found"
+        - "P02 GST-040 Help & Support"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-073 Lost & Found Register"
@@ -1443,6 +1954,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, guest, partner]
       summary: Raise a service case
       description: >
         From any channel — agent, guest app, email, chat. The SLA clock starts at creation
@@ -1481,6 +1993,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, partner]
       x-ticvai-read-routing: replica
       summary: Read a case with its thread
       tags: [case]
@@ -1505,12 +2018,15 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, partner]
       summary: Assign, reprioritise or resolve a case
       tags: [case]
       x-ticvai-permission: CASE_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -1551,6 +2067,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, partner]
       summary: Add a message or internal note
       description: >
         `isInternal` distinguishes a note from a reply to the guest. Getting that wrong sends
@@ -1600,6 +2117,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, partner]
       summary: Reopen a resolved case
       description: >
         The guest came back on the same issue. Reopening rather than raising a new case is what makes repeat problems visible — a second case looks like a second problem.
@@ -1645,6 +2163,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-audience: [staff, partner]
       summary: Escalate a case
       tags: [case]
       x-ticvai-permission: CASE_MANAGE
@@ -1675,7 +2194,10 @@ paths:
   /loyalty/programmes:
     get:
       operationId: listLoyaltyProgrammes
-      x-ticvai-guest-callable: true   # a guest may call this for their own data; the permission is for staff
+      x-ticvai-consumed-by:
+        - "P02 GST-036 Loyalty & Rewards"
+        - "P02 GST-064 Loyalty & Rewards"
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: List loyalty programmes
       tags: [loyalty]
@@ -1694,6 +2216,7 @@ paths:
 
     post:
       operationId: createLoyaltyProgramme
+      x-ticvai-audience: [staff]
       x-ticvai-config-scope: tenant
       summary: Create a loyalty programme
       description: >
@@ -1731,6 +2254,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: A guest's loyalty position
       tags: [loyalty]
@@ -1758,6 +2282,7 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
+      x-ticvai-audience: [staff]
       summary: Manually adjust points
       description: >
         Goodwill, correction, or reversal. Requires a reason and is reported separately —
@@ -1791,6 +2316,7 @@ paths:
   /reviews:
     get:
       operationId: listReviews
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List guest reviews and ratings
       tags: [feedback]
@@ -1829,6 +2355,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
+      x-ticvai-audience: [guest]
       security:
         - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -1838,7 +2365,6 @@ paths:
         configures it — feedback that goes nowhere is worse than no feedback mechanism.
       tags: [feedback]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-auth: guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -1864,6 +2390,7 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: respondToReview
+      x-ticvai-audience: [staff]
       summary: Respond to a review
       tags: [feedback]
       x-ticvai-permission: MARKETING_MANAGE
@@ -1894,6 +2421,140 @@ components:
     MessageChannel:
       type: string
       enum: [email, sms, whatsapp, push, inApp, post]
+
+    ConversationChannel:
+      type: string
+      enum: [webChat, inAppChat, whatsapp, sms, email, kiosk, voice]
+
+    ConversationState:
+      type: string
+      description: >
+        **`withAssistant` and `queued` are different, and the second has a person waiting.** Merging
+        them makes the service level unmeasurable, because time with a bot is not time in a queue.
+      enum: [withAssistant, queued, withAgent, waitingOnGuest, resolved, abandoned, timedOut]
+
+    ConversationMessage:
+      type: object
+      x-ticvai-persistence: "marketing.conversation_message"
+      required: [id, sender, body, sentAt]
+      properties:
+        id: { type: string, format: uuid }
+        sender:
+          type: string
+          enum: [guest, agent, assistant, system]
+          description: >
+            **Resolved, never declared.** The assistant is labelled as one — a guest talking to a
+            bot that presents as a person is a complaint waiting for the moment they find out.
+        senderPrincipalId: { type: string, format: uuid, nullable: true }
+        body: { type: string }
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              assetId: { type: string, format: uuid }
+              kind: { type: string, enum: [image, video, document, ticket, qr, paymentLink] }
+        aiInteractionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where the assistant sent it. **Links the message to its tokens and cost**, so a
+            conversation's spend is attributable (CF-14).
+        sentAt: { type: string, format: date-time }
+        readAt: { type: string, format: date-time, nullable: true }
+
+    Conversation:
+      type: object
+      x-ticvai-persistence: "marketing.conversation"
+      description: >
+        22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation
+        is a live session measured in seconds, with somebody waiting. A conversation may create a
+        case; it is not one.
+      required: [id, channel, state]
+      properties:
+        id: { type: string, format: uuid }
+        channel: { $ref: '#/components/schemas/ConversationChannel' }
+        state: { $ref: '#/components/schemas/ConversationState' }
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            22.8.3. Resolved from phone, email, membership number or a signed-in session.
+            **A conversation with none of those stays anonymous rather than being guessed at.**
+        venueId: { type: string, format: uuid, nullable: true }
+        assignedPrincipalId: { type: string, format: uuid, nullable: true }
+        queueId: { type: string, format: uuid, nullable: true }
+        queuePosition: { type: integer, nullable: true, readOnly: true }
+        estimatedWaitSeconds: { type: integer, nullable: true, readOnly: true }
+        handoverReason:
+          type: string
+          nullable: true
+          enum: [guestRequested, assistantRefused, assistantFailed, outOfScope, negativeSentiment, complexIntent, paymentIssue]
+        handoverSummary:
+          type: string
+          nullable: true
+          description: >
+            **The assistant's own account of what the guest wants**, so an agent opens with context
+            rather than reading a transcript while somebody waits.
+        sentiment:
+          type: string
+          nullable: true
+          enum: [positive, neutral, negative, escalating]
+          description: 22.8.16. **`escalating` is a routing signal**, not a report line.
+        intent:
+          type: string
+          nullable: true
+          description: 22.8.13. What the guest appears to want, used for routing.
+        locale: { type: string }
+        caseId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 22.8.12. Where the conversation raised one.
+        messages:
+          type: array
+          items: { $ref: '#/components/schemas/ConversationMessage' }
+        firstResponseSeconds: { type: integer, nullable: true, readOnly: true }
+        startedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time, nullable: true }
+        outcome:
+          type: string
+          nullable: true
+          enum: [resolved, caseRaised, abandonedByGuest, timedOut, spam]
+
+    KioskAssistSession:
+      type: object
+      x-ticvai-persistence: "marketing.kiosk_assist_session"
+      description: >
+        2.1.25. A staff member acting on a kiosk session remotely. **The guest can always see it and
+        always end it** — remote assistance a guest cannot see or stop is surveillance.
+      required: [id, deviceId, staffPrincipalId, startedAt]
+      properties:
+        id: { type: string, format: uuid }
+        deviceId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        staffPrincipalId: { type: string, format: uuid }
+        staffDisplayName:
+          type: string
+          description: >
+            **Shown on the kiosk.** A guest being helped should know by whom.
+        cartId: { type: string, format: uuid, nullable: true }
+        reason: { type: string, enum: [guestCalled, healthAlert, stuckSession, paymentIssue, proactive] }
+        endedBy: { type: string, nullable: true, enum: [staff, guest, timeout] }
+        actionsTaken:
+          type: array
+          description: >
+            **Every action recorded as the staff member's**, not the kiosk's. A cashier completing a
+            guest's checkout remotely is a staff action on a guest cart.
+          items:
+            type: object
+            properties:
+              operationId: { type: string }
+              at: { type: string, format: date-time }
+        startedAt: { type: string, format: date-time }
+        endedAt: { type: string, format: date-time, nullable: true }
 
     ConsentPurpose:
       type: string

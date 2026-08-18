@@ -8,7 +8,6 @@
 id: F14
 name: A discount needs a manager
 actor: cashier
-capability: C02
 wave: 1
 frequency: daily
 criticality: financial
@@ -103,3 +102,8 @@ exitStates:
   description: Guest left, order voided
 - state: deferred
   description: Applied offline, reconciled later under venue policy
+primaryContract: approvals
+contracts:
+- approvals
+- orders
+- promotions

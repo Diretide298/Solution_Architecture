@@ -275,6 +275,11 @@ function readTaxonomy(doc) {
   return {
     tier: info['x-ticvai-tier'] ? String(info['x-ticvai-tier']).trim() : null,
     module: info['x-ticvai-module'] ? String(info['x-ticvai-module']).trim() : null,
+    // Domain lens membership, declared once on the contract rather than on each
+    // of its operations — the same inheritance the module and tier already use.
+    // An operation may still override it, which is how one contract can put a
+    // single operation in a different lens from the rest of its file.
+    domains: info['x-ticvai-domain'] ?? null,
     platforms,
     capabilities,
     requirements: Number.isFinite(info['x-ticvai-requirements'])
@@ -419,6 +424,11 @@ export async function buildIndex(root, contractsDir = 'contracts') {
           conflictPolicy: op['x-ticvai-conflict-policy'] ?? null,
           auth: op['x-ticvai-auth'] ?? null,
           selfScoped: op['x-ticvai-self-scoped'] ?? null,
+          // Which domain lens claims this, when a person has said so. The lens
+          // also derives membership from the graph; this is the half that
+          // carries intent, and the two are reconciled in lib/domains.mjs.
+          domain: op['x-ticvai-domain'] ?? taxonomy.domains ?? null,
+          guestCallable: op['x-ticvai-guest-callable'] ?? null,
           consumes: io.consumes,
           produces: io.produces,
           consumers,

@@ -366,7 +366,10 @@ screens:
     offline: '**Cannot close.** Closing needs the server total, and a locally computed variance is not
       a variance'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -452,7 +455,10 @@ screens:
     error: Camera failed — distinct from a bad scan and needing a different response
     offline: The normal state. Strip shows bundle age and pending count
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -514,7 +520,10 @@ screens:
     error: —
     offline: Identical offline. The entitlement is consumed in the local journal
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -577,7 +586,10 @@ screens:
     offline: Identical, except a denial the bundle cannot explain says `unknown to this device` rather
       than inventing one
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -640,7 +652,10 @@ screens:
     offline: '**Available offline and recorded locally.** An override needing a network is one that
       never happens at a gate'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -703,7 +718,10 @@ screens:
     offline: Searches the bundle only. A ticket issued after the last sync will not be found, and the
       screen says so
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -793,7 +811,10 @@ screens:
     error: Could not resolve
     offline: Fully offline. Admits what is valid and states the shortfall
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -855,7 +876,10 @@ screens:
     error: Bundle missing or expired. **The device refuses to scan rather than admitting blind**
     offline: This is the screen. Bundle age, scans journalled, last sync attempt
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -917,7 +941,10 @@ screens:
     error: Sync failed. **The journal is kept** — a failed sync must never discard what it was carrying
     offline: Not applicable; this screen ends the offline period
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -987,7 +1014,10 @@ screens:
     error: Download failed. The previous bundle stays in place
     offline: Cannot refresh. The existing bundle continues and its age is shown
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -1239,7 +1269,10 @@ screens:
     error: Could not raise. The draft is kept
     offline: Queues locally. A task raised in a plant room must not need signal
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -1389,7 +1422,10 @@ screens:
     error: Could not load
     offline: Local totals, marked as unreconciled
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -1461,7 +1497,7 @@ screens:
   module: Operations
   purpose: The tab that is already in the shell.
   capability: C00
-  wave: 2
+  wave: 1
   layout:
     template: detail
     regions:
@@ -1475,15 +1511,19 @@ screens:
     error: Assistant unavailable. **Says so rather than answering from nothing**
     offline: '**Not available.** Retrieval needs the index'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-019
     designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. Pulled to Wave 1 (CF-101). CF-57: the client named AI configuration assistance
+    as a Wave 1 priority, and F20 is Wave 1.'
   implementation:
     app: venue-staff-app
     route: /operations/ai-assistant-home
@@ -1507,7 +1547,7 @@ screens:
   module: Operations
   purpose: Answer with the operation behind it visible.
   capability: C00
-  wave: 2
+  wave: 1
   layout:
     template: detail
     regions:
@@ -1531,7 +1571,8 @@ screens:
     board: wireframes/P06 Staff App.dc.html#emp-020
     designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. Pulled to Wave 1 (CF-101) with EMP-019 — **the question and the answer are
+    one screen pair** and splitting them across waves ships half a feature.
   implementation:
     app: venue-staff-app
     route: /operations/ai-assistant-answer
@@ -1569,7 +1610,10 @@ screens:
     error: Could not load
     offline: Last synced view with its age
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -1712,7 +1756,10 @@ screens:
     error: Could not load
     offline: Last synced, with age
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -1770,7 +1817,10 @@ screens:
     error: Could not load. Selling is blocked
     offline: '**Cash only offline.** Card completes nowhere the acquirer saw it'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -1901,7 +1951,10 @@ screens:
       retries'
     offline: Not available for card
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -1951,7 +2004,10 @@ screens:
     error: Could not issue. **No media is written on a failed issue**
     offline: Issues from the local range allocated at shift start
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2033,7 +2089,10 @@ screens:
     error: Could not load
     offline: Cached, with age. Acknowledgements queue
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2084,7 +2143,10 @@ screens:
     offline: Cached. **Acknowledgement queues** — an emergency acknowledgement needing a network does
       not arrive when it matters
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2134,7 +2196,10 @@ screens:
     error: Renders from local data only — it must work when nothing else does
     offline: Fully offline by design
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2184,7 +2249,10 @@ screens:
     error: Could not restore. Escalates to a duty manager
     offline: '**Works offline by design.** Post-incident restore is exactly when the network is worst'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2238,7 +2306,10 @@ screens:
     error: Could not load
     offline: Cached roster with its age
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2288,7 +2359,10 @@ screens:
     error: Could not load
     offline: Cached
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2338,7 +2412,10 @@ screens:
     error: Could not submit. The request is kept
     offline: Queues locally
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2389,7 +2466,10 @@ screens:
     offline: '**Device time is recorded and both are kept.** A steward clocking in at a gate with no
       signal is not late because the sync was'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2435,7 +2515,10 @@ screens:
     error: Could not record
     offline: Queues locally
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2538,7 +2621,10 @@ screens:
     error: Could not load
     offline: Cached; updates queue
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2593,7 +2679,10 @@ screens:
     offline: Queues locally and syncs on reconnect. The pending count is always current because it is
       local
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2656,7 +2745,10 @@ screens:
     offline: Queues locally and syncs on reconnect. The pending count is always current because it is
       local
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2738,7 +2830,10 @@ screens:
     error: Could not load. Falls back to a zone list
     offline: Cached map. **The zone list always works** because it is text
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2788,7 +2883,10 @@ screens:
     error: Could not send. **Nothing partially sent**
     offline: Queues, and states that it has not gone yet
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2838,7 +2936,10 @@ screens:
     error: Search unavailable
     offline: '**Cached articles only**, with a note that newer ones may exist'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2876,7 +2977,10 @@ screens:
     error: Could not load
     offline: Cached progress; completions queue
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2914,7 +3018,10 @@ screens:
     error: Could not load
     offline: Cached
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -2976,7 +3083,10 @@ screens:
     error: Could not read
     offline: '**Fully offline** — device settings are local by definition'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -3059,7 +3169,10 @@ screens:
     offline: '**Fully offline.** Accessibility settings are device-local and must never depend on a
       network'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -3092,7 +3205,10 @@ screens:
     error: —
     offline: '**Fully offline.** Direction is a device setting, not a server one'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -3126,7 +3242,10 @@ screens:
       must not be trapped by a failed sync'
     offline: Signs out locally and the journal stays on the device for the next steward
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted
@@ -3164,7 +3283,10 @@ screens:
     error: Could not load. **Handover is blocked** — an unread journal cannot be handed over
     offline: '**The point of the screen.** It exists because the journal outlives the shift'
   navigation:
-    exitTo: []
+    exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
   wireframe:
     status: drafted

@@ -204,6 +204,7 @@ components:
         - PARTNER_VIEW
         - PARTNER_MANAGE
         - PARKING_CONFIGURE
+        - PAYMENT_VOID
 
     PermissionSet:
       type: array

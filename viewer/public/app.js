@@ -168,7 +168,7 @@ const MODE_TIPS = {
   decisions: {
     title: 'Decisions',
     body:
-      'The 18 ADRs, the registers, and the authorisation spec **executed rather than listed** — ' +
+      'The ADRs, the registers, and the authorisation spec **executed rather than listed** — ' +
       'each permission vector resolved against the rule, because a failing vector is a build failure.',
   },
   audit: {
@@ -739,6 +739,53 @@ function partsArrived(arrived) {
 // yet" is a state the app was already built to survive.
 
 /** Which parts a layer cannot be drawn without. */
+/**
+ * Which domain lenses claim an artefact, and a mark to put on its tree row.
+ *
+ * This is the "within" half of the lens. The artefact stays exactly where its
+ * kind puts it — `ai.yaml` in Contracts, `conversation.yaml` in Domain under
+ * marketing-crm, which is where it correctly belongs — and wears a dot saying
+ * it is also part of something. The Domains page is the other half, gathering
+ * the same set on one screen. One definition, two surfaces; neither replaces
+ * the artefact-kind organisation, which is the thing the package is careful
+ * about and the thing an "AI" tab would quietly undo.
+ */
+function lensesFor(kind, id) {
+  if (!id) return [];
+  const direct = state.lensOf?.get(`${kind}:${id}`);
+  if (direct?.length) return direct;
+  // a contract file, marked by what its operations belong to
+  if (kind === 'file') return [...(state.lensByFile?.get(id) ?? [])];
+  return [];
+}
+
+/** The dot itself, or nothing — a row in no lens gets no markup at all. */
+function lensMark(kind, id) {
+  const keys = lensesFor(kind, id);
+  if (!keys.length) return null;
+  const mark = el('span', 'lens-mark');
+  mark.dataset.lens = keys.join(' ');
+  for (const key of keys) {
+    const dot = el('span', `lens-dot lens-${key}`);
+    dot.textContent = (state.lensById?.get(key)?.label ?? key).slice(0, 2).toUpperCase();
+    mark.append(dot);
+  }
+  mark.title = keys
+    .map((k) => `Also in the ${state.lensById?.get(k)?.label ?? k} lens`)
+    .join('\n');
+  return mark;
+}
+
+/** Attach the mark if there is one. Returns the row, so it can be chained. */
+function markLens(row, kind, id) {
+  const mark = lensMark(kind, id);
+  if (mark) {
+    row.append(mark);
+    row.dataset.lens = mark.dataset.lens;
+  }
+  return row;
+}
+
 const LAYER_PARTS = {
   frontend: ['journeys', 'lineage'],
   // the spine graph draws one edge per pair of contracts that share an event,
@@ -889,6 +936,24 @@ async function loadIndex() {
 
   // Small, and read by every layer's hover text, so it is not worth deferring.
   state.tooltips = await fetch('/api/tooltips').then((r) => r.json()).catch(() => null);
+
+  // The domain lenses. Every layer's tree marks its members, so this cannot be
+  // a per-layer part — and at 3 KB gzipped it does not want to be. `byArtefact`
+  // is already keyed `kind:id`, which is what a tree row asks with.
+  state.domains = await fetch('/api/domains').then((r) => r.json()).catch(() => null);
+  state.lensOf = new Map(Object.entries(state.domains?.byArtefact ?? {}));
+  state.lensById = new Map((state.domains?.lenses ?? []).map((l) => [l.key, l]));
+  // A contract file is not itself a lens member; its operations are. Rolling
+  // them up means the tree can mark the file a reader actually clicks.
+  state.lensByFile = new Map();
+  for (const lens of state.domains?.lenses ?? []) {
+    for (const m of lens.members) {
+      if (m.kind !== 'operation' || !m.file) continue;
+      const at = state.lensByFile.get(m.file) ?? new Set();
+      at.add(lens.key);
+      state.lensByFile.set(m.file, at);
+    }
+  }
 
   state.nodesById = new Map(index.nodes.map((n) => [n.id, n]));
 
@@ -1115,6 +1180,72 @@ function renderSideGroups() {
   }
   // the type chips only mean anything for contract members
   $('type-filters').hidden = state.layer !== 'contracts';
+  renderLensFilters();
+}
+
+/**
+ * One chip per lens, on every layer.
+ *
+ * The point of the "within" half is that a reader on the Backend layer can ask
+ * "which of these tables are AI's?" without leaving the layer or losing the
+ * schema grouping. So the chip filters the tree in place rather than navigating
+ * anywhere, and the Domains page stays the separate view for the whole set.
+ */
+function renderLensFilters() {
+  const bar = $('lens-filters');
+  if (!bar) return;
+  const lenses = state.domains?.lenses ?? [];
+  bar.innerHTML = '';
+  bar.hidden = lenses.length === 0;
+  if (!lenses.length) return;
+
+  for (const lens of lenses) {
+    const on = state.lensFilter === lens.key;
+    const chip = el('button', `chip lens-chip lens-${lens.key}`, lens.label);
+    chip.classList.toggle('on', on);
+    // how many of this layer's rows the chip would leave standing, so the
+    // reader knows before clicking whether it is worth clicking
+    const here = countLensRows(lens.key);
+    if (here) chip.append(el('span', 'lens-chip-count', String(here)));
+    chip.title = on
+      ? `Showing only the ${lens.label} lens. Click to show everything again.`
+      : `Show only what is in the ${lens.label} lens — ${lens.stats.total} artefacts across every layer, ${here} of them here.`;
+    chip.onclick = () => {
+      state.lensFilter = on ? null : lens.key;
+      renderLensFilters();
+      renderTree();
+    };
+    bar.append(chip);
+  }
+}
+
+/**
+ * Rows of this layer's tree the lens would leave standing.
+ *
+ * Counted as rows, not as members, because the two differ where a tree groups.
+ * The Contracts tree lists files: the AI lens holds 24 operations and they are
+ * all in one contract, so a chip reading 24 promises a filter that leaves 24
+ * rows and then leaves one. The chip has to count what the click will do.
+ */
+function countLensRows(key) {
+  const lens = state.lensById?.get(key);
+  if (!lens) return 0;
+  if (state.layer === 'contracts') {
+    return new Set(
+      lens.members.filter((m) => m.kind === 'operation' && m.file).map((m) => m.file)
+    ).size;
+  }
+  const kinds = {
+    frontend: ['screen'], backend: ['table'],
+    domain: ['state', 'event'], decisions: ['decision'],
+  }[state.layer] ?? [];
+  return lens.members.filter((m) => kinds.includes(m.kind)).length;
+}
+
+/** True when a row survives the lens filter. No filter, everything survives. */
+function passesLens(kind, id) {
+  if (!state.lensFilter) return true;
+  return lensesFor(kind, id).includes(state.lensFilter);
 }
 
 function renderTree() {
@@ -1158,9 +1289,11 @@ function renderDecisionsTree() {
       if (!hit(adr.title) && !hit(adr.id) && !hit(adr.closes)) continue;
       shown += 1;
       count += 1;
-      const row = el('div', 'tree-file');
+            if (!passesLens('decision', adr.id)) continue;
+const row = el('div', 'tree-file');
       row.append(el('span', 'tree-file-name', `${adr.id} ${adr.title}`));
       const mark = el('span', 'tree-file-count', adr.partlySuperseded ? 'part' : (adr.verdict ?? '—'));
+      markLens(row, 'decision', adr.id);
       if (adr.partlySuperseded) row.classList.add('problem');
       row.append(mark);
       deliveryTip(row, 'adrs', adr.id, {
@@ -1232,6 +1365,7 @@ function renderContractTree() {
     if (code) section.append(el('div', 'tree-group-sub', code));
 
     for (const file of groupFiles.sort((a, b) => a.name.localeCompare(b.name))) {
+      if (!passesLens('file', file.file)) continue;
       shownFiles += 1;
       const row = el('div', 'tree-file');
       row.dataset.id = file.id;
@@ -1242,6 +1376,7 @@ function renderContractTree() {
       const children = state.byFile.get(file.file) ?? [];
       const visible = children.filter((c) => state.typeFilter.has(c.type));
       row.append(el('span', 'tree-file-count', String(visible.length)));
+      markLens(row, 'file', file.file);
 
       const childBox = el('div', 'tree-children');
 
@@ -1313,11 +1448,13 @@ function renderScreenTree() {
     if (code) section.append(el('div', 'tree-group-sub', code));
 
     for (const screen of list.sort((a, b) => a.id.localeCompare(b.id))) {
+      if (!passesLens('screen', screen.id)) continue;
       const row = el('div', 'tree-file');
       row.dataset.id = `screen:${screen.id}`;
       row.append(el('span', 'tree-file-code', screen.id));
       row.append(el('span', 'tree-file-name', screen.name));
       row.append(el('span', 'tree-file-count', String(screen.apis.length)));
+      markLens(row, 'screen', screen.id);
       row.title = `${screen.purpose || screen.name}\n${screen.apis.length} operations · ${screen.file}`;
       row.onclick = () => selectScreen(screen.id);
       section.append(row);
@@ -1438,13 +1575,15 @@ function renderTableTree() {
     }
 
     for (const table of list.sort((a, b) => a.name.localeCompare(b.name))) {
-      const row = el('div', `tree-file${table.ddl ? ' written' : ''}`);
+            if (!passesLens('table', table.name)) continue;
+const row = el('div', `tree-file${table.ddl ? ' written' : ''}`);
       row.dataset.id = `table:${table.name}`;
       const label = groupBy() === 'modules'
         ? table.name.split('.').slice(1).join('.') || table.name
         : table.name;
       row.append(el('span', 'tree-file-name', label));
       row.append(el('span', 'tree-file-count', String(table.columns ?? 0)));
+      markLens(row, 'table', table.name);
       // "Table tips say why, not what" — the column list is already on screen
       deliveryTip(row, 'tables', table.name, {
         fallback: {
@@ -3951,9 +4090,11 @@ function renderDomainTree() {
   for (const m of machines()) {
     if (!hit(m.entity) && !hit(m.enum) && !m.states.some((s) => hit(s.name))) continue;
     count += 1;
-    const row = el('div', 'tree-file machine-row');
+        if (!passesLens('state', m.id)) continue;
+const row = el('div', 'tree-file machine-row');
     row.dataset.id = `machine:${m.id}`;
     row.append(el('span', 'tree-file-name', m.entity));
+    markLens(row, 'state', m.id);
     const counts = el('span', 'tree-file-count', `${m.stats.states}/${m.stats.transitions}`);
     // the bare "9/14" is the one unlabelled number in the sidebar, and the two
     // halves are what the whole layer is about: the contracts declare the states,
@@ -3989,9 +4130,11 @@ function renderDomainTree() {
   for (const event of domainEvents()) {
     if (!hit(event.name) && !hit(event.publisher)) continue;
     count += 1;
-    const row = el('div', 'tree-file event-row');
+        if (!passesLens('event', event.name)) continue;
+const row = el('div', 'tree-file event-row');
     row.dataset.id = `event:${event.name}`;
     row.append(el('span', 'tree-file-name', event.name));
+    markLens(row, 'event', event.name);
     const consumers = el('span', 'tree-file-count', String(event.consumers.length));
     const critical = event.consumers.filter((c) => c.critical).length;
     tip(
@@ -4141,7 +4284,21 @@ function buildSchemaMap() {
     links.get(from).set(to, row);
   };
 
+  // How much of each schema exists as SQL. Counted here rather than read from
+  // `module.written`, which is derived from a `Status` column the current
+  // workbook does not have — an absent optional column reads as blank by
+  // design, so every module came back false and every box drew amber. The one
+  // fact this view exists to show was stated in the sidebar and drawn nowhere.
+  //
+  // `table.ddl` is set from the parsed .sql, which is the same source the
+  // single-schema view and the sidebar note already trust.
+  const ddl = new Map();
   for (const table of backend.tables) {
+    const row = ddl.get(table.module) ?? { written: 0, total: 0 };
+    row.total += 1;
+    if (table.ddl) row.written += 1;
+    ddl.set(table.module, row);
+
     note(table.module, tableModule.get(table.childOf), true);
     for (const ref of table.references ?? []) note(table.module, tableModule.get(ref.toTable), true);
     for (const key of table.foreignKeys ?? []) note(table.module, tableModule.get(key.toTable), false);
@@ -4149,12 +4306,21 @@ function buildSchemaMap() {
 
   const nodes = backend.modules.map((module) => {
     const out = [...(links.get(module.name) ?? [])].sort((a, b) => b[1].count - a[1].count);
+    // Three states, not two. Binary green/amber would still be wrong: only one
+    // schema is complete, several are part-written, and most have nothing —
+    // and "half built" is the state a reader most needs to see, because it is
+    // the one that looks finished from either end.
+    const built = ddl.get(module.name) ?? { written: 0, total: module.tables ?? 0 };
+    const state_ =
+      built.total && built.written === built.total ? 'written'
+        : built.written > 0 ? 'part'
+          : 'none';
     return {
       id: `schema:${module.name}`,
       title: module.name,
-      badge: `${module.tables}t`,
-      // green where the migration is written, amber where it is only derivable
-      color: module.written ? '#34d399' : '#fbbf24',
+      badge: state_ === 'none' ? `${module.tables}t` : `${built.written}/${built.total}t`,
+      // green written · blue part-written · amber derivable but not written
+      color: { written: '#34d399', part: '#60a5fa', none: '#fbbf24' }[state_],
       rows: out.map(([target, info]) => ({
         label: `→ ${target}`,
         value: `${info.count}`,
@@ -4346,7 +4512,11 @@ function renderData({ focus } = {}) {
     everything.value = ALL_SCHEMAS;
     picker.append(everything);
     for (const module of backend.modules) {
-      const option = el('option', null, `${module.name} · ${module.tables} tables`);
+      const option = el(
+        'option',
+        null,
+        `${module.name} · ${module.tables} tables${module.unlisted ? ' · not on the Modules sheet' : ''}`
+      );
       option.value = module.name;
       picker.append(option);
     }
@@ -4375,19 +4545,27 @@ function renderData({ focus } = {}) {
 
   if (wholeDatabase) {
     const crossings = edges.reduce((a, e) => a + Number(e.label), 0);
+    const withDdl = backend.tables.filter((t) => t.ddl).length;
     $('data-hint').textContent =
-      `${nodes.length} schemas · ${backend.tables.length} tables · ${edges.length} schema-to-schema ` +
-      `relationships across ${crossings} columns · click a row to open that schema`;
+      `${nodes.length} schemas · ${backend.tables.length} tables, ${withDdl} written as SQL · ` +
+      `${edges.length} schema-to-schema relationships across ${crossings} columns · ` +
+      `click a row to open that schema`;
     renderBoxLegend($('data-legend'), [
-      ['#34d399', 'migration written'],
-      ['#fbbf24', 'derivable, not written'],
-    ], 'one box per schema · the number on a line is how many columns cross it');
+      ['#34d399', 'every table written'],
+      ['#60a5fa', 'part written'],
+      ['#fbbf24', 'derivable, none written'],
+    ], 'one box per schema · the badge counts tables that exist as SQL · the number on a line is how many columns cross it');
   } else {
     const module = backend.modules.find((m) => m.name === state.dataModule);
     const pulled = nodes.length - own;
     const written = [...nodes].filter((n) => !n.external && /sql/.test(String(n.badge))).length;
+    // ai draws thirteen boxes with nothing in them, which reads as a broken
+    // view rather than as the fact it is: the workbook names the tables and
+    // has never written their columns. Say so, or the reader blames the viewer.
+    const bare = nodes.filter((n) => !n.external && !n.rows.length).length;
     $('data-hint').textContent =
       `${own} tables${written ? `, ${written} with DDL` : ''}` +
+      `${bare ? `, ${bare === own ? 'none' : `${own - bare}`} with columns on the workbook` : ''}` +
       `${pulled ? ` · ${pulled} pulled in from other schemas` : ''} · ` +
       (built.stated
         ? `${built.child} child, ${built.reference} reference` +
@@ -4395,7 +4573,9 @@ function renderData({ focus } = {}) {
           ` · ${built.declared} declared, ${built.inferred} inferred` +
           (built.hiddenAmbient ? ` · ${built.hiddenAmbient} ambient hidden` : '')
         : `${built.declared} declared, ${built.inferred} inferred`) +
-      (module ? ` · migration ${module.migration ?? '—'} (${module.status ?? 'unknown'})` : '');
+      (module?.unlisted
+        ? ' · no row on the Modules sheet — counted from the tables that name it'
+        : module ? ` · migration ${module.migration ?? '—'} (${module.status ?? 'unknown'})` : '');
     renderBoxLegend($('data-legend'), [
       ['#34d399', 'created by a migration'],
       ['#60a5fa', 'derived from the contracts, not written yet'],
@@ -5407,6 +5587,21 @@ function renderSidePane() {
 }
 
 function fillSidePane() {
+  // Clear before the dispatch, not inside it.
+  //
+  // Each renderer below used to clear the pane itself, and the tail fell
+  // through to `if (node) renderLinksPane(node)` with no else — so on any layer
+  // with no dispatch line, and no selection ever made, nothing ran and nothing
+  // cleared. The Frontend layer's links sat there on every Contracts view and
+  // every Decisions view, describing a screen the reader was no longer looking
+  // at. `state.selectedId` is never reset when the layer changes, so a reader
+  // who had not clicked a contract kept the stale pane indefinitely.
+  //
+  // Clearing here also covers `renderStateLinks`, which returns early when
+  // there is no machine — before its own clear, one line further down.
+  const pane = $('links-pane');
+  pane.innerHTML = '';
+
   if (state.layer === 'frontend') return renderScreenLinks();
   if (state.layer === 'backend') return renderTableLinks();
   // the states view explains a state in here; the events view is already a full
@@ -5415,7 +5610,17 @@ function fillSidePane() {
     return state.mode === 'events' ? renderEventLinks() : renderStateLinks();
   }
   const node = state.selectedId ? state.nodesById.get(state.selectedId) : null;
-  if (node) renderLinksPane(node);
+  if (node) return renderLinksPane(node);
+
+  // Nothing selected. Say so in this layer's own noun — "Select a table." on
+  // the Decisions layer was the Backend empty state left behind, which is the
+  // same bug wearing a plausible sentence. `pane-empty` is what
+  // syncLinksToggle counts as "not filled", so the phone toggle stays hidden.
+  const ask = {
+    contracts: 'Select a contract, an operation or a schema.',
+    decisions: 'Select a decision or a register.',
+  }[state.layer] ?? 'Select something to see what it links to.';
+  pane.append(el('p', 'pane-empty', ask));
 }
 
 /** For a screen: the flows that traverse it and the screens either side. */
@@ -5740,6 +5945,56 @@ function renderLinksPane(node) {
         row.append(el('span', 'link-name', flow ? `${id} ${flow.name}` : id));
         row.onclick = () => { state.journeyId = id; setLayer('frontend'); setMode('journey'); };
         pane.append(row);
+      }
+    }
+
+    // The tables it touches, listed here as well as in the Reaches card.
+    //
+    // This pane answers "what does this connect to", and until now it answered
+    // it about screens, flows and $refs while leaving out the database
+    // entirely — so the one direction a reviewer most often follows was the
+    // one direction the pane would not follow. Writes are listed apart from
+    // reads rather than merged: what an operation changes is a different
+    // question from what it needs, and it is the one that decides how much
+    // care a change to it takes.
+    const trace = state.lineage?.operations?.find((o) => o.name === node.name);
+    if (trace) {
+      const writes = trace.writes ?? [];
+      // A table it both reads and writes belongs under writes, which is the
+      // stronger claim; listing it twice would overstate the count.
+      const reads = (trace.reads ?? []).filter((t) => !writes.includes(t));
+
+      const tableRows = (title, names, write) => {
+        pane.append(sectionHead(title, names.length));
+        for (const name of names) {
+          const known = (state.backend?.tables ?? []).some((t) => t.name === name);
+          const row = el('div', `link-item${write ? ' writes-table' : ''}`);
+          const dot = el('span', 'type-dot');
+          dot.style.background = write ? '#f87171' : '#34d399';
+          row.append(dot, el('span', 'link-name', name));
+          row.append(el('span', 'link-file', name.split('.')[0]));
+          row.onclick = () => {
+            if (!known) return toast(`${name} is not in the schema reference`);
+            selectTable(name);
+            setLayer('backend');
+            setMode('data');
+          };
+          if (!known) row.classList.add('problem');
+          pane.append(row);
+        }
+      };
+
+      tableRows('Writes', writes, true);
+      tableRows('Reads', reads, false);
+
+      if (!writes.length && !reads.length) {
+        pane.append(
+          el('p', 'pane-note',
+            trace.source === 'unresolved'
+              ? 'The lineage carries no tables for this operation — 318 of the 654 are in that ' +
+                'state. It is not a claim that it touches nothing.'
+              : 'The lineage resolved this and found no table, usually a computed projection.')
+        );
       }
     }
   }
