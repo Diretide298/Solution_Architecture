@@ -125,6 +125,21 @@ def main() -> int:
                     persisted[sname] = table
                     owner[table] = name
 
+    # The relationship graph knows where a column points; the column did not say so. On 18 August
+    # **all 514 relationships were invisible at column level** — `facility_id` on
+    # `access.parking_entitlement` is a bare `uuid` in the contract, and the only record that it
+    # points at `access.parking_facility` lived in a separate file. A reader looking at the column
+    # in the workbook saw a uuid and nothing else.
+    #
+    # Contracts express almost none of these as `$ref` — 486 of 514 are conventions rather than
+    # declared references — so the graph is the source and the column is annotated from it.
+    graph_path = HANDOFF / "relationship-graph.json"
+    edges: dict[tuple[str, str], dict] = {}
+    if graph_path.exists():
+        for r in json.loads(graph_path.read_text(encoding="utf-8")).get("rels", []):
+            if r.get("to"):
+                edges[(r["frm"], r["col"])] = r
+
     ref_path = HANDOFF / "schema-reference.json"
     S = json.loads(ref_path.read_text(encoding="utf-8"))
     existing = S.get("cols", {})
@@ -148,6 +163,15 @@ def main() -> int:
                 "table": table,
                 **({"references": fk} if fk else {}),
             })
+        for c in cols:
+            e = edges.get((table, c["column"]))
+            if e:
+                c["references"] = e["to"]
+                c["referenceKind"] = e.get("edgeKind", "reference")
+                # How the link was established, because 486 of 514 are conventions rather than
+                # declared references and a reader should know which they are looking at.
+                c["referenceHow"] = e.get("how", "convention")
+                c["enforced"] = "yes" if "DDL" in str(e.get("how", "")) else "no"
         if cols:
             derived[table] = cols
 
@@ -171,6 +195,34 @@ def main() -> int:
     for table, cols in derived.items():
         if not existing.get(table) or len(cols) >= len(existing[table]):
             existing[table] = cols
+    # A relationship is evidence a column exists — applied after the merge so it reaches tables the
+    # contracts do not describe at all. The graph names columns an API never returns: `ai.policy`
+    # carries a tenant, `identity.authz_audit` an actor and a subject, `fnb.location_code` a
+    # location. **Scope and audit columns are the usual case**, and they are exactly the ones a
+    # reader must see — a policy table with no visible tenant column looks unscoped.
+    for (table, col), e in sorted(edges.items()):
+        row = existing.setdefault(table, [])
+        found = next((c for c in row if c["column"] == col), None)
+        if found:
+            found["references"] = e["to"]
+            found["referenceKind"] = e.get("edgeKind", "reference")
+            found["referenceHow"] = e.get("how", "convention")
+            found["enforced"] = "yes" if "DDL" in str(e.get("how", "")) else "no"
+            continue
+        row.append({
+            "column": col,
+            "type": "uuid",
+            "required": e.get("required") or "no",
+            "source": "relationship-graph.json",
+            "description": (f"Points at {e['to']}. **Not exposed by the contract** — an API returns "
+                            "what a caller needs and a table carries what RLS and the joins need."),
+            "table": table,
+            "references": e["to"],
+            "referenceKind": e.get("edgeKind", "reference"),
+            "referenceHow": e.get("how", "convention"),
+            "enforced": "yes" if "DDL" in str(e.get("how", "")) else "no",
+        })
+
     S["cols"] = existing
     ref_path.write_text(json.dumps(S), encoding="utf-8")
 

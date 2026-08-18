@@ -1,0 +1,340 @@
+{
+ "code": "P12",
+ "name": "Venue Support \u2014 Agent Console",
+ "shortName": "Venue Support",
+ "app": "venue-support-web",
+ "operator": "venue",
+ "audience": "staff",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-18",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 8,
+  "operations": 74,
+  "contracts": 5,
+  "modules": 4,
+  "undrawn": 0,
+  "operationsWithNoScreen": 29
+ },
+ "waves": {
+  "wave2": 2,
+  "wave3": 6
+ },
+ "modules": [
+  {
+   "module": "marketing-crm",
+   "screens": 5,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "identity",
+   "screens": 1,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "white-label",
+   "screens": 1,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "reporting",
+   "screens": 1,
+   "waves": [
+    3
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "white-label",
+   "operations": 41
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 16
+  },
+  {
+   "contract": "identity",
+   "operations": 8
+  },
+  {
+   "contract": "reporting",
+   "operations": 8
+  },
+  {
+   "contract": "finance",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "SUP-001",
+   "name": "Agent Login",
+   "module": "identity",
+   "wave": 3,
+   "route": "/general/agent-login",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "SUP-002",
+   "name": "Agent Dashboard",
+   "module": "marketing-crm",
+   "wave": 3,
+   "route": "/general/agent-dashboard",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "SUP-003",
+   "name": "Availability & Routing Settings",
+   "module": "marketing-crm",
+   "wave": 3,
+   "route": "/general/availability-and-routing-settings",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-004",
+   "name": "Conversation Queue",
+   "module": "marketing-crm",
+   "wave": 2,
+   "route": "/general/conversation-queue",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "SUP-005",
+   "name": "Live Chat Workspace",
+   "module": "marketing-crm",
+   "wave": 2,
+   "route": "/general/live-chat-workspace",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "SUP-006",
+   "name": "Knowledge Base Search",
+   "module": "white-label",
+   "wave": 3,
+   "route": "/general/knowledge-base-search",
+   "operations": 41,
+   "drawn": true
+  },
+  {
+   "id": "SUP-007",
+   "name": "Canned Response Management",
+   "module": "marketing-crm",
+   "wave": 3,
+   "route": "/general/canned-response-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "SUP-008",
+   "name": "Agent Performance & SLA View",
+   "module": "reporting",
+   "wave": 3,
+   "route": "/general/agent-performance-and-sla-view",
+   "operations": 10,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "calculateTax",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Compute tax for a set of lines"
+   },
+   {
+    "operation": "disputeObligation",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "One entity disagrees with the amount"
+   },
+   {
+    "operation": "recordSettlement",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "One entity paid another"
+   },
+   {
+    "operation": "resolveObligationDispute",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Agree what is actually owed"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "deleteGuestAccount",
+    "contract": "identity",
+    "verb": "DELETE",
+    "summary": "Self-service account deletion"
+   },
+   {
+    "operation": "resolvePermissions",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Simulate a principal's effective permissions"
+   },
+   {
+    "operation": "addSuppression",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Suppress an address"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
+   },
+   {
+    "operation": "createSegment",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a segment"
+   },
+   {
+    "operation": "getSuppressionList",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "listReviews",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guest reviews and ratings"
+   },
+   {
+    "operation": "listSegmentMembers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guests currently matching a segment"
+   },
+   {
+    "operation": "listSegments",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List segments"
+   },
+   {
+    "operation": "previewSegment",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Estimate segment size and reachability"
+   },
+   {
+    "operation": "respondToReview",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Respond to a review"
+   },
+   {
+    "operation": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Configure consent purposes"
+   },
+   {
+    "operation": "startKioskAssist",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A staff member helps a guest at a kiosk, remotely"
+   },
+   {
+    "operation": "cancelReportExecution",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Cancel a running execution"
+   },
+   {
+    "operation": "createReportSchedule",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Schedule a report"
+   },
+   {
+    "operation": "deleteReportSchedule",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Delete a schedule"
+   },
+   {
+    "operation": "exportReportResult",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Export a completed result"
+   },
+   {
+    "operation": "getReportExecution",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Execution status and result"
+   },
+   {
+    "operation": "getReportExport",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Export status and download link"
+   },
+   {
+    "operation": "getReportResult",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Paged result rows"
+   },
+   {
+    "operation": "listReportExecutions",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List executions"
+   },
+   {
+    "operation": "listReportFields",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Fields available for a data source"
+   },
+   {
+    "operation": "listReportSchedules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List scheduled reports"
+   },
+   {
+    "operation": "updateReportSchedule",
+    "contract": "reporting",
+    "verb": "PATCH",
+    "summary": "Amend, pause or resume a schedule"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "marketing-crm",
+    "waves": [
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

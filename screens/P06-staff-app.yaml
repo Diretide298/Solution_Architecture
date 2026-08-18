@@ -42,7 +42,7 @@ platform:
 screens:
 - id: EMP-001
   name: Sign in
-  module: Operations
+  module: identity
   purpose: Get an employee onto a shared device fast.
   capability: C00
   wave: 1
@@ -111,9 +111,11 @@ screens:
     contract: identity
     purpose: Revoke every session in scope
     trigger: onAction
+  modules:
+  - identity
 - id: EMP-002
   name: Select venue & role
-  module: Operations
+  module: identity
   purpose: Confirm which hat this person is wearing today.
   capability: C00
   wave: 1
@@ -189,9 +191,11 @@ screens:
     contract: identity
     purpose: Revoke every session in scope
     trigger: onAction
+  modules:
+  - identity
 - id: EMP-003
   name: Home — on duty
-  module: Operations
+  module: shift
   purpose: The screen the device sits on between tasks.
   capability: C00
   wave: 1
@@ -298,9 +302,12 @@ screens:
     contract: maintenance
     purpose: Investigate, escalate or close an incident
     trigger: onAction
+  modules:
+  - shift
+  - maintenance
 - id: EMP-048
   name: Opening checklist
-  module: Operations
+  module: maintenance
   purpose: Confirm a gate is fit to open before the first guest reaches it.
   capability: C00
   wave: 1
@@ -353,9 +360,11 @@ screens:
     contract: maintenance
     purpose: List completed inspections
     trigger: onLoad
+  modules:
+  - maintenance
 - id: EMP-009
   name: End shift
-  module: Operations
+  module: shift
   purpose: Close out cleanly, including anything unsynced.
   capability: C00
   wave: 1
@@ -443,9 +452,11 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
+  modules:
+  - shift
 - id: EMP-010
   name: Scan — ready
-  module: Operations
+  module: access
   purpose: The raised centre action, and the thing this app is for.
   capability: C00
   wave: 1
@@ -508,9 +519,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: EMP-011
   name: Scan — admitted
-  module: Operations
+  module: access
   purpose: Confirm entry, then get out of the way.
   capability: C00
   wave: 1
@@ -573,9 +586,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: EMP-012
   name: Scan — denied
-  module: Operations
+  module: access
   purpose: Give the reason and the next action.
   capability: C00
   wave: 1
@@ -639,9 +654,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: EMP-013
   name: Override
-  module: Operations
+  module: access
   purpose: Admit against a failed validation, on the record.
   capability: C00
   wave: 1
@@ -705,9 +722,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: EMP-014
   name: Ticket lookup
-  module: Operations
+  module: orders
   purpose: Answer a question without admitting anybody.
   capability: C00
   wave: 1
@@ -799,9 +818,11 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
 - id: EMP-015
   name: Group scan
-  module: Operations
+  module: access
   purpose: Admit a party on one credential.
   capability: C00
   wave: 2
@@ -864,9 +885,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: EMP-016
   name: Offline scanning
-  module: Operations
+  module: access
   purpose: Keep working when the network does not.
   capability: C00
   wave: 1
@@ -929,9 +952,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: EMP-017
   name: Sync & reconciliation
-  module: Operations
+  module: access
   purpose: Learn that the server disagreed with you.
   capability: C00
   wave: 1
@@ -1002,9 +1027,12 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
+  - orders
 - id: EMP-018
   name: Offline package
-  module: Operations
+  module: catalogue
   purpose: Know which rules this device is enforcing.
   capability: C00
   wave: 1
@@ -1055,9 +1083,11 @@ screens:
     contract: catalogue
     purpose: Report that a workstation applied a bundle
     trigger: onAction
+  modules:
+  - catalogue
 - id: EMP-004
   name: Task list
-  module: Operations
+  module: maintenance
   purpose: See what is assigned, and what is overdue.
   capability: C00
   wave: 1
@@ -1158,9 +1188,11 @@ screens:
     contract: maintenance
     purpose: Supervisor verification
     trigger: onAction
+  modules:
+  - maintenance
 - id: EMP-005
   name: Task detail
-  module: Operations
+  module: maintenance
   purpose: Do the task and record that it was done.
   capability: C00
   wave: 1
@@ -1263,9 +1295,11 @@ screens:
     contract: maintenance
     purpose: Supervisor verification
     trigger: onAction
+  modules:
+  - maintenance
 - id: EMP-006
   name: Raise a task
-  module: Operations
+  module: maintenance
   purpose: Report something without finding a manager.
   capability: C00
   wave: 1
@@ -1364,9 +1398,11 @@ screens:
     contract: maintenance
     purpose: Supervisor verification
     trigger: onAction
+  modules:
+  - maintenance
 - id: EMP-007
   name: Handover notes
-  module: Operations
+  module: workforce
   purpose: Tell the next shift what they are walking into.
   capability: C00
   wave: 2
@@ -1419,9 +1455,11 @@ screens:
     contract: workforce
     purpose: Who has acknowledged, and who has not
     trigger: onLoad
+  modules:
+  - workforce
 - id: EMP-008
   name: Shift summary
-  module: Operations
+  module: shift
   purpose: See what this person actually did today.
   capability: C00
   wave: 2
@@ -1508,9 +1546,11 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
+  modules:
+  - shift
 - id: EMP-019
   name: AI assistant — home
-  module: Operations
+  module: ai
   purpose: The tab that is already in the shell.
   capability: C00
   wave: 1
@@ -1558,9 +1598,11 @@ screens:
     contract: ai
     purpose: Ask
     trigger: onAction
+  modules:
+  - ai
 - id: EMP-020
   name: AI assistant — answer
-  module: Operations
+  module: ai
   purpose: Answer with the operation behind it visible.
   capability: C00
   wave: 1
@@ -1610,9 +1652,11 @@ screens:
     contract: ai
     purpose: A principal's conversation history
     trigger: onLoad
+  modules:
+  - ai
 - id: EMP-031
   name: Queue monitor
-  module: Operations
+  module: queue
   purpose: See the queue from the floor.
   capability: C00
   wave: 2
@@ -1683,9 +1727,11 @@ screens:
     contract: queue
     purpose: Amend queue configuration
     trigger: onAction
+  modules:
+  - queue
 - id: EMP-032
   name: Manual wait entry
-  module: Operations
+  module: queue
   purpose: Take over when the wait feed dies.
   capability: C00
   wave: 2
@@ -1759,9 +1805,11 @@ screens:
     contract: queue
     purpose: Amend queue configuration
     trigger: onAction
+  modules:
+  - queue
 - id: EMP-033
   name: Capacity view
-  module: Operations
+  module: catalogue
   purpose: Know whether the next session can take a walk-up.
   capability: C00
   wave: 2
@@ -1820,9 +1868,11 @@ screens:
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
+  modules:
+  - catalogue
 - id: EMP-034
   name: Walk-up sale
-  module: Operations
+  module: orders
   purpose: Sell at the gate without a till.
   capability: C00
   wave: 2
@@ -1953,9 +2003,12 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
+  - catalogue
 - id: EMP-035
   name: Payment on device
-  module: Operations
+  module: orders
   purpose: Take a card payment on the handheld.
   capability: C00
   wave: 2
@@ -2008,9 +2061,11 @@ screens:
     contract: orders
     purpose: Capture a previously authorised payment
     trigger: onAction
+  modules:
+  - orders
 - id: EMP-036
   name: Issue media
-  module: Operations
+  module: assets
   purpose: Give the guest something the gate can read.
   capability: C00
   wave: 2
@@ -2093,9 +2148,12 @@ screens:
     contract: assets
     purpose: Amend metadata, tags or rights
     trigger: onAction
+  modules:
+  - assets
+  - orders
 - id: EMP-037
   name: Notifications
-  module: Operations
+  module: workforce
   purpose: Tell the right person the right thing.
   capability: C00
   wave: 1
@@ -2146,9 +2204,11 @@ screens:
     contract: workforce
     purpose: Tell staff something
     trigger: onAction
+  modules:
+  - workforce
 - id: EMP-039
   name: Announcements
-  module: Operations
+  module: workforce
   purpose: Read what the venue told everybody.
   capability: C00
   wave: 2
@@ -2200,9 +2260,11 @@ screens:
     contract: workforce
     purpose: Tell staff something
     trigger: onAction
+  modules:
+  - workforce
 - id: EMP-047
   name: Emergency mode
-  module: Operations
+  module: workforce
   purpose: Evacuate, and stop pretending to be a ticketing app.
   capability: C00
   wave: 1
@@ -2253,9 +2315,11 @@ screens:
     contract: workforce
     purpose: Tell staff something
     trigger: onAction
+  modules:
+  - workforce
 - id: EMP-050
   name: Post-incident restore
-  module: Operations
+  module: maintenance
   purpose: Put the venue back to how it was.
   capability: C00
   wave: 2
@@ -2310,9 +2374,11 @@ screens:
     contract: maintenance
     purpose: Investigate, escalate or close an incident
     trigger: onAction
+  modules:
+  - maintenance
 - id: EMP-021
   name: Roster
-  module: Operations
+  module: workforce
   purpose: See who is on, and where.
   capability: C00
   wave: 1
@@ -2363,9 +2429,11 @@ screens:
     contract: workforce
     purpose: Move or cancel an assignment
     trigger: onAction
+  modules:
+  - workforce
 - id: EMP-022
   name: My rota
-  module: Operations
+  module: workforce
   purpose: Know when to turn up next.
   capability: C00
   wave: 1
@@ -2416,9 +2484,11 @@ screens:
     contract: workforce
     purpose: Move or cancel an assignment
     trigger: onAction
+  modules:
+  - workforce
 - id: EMP-023
   name: Swap request
-  module: Operations
+  module: workforce
   purpose: Ask somebody to take a shift.
   capability: C00
   wave: 2
@@ -2469,9 +2539,11 @@ screens:
     contract: workforce
     purpose: Move or cancel an assignment
     trigger: onAction
+  modules:
+  - workforce
 - id: EMP-024
   name: Clock in / out
-  module: Operations
+  module: workforce
   purpose: Record attendance from the device already in hand.
   capability: C00
   wave: 1
@@ -2519,9 +2591,11 @@ screens:
     contract: workforce
     purpose: A supervisor corrects a record
     trigger: onAction
+  modules:
+  - workforce
 - id: EMP-025
   name: Break management
-  module: Operations
+  module: workforce
   purpose: Take a break without leaving a gate unstaffed.
   capability: C00
   wave: 2
@@ -2568,9 +2642,11 @@ screens:
     contract: workforce
     purpose: Who was here
     trigger: onLoad
+  modules:
+  - workforce
 - id: EMP-026
   name: Incident report
-  module: Operations
+  module: maintenance
   purpose: Record what happened while it is fresh.
   capability: C00
   wave: 1
@@ -2628,9 +2704,11 @@ screens:
     contract: maintenance
     purpose: Investigate, escalate or close an incident
     trigger: onAction
+  modules:
+  - maintenance
 - id: EMP-027
   name: Incident detail
-  module: Operations
+  module: maintenance
   purpose: Follow up on something already reported.
   capability: C00
   wave: 2
@@ -2685,9 +2763,11 @@ screens:
     contract: maintenance
     purpose: Report an incident
     trigger: onAction
+  modules:
+  - maintenance
 - id: EMP-028
   name: Lost & found
-  module: Operations
+  module: marketing-crm
   purpose: Log something handed in.
   capability: C00
   wave: 2
@@ -2751,9 +2831,11 @@ screens:
     contract: marketing-crm
     purpose: Assign, reprioritise or resolve a case
     trigger: onAction
+  modules:
+  - marketing-crm
 - id: EMP-029
   name: Guest assistance
-  module: Operations
+  module: marketing-crm
   purpose: Help a guest without leaving the floor.
   capability: C00
   wave: 2
@@ -2837,9 +2919,12 @@ screens:
     contract: maintenance
     purpose: Investigate, escalate or close an incident
     trigger: onAction
+  modules:
+  - marketing-crm
+  - maintenance
 - id: EMP-030
   name: Venue map
-  module: Operations
+  module: orders
   purpose: Find a gate, an exit or a colleague.
   capability: C00
   wave: 2
@@ -2890,9 +2975,12 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
+  modules:
+  - orders
+  - fnb
 - id: EMP-038
   name: Broadcast to team
-  module: Operations
+  module: workforce
   purpose: Reach everybody on shift at once.
   capability: C00
   wave: 2
@@ -2943,9 +3031,11 @@ screens:
     contract: workforce
     purpose: What staff have been told
     trigger: onLoad
+  modules:
+  - workforce
 - id: EMP-040
   name: Knowledge base
-  module: Operations
+  module: ai
   purpose: Look up the rule rather than guess it.
   capability: C00
   wave: 2
@@ -2984,9 +3074,11 @@ screens:
     contract: ai
     purpose: Search meaning, not words
     trigger: onAction
+  modules:
+  - ai
 - id: EMP-041
   name: Training
-  module: Operations
+  module: ai
   purpose: Do the module that unlocks the role.
   capability: C00
   wave: 3
@@ -3025,9 +3117,11 @@ screens:
     contract: ai
     purpose: Search meaning, not words
     trigger: onAction
+  modules:
+  - ai
 - id: EMP-042
   name: Profile
-  module: Operations
+  module: identity
   purpose: Change what this person controls about themselves.
   capability: C00
   wave: 1
@@ -3090,9 +3184,11 @@ screens:
     contract: identity
     purpose: Revoke every session in scope
     trigger: onAction
+  modules:
+  - identity
 - id: EMP-043
   name: Device settings
-  module: Operations
+  module: marketing-crm
   purpose: Set how this handheld behaves.
   capability: C00
   wave: 1
@@ -3175,6 +3271,9 @@ screens:
     contract: marketing-crm
     purpose: Amend a guest profile
     trigger: onAction
+  modules:
+  - marketing-crm
+  - tenancy
 - id: EMP-044
   name: Accessibility
   module: Operations
@@ -3250,7 +3349,7 @@ screens:
     status: notStarted
 - id: EMP-046
   name: Sign out
-  module: Operations
+  module: identity
   purpose: Leave the shared device safe for the next person.
   capability: C00
   wave: 1
@@ -3290,9 +3389,11 @@ screens:
     contract: identity
     purpose: Close the current session
     trigger: onAction
+  modules:
+  - identity
 - id: EMP-049
   name: Hand over the journal
-  module: Operations
+  module: access
   purpose: Move an unsynced journal off a device that is going flat.
   capability: C00
   wave: 1
@@ -3335,3 +3436,5 @@ screens:
     contract: access
     purpose: Replay scans recorded offline
     trigger: onAction
+  modules:
+  - access

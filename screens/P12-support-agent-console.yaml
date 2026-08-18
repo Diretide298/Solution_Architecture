@@ -47,7 +47,7 @@ platform:
 screens:
 - id: SUP-001
   name: Agent Login
-  module: TODO
+  module: identity
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 3
   layout:
@@ -113,9 +113,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
 - id: SUP-002
   name: Agent Dashboard
-  module: TODO
+  module: marketing-crm
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
@@ -186,9 +188,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: SUP-003
   name: Availability & Routing Settings
-  module: TODO
+  module: marketing-crm
   purpose: Change how availability behaves here, and see which level the current value came from.
   wave: 3
   layout:
@@ -229,9 +233,11 @@ screens:
     contract: marketing-crm
     purpose: An agent goes available, away or offline
     trigger: onAction
+  modules:
+  - marketing-crm
 - id: SUP-004
   name: Conversation Queue
-  module: TODO
+  module: marketing-crm
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 2
   layout:
@@ -309,9 +315,11 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101).
     **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace
     move; the rest of the console stays Wave 3.
+  modules:
+  - marketing-crm
 - id: SUP-005
   name: Live Chat Workspace
-  module: TODO
+  module: marketing-crm
   purpose: Work with live chat workspace for this venue.
   wave: 2
   layout:
@@ -394,9 +402,11 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
     with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting
     can wait.
+  modules:
+  - marketing-crm
 - id: SUP-006
   name: Knowledge Base Search
-  module: TODO
+  module: white-label
   purpose: Find something when the guest does not know what it is called.
   wave: 3
   layout:
@@ -596,9 +606,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - white-label
 - id: SUP-007
   name: Canned Response Management
-  module: TODO
+  module: marketing-crm
   purpose: Find canned response management for this venue.
   wave: 3
   layout:
@@ -642,9 +654,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: SUP-008
   name: Agent Performance & SLA View
-  module: TODO
+  module: reporting
   purpose: Produce agent performance & sla view for this venue.
   wave: 3
   layout:
@@ -719,3 +733,7 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - reporting
+  - finance
+  - marketing-crm

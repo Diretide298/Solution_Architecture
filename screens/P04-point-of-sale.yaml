@@ -50,7 +50,7 @@ platform:
 screens:
 - id: POS-001
   name: Begin Shift
-  module: Shift
+  module: shift
   purpose: Count the opening float and open the till.
   capability: C11
   wave: 1
@@ -157,9 +157,11 @@ screens:
     - POS-002
     - POS-007
     - POS-009
+  modules:
+  - shift
 - id: POS-002
   name: Sell — Ticket Catalogue
-  module: Sell
+  module: orders
   purpose: Find a product and add it to the cart.
   capability: C01
   wave: 1
@@ -403,9 +405,16 @@ screens:
     - POS-006
     - POS-010
     fromFlows: true
+  modules:
+  - orders
+  - promotions
+  - catalogue
+  - retail
+  - games
+  - approvals
 - id: POS-003
   name: Sell — Timed Entry
-  module: Sell
+  module: catalogue
   purpose: Pick a date, a session and ticket quantities.
   capability: C81
   wave: 1
@@ -523,9 +532,11 @@ screens:
     - POS-004
     - POS-005
     - POS-006
+  modules:
+  - catalogue
 - id: POS-004
   name: Sell — Seat Map
-  module: Sell
+  module: seating
   purpose: Choose specific seats for a seated event.
   capability: C51
   wave: 2
@@ -628,9 +639,14 @@ screens:
     - POS-003
     - POS-005
     - POS-006
+  modules:
+  - seating
+  - catalogue
+  - orders
+  - approvals
 - id: POS-005
   name: Payment
-  module: Payment
+  module: orders
   purpose: Take payment and complete the sale.
   capability: C04
   wave: 1
@@ -740,9 +756,12 @@ screens:
     - POS-001
     - POS-002
     fromFlows: true
+  modules:
+  - orders
+  - retail
 - id: POS-006
   name: Held Orders
-  module: Sell
+  module: orders
   purpose: Find and resume a parked sale.
   capability: C01
   wave: 1
@@ -844,9 +863,11 @@ screens:
     - POS-002
     - POS-003
     - POS-004
+  modules:
+  - orders
 - id: POS-007
   name: Close Shift
-  module: Shift
+  module: shift
   purpose: Count the drawer and close the till.
   capability: C11
   wave: 1
@@ -946,9 +967,11 @@ screens:
     - POS-001
     - POS-009
     inferred: true
+  modules:
+  - shift
 - id: POS-008
   name: Reports
-  module: Reports
+  module: reporting
   purpose: See how the day is going from the terminal.
   capability: C21
   wave: 2
@@ -1031,9 +1054,12 @@ screens:
     exitTo:
     - POS-001
     - POS-002
+  modules:
+  - reporting
+  - finance
 - id: POS-009
   name: Staff Roster
-  module: Shift
+  module: shift
   purpose: See who is on duty and on which terminal.
   capability: C11
   wave: 2
@@ -1124,9 +1150,11 @@ screens:
     a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
     removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
     does not handle money should not be able to move it (CF-87's class).
+  modules:
+  - shift
 - id: POS-010
   name: Add to Existing Ticket
-  module: Sell
+  module: assets
   purpose: Sell something onto media the guest is already carrying.
   capability: C01
   wave: 1
@@ -1224,3 +1252,6 @@ screens:
     board: wireframes/P04 Staff POS.dc.html#pos-010
     designReference: sources/designs/Park_POS_dc.html
   notes: CF-58, from the 14 August MoM. Not in the delivered mockups.
+  modules:
+  - assets
+  - orders

@@ -41,6 +41,7 @@ for d in ai; do
   python3 tools/render-domain.py "$d"
 done
 
+python3 tools/derive-platform.py
 python3 tools/build-audience.py
 python3 tools/build-status.py
 python3 tools/build-status.py --domain ai

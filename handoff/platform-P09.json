@@ -1,0 +1,846 @@
+{
+ "code": "P09",
+ "name": "TICVAI Web \u2014 Platform Console",
+ "shortName": "TICVAI Web",
+ "app": "ticvai-web",
+ "operator": "ticvai",
+ "audience": "platformAdmin",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-18",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 37,
+  "operations": 128,
+  "contracts": 8,
+  "modules": 6,
+  "undrawn": 1,
+  "operationsWithNoScreen": 61
+ },
+ "waves": {
+  "wave1": 11,
+  "wave2": 16,
+  "wave3": 10
+ },
+ "modules": [
+  {
+   "module": "subscription",
+   "screens": 19,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "platform-ops",
+   "screens": 9,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "identity",
+   "screens": 3,
+   "waves": [
+    1
+   ]
+  },
+  {
+   "module": "white-label",
+   "screens": 3,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "ai",
+   "screens": 2,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "reporting",
+   "screens": 1,
+   "waves": [
+    3
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "white-label",
+   "operations": 41
+  },
+  {
+   "contract": "subscription",
+   "operations": 33
+  },
+  {
+   "contract": "platform-ops",
+   "operations": 24
+  },
+  {
+   "contract": "identity",
+   "operations": 16
+  },
+  {
+   "contract": "ai",
+   "operations": 5
+  },
+  {
+   "contract": "reporting",
+   "operations": 4
+  },
+  {
+   "contract": "cross-cell",
+   "operations": 3
+  },
+  {
+   "contract": "tenancy",
+   "operations": 2
+  }
+ ],
+ "screens": [
+  {
+   "id": "ADM-001",
+   "name": "Platform Login / MFA",
+   "module": "identity",
+   "wave": 1,
+   "route": "/general/platform-login-mfa",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "ADM-002",
+   "name": "Platform Dashboard",
+   "module": "subscription",
+   "wave": 1,
+   "route": "/general/platform-dashboard",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "ADM-003",
+   "name": "Cross-Tenant Health Dashboard",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/cross-tenant-health-dashboard",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "ADM-004",
+   "name": "Platform Audit Log",
+   "module": "ai",
+   "wave": 2,
+   "route": "/general/platform-audit-log",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-005",
+   "name": "Tenant Directory",
+   "module": "subscription",
+   "wave": 1,
+   "route": "/general/tenant-directory",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "ADM-006",
+   "name": "Tenant Hierarchy Explorer",
+   "module": "subscription",
+   "wave": 1,
+   "route": "/general/tenant-hierarchy-explorer",
+   "operations": 23,
+   "drawn": true
+  },
+  {
+   "id": "ADM-007",
+   "name": "Module & Feature Entitlement",
+   "module": "subscription",
+   "wave": 1,
+   "route": "/general/module-and-feature-entitlement",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "ADM-008",
+   "name": "Subscription & Plan Management",
+   "module": "subscription",
+   "wave": 1,
+   "route": "/general/subscription-and-plan-management",
+   "operations": 28,
+   "drawn": true
+  },
+  {
+   "id": "ADM-009",
+   "name": "Tenant Billing & Invoicing",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/tenant-billing-and-invoicing",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "ADM-010",
+   "name": "Usage Metering",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/usage-metering",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "ADM-011",
+   "name": "Licence & Seat Management",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/licence-and-seat-management",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "ADM-012",
+   "name": "Tenant Isolation & Resource Pool",
+   "module": "subscription",
+   "wave": 1,
+   "route": "/general/tenant-isolation-and-resource-pool",
+   "operations": 22,
+   "drawn": true
+  },
+  {
+   "id": "ADM-013",
+   "name": "Tenant Performance Monitor",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/tenant-performance-monitor",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-014",
+   "name": "Auto-Scaling Configuration",
+   "module": "subscription",
+   "wave": 3,
+   "route": "/general/auto-scaling-configuration",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-015",
+   "name": "API Rate Limit & Quota Management",
+   "module": "subscription",
+   "wave": 3,
+   "route": "/general/api-rate-limit-and-quota-management",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "ADM-016",
+   "name": "White-Label Branding Management",
+   "module": "white-label",
+   "wave": 2,
+   "route": "/general/white-label-branding-management",
+   "operations": 41,
+   "drawn": true
+  },
+  {
+   "id": "ADM-017",
+   "name": "Domain & Certificate Management",
+   "module": "white-label",
+   "wave": 2,
+   "route": "/general/domain-and-certificate-management",
+   "operations": 41,
+   "drawn": true
+  },
+  {
+   "id": "ADM-018",
+   "name": "Localisation & Language Pack",
+   "module": "white-label",
+   "wave": 2,
+   "route": "/general/localisation-and-language-pack",
+   "operations": 41,
+   "drawn": true
+  },
+  {
+   "id": "ADM-019",
+   "name": "Global Configuration & Defaults",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/global-configuration-and-defaults",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-020",
+   "name": "Platform User Directory",
+   "module": "identity",
+   "wave": 1,
+   "route": "/general/platform-user-directory",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-021",
+   "name": "Platform Role Management",
+   "module": "identity",
+   "wave": 1,
+   "route": "/general/platform-role-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-022",
+   "name": "Release & Version Management",
+   "module": "platform-ops",
+   "wave": 2,
+   "route": "/general/release-and-version-management",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-023",
+   "name": "Staging Promotion & Approval",
+   "module": "platform-ops",
+   "wave": 2,
+   "route": "/general/staging-promotion-and-approval",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-024",
+   "name": "Release Notification Composer",
+   "module": "platform-ops",
+   "wave": 3,
+   "route": "/general/release-notification-composer",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-025",
+   "name": "Tenant Upgrade Scheduler",
+   "module": "platform-ops",
+   "wave": 2,
+   "route": "/general/tenant-upgrade-scheduler",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-026",
+   "name": "End-of-Support Notice Management",
+   "module": "platform-ops",
+   "wave": 3,
+   "route": "/general/end-of-support-notice-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-027",
+   "name": "Database Migration Console",
+   "module": "platform-ops",
+   "wave": 1,
+   "route": "/general/database-migration-console",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "ADM-028",
+   "name": "Environment Registry",
+   "module": "platform-ops",
+   "wave": 2,
+   "route": "/general/environment-registry",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-029",
+   "name": "Deployment Monitor",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/deployment-monitor",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "ADM-030",
+   "name": "Infrastructure Sizing & Scaling Policy",
+   "module": "subscription",
+   "wave": 3,
+   "route": "/general/infrastructure-sizing-and-scaling-policy",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-031",
+   "name": "Security & Compliance Dashboard",
+   "module": "reporting",
+   "wave": 3,
+   "route": "/general/security-and-compliance-dashboard",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-032",
+   "name": "WAF & Security Policy View",
+   "module": "subscription",
+   "wave": 3,
+   "route": "/general/waf-and-security-policy-view",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-033",
+   "name": "Backup & DR Status",
+   "module": "subscription",
+   "wave": 2,
+   "route": "/general/backup-and-dr-status",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-034",
+   "name": "Archival Job Monitor",
+   "module": "subscription",
+   "wave": 3,
+   "route": "/general/archival-job-monitor",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-035",
+   "name": "Support & Escalation Console",
+   "module": "platform-ops",
+   "wave": 3,
+   "route": "/general/support-and-escalation-console",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-036",
+   "name": "Platform Notification Broadcast",
+   "module": "platform-ops",
+   "wave": 3,
+   "route": "/general/platform-notification-broadcast",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-037",
+   "name": "AI Provider & Credentials",
+   "module": "ai",
+   "wave": 1,
+   "route": "/ai/providers",
+   "operations": 4,
+   "drawn": false
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "createKnowledgeCollection",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Create a collection"
+   },
+   {
+    "operation": "decideProposedAction",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Approve or reject a proposal"
+   },
+   {
+    "operation": "generateConfiguration",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a configuration from a description"
+   },
+   {
+    "operation": "generateVenueLayout",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a seat map from an uploaded plan"
+   },
+   {
+    "operation": "ingestKnowledgeDocument",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Add a document"
+   },
+   {
+    "operation": "listIndexJobs",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "Indexing in flight and recently finished"
+   },
+   {
+    "operation": "listIndexSources",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What is indexed, and how current it is"
+   },
+   {
+    "operation": "listKnowledgeCollections",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "Collections available to this tenant"
+   },
+   {
+    "operation": "listProposedActions",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What the assistant has proposed and nobody has decided"
+   },
+   {
+    "operation": "reindexSource",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Rebuild a source"
+   },
+   {
+    "operation": "removeIndexEntry",
+    "contract": "ai",
+    "verb": "DELETE",
+    "summary": "Remove one record from the index"
+   },
+   {
+    "operation": "setIndexSource",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": "Declare a source indexed"
+   },
+   {
+    "operation": "authoriseWalletSpend",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Hold funds against the guest's home-cell balance"
+   },
+   {
+    "operation": "captureWalletAuthorisation",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Capture a held amount"
+   },
+   {
+    "operation": "createDsarRequest",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Raise a data subject request across every linked cell"
+   },
+   {
+    "operation": "createGuestLink",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Link a guest's records across cells"
+   },
+   {
+    "operation": "getDsarRequest",
+    "contract": "cross-cell",
+    "verb": "GET",
+    "summary": "Track fan-out progress per cell"
+   },
+   {
+    "operation": "getWalletAllocation",
+    "contract": "cross-cell",
+    "verb": "GET",
+    "summary": "The consuming cell's bounded offline allocation"
+   },
+   {
+    "operation": "releaseWalletAuthorisation",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Release a hold without capturing"
+   },
+   {
+    "operation": "resolveGuestLink",
+    "contract": "cross-cell",
+    "verb": "GET",
+    "summary": "Find the link for a local subject"
+   },
+   {
+    "operation": "revokeGuestLink",
+    "contract": "cross-cell",
+    "verb": "DELETE",
+    "summary": "Sever a link on consent withdrawal"
+   },
+   {
+    "operation": "revokeRedemptionRight",
+    "contract": "cross-cell",
+    "verb": "DELETE",
+    "summary": "Revoke a right"
+   },
+   {
+    "operation": "setWalletAllocationPolicy",
+    "contract": "cross-cell",
+    "verb": "PUT",
+    "summary": "Set the allocation cap policy"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "deleteGuestAccount",
+    "contract": "identity",
+    "verb": "DELETE",
+    "summary": "Self-service account deletion"
+   },
+   {
+    "operation": "resolvePermissions",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Simulate a principal's effective permissions"
+   },
+   {
+    "operation": "skipRolloutCell",
+    "contract": "platform-ops",
+    "verb": "POST",
+    "summary": "Exclude a cell from this wave"
+   },
+   {
+    "operation": "cancelReportExecution",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Cancel a running execution"
+   },
+   {
+    "operation": "createReportSchedule",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Schedule a report"
+   },
+   {
+    "operation": "deleteReportSchedule",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Delete a schedule"
+   },
+   {
+    "operation": "exportReportResult",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Export a completed result"
+   },
+   {
+    "operation": "getReportExecution",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Execution status and result"
+   },
+   {
+    "operation": "getReportExport",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Export status and download link"
+   },
+   {
+    "operation": "getReportResult",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Paged result rows"
+   },
+   {
+    "operation": "listReportExecutions",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List executions"
+   },
+   {
+    "operation": "listReportFields",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Fields available for a data source"
+   },
+   {
+    "operation": "listReportSchedules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List scheduled reports"
+   },
+   {
+    "operation": "updateReportSchedule",
+    "contract": "reporting",
+    "verb": "PATCH",
+    "summary": "Amend, pause or resume a schedule"
+   },
+   {
+    "operation": "cancelInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Cancel or credit an invoice"
+   },
+   {
+    "operation": "cancelSubscription",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Terminate a tenant subscription"
+   },
+   {
+    "operation": "disputeInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Raise a dispute"
+   },
+   {
+    "operation": "executeTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Move the tenant"
+   },
+   {
+    "operation": "launchCellCluster",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Launch an identical cluster"
+   },
+   {
+    "operation": "listCellClusters",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Clusters in a region"
+   },
+   {
+    "operation": "listTenantMigrations",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Tenant moves between cells"
+   },
+   {
+    "operation": "planTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Plan moving a tenant to another cell"
+   },
+   {
+    "operation": "recordInvoicePayment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Record payment against an invoice"
+   },
+   {
+    "operation": "recordUsage",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Record metered usage"
+   },
+   {
+    "operation": "registerPartner",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "A business applies to become a partner"
+   },
+   {
+    "operation": "resolveInvoiceDispute",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Resolve a dispute"
+   },
+   {
+    "operation": "rollbackTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Roll a cutover back"
+   },
+   {
+    "operation": "settleAiUsage",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Turn metered AI interactions into a billable usage record"
+   },
+   {
+    "operation": "configureWorkstation",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Configure a workstation"
+   },
+   {
+    "operation": "createSaleBoard",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Create a sale board"
+   },
+   {
+    "operation": "getRegionSettings",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read region settings"
+   },
+   {
+    "operation": "getWorkstation",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read a workstation"
+   },
+   {
+    "operation": "listSaleBoards",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "List sale boards"
+   },
+   {
+    "operation": "listWorkstations",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "List workstations"
+   },
+   {
+    "operation": "recordDeviceHeartbeat",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Device heartbeat and status"
+   },
+   {
+    "operation": "updateRegionSettings",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Update region settings"
+   },
+   {
+    "operation": "updateSaleBoard",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Update a sale board"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "ai",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "platform-ops",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "subscription",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [
+   {
+    "id": "ADM-037",
+    "name": "AI Provider & Credentials",
+    "wave": 1
+   }
+  ],
+  "flowsNamingAMissingScreen": []
+ }
+}

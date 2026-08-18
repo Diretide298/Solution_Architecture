@@ -38,7 +38,7 @@ platform:
 screens:
 - id: ADM-001
   name: Platform Login / MFA
-  module: TODO
+  module: identity
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 1
   layout:
@@ -103,9 +103,11 @@ screens:
     - ADM-003
     - ADM-004
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
 - id: ADM-002
   name: Platform Dashboard
-  module: TODO
+  module: subscription
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -226,9 +228,12 @@ screens:
     - ADM-012
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
-  module: TODO
+  module: subscription
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -304,9 +309,12 @@ screens:
     - SCN-004
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - cross-cell
 - id: ADM-004
   name: Platform Audit Log
-  module: TODO
+  module: ai
   purpose: Find platform audit log for this venue.
   wave: 2
   layout:
@@ -346,9 +354,11 @@ screens:
     purpose: Every prompt, response and action
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - ai
 - id: ADM-005
   name: Tenant Directory
-  module: TODO
+  module: subscription
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -467,9 +477,12 @@ screens:
     - ADM-012
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-006
   name: Tenant Hierarchy Explorer
-  module: TODO
+  module: subscription
   purpose: See tenant hierarchy explorer for this venue.
   wave: 1
   layout:
@@ -596,9 +609,13 @@ screens:
     purpose: Create a scope node
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
+  - tenancy
 - id: ADM-007
   name: Module & Feature Entitlement
-  module: TODO
+  module: subscription
   purpose: See module & feature entitlement for this venue.
   wave: 1
   layout:
@@ -717,9 +734,12 @@ screens:
     - BO-074
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-008
   name: Subscription & Plan Management
-  module: TODO
+  module: subscription
   purpose: Find subscription & plan management for this venue.
   wave: 1
   layout:
@@ -864,9 +884,12 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-009
   name: Tenant Billing & Invoicing
-  module: TODO
+  module: subscription
   purpose: Find tenant billing & invoicing for this venue.
   wave: 2
   layout:
@@ -983,9 +1006,12 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-010
   name: Usage Metering
-  module: TODO
+  module: subscription
   purpose: See usage metering for this venue.
   wave: 2
   layout:
@@ -1101,9 +1127,12 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-011
   name: Licence & Seat Management
-  module: TODO
+  module: subscription
   purpose: See licence & seat management for this venue.
   wave: 2
   layout:
@@ -1220,9 +1249,12 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-012
   name: Tenant Isolation & Resource Pool
-  module: TODO
+  module: subscription
   purpose: Work with tenant isolation & resource pool for this venue.
   wave: 1
   layout:
@@ -1345,9 +1377,12 @@ screens:
     - ADM-006
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-013
   name: Tenant Performance Monitor
-  module: TODO
+  module: subscription
   purpose: See tenant performance monitor for this venue.
   wave: 2
   layout:
@@ -1409,9 +1444,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
 - id: ADM-014
   name: Auto-Scaling Configuration
-  module: TODO
+  module: subscription
   purpose: Change how auto-scaling behaves here, and see which level the current value came from.
   wave: 3
   layout:
@@ -1474,9 +1511,11 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
 - id: ADM-015
   name: API Rate Limit & Quota Management
-  module: TODO
+  module: subscription
   purpose: See api rate limit & quota management for this venue.
   wave: 3
   layout:
@@ -1594,9 +1633,12 @@ screens:
     purpose: Amend tenant details
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - identity
 - id: ADM-016
   name: White-Label Branding Management
-  module: TODO
+  module: white-label
   purpose: See white-label branding management for this venue.
   wave: 2
   layout:
@@ -1793,9 +1835,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - white-label
 - id: ADM-017
   name: Domain & Certificate Management
-  module: TODO
+  module: white-label
   purpose: See domain & certificate management for this venue.
   wave: 2
   layout:
@@ -1995,9 +2039,11 @@ screens:
     purpose: Validate the working draft
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - white-label
 - id: ADM-018
   name: Localisation & Language Pack
-  module: TODO
+  module: white-label
   purpose: Configure localisation & language pack for this venue.
   wave: 2
   layout:
@@ -2193,9 +2239,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - white-label
 - id: ADM-019
   name: Global Configuration & Defaults
-  module: TODO
+  module: subscription
   purpose: Change how global behaves here, and see which level the current value came from.
   wave: 2
   layout:
@@ -2247,9 +2295,11 @@ screens:
     purpose: Read a plan
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
 - id: ADM-020
   name: Platform User Directory
-  module: TODO
+  module: identity
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -2298,9 +2348,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
 - id: ADM-021
   name: Platform Role Management
-  module: TODO
+  module: identity
   purpose: Find platform role management for this venue.
   wave: 1
   layout:
@@ -2341,9 +2393,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
 - id: ADM-022
   name: Release & Version Management
-  module: TODO
+  module: platform-ops
   purpose: Find release & version management for this venue.
   wave: 2
   layout:
@@ -2408,9 +2462,11 @@ screens:
     - ADM-027
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-023
   name: Staging Promotion & Approval
-  module: TODO
+  module: platform-ops
   purpose: Work with staging promotion & approval for this venue.
   wave: 2
   layout:
@@ -2477,9 +2533,11 @@ screens:
     - ADM-029
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-024
   name: Release Notification Composer
-  module: TODO
+  module: platform-ops
   purpose: Push live release notification composer for this venue.
   wave: 3
   layout:
@@ -2522,9 +2580,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-025
   name: Tenant Upgrade Scheduler
-  module: TODO
+  module: platform-ops
   purpose: Find tenant upgrade scheduler for this venue.
   wave: 2
   layout:
@@ -2567,9 +2627,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-026
   name: End-of-Support Notice Management
-  module: TODO
+  module: platform-ops
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -2612,9 +2674,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-027
   name: Database Migration Console
-  module: TODO
+  module: platform-ops
   purpose: Find database migration console for this venue.
   wave: 1
   layout:
@@ -2676,9 +2740,11 @@ screens:
     - ADM-023
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-028
   name: Environment Registry
-  module: TODO
+  module: platform-ops
   purpose: Find environment registry for this venue.
   wave: 2
   layout:
@@ -2720,9 +2786,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-029
   name: Deployment Monitor
-  module: TODO
+  module: subscription
   purpose: Find deployment monitor for this venue.
   wave: 2
   layout:
@@ -2805,9 +2873,12 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
+  - platform-ops
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
-  module: TODO
+  module: subscription
   purpose: See infrastructure sizing & scaling policy for this venue.
   wave: 3
   layout:
@@ -2870,9 +2941,11 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
 - id: ADM-031
   name: Security & Compliance Dashboard
-  module: TODO
+  module: reporting
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
@@ -2923,9 +2996,11 @@ screens:
     purpose: Update a dashboard
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - reporting
 - id: ADM-032
   name: WAF & Security Policy View
-  module: TODO
+  module: subscription
   purpose: See waf & security policy view for this venue.
   wave: 3
   layout:
@@ -2988,9 +3063,11 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
 - id: ADM-033
   name: Backup & DR Status
-  module: TODO
+  module: subscription
   purpose: See backup & dr status for this venue.
   wave: 2
   layout:
@@ -3052,9 +3129,11 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
 - id: ADM-034
   name: Archival Job Monitor
-  module: TODO
+  module: subscription
   purpose: Find archival job monitor for this venue.
   wave: 3
   layout:
@@ -3117,9 +3196,11 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - subscription
 - id: ADM-035
   name: Support & Escalation Console
-  module: TODO
+  module: platform-ops
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -3160,9 +3241,11 @@ screens:
     purpose: Publish an end-of-support notice
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-036
   name: Platform Notification Broadcast
-  module: TODO
+  module: platform-ops
   purpose: Push live platform notification broadcast for this venue.
   wave: 3
   layout:
@@ -3205,9 +3288,11 @@ screens:
     purpose: End-of-support notices
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - platform-ops
 - id: ADM-037
   name: AI Provider & Credentials
-  module: AI
+  module: ai
   purpose: Configure which model a tenant uses, hold the key, and prove it works before anyone relies
     on it.
   capability: C00
@@ -3257,3 +3342,5 @@ screens:
   notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
     a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
     board.**
+  modules:
+  - ai

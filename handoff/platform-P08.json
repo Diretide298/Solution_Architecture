@@ -1,0 +1,2200 @@
+{
+ "code": "P08",
+ "name": "Venue Management \u2014 Back Office",
+ "shortName": "Venue Management",
+ "app": "venue-management-web",
+ "operator": "venue",
+ "audience": "staff",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-18",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 91,
+  "operations": 368,
+  "contracts": 21,
+  "modules": 19,
+  "undrawn": 18,
+  "operationsWithNoScreen": 154
+ },
+ "waves": {
+  "wave1": 45,
+  "wave2": 42,
+  "wave3": 4
+ },
+ "modules": [
+  {
+   "module": "catalogue",
+   "screens": 13,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "orders",
+   "screens": 11,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "finance",
+   "screens": 9,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "inventory",
+   "screens": 9,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "access",
+   "screens": 6,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "fnb",
+   "screens": 5,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "reporting",
+   "screens": 5,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "maintenance",
+   "screens": 5,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "approvals",
+   "screens": 5,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "queue",
+   "screens": 4,
+   "waves": [
+    1
+   ]
+  },
+  {
+   "module": "shift",
+   "screens": 4,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "marketing-crm",
+   "screens": 3,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "identity",
+   "screens": 3,
+   "waves": [
+    1,
+    3
+   ]
+  },
+  {
+   "module": "workforce",
+   "screens": 3,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "ai",
+   "screens": 2,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "promotions",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "assets",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "retail",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Venue Operations",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "finance",
+   "operations": 45
+  },
+  {
+   "contract": "catalogue",
+   "operations": 43
+  },
+  {
+   "contract": "inventory",
+   "operations": 42
+  },
+  {
+   "contract": "maintenance",
+   "operations": 31
+  },
+  {
+   "contract": "orders",
+   "operations": 25
+  },
+  {
+   "contract": "fnb",
+   "operations": 24
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 22
+  },
+  {
+   "contract": "access",
+   "operations": 21
+  },
+  {
+   "contract": "promotions",
+   "operations": 15
+  },
+  {
+   "contract": "shift",
+   "operations": 13
+  },
+  {
+   "contract": "queue",
+   "operations": 13
+  },
+  {
+   "contract": "approvals",
+   "operations": 12
+  },
+  {
+   "contract": "workforce",
+   "operations": 11
+  },
+  {
+   "contract": "assets",
+   "operations": 10
+  },
+  {
+   "contract": "tenancy",
+   "operations": 9
+  },
+  {
+   "contract": "retail",
+   "operations": 8
+  },
+  {
+   "contract": "reporting",
+   "operations": 8
+  },
+  {
+   "contract": "identity",
+   "operations": 6
+  },
+  {
+   "contract": "games",
+   "operations": 4
+  },
+  {
+   "contract": "ai",
+   "operations": 4
+  },
+  {
+   "contract": "seating",
+   "operations": 2
+  }
+ ],
+ "screens": [
+  {
+   "id": "BO-001",
+   "name": "Queue Directory",
+   "module": "queue",
+   "wave": 1,
+   "route": "/queue-management/queue-directory",
+   "operations": 19,
+   "drawn": true
+  },
+  {
+   "id": "BO-002",
+   "name": "Queue Configuration",
+   "module": "queue",
+   "wave": 1,
+   "route": "/queue-management/queue-configuration",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "BO-003",
+   "name": "Queue Integration Setup",
+   "module": "orders",
+   "wave": 1,
+   "route": "/queue-management/queue-integration-setup",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "BO-004",
+   "name": "Manual Wait Time Entry",
+   "module": "queue",
+   "wave": 1,
+   "route": "/queue-management/manual-wait-time-entry",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-005",
+   "name": "Queue Monitor",
+   "module": "marketing-crm",
+   "wave": 1,
+   "route": "/queue-management/queue-monitor",
+   "operations": 19,
+   "drawn": true
+  },
+  {
+   "id": "BO-006",
+   "name": "Parking Configuration",
+   "module": "access",
+   "wave": 2,
+   "route": "/parking/parking-configuration",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-007",
+   "name": "Product Directory",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/product-directory",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "BO-008",
+   "name": "Product Detail & Variants",
+   "module": "finance",
+   "wave": 1,
+   "route": "/venue-operations/product-detail-variants",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "BO-009",
+   "name": "Pricing Rules",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/pricing-rules",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "BO-010",
+   "name": "Promotions & Coupons",
+   "module": "promotions",
+   "wave": 2,
+   "route": "/venue-operations/promotions-coupons",
+   "operations": 15,
+   "drawn": true
+  },
+  {
+   "id": "BO-011",
+   "name": "Packages & Bundles",
+   "module": "catalogue",
+   "wave": 2,
+   "route": "/venue-operations/packages-bundles",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-012",
+   "name": "Membership Products",
+   "module": "catalogue",
+   "wave": 2,
+   "route": "/venue-operations/membership-products",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "BO-013",
+   "name": "Channel & Distribution",
+   "module": "catalogue",
+   "wave": 2,
+   "route": "/venue-operations/channel-distribution",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "BO-014",
+   "name": "Catalogue Publishing",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/catalogue-publishing",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "BO-015",
+   "name": "Session Calendar",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/session-calendar",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-016",
+   "name": "Session Template",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/session-template",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-017",
+   "name": "Capacity Management",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/capacity-management",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "BO-018",
+   "name": "Allocation & Holds",
+   "module": "catalogue",
+   "wave": 2,
+   "route": "/venue-operations/allocation-holds",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "BO-019",
+   "name": "Closures & Blackouts",
+   "module": "catalogue",
+   "wave": 2,
+   "route": "/venue-operations/closures-blackouts",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-020",
+   "name": "Timed Entry Rules",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/venue-operations/timed-entry-rules",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-021",
+   "name": "Order Search",
+   "module": "fnb",
+   "wave": 1,
+   "route": "/venue-operations/order-search",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "BO-022",
+   "name": "Order Detail",
+   "module": "orders",
+   "wave": 1,
+   "route": "/venue-operations/order-detail",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "BO-023",
+   "name": "Refunds & Exchanges",
+   "module": "orders",
+   "wave": 1,
+   "route": "/venue-operations/refunds-exchanges",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "BO-024",
+   "name": "Payment Exceptions",
+   "module": "orders",
+   "wave": 1,
+   "route": "/venue-operations/payment-exceptions",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-025",
+   "name": "Chargebacks & Disputes",
+   "module": "finance",
+   "wave": 2,
+   "route": "/venue-operations/chargebacks-disputes",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "BO-026",
+   "name": "Group Bookings",
+   "module": "orders",
+   "wave": 2,
+   "route": "/venue-operations/group-bookings",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "BO-027",
+   "name": "Reissue & Media Replacement",
+   "module": "assets",
+   "wave": 2,
+   "route": "/venue-operations/reissue-media-replacement",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "BO-028",
+   "name": "Refund Approval Queue",
+   "module": "orders",
+   "wave": 1,
+   "route": "/venue-operations/refund-approval-queue",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-029",
+   "name": "Report Builder",
+   "module": "reporting",
+   "wave": 2,
+   "route": "/venue-operations/report-builder",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "BO-030",
+   "name": "Access Point Directory",
+   "module": "maintenance",
+   "wave": 1,
+   "route": "/venue-operations/access-point-directory",
+   "operations": 16,
+   "drawn": true
+  },
+  {
+   "id": "BO-031",
+   "name": "Access Point Configuration",
+   "module": "maintenance",
+   "wave": 1,
+   "route": "/venue-operations/access-point-configuration",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "BO-032",
+   "name": "Admission Profiles",
+   "module": "access",
+   "wave": 1,
+   "route": "/venue-operations/admission-profiles",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "BO-033",
+   "name": "Blacklist Management",
+   "module": "access",
+   "wave": 1,
+   "route": "/venue-operations/blacklist-management",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "BO-034",
+   "name": "Scan Activity",
+   "module": "access",
+   "wave": 1,
+   "route": "/venue-operations/scan-activity",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "BO-035",
+   "name": "Override Audit",
+   "module": "access",
+   "wave": 1,
+   "route": "/venue-operations/override-audit",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "BO-036",
+   "name": "Device Registry",
+   "module": "marketing-crm",
+   "wave": 2,
+   "route": "/venue-operations/device-registry",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "BO-037",
+   "name": "Offline Package Status",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/offline-package-status",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-038",
+   "name": "Reconciliation Queue",
+   "module": "queue",
+   "wave": 1,
+   "route": "/venue-operations/reconciliation-queue",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "BO-039",
+   "name": "Shift Directory",
+   "module": "shift",
+   "wave": 1,
+   "route": "/venue-operations/shift-directory",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "BO-040",
+   "name": "Variance Approval",
+   "module": "shift",
+   "wave": 1,
+   "route": "/venue-operations/variance-approval",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "BO-041",
+   "name": "Cash Movements",
+   "module": "shift",
+   "wave": 2,
+   "route": "/venue-operations/cash-movements",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "BO-042",
+   "name": "Banking & Safe",
+   "module": "shift",
+   "wave": 2,
+   "route": "/venue-operations/banking-safe",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "BO-043",
+   "name": "Daily Reconciliation",
+   "module": "finance",
+   "wave": 1,
+   "route": "/venue-operations/daily-reconciliation",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "BO-044",
+   "name": "F&B Outlets",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/venue-operations/f-b-outlets",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-045",
+   "name": "Menu Management",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/venue-operations/menu-management",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "BO-046",
+   "name": "Kitchen Display",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/venue-operations/kitchen-display",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "BO-047",
+   "name": "F&B Order Management",
+   "module": "orders",
+   "wave": 2,
+   "route": "/venue-operations/f-b-order-management",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "BO-048",
+   "name": "Retail Products",
+   "module": "retail",
+   "wave": 2,
+   "route": "/venue-operations/retail-products",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-049",
+   "name": "Stock Levels",
+   "module": "inventory",
+   "wave": 2,
+   "route": "/venue-operations/stock-levels",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "BO-050",
+   "name": "Stock Count",
+   "module": "inventory",
+   "wave": 2,
+   "route": "/venue-operations/stock-count",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "BO-051",
+   "name": "Purchase Orders",
+   "module": "orders",
+   "wave": 2,
+   "route": "/venue-operations/purchase-orders",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "BO-052",
+   "name": "Goods Receipt",
+   "module": "inventory",
+   "wave": 2,
+   "route": "/venue-operations/goods-receipt",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "BO-053",
+   "name": "Staff Directory",
+   "module": "identity",
+   "wave": 1,
+   "route": "/venue-operations/staff-directory",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-054",
+   "name": "Role Assignment",
+   "module": "identity",
+   "wave": 1,
+   "route": "/venue-operations/role-assignment",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "BO-055",
+   "name": "Rota & Scheduling",
+   "module": "workforce",
+   "wave": 2,
+   "route": "/venue-operations/rota-scheduling",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-056",
+   "name": "Time & Attendance",
+   "module": "workforce",
+   "wave": 2,
+   "route": "/venue-operations/time-attendance",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "BO-057",
+   "name": "Training & Certification",
+   "module": "identity",
+   "wave": 3,
+   "route": "/venue-operations/training-certification",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-058",
+   "name": "Reporting Home",
+   "module": "reporting",
+   "wave": 1,
+   "route": "/venue-operations/reporting-home",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "BO-059",
+   "name": "Sales Reports",
+   "module": "reporting",
+   "wave": 1,
+   "route": "/venue-operations/sales-reports",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "BO-060",
+   "name": "Attendance & Footfall",
+   "module": "reporting",
+   "wave": 2,
+   "route": "/venue-operations/attendance-footfall",
+   "operations": 16,
+   "drawn": true
+  },
+  {
+   "id": "BO-061",
+   "name": "Scheduled Reports",
+   "module": "reporting",
+   "wave": 3,
+   "route": "/venue-operations/scheduled-reports",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "BO-062",
+   "name": "Venue Profile",
+   "module": "orders",
+   "wave": 1,
+   "route": "/venue-operations/venue-profile",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-063",
+   "name": "Opening Hours & Calendar",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/venue-operations/opening-hours-calendar",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-064",
+   "name": "Zones & Areas",
+   "module": "access",
+   "wave": 1,
+   "route": "/venue-operations/zones-areas",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "BO-065",
+   "name": "Venue Configuration",
+   "module": "orders",
+   "wave": 1,
+   "route": "/venue-operations/venue-configuration",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-066",
+   "name": "Notification Settings",
+   "module": "workforce",
+   "wave": 2,
+   "route": "/venue-operations/notification-settings",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "BO-067",
+   "name": "Integrations",
+   "module": "Venue Operations",
+   "wave": 2,
+   "route": "/venue-operations/integrations",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-068",
+   "name": "Audit Log",
+   "module": "ai",
+   "wave": 2,
+   "route": "/venue-operations/audit-log",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-069",
+   "name": "Asset Register",
+   "module": "maintenance",
+   "wave": 2,
+   "route": "/venue-operations/asset-register",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "BO-070",
+   "name": "Work Orders",
+   "module": "orders",
+   "wave": 2,
+   "route": "/venue-operations/work-orders",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "BO-071",
+   "name": "Planned Maintenance",
+   "module": "maintenance",
+   "wave": 3,
+   "route": "/venue-operations/planned-maintenance",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "BO-072",
+   "name": "Incident Log",
+   "module": "maintenance",
+   "wave": 2,
+   "route": "/venue-operations/incident-log",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "BO-073",
+   "name": "Lost & Found Register",
+   "module": "marketing-crm",
+   "wave": 2,
+   "route": "/venue-operations/lost-found-register",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "BO-074",
+   "name": "Chart of Accounts",
+   "module": "finance",
+   "wave": 1,
+   "route": "/finance/chart-of-accounts",
+   "operations": 8,
+   "drawn": false
+  },
+  {
+   "id": "BO-075",
+   "name": "Account Mapping",
+   "module": "finance",
+   "wave": 1,
+   "route": "/finance/account-mapping",
+   "operations": 7,
+   "drawn": false
+  },
+  {
+   "id": "BO-076",
+   "name": "Revenue Recognition",
+   "module": "finance",
+   "wave": 2,
+   "route": "/finance/revenue-recognition",
+   "operations": 4,
+   "drawn": false
+  },
+  {
+   "id": "BO-077",
+   "name": "FX Rates & Variances",
+   "module": "finance",
+   "wave": 2,
+   "route": "/finance/fx-rates-variances",
+   "operations": 4,
+   "drawn": false
+  },
+  {
+   "id": "BO-078",
+   "name": "Requisitions",
+   "module": "inventory",
+   "wave": 1,
+   "route": "/inventory/requisitions",
+   "operations": 8,
+   "drawn": false
+  },
+  {
+   "id": "BO-079",
+   "name": "Stock Count",
+   "module": "inventory",
+   "wave": 1,
+   "route": "/inventory/stock-count",
+   "operations": 6,
+   "drawn": false
+  },
+  {
+   "id": "BO-080",
+   "name": "Stock Transfers",
+   "module": "inventory",
+   "wave": 2,
+   "route": "/inventory/stock-transfers",
+   "operations": 4,
+   "drawn": false
+  },
+  {
+   "id": "BO-081",
+   "name": "Inventory Items",
+   "module": "inventory",
+   "wave": 2,
+   "route": "/inventory/inventory-items",
+   "operations": 7,
+   "drawn": false
+  },
+  {
+   "id": "BO-082",
+   "name": "Stock Movements",
+   "module": "inventory",
+   "wave": 2,
+   "route": "/inventory/stock-movements",
+   "operations": 2,
+   "drawn": false
+  },
+  {
+   "id": "BO-083",
+   "name": "Suppliers",
+   "module": "inventory",
+   "wave": 2,
+   "route": "/inventory/suppliers",
+   "operations": 3,
+   "drawn": false
+  },
+  {
+   "id": "BO-084",
+   "name": "Approval Inbox",
+   "module": "approvals",
+   "wave": 1,
+   "route": "/approvals/approval-inbox",
+   "operations": 3,
+   "drawn": false
+  },
+  {
+   "id": "BO-085",
+   "name": "Approval Request",
+   "module": "approvals",
+   "wave": 1,
+   "route": "/approvals/approval-request",
+   "operations": 5,
+   "drawn": false
+  },
+  {
+   "id": "BO-086",
+   "name": "Approval Matrix",
+   "module": "approvals",
+   "wave": 2,
+   "route": "/approvals/approval-matrix",
+   "operations": 2,
+   "drawn": false
+  },
+  {
+   "id": "BO-087",
+   "name": "Approval Delegations",
+   "module": "approvals",
+   "wave": 2,
+   "route": "/approvals/approval-delegations",
+   "operations": 3,
+   "drawn": false
+  },
+  {
+   "id": "BO-088",
+   "name": "Approval Analytics",
+   "module": "approvals",
+   "wave": 3,
+   "route": "/approvals/approval-analytics",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-089",
+   "name": "Journal Entries",
+   "module": "finance",
+   "wave": 1,
+   "route": "/finance/journal-entries",
+   "operations": 6,
+   "drawn": false
+  },
+  {
+   "id": "BO-090",
+   "name": "Period Close",
+   "module": "finance",
+   "wave": 1,
+   "route": "/finance/period-close",
+   "operations": 6,
+   "drawn": false
+  },
+  {
+   "id": "BO-091",
+   "name": "AI Policy & Spend",
+   "module": "ai",
+   "wave": 1,
+   "route": "/ai/policy",
+   "operations": 3,
+   "drawn": false
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "enrolFacePass",
+    "contract": "access",
+    "verb": "POST",
+    "summary": "Register a facial profile against an entitlement"
+   },
+   {
+    "operation": "getFacePassEnrolment",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Whether a pass has a face registered, and when"
+   },
+   {
+    "operation": "revokeFacePass",
+    "contract": "access",
+    "verb": "DELETE",
+    "summary": "Remove a facial profile"
+   },
+   {
+    "operation": "createKnowledgeCollection",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Create a collection"
+   },
+   {
+    "operation": "decideProposedAction",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Approve or reject a proposal"
+   },
+   {
+    "operation": "generateConfiguration",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a configuration from a description"
+   },
+   {
+    "operation": "generateVenueLayout",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a seat map from an uploaded plan"
+   },
+   {
+    "operation": "ingestKnowledgeDocument",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Add a document"
+   },
+   {
+    "operation": "listIndexJobs",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "Indexing in flight and recently finished"
+   },
+   {
+    "operation": "listIndexSources",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What is indexed, and how current it is"
+   },
+   {
+    "operation": "listKnowledgeCollections",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "Collections available to this tenant"
+   },
+   {
+    "operation": "listProposedActions",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What the assistant has proposed and nobody has decided"
+   },
+   {
+    "operation": "reindexSource",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Rebuild a source"
+   },
+   {
+    "operation": "removeIndexEntry",
+    "contract": "ai",
+    "verb": "DELETE",
+    "summary": "Remove one record from the index"
+   },
+   {
+    "operation": "setIndexSource",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": "Declare a source indexed"
+   },
+   {
+    "operation": "createApprovalRequest",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Raise a request"
+   },
+   {
+    "operation": "createDonationCampaign",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Create a campaign"
+   },
+   {
+    "operation": "joinWaitlist",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Ask to be told if capacity frees up"
+   },
+   {
+    "operation": "leaveWaitlist",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Stop waiting"
+   },
+   {
+    "operation": "listDonationCampaigns",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Campaigns a guest can give to"
+   },
+   {
+    "operation": "listWaitlistEntries",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Who is waiting for capacity"
+   },
+   {
+    "operation": "offerWaitlistCapacity",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Tell a waiting guest that capacity appeared"
+   },
+   {
+    "operation": "suspendEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Suspend or reinstate an entitlement"
+   },
+   {
+    "operation": "updateDonationCampaign",
+    "contract": "catalogue",
+    "verb": "PATCH",
+    "summary": "Amend or close a campaign"
+   },
+   {
+    "operation": "calculateTax",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Compute tax for a set of lines"
+   },
+   {
+    "operation": "disputeObligation",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "One entity disagrees with the amount"
+   },
+   {
+    "operation": "recordSettlement",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "One entity paid another"
+   },
+   {
+    "operation": "resolveObligationDispute",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Agree what is actually owed"
+   },
+   {
+    "operation": "clearTable",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Mark a table cleared and free"
+   },
+   {
+    "operation": "closeTableVisit",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Settle and close a visit"
+   },
+   {
+    "operation": "createModifierGroup",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Create a modifier group"
+   },
+   {
+    "operation": "createTableReservation",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Book a table in advance"
+   },
+   {
+    "operation": "getBill",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Bill for a visit"
+   },
+   {
+    "operation": "getTableVisit",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Read a visit with all its orders"
+   },
+   {
+    "operation": "listModifierGroups",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "List modifier groups"
+   },
+   {
+    "operation": "listRecipes",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "List recipes"
+   },
+   {
+    "operation": "listTableReservations",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Bookings for a service period"
+   },
+   {
+    "operation": "mergeTableVisits",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Merge another visit into this one"
+   },
+   {
+    "operation": "openTableVisit",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Seat a party and open a visit"
+   },
+   {
+    "operation": "requestBill",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "The party asked to pay"
+   },
+   {
+    "operation": "seatTableReservation",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "The party arrived and has been sat down"
+   },
+   {
+    "operation": "setItemAvailability",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Mark an item available or eighty-sixed"
+   },
+   {
+    "operation": "setRecipe",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Define a recipe for a menu item"
+   },
+   {
+    "operation": "splitBill",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Split a bill"
+   },
+   {
+    "operation": "updateTableReservation",
+    "contract": "fnb",
+    "verb": "PATCH",
+    "summary": "Change or cancel a booking"
+   },
+   {
+    "operation": "updateTableVisit",
+    "contract": "fnb",
+    "verb": "PATCH",
+    "summary": "Amend covers, move table, or reassign server"
+   },
+   {
+    "operation": "adjustGameCard",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Manually adjust credits or points"
+   },
+   {
+    "operation": "createGame",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Register a game"
+   },
+   {
+    "operation": "createPrize",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Add a prize"
+   },
+   {
+    "operation": "listPrizes",
+    "contract": "games",
+    "verb": "GET",
+    "summary": "The prize catalogue"
+   },
+   {
+    "operation": "redeemPrize",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Redeem points for a prize"
+   },
+   {
+    "operation": "transferGameCard",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Move balances to another card"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "deleteGuestAccount",
+    "contract": "identity",
+    "verb": "DELETE",
+    "summary": "Self-service account deletion"
+   },
+   {
+    "operation": "resolvePermissions",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Simulate a principal's effective permissions"
+   },
+   {
+    "operation": "submitCountLines",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Submit counted quantities"
+   },
+   {
+    "operation": "updateMaintenancePlan",
+    "contract": "maintenance",
+    "verb": "PATCH",
+    "summary": "Amend or suspend a plan"
+   },
+   {
+    "operation": "addSuppression",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Suppress an address"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
+   },
+   {
+    "operation": "createSegment",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a segment"
+   },
+   {
+    "operation": "getSuppressionList",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "listReviews",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guest reviews and ratings"
+   },
+   {
+    "operation": "listSegmentMembers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guests currently matching a segment"
+   },
+   {
+    "operation": "listSegments",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List segments"
+   },
+   {
+    "operation": "previewSegment",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Estimate segment size and reachability"
+   },
+   {
+    "operation": "respondToReview",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Respond to a review"
+   },
+   {
+    "operation": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Configure consent purposes"
+   },
+   {
+    "operation": "startKioskAssist",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A staff member helps a guest at a kiosk, remotely"
+   },
+   {
+    "operation": "convertReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Convert a reservation into an order"
+   },
+   {
+    "operation": "createCart",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Start a cart"
+   },
+   {
+    "operation": "createReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Hold without payment"
+   },
+   {
+    "operation": "extendReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Extend a reservation"
+   },
+   {
+    "operation": "listAbandonedCarts",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Carts that lapsed without checking out"
+   },
+   {
+    "operation": "voidPayment",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Release an authorisation before it is captured"
+   },
+   {
+    "operation": "assignCoupon",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Assign a coupon to a named guest"
+   },
+   {
+    "operation": "createBundle",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Create a bundle"
+   },
+   {
+    "operation": "createUpsellRule",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Create an upsell rule"
+   },
+   {
+    "operation": "createVoucherBatch",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Issue a voucher batch"
+   },
+   {
+    "operation": "deleteUpsellRule",
+    "contract": "promotions",
+    "verb": "DELETE",
+    "summary": "Remove an upsell rule"
+   },
+   {
+    "operation": "listAllocationSplits",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List allocation split definitions"
+   },
+   {
+    "operation": "listBundles",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List bundles"
+   },
+   {
+    "operation": "listUpsellRules",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List upsell and cross-sell rules"
+   },
+   {
+    "operation": "listVoucherBatches",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List voucher batches"
+   },
+   {
+    "operation": "previewAllocationSplit",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Preview how an amount divides"
+   },
+   {
+    "operation": "redeemVoucher",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Redeem voucher value against an order"
+   },
+   {
+    "operation": "updateBundle",
+    "contract": "promotions",
+    "verb": "PATCH",
+    "summary": "Amend a bundle"
+   },
+   {
+    "operation": "voidCouponCode",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Void a code"
+   },
+   {
+    "operation": "voidVoucher",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Cancel a voucher"
+   },
+   {
+    "operation": "getSignageQueueBoard",
+    "contract": "queue",
+    "verb": "GET",
+    "summary": "Wait-time board for a display"
+   },
+   {
+    "operation": "getSignageQueueCalls",
+    "contract": "queue",
+    "verb": "GET",
+    "summary": "Currently called party numbers"
+   },
+   {
+    "operation": "overrideQueueEntry",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit against a failed redemption"
+   },
+   {
+    "operation": "redeemQueueEntry",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit a party at the ride"
+   },
+   {
+    "operation": "submitQueueReading",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Inbound sensor reading"
+   },
+   {
+    "operation": "cancelReportExecution",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Cancel a running execution"
+   },
+   {
+    "operation": "createReportSchedule",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Schedule a report"
+   },
+   {
+    "operation": "deleteReportSchedule",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Delete a schedule"
+   },
+   {
+    "operation": "exportReportResult",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Export a completed result"
+   },
+   {
+    "operation": "getReportExecution",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Execution status and result"
+   },
+   {
+    "operation": "getReportExport",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Export status and download link"
+   },
+   {
+    "operation": "getReportResult",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Paged result rows"
+   },
+   {
+    "operation": "listReportExecutions",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List executions"
+   },
+   {
+    "operation": "listReportFields",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Fields available for a data source"
+   },
+   {
+    "operation": "listReportSchedules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List scheduled reports"
+   },
+   {
+    "operation": "updateReportSchedule",
+    "contract": "reporting",
+    "verb": "PATCH",
+    "summary": "Amend, pause or resume a schedule"
+   },
+   {
+    "operation": "activateGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Activate a card at the point of sale"
+   },
+   {
+    "operation": "adjustWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Manually adjust a wallet balance"
+   },
+   {
+    "operation": "blockGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Block a gift card"
+   },
+   {
+    "operation": "cancelMerchandiseReservation",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Release a reservation"
+   },
+   {
+    "operation": "closeWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Close a wallet"
+   },
+   {
+    "operation": "collectMerchandiseReservation",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "The guest picked it up"
+   },
+   {
+    "operation": "collectShopAndDrop",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Hand the goods over"
+   },
+   {
+    "operation": "createRetailExchange",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Exchange one item for another"
+   },
+   {
+    "operation": "createRetailReturn",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Accept a return"
+   },
+   {
+    "operation": "createShopAndDrop",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Buy now, collect on the way out"
+   },
+   {
+    "operation": "disposeShopAndDrop",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Dispose of an uncollected item"
+   },
+   {
+    "operation": "issueGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Issue or activate a gift card"
+   },
+   {
+    "operation": "listRetailReturns",
+    "contract": "retail",
+    "verb": "GET",
+    "summary": "List returns"
+   },
+   {
+    "operation": "redeemGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Spend against a card"
+   },
+   {
+    "operation": "reinstateWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Unfreeze a wallet"
+   },
+   {
+    "operation": "suspendWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Freeze a wallet"
+   },
+   {
+    "operation": "topUpWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Add value to a wallet"
+   },
+   {
+    "operation": "cloneSeatMap",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Clone a map, optionally into another venue"
+   },
+   {
+    "operation": "commitImportJob",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Apply a parsed import"
+   },
+   {
+    "operation": "createSeatCategory",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Create a seat category"
+   },
+   {
+    "operation": "createSeatMap",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Create a seat map"
+   },
+   {
+    "operation": "createSeatMapTemplate",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Save a map as a reusable template"
+   },
+   {
+    "operation": "getImportJob",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "Import progress and findings"
+   },
+   {
+    "operation": "getSeatMap",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "Read a seat map with its structure"
+   },
+   {
+    "operation": "getSeatingRules",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "Read seating rules"
+   },
+   {
+    "operation": "importSeatGeometry",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Import seat geometry from a plan"
+   },
+   {
+    "operation": "importSeatManifest",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Import the logical seat structure"
+   },
+   {
+    "operation": "listSeatCategories",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "List seat categories"
+   },
+   {
+    "operation": "listSeatMapTemplates",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "List reusable layout templates"
+   },
+   {
+    "operation": "listSeatMaps",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "List seat maps"
+   },
+   {
+    "operation": "listSeats",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "List seats in a map"
+   },
+   {
+    "operation": "publishSeatMap",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Validate and publish a seat map"
+   },
+   {
+    "operation": "setSeatingRules",
+    "contract": "seating",
+    "verb": "PUT",
+    "summary": "Set seating rules"
+   },
+   {
+    "operation": "updateSeatMap",
+    "contract": "seating",
+    "verb": "PATCH",
+    "summary": "Rename or amend a seat map"
+   },
+   {
+    "operation": "updateSeats",
+    "contract": "seating",
+    "verb": "PATCH",
+    "summary": "Bulk-amend seats"
+   },
+   {
+    "operation": "validateSeatMap",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Run validation without publishing"
+   },
+   {
+    "operation": "adjustDepositBoxFloat",
+    "contract": "shift",
+    "verb": "POST",
+    "summary": "Change the initial fund"
+   },
+   {
+    "operation": "allocateDepositBox",
+    "contract": "shift",
+    "verb": "POST",
+    "summary": "Give a cashier a box and a float"
+   },
+   {
+    "operation": "closeDepositBoxes",
+    "contract": "shift",
+    "verb": "POST",
+    "summary": "Close one box or all of them"
+   },
+   {
+    "operation": "listDepositBoxes",
+    "contract": "shift",
+    "verb": "GET",
+    "summary": "Cash boxes and who holds them"
+   },
+   {
+    "operation": "withdrawFromDepositBox",
+    "contract": "shift",
+    "verb": "POST",
+    "summary": "A supervisor takes cash out mid-shift"
+   },
+   {
+    "operation": "configureWorkstation",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Configure a workstation"
+   },
+   {
+    "operation": "createSaleBoard",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Create a sale board"
+   },
+   {
+    "operation": "getRegionSettings",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read region settings"
+   },
+   {
+    "operation": "getWorkstation",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read a workstation"
+   },
+   {
+    "operation": "listSaleBoards",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "List sale boards"
+   },
+   {
+    "operation": "listWorkstations",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "List workstations"
+   },
+   {
+    "operation": "recordDeviceHeartbeat",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Device heartbeat and status"
+   },
+   {
+    "operation": "updateRegionSettings",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Update region settings"
+   },
+   {
+    "operation": "updateSaleBoard",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Update a sale board"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "access",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "ai",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "approvals",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "catalogue",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "finance",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "fnb",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "identity",
+    "waves": [
+     1,
+     3
+    ]
+   },
+   {
+    "module": "inventory",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "maintenance",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "marketing-crm",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "orders",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "reporting",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "shift",
+    "waves": [
+     1,
+     2
+    ]
+   }
+  ],
+  "screensNotDrawn": [
+   {
+    "id": "BO-074",
+    "name": "Chart of Accounts",
+    "wave": 1
+   },
+   {
+    "id": "BO-075",
+    "name": "Account Mapping",
+    "wave": 1
+   },
+   {
+    "id": "BO-076",
+    "name": "Revenue Recognition",
+    "wave": 2
+   },
+   {
+    "id": "BO-077",
+    "name": "FX Rates & Variances",
+    "wave": 2
+   },
+   {
+    "id": "BO-078",
+    "name": "Requisitions",
+    "wave": 1
+   },
+   {
+    "id": "BO-079",
+    "name": "Stock Count",
+    "wave": 1
+   },
+   {
+    "id": "BO-080",
+    "name": "Stock Transfers",
+    "wave": 2
+   },
+   {
+    "id": "BO-081",
+    "name": "Inventory Items",
+    "wave": 2
+   },
+   {
+    "id": "BO-082",
+    "name": "Stock Movements",
+    "wave": 2
+   },
+   {
+    "id": "BO-083",
+    "name": "Suppliers",
+    "wave": 2
+   },
+   {
+    "id": "BO-084",
+    "name": "Approval Inbox",
+    "wave": 1
+   },
+   {
+    "id": "BO-085",
+    "name": "Approval Request",
+    "wave": 1
+   },
+   {
+    "id": "BO-086",
+    "name": "Approval Matrix",
+    "wave": 2
+   },
+   {
+    "id": "BO-087",
+    "name": "Approval Delegations",
+    "wave": 2
+   },
+   {
+    "id": "BO-088",
+    "name": "Approval Analytics",
+    "wave": 3
+   },
+   {
+    "id": "BO-089",
+    "name": "Journal Entries",
+    "wave": 1
+   },
+   {
+    "id": "BO-090",
+    "name": "Period Close",
+    "wave": 1
+   },
+   {
+    "id": "BO-091",
+    "name": "AI Policy & Spend",
+    "wave": 1
+   }
+  ],
+  "flowsNamingAMissingScreen": []
+ }
+}

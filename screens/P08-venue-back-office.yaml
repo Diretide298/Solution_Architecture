@@ -41,7 +41,7 @@ platform:
 screens:
 - id: BO-001
   name: Queue Directory
-  module: Queue Management
+  module: queue
   purpose: See every queue in the venue and whether its data is arriving.
   capability: C05
   wave: 1
@@ -156,9 +156,12 @@ screens:
     - BO-004
     - BO-005
     inferred: true
+  modules:
+  - queue
+  - catalogue
 - id: BO-002
   name: Queue Configuration
-  module: Queue Management
+  module: queue
   purpose: Create a queue and set how it behaves.
   capability: C05
   wave: 1
@@ -261,9 +264,13 @@ screens:
     - BO-003
     - BO-004
     fromFlows: true
+  modules:
+  - queue
+  - catalogue
+  - seating
 - id: BO-003
   name: Queue Integration Setup
-  module: Queue Management
+  module: orders
   purpose: Connect a queue to an on-site system, or leave it on manual entry.
   capability: C05
   wave: 1
@@ -411,9 +418,13 @@ screens:
     - BO-002
     - BO-004
     fromFlows: true
+  modules:
+  - orders
+  - queue
+  - fnb
 - id: BO-004
   name: Manual Wait Time Entry
-  module: Queue Management
+  module: queue
   purpose: Set a wait time by hand, whether or not a feed exists.
   capability: C05
   wave: 1
@@ -502,9 +513,12 @@ screens:
     - BO-003
     - BO-005
     fromFlows: true
+  modules:
+  - queue
+  - orders
 - id: BO-005
   name: Queue Monitor
-  module: Queue Management
+  module: marketing-crm
   purpose: Watch queues during operation and call parties forward.
   capability: C05
   wave: 1
@@ -625,9 +639,12 @@ screens:
     fromFlows: true
   notes: 'Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1
     flow cannot step through a Wave 2 screen.'
+  modules:
+  - marketing-crm
+  - queue
 - id: BO-006
   name: Parking Configuration
-  module: Parking
+  module: access
   purpose: Change how parking behaves here, and see which level the current value came from.
   capability: C39
   wave: 2
@@ -682,9 +699,11 @@ screens:
     contract: access
     purpose: Configure a car park and its integration
     trigger: onAction
+  modules:
+  - access
 - id: BO-007
   name: Product Directory
-  module: Venue Operations
+  module: catalogue
   purpose: Find anything sellable at this venue.
   capability: C00
   wave: 1
@@ -759,9 +778,11 @@ screens:
     contract: catalogue
     purpose: Update a product
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-008
   name: Product Detail & Variants
-  module: Venue Operations
+  module: finance
   purpose: Define what is sold and the ticket types under it.
   capability: C00
   wave: 1
@@ -808,9 +829,11 @@ screens:
     contract: finance
     purpose: Revalue monetary balances at close
     trigger: onAction
+  modules:
+  - finance
 - id: BO-009
   name: Pricing Rules
-  module: Venue Operations
+  module: catalogue
   purpose: Set what something costs, and when that changes.
   capability: C00
   wave: 1
@@ -874,9 +897,11 @@ screens:
     contract: catalogue
     purpose: Amend a price list
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-010
   name: Promotions & Coupons
-  module: Venue Operations
+  module: promotions
   purpose: Issue a code and control what it does.
   capability: C00
   wave: 2
@@ -971,9 +996,11 @@ screens:
     contract: promotions
     purpose: Amend a promotion
     trigger: onAction
+  modules:
+  - promotions
 - id: BO-011
   name: Packages & Bundles
-  module: Venue Operations
+  module: catalogue
   purpose: Sell several products as one line.
   capability: C00
   wave: 2
@@ -1024,9 +1051,11 @@ screens:
     contract: catalogue
     purpose: Report that a workstation applied a bundle
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-012
   name: Membership Products
-  module: Venue Operations
+  module: catalogue
   purpose: Define what a membership includes.
   capability: C00
   wave: 2
@@ -1109,9 +1138,11 @@ screens:
     contract: catalogue
     purpose: Update a product
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-013
   name: Channel & Distribution
-  module: Venue Operations
+  module: catalogue
   purpose: Decide where each product can be sold.
   capability: C00
   wave: 2
@@ -1170,9 +1201,11 @@ screens:
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-014
   name: Catalogue Publishing
-  module: Venue Operations
+  module: catalogue
   purpose: Push catalogue changes live, or schedule them.
   capability: C00
   wave: 1
@@ -1247,9 +1280,11 @@ screens:
     contract: catalogue
     purpose: Update a product
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-015
   name: Session Calendar
-  module: Venue Operations
+  module: catalogue
   purpose: See what is scheduled and how full it is.
   capability: C00
   wave: 1
@@ -1328,9 +1363,12 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
+  modules:
+  - catalogue
+  - seating
 - id: BO-016
   name: Session Template
-  module: Venue Operations
+  module: catalogue
   purpose: Define the pattern the calendar is generated from.
   capability: C00
   wave: 1
@@ -1410,9 +1448,12 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
+  modules:
+  - catalogue
+  - seating
 - id: BO-017
   name: Capacity Management
-  module: Venue Operations
+  module: catalogue
   purpose: Change how many people a session can take.
   capability: C00
   wave: 1
@@ -1472,9 +1513,11 @@ screens:
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-018
   name: Allocation & Holds
-  module: Venue Operations
+  module: catalogue
   purpose: See who is holding capacity, and release it.
   capability: C00
   wave: 2
@@ -1529,9 +1572,11 @@ screens:
     contract: catalogue
     purpose: Extend a lease TTL
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-019
   name: Closures & Blackouts
-  module: Venue Operations
+  module: catalogue
   purpose: Stop selling something, for a reason.
   capability: C00
   wave: 2
@@ -1610,9 +1655,12 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
+  modules:
+  - catalogue
+  - seating
 - id: BO-020
   name: Timed Entry Rules
-  module: Venue Operations
+  module: fnb
   purpose: Control how early and how late a ticket admits.
   capability: C00
   wave: 2
@@ -1695,9 +1743,11 @@ screens:
     contract: fnb
     purpose: Configure stations and item routing
     trigger: onAction
+  modules:
+  - fnb
 - id: BO-021
   name: Order Search
-  module: Venue Operations
+  module: fnb
   purpose: Find any order taken at this venue.
   capability: C00
   wave: 1
@@ -1740,9 +1790,11 @@ screens:
     contract: fnb
     purpose: Track an order
     trigger: onLoad
+  modules:
+  - fnb
 - id: BO-022
   name: Order Detail
-  module: Venue Operations
+  module: orders
   purpose: See everything about one order in one place.
   capability: C00
   wave: 1
@@ -1833,9 +1885,11 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
 - id: BO-023
   name: Refunds & Exchanges
-  module: Venue Operations
+  module: orders
   purpose: Give money back, or move the booking.
   capability: C00
   wave: 1
@@ -1927,9 +1981,11 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
 - id: BO-024
   name: Payment Exceptions
-  module: Venue Operations
+  module: orders
   purpose: Resolve payments that never resolved themselves.
   capability: C00
   wave: 1
@@ -1984,9 +2040,11 @@ screens:
     contract: orders
     purpose: Ask the provider what actually happened
     trigger: onAction
+  modules:
+  - orders
 - id: BO-025
   name: Chargebacks & Disputes
-  module: Venue Operations
+  module: finance
   purpose: Answer the acquirer with the evidence attached.
   capability: C00
   wave: 2
@@ -2041,9 +2099,11 @@ screens:
     contract: finance
     purpose: List settlement batches
     trigger: onLoad
+  modules:
+  - finance
 - id: BO-026
   name: Group Bookings
-  module: Venue Operations
+  module: orders
   purpose: Handle a booking that arrives as a school, not a guest.
   capability: C00
   wave: 2
@@ -2134,9 +2194,11 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
 - id: BO-027
   name: Reissue & Media Replacement
-  module: Venue Operations
+  module: assets
   purpose: Replace media a guest has lost or damaged.
   capability: C00
   wave: 2
@@ -2219,9 +2281,12 @@ screens:
     contract: assets
     purpose: Amend metadata, tags or rights
     trigger: onAction
+  modules:
+  - assets
+  - orders
 - id: BO-028
   name: Refund Approval Queue
-  module: Venue Operations
+  module: orders
   purpose: Approve the refunds a cashier is not allowed to make alone.
   capability: C00
   wave: 1
@@ -2261,9 +2326,11 @@ screens:
     contract: orders
     purpose: Guest-initiated refund request
     trigger: onAction
+  modules:
+  - orders
 - id: BO-029
   name: Report Builder
-  module: Venue Operations
+  module: reporting
   purpose: Build the report nobody wrote down, without asking for a release.
   capability: C00
   wave: 2
@@ -2334,9 +2401,12 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
+  modules:
+  - reporting
+  - finance
 - id: BO-030
   name: Access Point Directory
-  module: Venue Operations
+  module: maintenance
   purpose: See every gate and what it is doing.
   capability: C00
   wave: 1
@@ -2437,9 +2507,11 @@ screens:
     contract: maintenance
     purpose: Assign, reprioritise or amend
     trigger: onAction
+  modules:
+  - maintenance
 - id: BO-031
   name: Access Point Configuration
-  module: Venue Operations
+  module: maintenance
   purpose: Define what a gate is and where it is.
   capability: C00
   wave: 1
@@ -2503,9 +2575,11 @@ screens:
     contract: maintenance
     purpose: Take an asset out of service or return it
     trigger: onAction
+  modules:
+  - maintenance
 - id: BO-032
   name: Admission Profiles
-  module: Venue Operations
+  module: access
   purpose: Set the rules a gate enforces, including offline.
   capability: C00
   wave: 1
@@ -2553,9 +2627,11 @@ screens:
     contract: access
     purpose: Update an admission profile
     trigger: onAction
+  modules:
+  - access
 - id: BO-033
   name: Blacklist Management
-  module: Venue Operations
+  module: access
   purpose: Bar a media code outright.
   capability: C00
   wave: 1
@@ -2603,9 +2679,11 @@ screens:
     contract: access
     purpose: Remove a blacklist entry
     trigger: onAction
+  modules:
+  - access
 - id: BO-034
   name: Scan Activity
-  module: Venue Operations
+  module: access
   purpose: See what the gates have been doing.
   capability: C00
   wave: 1
@@ -2668,9 +2746,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: BO-035
   name: Override Audit
-  module: Venue Operations
+  module: access
   purpose: Review every admission that broke a rule.
   capability: C00
   wave: 1
@@ -2733,9 +2813,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: BO-036
   name: Device Registry
-  module: Venue Operations
+  module: marketing-crm
   purpose: Know which handheld is where, and whether it has synced.
   capability: C00
   wave: 2
@@ -2818,9 +2900,12 @@ screens:
     contract: marketing-crm
     purpose: Amend a guest profile
     trigger: onAction
+  modules:
+  - marketing-crm
+  - tenancy
 - id: BO-037
   name: Offline Package Status
-  module: Venue Operations
+  module: catalogue
   purpose: Know what each device is enforcing right now.
   capability: C00
   wave: 1
@@ -2871,9 +2956,11 @@ screens:
     contract: catalogue
     purpose: Report that a workstation applied a bundle
     trigger: onAction
+  modules:
+  - catalogue
 - id: BO-038
   name: Reconciliation Queue
-  module: Venue Operations
+  module: queue
   purpose: Handle scans the server disagreed with.
   capability: C00
   wave: 1
@@ -2945,9 +3032,11 @@ screens:
     contract: queue
     purpose: Amend queue configuration
     trigger: onAction
+  modules:
+  - queue
 - id: BO-039
   name: Shift Directory
-  module: Venue Operations
+  module: shift
   purpose: See every till, open or closed.
   capability: C00
   wave: 1
@@ -3034,9 +3123,11 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
+  modules:
+  - shift
 - id: BO-040
   name: Variance Approval
-  module: Venue Operations
+  module: shift
   purpose: Accept or refuse a till that did not balance.
   capability: C00
   wave: 1
@@ -3126,9 +3217,11 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
+  modules:
+  - shift
 - id: BO-041
   name: Cash Movements
-  module: Venue Operations
+  module: shift
   purpose: Track money in and out of a drawer that is not a sale.
   capability: C00
   wave: 2
@@ -3216,9 +3309,11 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
+  modules:
+  - shift
 - id: BO-042
   name: Banking & Safe
-  module: Venue Operations
+  module: shift
   purpose: Move the day’s cash out of the tills.
   capability: C00
   wave: 2
@@ -3306,9 +3401,11 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
+  modules:
+  - shift
 - id: BO-043
   name: Daily Reconciliation
-  module: Venue Operations
+  module: finance
   purpose: Prove the day balances before anyone goes home.
   capability: C00
   wave: 1
@@ -3372,9 +3469,11 @@ screens:
     contract: finance
     purpose: Resolve a settlement exception
     trigger: onAction
+  modules:
+  - finance
 - id: BO-044
   name: F&B Outlets
-  module: Venue Operations
+  module: fnb
   purpose: See every outlet and whether it is trading.
   capability: C00
   wave: 2
@@ -3453,9 +3552,13 @@ screens:
     contract: tenancy
     purpose: Amend an outlet
     trigger: onAction
+  modules:
+  - fnb
+  - retail
+  - tenancy
 - id: BO-045
   name: Menu Management
-  module: Venue Operations
+  module: fnb
   purpose: Change what is on sale and what is in it.
   capability: C00
   wave: 2
@@ -3511,9 +3614,11 @@ screens:
     contract: fnb
     purpose: Amend a menu
     trigger: onAction
+  modules:
+  - fnb
 - id: BO-046
   name: Kitchen Display
-  module: Venue Operations
+  module: fnb
   purpose: Show the kitchen what to make, in order.
   capability: C00
   wave: 2
@@ -3568,9 +3673,11 @@ screens:
     contract: fnb
     purpose: Configure stations and item routing
     trigger: onAction
+  modules:
+  - fnb
 - id: BO-047
   name: F&B Order Management
-  module: Venue Operations
+  module: orders
   purpose: Fix an order that has gone wrong.
   capability: C00
   wave: 2
@@ -3662,9 +3769,11 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
 - id: BO-048
   name: Retail Products
-  module: Venue Operations
+  module: retail
   purpose: Manage what the shop sells.
   capability: C00
   wave: 2
@@ -3717,9 +3826,11 @@ screens:
     contract: retail
     purpose: Amend a merchandise item
     trigger: onAction
+  modules:
+  - retail
 - id: BO-049
   name: Stock Levels
-  module: Venue Operations
+  module: inventory
   purpose: Know what is on the shelf and what is on order.
   capability: C00
   wave: 2
@@ -3762,9 +3873,11 @@ screens:
     contract: inventory
     purpose: Stock value by location and category
     trigger: onLoad
+  modules:
+  - inventory
 - id: BO-050
   name: Stock Count
-  module: Venue Operations
+  module: inventory
   purpose: Count the shelf and account for the difference.
   capability: C00
   wave: 2
@@ -3807,9 +3920,11 @@ screens:
     contract: inventory
     purpose: Stock value by location and category
     trigger: onLoad
+  modules:
+  - inventory
 - id: BO-051
   name: Purchase Orders
-  module: Venue Operations
+  module: orders
   purpose: Order more of what is running out.
   capability: C00
   wave: 2
@@ -3898,9 +4013,11 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
 - id: BO-052
   name: Goods Receipt
-  module: Venue Operations
+  module: inventory
   purpose: Book in what actually arrived.
   capability: C00
   wave: 2
@@ -3979,9 +4096,11 @@ screens:
     contract: inventory
     purpose: Issue the order to the supplier
     trigger: onAction
+  modules:
+  - inventory
 - id: BO-053
   name: Staff Directory
-  module: Venue Operations
+  module: identity
   purpose: Find anyone who works at this venue.
   capability: C00
   wave: 1
@@ -4032,9 +4151,11 @@ screens:
     contract: identity
     purpose: Update or deactivate a principal
     trigger: onAction
+  modules:
+  - identity
 - id: BO-054
   name: Role Assignment
-  module: Venue Operations
+  module: identity
   purpose: Give somebody the permissions their job needs.
   capability: C00
   wave: 1
@@ -4077,9 +4198,11 @@ screens:
     contract: identity
     purpose: Create a role
     trigger: onAction
+  modules:
+  - identity
 - id: BO-055
   name: Rota & Scheduling
-  module: Venue Operations
+  module: workforce
   purpose: Decide who is on which gate, when.
   capability: C00
   wave: 2
@@ -4130,9 +4253,11 @@ screens:
     contract: workforce
     purpose: Ask someone to take your shift
     trigger: onAction
+  modules:
+  - workforce
 - id: BO-056
   name: Time & Attendance
-  module: Venue Operations
+  module: workforce
   purpose: Record who actually turned up.
   capability: C00
   wave: 2
@@ -4179,9 +4304,11 @@ screens:
     contract: workforce
     purpose: Clock in, clock out, or take a break
     trigger: onAction
+  modules:
+  - workforce
 - id: BO-057
   name: Training & Certification
-  module: Venue Operations
+  module: identity
   purpose: Know who is allowed to do what.
   capability: C00
   wave: 3
@@ -4220,9 +4347,11 @@ screens:
     contract: identity
     purpose: List principals
     trigger: onLoad
+  modules:
+  - identity
 - id: BO-058
   name: Reporting Home
-  module: Venue Operations
+  module: reporting
   purpose: Find the report rather than build it.
   capability: C00
   wave: 1
@@ -4295,9 +4424,12 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
+  modules:
+  - reporting
+  - finance
 - id: BO-059
   name: Sales Reports
-  module: Venue Operations
+  module: reporting
   purpose: See what sold, through which channel.
   capability: C00
   wave: 1
@@ -4368,9 +4500,12 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
+  modules:
+  - reporting
+  - finance
 - id: BO-060
   name: Attendance & Footfall
-  module: Venue Operations
+  module: reporting
   purpose: See how many people actually came in.
   capability: C00
   wave: 2
@@ -4469,9 +4604,13 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - reporting
+  - access
+  - finance
 - id: BO-061
   name: Scheduled Reports
-  module: Venue Operations
+  module: reporting
   purpose: Send a report to somebody without them asking.
   capability: C00
   wave: 3
@@ -4542,9 +4681,12 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
+  modules:
+  - reporting
+  - finance
 - id: BO-062
   name: Venue Profile
-  module: Venue Operations
+  module: orders
   purpose: The facts every other surface reads.
   capability: C00
   wave: 1
@@ -4596,9 +4738,12 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
+  modules:
+  - orders
+  - fnb
 - id: BO-063
   name: Opening Hours & Calendar
-  module: Venue Operations
+  module: catalogue
   purpose: Say when the venue is open, including the exceptions.
   capability: C00
   wave: 1
@@ -4677,9 +4822,12 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
+  modules:
+  - catalogue
+  - seating
 - id: BO-064
   name: Zones & Areas
-  module: Venue Operations
+  module: access
   purpose: Divide the venue into the things gates control.
   capability: C00
   wave: 1
@@ -4754,9 +4902,12 @@ screens:
     contract: tenancy
     purpose: Rename or deactivate a scope node
     trigger: onAction
+  modules:
+  - access
+  - tenancy
 - id: BO-065
   name: Venue Configuration
-  module: Venue Operations
+  module: orders
   purpose: Set the venue-level values everything inherits from.
   capability: C00
   wave: 1
@@ -4808,9 +4959,12 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
+  modules:
+  - orders
+  - fnb
 - id: BO-066
   name: Notification Settings
-  module: Venue Operations
+  module: workforce
   purpose: Decide what this venue tells people, and how.
   capability: C00
   wave: 2
@@ -4862,6 +5016,8 @@ screens:
     contract: workforce
     purpose: Who has acknowledged, and who has not
     trigger: onLoad
+  modules:
+  - workforce
 - id: BO-067
   name: Integrations
   module: Venue Operations
@@ -4900,7 +5056,7 @@ screens:
     for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 - id: BO-068
   name: Audit Log
-  module: Venue Operations
+  module: ai
   purpose: See who changed what at this venue.
   capability: C00
   wave: 2
@@ -4939,9 +5095,11 @@ screens:
     contract: ai
     purpose: Every prompt, response and action
     trigger: onLoad
+  modules:
+  - ai
 - id: BO-069
   name: Asset Register
-  module: Venue Operations
+  module: maintenance
   purpose: Know what equipment exists and where.
   capability: C00
   wave: 2
@@ -5020,9 +5178,12 @@ screens:
     contract: games
     purpose: Replay plays recorded offline
     trigger: onAction
+  modules:
+  - maintenance
+  - games
 - id: BO-070
   name: Work Orders
-  module: Venue Operations
+  module: orders
   purpose: Get something fixed, and know it was.
   capability: C00
   wave: 2
@@ -5111,9 +5272,11 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
+  modules:
+  - orders
 - id: BO-071
   name: Planned Maintenance
-  module: Venue Operations
+  module: maintenance
   purpose: Schedule the work that stops the emergencies.
   capability: C00
   wave: 3
@@ -5160,9 +5323,11 @@ screens:
     contract: maintenance
     purpose: Planned tasks due or overdue
     trigger: onLoad
+  modules:
+  - maintenance
 - id: BO-072
   name: Incident Log
-  module: Venue Operations
+  module: maintenance
   purpose: Record what happened, while it is fresh.
   capability: C00
   wave: 2
@@ -5217,9 +5382,11 @@ screens:
     contract: maintenance
     purpose: Investigate, escalate or close an incident
     trigger: onAction
+  modules:
+  - maintenance
 - id: BO-073
   name: Lost & Found Register
-  module: Venue Operations
+  module: marketing-crm
   purpose: Match what was lost to what was handed in.
   capability: C00
   wave: 2
@@ -5262,9 +5429,11 @@ screens:
     contract: marketing-crm
     purpose: Raise a service case
     trigger: onAction
+  modules:
+  - marketing-crm
 - id: BO-074
   name: Chart of Accounts
-  module: Finance
+  module: finance
   purpose: Accounts, cost centres and legal entities.
   capability: C00
   wave: 1
@@ -5333,9 +5502,11 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts
     blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.
+  modules:
+  - finance
 - id: BO-075
   name: Account Mapping
-  module: Finance
+  module: finance
   purpose: Which product or movement posts to which account.
   capability: C00
   wave: 1
@@ -5400,9 +5571,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense.
+  modules:
+  - finance
 - id: BO-076
   name: Revenue Recognition
-  module: Finance
+  module: finance
   purpose: Deferred revenue, its ageing, and the schedules that release it.
   capability: C00
   wave: 2
@@ -5454,9 +5627,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - finance
 - id: BO-077
   name: FX Rates & Variances
-  module: Finance
+  module: finance
   purpose: Rates, and the price variances waiting for review.
   capability: C00
   wave: 2
@@ -5507,9 +5682,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - finance
 - id: BO-078
   name: Requisitions
-  module: Inventory
+  module: inventory
   purpose: Raise, track and approve a request to buy something.
   capability: C00
   wave: 1
@@ -5578,9 +5755,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - inventory
 - id: BO-079
   name: Stock Count
-  module: Inventory
+  module: inventory
   purpose: Count what is there, blind, and resolve the variance.
   capability: C00
   wave: 1
@@ -5640,9 +5819,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - inventory
 - id: BO-080
   name: Stock Transfers
-  module: Inventory
+  module: inventory
   purpose: Move stock between venues, and receive what arrives.
   capability: C00
   wave: 2
@@ -5693,9 +5874,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - inventory
 - id: BO-081
   name: Inventory Items
-  module: Inventory
+  module: inventory
   purpose: What the venue stocks, and where.
   capability: C00
   wave: 2
@@ -5758,9 +5941,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - inventory
 - id: BO-082
   name: Stock Movements
-  module: Inventory
+  module: inventory
   purpose: Every movement, and why it happened.
   capability: C00
   wave: 2
@@ -5804,9 +5989,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - inventory
 - id: BO-083
   name: Suppliers
-  module: Inventory
+  module: inventory
   purpose: Who we buy from, and what they quoted.
   capability: C00
   wave: 2
@@ -5853,9 +6040,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - inventory
 - id: BO-084
   name: Approval Inbox
-  module: Approvals
+  module: approvals
   purpose: What is waiting on this person, sorted by what breaches soonest.
   capability: C00
   wave: 1
@@ -5905,9 +6094,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - approvals
 - id: BO-085
   name: Approval Request
-  module: Approvals
+  module: approvals
   purpose: One request, its subject, and the decision.
   capability: C00
   wave: 1
@@ -5965,9 +6156,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - approvals
 - id: BO-086
   name: Approval Matrix
-  module: Approvals
+  module: approvals
   purpose: What needs approval here, and who grants it.
   capability: C00
   wave: 2
@@ -6011,9 +6204,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - approvals
 - id: BO-087
   name: Approval Delegations
-  module: Approvals
+  module: approvals
   purpose: Who is standing in for whom, and until when.
   capability: C00
   wave: 2
@@ -6061,9 +6256,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - approvals
 - id: BO-088
   name: Approval Analytics
-  module: Approvals
+  module: approvals
   purpose: Volumes, decision times and where requests get stuck.
   capability: C00
   wave: 3
@@ -6102,9 +6299,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - approvals
 - id: BO-089
   name: Journal Entries
-  module: Finance
+  module: finance
   purpose: Every posting, and the ones waiting for approval.
   capability: C00
   wave: 1
@@ -6166,9 +6365,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - finance
 - id: BO-090
   name: Period Close
-  module: Finance
+  module: finance
   purpose: Close a fiscal period, and see what is stopping it.
   capability: C00
   wave: 1
@@ -6229,9 +6430,11 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
+  modules:
+  - finance
 - id: BO-091
   name: AI Policy & Spend
-  module: AI
+  module: ai
   purpose: What the assistant may do here, what it has cost, and what happens at the ceiling.
   capability: C00
   wave: 1
@@ -6276,3 +6479,5 @@ screens:
   notes: Added 17 August. **Staff and guest spend shown separately** — a venue can manage the first
     and cannot stop guests asking questions. At the ceiling the manager decides whether to continue;
     the assistant does not stop on its own (CF-14).
+  modules:
+  - ai

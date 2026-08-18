@@ -204,5 +204,5 @@
 
 **4 open** — **CF-61** · **CF-74** · **CF-57** · **CF-41**
 
-21 closed — CF-118 · CF-113 · CF-109 · CF-107 · CF-106 · CF-105 · CF-14 · CF-96 · CF-94 · CF-92 · CF-93 · CF-90 · CF-89 · CF-88 · CF-59 · CF-80 · CF-78 · CF-76 · CF-73 · CF-20 · CF-43
+23 closed — CF-120 · CF-119 · CF-118 · CF-113 · CF-109 · CF-107 · CF-106 · CF-105 · CF-14 · CF-96 · CF-94 · CF-92 · CF-93 · CF-90 · CF-89 · CF-88 · CF-59 · CF-80 · CF-78 · CF-76 · CF-73 · CF-20 · CF-43
 

@@ -1,0 +1,846 @@
+{
+ "code": "P02",
+ "name": "Guest App \u2014 Mobile",
+ "shortName": "Guest App",
+ "app": "guest-app",
+ "operator": "guest",
+ "audience": "guest",
+ "formFactor": "mobileApp",
+ "offlineCapable": true,
+ "generated": "2026-08-18",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 63,
+  "operations": 89,
+  "contracts": 15,
+  "modules": 16,
+  "undrawn": 2,
+  "operationsWithNoScreen": 0
+ },
+ "waves": {
+  "wave1": 20,
+  "wave2": 27,
+  "wave3": 16
+ },
+ "modules": [
+  {
+   "module": "orders",
+   "screens": 16,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "catalogue",
+   "screens": 12,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "fnb",
+   "screens": 7,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "queue",
+   "screens": 6,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "white-label",
+   "screens": 5,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "marketing-crm",
+   "screens": 5,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "retail",
+   "screens": 2,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "access",
+   "screens": 2,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "cross-cell",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "games",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "ai",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "promotions",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "identity",
+   "screens": 1,
+   "waves": [
+    1
+   ]
+  },
+  {
+   "module": "TODO",
+   "screens": 1,
+   "waves": [
+    1
+   ]
+  },
+  {
+   "module": "finance",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "seating",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "identity",
+   "operations": 21
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 15
+  },
+  {
+   "contract": "orders",
+   "operations": 12
+  },
+  {
+   "contract": "fnb",
+   "operations": 8
+  },
+  {
+   "contract": "catalogue",
+   "operations": 7
+  },
+  {
+   "contract": "promotions",
+   "operations": 5
+  },
+  {
+   "contract": "queue",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
+   "operations": 4
+  },
+  {
+   "contract": "seating",
+   "operations": 3
+  },
+  {
+   "contract": "white-label",
+   "operations": 3
+  },
+  {
+   "contract": "access",
+   "operations": 3
+  },
+  {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
+   "contract": "cross-cell",
+   "operations": 1
+  },
+  {
+   "contract": "games",
+   "operations": 1
+  },
+  {
+   "contract": "ai",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "GST-001",
+   "name": "Home \u2013 Default",
+   "module": "white-label",
+   "wave": 1,
+   "route": "/general/home-default",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-002",
+   "name": "Explore Categories",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/general/explore-categories",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-003",
+   "name": "Attractions List",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/general/attractions-list",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-004",
+   "name": "Attraction Details",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/general/attraction-details",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-005",
+   "name": "What's On",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/general/whats-on",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-006",
+   "name": "Event / Exhibition Details",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/general/event-exhibition-details",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-007",
+   "name": "Select Date & Time",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/general/select-date-and-time",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-008",
+   "name": "Tickets & Add-ons",
+   "module": "orders",
+   "wave": 1,
+   "route": "/general/tickets-and-add-ons",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-009",
+   "name": "Review & Payment",
+   "module": "orders",
+   "wave": 1,
+   "route": "/general/review-and-payment",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "GST-010",
+   "name": "Booking Confirmation",
+   "module": "orders",
+   "wave": 1,
+   "route": "/general/booking-confirmation",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-011",
+   "name": "Wallet Overview",
+   "module": "retail",
+   "wave": 2,
+   "route": "/general/wallet-overview",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-012",
+   "name": "My Tickets",
+   "module": "orders",
+   "wave": 1,
+   "route": "/general/my-tickets",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-013",
+   "name": "Ticket Details",
+   "module": "orders",
+   "wave": 1,
+   "route": "/general/ticket-details",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-014",
+   "name": "Ticket Transfer",
+   "module": "orders",
+   "wave": 2,
+   "route": "/general/ticket-transfer",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-015",
+   "name": "Memberships",
+   "module": "cross-cell",
+   "wave": 2,
+   "route": "/general/memberships",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-016",
+   "name": "My Reservations",
+   "module": "orders",
+   "wave": 2,
+   "route": "/general/my-reservations",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-017",
+   "name": "Reservation Details",
+   "module": "orders",
+   "wave": 2,
+   "route": "/general/reservation-details",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-018",
+   "name": "Add to Calendar / Reminders",
+   "module": "orders",
+   "wave": 3,
+   "route": "/general/add-to-calendar-reminders",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-019",
+   "name": "Order History (Wallet)",
+   "module": "orders",
+   "wave": 2,
+   "route": "/general/order-history-wallet",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-020",
+   "name": "Saved Items / Wishlist",
+   "module": "marketing-crm",
+   "wave": 3,
+   "route": "/general/saved-items-wishlist",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "GST-021",
+   "name": "Interactive Map",
+   "module": "catalogue",
+   "wave": 2,
+   "route": "/general/interactive-map",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-022",
+   "name": "Attraction Wait Times",
+   "module": "queue",
+   "wave": 2,
+   "route": "/general/attraction-wait-times",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-023",
+   "name": "Virtual Queue / Join Queue",
+   "module": "queue",
+   "wave": 3,
+   "route": "/general/virtual-queue-join-queue",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-024",
+   "name": "F&B \u2013 Browse & Order",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/general/fandb-browse-and-order",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "GST-025",
+   "name": "F&B \u2013 Order Tracking",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/general/fandb-order-tracking",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-026",
+   "name": "Retail / Merchandise",
+   "module": "games",
+   "wave": 2,
+   "route": "/general/retail-merchandise",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-027",
+   "name": "Parking \u2013 Reserve & Pay",
+   "module": "access",
+   "wave": 3,
+   "route": "/general/parking-reserve-and-pay",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-028",
+   "name": "Parking \u2013 Reservation Confirmed",
+   "module": "access",
+   "wave": 3,
+   "route": "/general/parking-reservation-confirmed",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-029",
+   "name": "Venue Info & Services",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/general/venue-info-and-services",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-030",
+   "name": "In-Venue Notifications",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/general/in-venue-notifications",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-031",
+   "name": "AI Concierge \u2013 Home",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/general/ai-concierge-home",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-032",
+   "name": "AI Concierge \u2013 Chat",
+   "module": "orders",
+   "wave": 2,
+   "route": "/general/ai-concierge-chat",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "GST-033",
+   "name": "AI Concierge \u2013 Contextual Help",
+   "module": "ai",
+   "wave": 2,
+   "route": "/general/ai-concierge-contextual-help",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-034",
+   "name": "Lost & Found",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/general/lost-and-found",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-035",
+   "name": "Feedback & Ratings",
+   "module": "marketing-crm",
+   "wave": 3,
+   "route": "/general/feedback-and-ratings",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-036",
+   "name": "Loyalty & Rewards",
+   "module": "marketing-crm",
+   "wave": 2,
+   "route": "/loyalty-rewards",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-037",
+   "name": "Offers & Promotions",
+   "module": "promotions",
+   "wave": 2,
+   "route": "/general/offers-and-promotions",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-038",
+   "name": "Digital Companion Mode",
+   "module": "white-label",
+   "wave": 3,
+   "route": "/general/digital-companion-mode",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-039",
+   "name": "Profile",
+   "module": "marketing-crm",
+   "wave": 1,
+   "route": "/general/profile",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-040",
+   "name": "Help & Support",
+   "module": "white-label",
+   "wave": 2,
+   "route": "/general/help-and-support",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-041",
+   "name": "Checkout Entry",
+   "module": "orders",
+   "wave": 1,
+   "route": "/general/checkout-entry",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-042",
+   "name": "Simple Registration & OTP",
+   "module": "identity",
+   "wave": 1,
+   "route": "/general/simple-registration-and-otp",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "GST-043",
+   "name": "Arabic / RTL Experience",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/arabic-rtl-experience",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "GST-044",
+   "name": "Multi-Currency & Pricing",
+   "module": "finance",
+   "wave": 2,
+   "route": "/general/multi-currency-and-pricing",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-045",
+   "name": "Ticket Delivery & Sharing",
+   "module": "orders",
+   "wave": 2,
+   "route": "/general/ticket-delivery-and-sharing",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-046",
+   "name": "Branded Queue / Waiting Room",
+   "module": "queue",
+   "wave": 1,
+   "route": "/general/branded-queue-waiting-room",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-047",
+   "name": "Maintenance / Upgrade Page",
+   "module": "white-label",
+   "wave": 1,
+   "route": "/general/maintenance-page",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-048",
+   "name": "Upsell / Cross-Sell",
+   "module": "orders",
+   "wave": 2,
+   "route": "/general/upsell-cross-sell",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-049",
+   "name": "Interactive Seat Selection",
+   "module": "seating",
+   "wave": 2,
+   "route": "/general/interactive-seat-selection",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-050",
+   "name": "Resource Booking \u2013 Cabana",
+   "module": "catalogue",
+   "wave": 3,
+   "route": "/general/resource-booking-cabana",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-051",
+   "name": "Plan Your Adventure \u2013 Start",
+   "module": "queue",
+   "wave": 3,
+   "route": "/general/plan-your-adventure-start",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-052",
+   "name": "Suggested Itineraries",
+   "module": "catalogue",
+   "wave": 3,
+   "route": "/general/suggested-itineraries",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-053",
+   "name": "Build Your Own Itinerary",
+   "module": "orders",
+   "wave": 3,
+   "route": "/general/build-your-own-itinerary",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-054",
+   "name": "AI Optimized Itinerary",
+   "module": "queue",
+   "wave": 3,
+   "route": "/general/ai-optimized-itinerary",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-055",
+   "name": "Dynamic QR Ticket",
+   "module": "orders",
+   "wave": 1,
+   "route": "/general/dynamic-qr-ticket",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-056",
+   "name": "Bundle Package",
+   "module": "catalogue",
+   "wave": 2,
+   "route": "/general/bundle-package",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-057",
+   "name": "Accessibility Information",
+   "module": "white-label",
+   "wave": 2,
+   "route": "/general/accessibility-information",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-058",
+   "name": "Resource Availability (Cabana)",
+   "module": "catalogue",
+   "wave": 3,
+   "route": "/general/resource-availability-cabana",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-059",
+   "name": "Plan My Day \u2013 In Progress",
+   "module": "queue",
+   "wave": 3,
+   "route": "/general/plan-my-day-in-progress",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-061",
+   "name": "Menu Item Detail",
+   "module": "fnb",
+   "wave": 2,
+   "route": "/in-venue-experience/menu-item-detail",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-062",
+   "name": "Shop & Drop Collection",
+   "module": "retail",
+   "wave": 3,
+   "route": "/in-venue-experience/shop-and-drop-collection",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-063",
+   "name": "Search",
+   "module": "catalogue",
+   "wave": 1,
+   "route": "/search",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "GST-065",
+   "name": "Newsletter & Preferences",
+   "module": "marketing-crm",
+   "wave": 3,
+   "route": "/newsletter-preferences",
+   "operations": 2,
+   "drawn": false
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "catalogue",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "marketing-crm",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "orders",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "queue",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "retail",
+    "waves": [
+     2,
+     3
+    ]
+   },
+   {
+    "module": "white-label",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [
+   {
+    "id": "GST-063",
+    "name": "Search",
+    "wave": 1
+   },
+   {
+    "id": "GST-065",
+    "name": "Newsletter & Preferences",
+    "wave": 3
+   }
+  ],
+  "flowsNamingAMissingScreen": []
+ }
+}

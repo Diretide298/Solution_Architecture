@@ -1,0 +1,207 @@
+{
+ "P01": {
+  "shortName": "Guest Web",
+  "app": "guest-web",
+  "operator": "guest",
+  "counts": {
+   "screens": 35,
+   "operations": 77,
+   "contracts": 10,
+   "modules": 10,
+   "undrawn": 6,
+   "operationsWithNoScreen": 0
+  },
+  "waves": {
+   "wave1": 20,
+   "wave2": 11,
+   "wave3": 4
+  }
+ },
+ "P02": {
+  "shortName": "Guest App",
+  "app": "guest-app",
+  "operator": "guest",
+  "counts": {
+   "screens": 63,
+   "operations": 89,
+   "contracts": 15,
+   "modules": 16,
+   "undrawn": 2,
+   "operationsWithNoScreen": 0
+  },
+  "waves": {
+   "wave1": 20,
+   "wave2": 27,
+   "wave3": 16
+  }
+ },
+ "P04": {
+  "shortName": "Venue POS",
+  "app": "venue-pos",
+  "operator": "venue",
+  "counts": {
+   "screens": 10,
+   "operations": 98,
+   "contracts": 11,
+   "modules": 6,
+   "undrawn": 0,
+   "operationsWithNoScreen": 91
+  },
+  "waves": {
+   "wave1": 7,
+   "wave2": 3
+  }
+ },
+ "P05": {
+  "shortName": "Guest Kiosk",
+  "app": "guest-app",
+  "operator": "guest",
+  "counts": {
+   "screens": 15,
+   "operations": 18,
+   "contracts": 7,
+   "modules": 6,
+   "undrawn": 1,
+   "operationsWithNoScreen": 0
+  },
+  "waves": {
+   "wave2": 15
+  }
+ },
+ "P06": {
+  "shortName": "Venue Staff App",
+  "app": "venue-staff-app",
+  "operator": "venue",
+  "counts": {
+   "screens": 50,
+   "operations": 156,
+   "contracts": 13,
+   "modules": 12,
+   "undrawn": 0,
+   "operationsWithNoScreen": 81
+  },
+  "waves": {
+   "wave1": 29,
+   "wave2": 20,
+   "wave3": 1
+  }
+ },
+ "P07": {
+  "shortName": "Venue Scanner",
+  "app": "venue-scanner",
+  "operator": "venue",
+  "counts": {
+   "screens": 16,
+   "operations": 40,
+   "contracts": 5,
+   "modules": 3,
+   "undrawn": 0,
+   "operationsWithNoScreen": 28
+  },
+  "waves": {
+   "wave1": 16
+  }
+ },
+ "P08": {
+  "shortName": "Venue Management",
+  "app": "venue-management-web",
+  "operator": "venue",
+  "counts": {
+   "screens": 91,
+   "operations": 368,
+   "contracts": 21,
+   "modules": 19,
+   "undrawn": 18,
+   "operationsWithNoScreen": 154
+  },
+  "waves": {
+   "wave1": 45,
+   "wave2": 42,
+   "wave3": 4
+  }
+ },
+ "P09": {
+  "shortName": "TICVAI Web",
+  "app": "ticvai-web",
+  "operator": "ticvai",
+  "counts": {
+   "screens": 37,
+   "operations": 128,
+   "contracts": 8,
+   "modules": 6,
+   "undrawn": 1,
+   "operationsWithNoScreen": 61
+  },
+  "waves": {
+   "wave1": 11,
+   "wave2": 16,
+   "wave3": 10
+  }
+ },
+ "P10": {
+  "shortName": "Partner Web",
+  "app": "partner-web",
+  "operator": "partner",
+  "counts": {
+   "screens": 21,
+   "operations": 105,
+   "contracts": 9,
+   "modules": 10,
+   "undrawn": 0,
+   "operationsWithNoScreen": 0
+  },
+  "waves": {
+   "wave2": 11,
+   "wave3": 10
+  }
+ },
+ "P11": {
+  "shortName": "Accreditation Web",
+  "app": "accreditation-web",
+  "operator": "public",
+  "counts": {
+   "screens": 8,
+   "operations": 3,
+   "contracts": 2,
+   "modules": 4,
+   "undrawn": 0,
+   "operationsWithNoScreen": 0
+  },
+  "waves": {
+   "wave3": 8
+  }
+ },
+ "P12": {
+  "shortName": "Venue Support",
+  "app": "venue-support-web",
+  "operator": "venue",
+  "counts": {
+   "screens": 8,
+   "operations": 74,
+   "contracts": 5,
+   "modules": 4,
+   "undrawn": 0,
+   "operationsWithNoScreen": 29
+  },
+  "waves": {
+   "wave2": 2,
+   "wave3": 6
+  }
+ },
+ "P13": {
+  "shortName": "Venue CMS",
+  "app": "venue-management-web",
+  "operator": "venue",
+  "counts": {
+   "screens": 20,
+   "operations": 99,
+   "contracts": 8,
+   "modules": 8,
+   "undrawn": 0,
+   "operationsWithNoScreen": 53
+  },
+  "waves": {
+   "wave2": 20
+  }
+ }
+}

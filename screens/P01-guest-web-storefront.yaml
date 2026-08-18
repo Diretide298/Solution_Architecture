@@ -43,7 +43,7 @@ platform:
 screens:
 - id: WEB-001
   name: Home / Landing
-  module: Discovery & Browse
+  module: white-label
   purpose: Show a guest what is on and give them one obvious way to start booking.
   wave: 1
   layout:
@@ -104,9 +104,12 @@ screens:
     route: /discovery-and-browse/home-landing
     component: apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx
     status: notStarted
+  modules:
+  - white-label
+  - catalogue
 - id: WEB-002
   name: Event & Attraction Listing
-  module: Discovery & Browse
+  module: catalogue
   purpose: Browse and filter everything bookable.
   wave: 1
   layout:
@@ -160,9 +163,11 @@ screens:
     contract: catalogue
     purpose: Find something by name
     trigger: onLoad
+  modules:
+  - catalogue
 - id: WEB-003
   name: Search Results
-  module: Discovery & Browse
+  module: catalogue
   purpose: Find something when the guest does not know what it is called.
   wave: 1
   layout:
@@ -205,9 +210,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  modules:
+  - catalogue
 - id: WEB-004
   name: Event / Attraction Detail
-  module: Discovery & Browse
+  module: catalogue
   purpose: Decide whether to book this.
   wave: 1
   layout:
@@ -259,9 +266,11 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onLoad
+  modules:
+  - catalogue
 - id: WEB-005
   name: Ticket Type Selection
-  module: Booking & Selection
+  module: promotions
   purpose: Choose which ticket and how many.
   wave: 1
   layout:
@@ -312,9 +321,12 @@ screens:
     contract: catalogue
     purpose: List generated variants
     trigger: onLoad
+  modules:
+  - promotions
+  - catalogue
 - id: WEB-006
   name: Date & Session Selection
-  module: Booking & Selection
+  module: catalogue
   purpose: Pick a date and time that has capacity.
   wave: 1
   layout:
@@ -362,9 +374,11 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
+  modules:
+  - catalogue
 - id: WEB-007
   name: Seat Map Selection
-  module: Booking & Selection
+  module: seating
   purpose: Choose specific seats.
   wave: 2
   layout:
@@ -419,9 +433,11 @@ screens:
     contract: seating
     purpose: Seat status for a performance
     trigger: onLoad
+  modules:
+  - seating
 - id: WEB-008
   name: Add-ons & Upsell
-  module: Booking & Selection
+  module: orders
   purpose: See add-ons & upsell for this venue.
   wave: 2
   layout:
@@ -467,9 +483,13 @@ screens:
     contract: promotions
     purpose: Suggestions for a cart
     trigger: onAction
+  modules:
+  - orders
+  - catalogue
+  - promotions
 - id: WEB-009
   name: Wishlist
-  module: Booking & Selection
+  module: marketing-crm
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -533,9 +553,11 @@ screens:
     - WEB-005
     - WEB-006
     - WEB-007
+  modules:
+  - marketing-crm
 - id: WEB-010
   name: Shopping Cart
-  module: Cart & Checkout
+  module: orders
   purpose: Review and confirm what is being bought.
   wave: 1
   layout:
@@ -617,9 +639,12 @@ screens:
     route: /cart-and-checkout/shopping-cart
     component: apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx
     status: notStarted
+  modules:
+  - orders
+  - promotions
 - id: WEB-011
   name: Guest Details & Attendee Forms
-  module: Cart & Checkout
+  module: marketing-crm
   purpose: Collect who is coming and how to reach them.
   wave: 1
   layout:
@@ -707,9 +732,11 @@ screens:
     route: /cart-and-checkout/guest-details-and-attendee-forms
     component: apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
     status: notStarted
+  modules:
+  - marketing-crm
 - id: WEB-012
   name: Checkout — Payment
-  module: Cart & Checkout
+  module: orders
   purpose: Take payment and create the order.
   wave: 1
   layout:
@@ -770,9 +797,11 @@ screens:
     route: /cart-and-checkout/checkout-payment
     component: apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
     status: notStarted
+  modules:
+  - orders
 - id: WEB-013
   name: Order Confirmation
-  module: Cart & Checkout
+  module: orders
   purpose: Confirm the purchase and deliver the tickets.
   wave: 1
   layout:
@@ -825,9 +854,11 @@ screens:
     route: /cart-and-checkout/order-confirmation
     component: apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
     status: notStarted
+  modules:
+  - orders
 - id: WEB-014
   name: Payment Link Landing
-  module: Cart & Checkout
+  module: orders
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 2
   layout:
@@ -870,9 +901,11 @@ screens:
     - WEB-011
     - WEB-012
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: WEB-015
   name: Virtual Waiting Room
-  module: High-Demand Access
+  module: queue
   purpose: Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting
     room.
   wave: 2
@@ -920,9 +953,11 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  modules:
+  - queue
 - id: WEB-016
   name: Login / Register
-  module: Account & Self-Service
+  module: identity
   purpose: Get a guest into the app, fast, on a device that may be shared.
   wave: 1
   layout:
@@ -1045,9 +1080,12 @@ screens:
     - WEB-018
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
+  - orders
 - id: WEB-017
   name: My Account Dashboard
-  module: Account & Self-Service
+  module: marketing-crm
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -1110,9 +1148,11 @@ screens:
     - WEB-018
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: WEB-018
   name: My Tickets
-  module: Account & Self-Service
+  module: orders
   purpose: Find my tickets for this venue.
   wave: 1
   layout:
@@ -1151,9 +1191,11 @@ screens:
     - WEB-016
     - WEB-017
     - WEB-019
+  modules:
+  - orders
 - id: WEB-019
   name: Order History
-  module: Account & Self-Service
+  module: orders
   purpose: Find order history for this venue.
   wave: 1
   layout:
@@ -1192,9 +1234,11 @@ screens:
     - WEB-017
     - WEB-018
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: WEB-020
   name: Profile & Preferences
-  module: Account & Self-Service
+  module: marketing-crm
   purpose: Change how profile behaves here, and see which level the current value came from.
   wave: 1
   layout:
@@ -1258,9 +1302,11 @@ screens:
     - WEB-016
     - WEB-017
     - WEB-018
+  modules:
+  - marketing-crm
 - id: WEB-021
   name: Wallet & Gift Cards
-  module: Membership, Loyalty & Value
+  module: retail
   purpose: See wallet & gift cards for this venue.
   wave: 2
   layout:
@@ -1306,9 +1352,11 @@ screens:
     contract: retail
     purpose: Check a gift card balance
     trigger: onLoad
+  modules:
+  - retail
 - id: WEB-022
   name: Membership Plans
-  module: Membership, Loyalty & Value
+  module: catalogue
   purpose: Membership Plans — the screen a person opens when they need to deal with membership plans.
   wave: 2
   layout:
@@ -1350,9 +1398,11 @@ screens:
     contract: catalogue
     purpose: Read a product
     trigger: onLoad
+  modules:
+  - catalogue
 - id: WEB-023
   name: Membership Management
-  module: Membership, Loyalty & Value
+  module: orders
   purpose: Work with membership management for this venue.
   wave: 2
   layout:
@@ -1391,9 +1441,11 @@ screens:
     - WEB-022
     - WEB-024
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: WEB-024
   name: Loyalty & Rewards
-  module: Membership, Loyalty & Value
+  module: marketing-crm
   purpose: See loyalty & rewards for this venue.
   wave: 3
   layout:
@@ -1455,9 +1507,11 @@ screens:
     - WEB-023
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: WEB-025
   name: Help Centre / FAQ
-  module: Engagement & Support
+  module: white-label
   purpose: Answer a question without needing a person.
   wave: 1
   layout:
@@ -1496,9 +1550,11 @@ screens:
     - WEB-027
     - WEB-028
     inferred: true
+  modules:
+  - white-label
 - id: WEB-026
   name: Survey & Feedback
-  module: Engagement & Support
+  module: marketing-crm
   purpose: Work with survey & feedback for this venue.
   wave: 3
   layout:
@@ -1536,9 +1592,11 @@ screens:
     - WEB-028
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: WEB-027
   name: Newsletter Subscription
-  module: Engagement & Support
+  module: marketing-crm
   purpose: Record newsletter subscription for this venue.
   wave: 2
   layout:
@@ -1601,9 +1659,11 @@ screens:
     - WEB-028
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: WEB-028
   name: Contact & Venue Information
-  module: Engagement & Support
+  module: white-label
   purpose: Find contact & venue information for this venue.
   wave: 1
   layout:
@@ -1642,9 +1702,11 @@ screens:
     - WEB-026
     - WEB-027
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - white-label
 - id: WEB-029
   name: Error / Sold Out / Maintenance
-  module: System States
+  module: white-label
   purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
@@ -1682,9 +1744,11 @@ screens:
     inferred: true
     exitTo:
     - WEB-001
+  modules:
+  - white-label
 - id: WEB-030
   name: Ticket Transfer
-  module: Ticketing
+  module: orders
   purpose: Send a ticket to someone else, and see what you have sent.
   capability: C00
   wave: 1
@@ -1729,9 +1793,11 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-014. **Not on the wireframe board** — needs drawing. CF-93.
+  modules:
+  - orders
 - id: WEB-031
   name: My Reservations
-  module: Ticketing
+  module: orders
   purpose: What you have booked and not yet paid for.
   capability: C00
   wave: 2
@@ -1775,9 +1841,11 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.
+  modules:
+  - orders
 - id: WEB-032
   name: Offers & Promotions
-  module: Promotions
+  module: promotions
   purpose: What is on, and what applies to you.
   capability: C00
   wave: 2
@@ -1819,9 +1887,11 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.
+  modules:
+  - promotions
 - id: WEB-033
   name: Shop
-  module: Retail
+  module: retail
   purpose: Merchandise, browsable before you arrive.
   capability: C00
   wave: 2
@@ -1868,9 +1938,12 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
+  modules:
+  - retail
+  - orders
 - id: WEB-034
   name: Lost & Found
-  module: Support
+  module: marketing-crm
   purpose: Report something you left behind.
   capability: C00
   wave: 3
@@ -1908,9 +1981,11 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-034. **Not on the wireframe board** — needs drawing. CF-93.
+  modules:
+  - marketing-crm
 - id: WEB-035
   name: Multi-Currency & Pricing
-  module: Ticketing
+  module: finance
   purpose: Compare prices in your own currency before you travel.
   capability: C00
   wave: 1
@@ -1958,3 +2033,6 @@ screens:
     wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not
     need the venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a
     rate exists only for a currency the venue enabled, so the two questions have one answer.'
+  modules:
+  - finance
+  - catalogue

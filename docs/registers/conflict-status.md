@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**122 conflicts raised — CF-01 to CF-119, plus CF-33a and one screen-level item.**
+**124 conflicts raised — CF-01 to CF-121, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -10,12 +10,12 @@ register.
 |---|---|
 | OPEN — client | **19** |
 | OPEN — Softlabs | **1** |
-| CLOSED | **96** |
+| CLOSED | **98** |
 | WITHDRAWN | **6** |
-| **Total** | **122** |
+| **Total** | **124** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**20 open, 96 closed.**
+**20 open, 98 closed.**
 
 
 ## Open — needs a client decision — 19
@@ -48,7 +48,7 @@ register.
 |---|---|---|
 | **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
 
-## Closed — 96
+## Closed — 98
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -147,6 +147,8 @@ register.
 | **CF-117** | Two package contradictions from an external run — one was eight platforms, not one, and the other was a state model excusing its own broken anchor. P0 | Chinmay |
 | **CF-118** | Multi-currency swept across every surface that takes money, and the sweep found three defects worse than the currency gap. (1) Ten money operations we | Chinmay |
 | **CF-119** | 76 of 287 tables had no columns, including all 13 AI tables, and nothing failed. The schema reference was derived once by an ad-hoc script that never  | Chinmay |
+| **CF-120** | All 514 relationships were invisible at column level. Asked where `facility_id` on `access.parking_entitlement` comes from, the answer was in `relatio | Chinmay |
+| **CF-121** | A page per platform, with the gaps derived rather than listed — and the screen `module` field was unusable before it could be built. 32 hand-typed val | Chinmay |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
 ## Withdrawn or absorbed — 6
@@ -164,7 +166,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-119, no gaps
+- **Numbering:** CF-01 to CF-121, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

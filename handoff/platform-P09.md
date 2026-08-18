@@ -1,0 +1,129 @@
+# P09 TICVAI Web — platform
+
+**Derived.** `python3 tools/derive-platform.py P09`. App `ticvai-web` · ticvai · web
+
+| | |
+|---|---|
+| Screens | 37 |
+| Operations | 128 |
+| Contracts | 8 |
+| Modules | 6 |
+| Undrawn | 1 |
+| Operations with no screen | 61 |
+| Waves | wave1 11 · wave2 16 · wave3 10 |
+
+## Gaps
+
+### 61 operations with no screen here
+
+**In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
+
+| Operation | Contract | | |
+|---|---|---|---|
+| `createKnowledgeCollection` | ai | POST | Create a collection |
+| `decideProposedAction` | ai | POST | Approve or reject a proposal |
+| `generateConfiguration` | ai | POST | Draft a configuration from a description |
+| `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
+| `ingestKnowledgeDocument` | ai | POST | Add a document |
+| `listIndexJobs` | ai | GET | Indexing in flight and recently finished |
+| `listIndexSources` | ai | GET | What is indexed, and how current it is |
+| `listKnowledgeCollections` | ai | GET | Collections available to this tenant |
+| `listProposedActions` | ai | GET | What the assistant has proposed and nobody has decided |
+| `reindexSource` | ai | POST | Rebuild a source |
+| `removeIndexEntry` | ai | DELETE | Remove one record from the index |
+| `setIndexSource` | ai | PUT | Declare a source indexed |
+| `authoriseWalletSpend` | cross-cell | POST | Hold funds against the guest's home-cell balance |
+| `captureWalletAuthorisation` | cross-cell | POST | Capture a held amount |
+| `createDsarRequest` | cross-cell | POST | Raise a data subject request across every linked cell |
+| `createGuestLink` | cross-cell | POST | Link a guest's records across cells |
+| `getDsarRequest` | cross-cell | GET | Track fan-out progress per cell |
+| `getWalletAllocation` | cross-cell | GET | The consuming cell's bounded offline allocation |
+| `releaseWalletAuthorisation` | cross-cell | POST | Release a hold without capturing |
+| `resolveGuestLink` | cross-cell | GET | Find the link for a local subject |
+| `revokeGuestLink` | cross-cell | DELETE | Sever a link on consent withdrawal |
+| `revokeRedemptionRight` | cross-cell | DELETE | Revoke a right |
+| `setWalletAllocationPolicy` | cross-cell | PUT | Set the allocation cap policy |
+| `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
+| `deleteGuestAccount` | identity | DELETE | Self-service account deletion |
+| `resolvePermissions` | identity | POST | Simulate a principal's effective permissions |
+| `skipRolloutCell` | platform-ops | POST | Exclude a cell from this wave |
+| `cancelReportExecution` | reporting | DELETE | Cancel a running execution |
+| `createReportSchedule` | reporting | POST | Schedule a report |
+| `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
+| `exportReportResult` | reporting | POST | Export a completed result |
+| `getReportExecution` | reporting | GET | Execution status and result |
+| `getReportExport` | reporting | GET | Export status and download link |
+| `getReportResult` | reporting | GET | Paged result rows |
+| `listReportExecutions` | reporting | GET | List executions |
+| `listReportFields` | reporting | GET | Fields available for a data source |
+| `listReportSchedules` | reporting | GET | List scheduled reports |
+| `updateReportSchedule` | reporting | PATCH | Amend, pause or resume a schedule |
+| `cancelInvoice` | subscription | POST | Cancel or credit an invoice |
+| `cancelSubscription` | subscription | POST | Terminate a tenant subscription |
+| … | | | 21 more |
+
+### 3 modules split across waves
+
+**A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
+
+- **ai** — waves 1, 2
+- **platform-ops** — waves 1, 2, 3
+- **subscription** — waves 1, 2, 3
+
+### 1 screens nobody has drawn
+
+- `ADM-037` AI Provider & Credentials — wave 1
+
+## Modules
+
+| Module | Screens | Waves |
+|---|---|---|
+| subscription | 19 | 1, 2, 3 |
+| platform-ops | 9 | 1, 2, 3 |
+| identity | 3 | 1 |
+| white-label | 3 | 2 |
+| ai | 2 | 1, 2 |
+| reporting | 1 | 3 |
+
+## Screens
+
+| | Name | Module | Wave | Ops | Drawn |
+|---|---|---|---|---|---|
+| `ADM-001` | Platform Login / MFA | identity | 1 | 8 | yes |
+| `ADM-002` | Platform Dashboard | subscription | 1 | 21 | yes |
+| `ADM-003` | Cross-Tenant Health Dashboard | subscription | 2 | 10 | yes |
+| `ADM-004` | Platform Audit Log | ai | 2 | 1 | yes |
+| `ADM-005` | Tenant Directory | subscription | 1 | 21 | yes |
+| `ADM-006` | Tenant Hierarchy Explorer | subscription | 1 | 23 | yes |
+| `ADM-007` | Module & Feature Entitlement | subscription | 1 | 21 | yes |
+| `ADM-008` | Subscription & Plan Management | subscription | 1 | 28 | yes |
+| `ADM-009` | Tenant Billing & Invoicing | subscription | 2 | 21 | yes |
+| `ADM-010` | Usage Metering | subscription | 2 | 21 | yes |
+| `ADM-011` | Licence & Seat Management | subscription | 2 | 21 | yes |
+| `ADM-012` | Tenant Isolation & Resource Pool | subscription | 1 | 22 | yes |
+| `ADM-013` | Tenant Performance Monitor | subscription | 2 | 7 | yes |
+| `ADM-014` | Auto-Scaling Configuration | subscription | 3 | 7 | yes |
+| `ADM-015` | API Rate Limit & Quota Management | subscription | 3 | 21 | yes |
+| `ADM-016` | White-Label Branding Management | white-label | 2 | 41 | yes |
+| `ADM-017` | Domain & Certificate Management | white-label | 2 | 41 | yes |
+| `ADM-018` | Localisation & Language Pack | white-label | 2 | 41 | yes |
+| `ADM-019` | Global Configuration & Defaults | subscription | 2 | 4 | yes |
+| `ADM-020` | Platform User Directory | identity | 1 | 4 | yes |
+| `ADM-021` | Platform Role Management | identity | 1 | 2 | yes |
+| `ADM-022` | Release & Version Management | platform-ops | 2 | 7 | yes |
+| `ADM-023` | Staging Promotion & Approval | platform-ops | 2 | 7 | yes |
+| `ADM-024` | Release Notification Composer | platform-ops | 3 | 2 | yes |
+| `ADM-025` | Tenant Upgrade Scheduler | platform-ops | 2 | 2 | yes |
+| `ADM-026` | End-of-Support Notice Management | platform-ops | 3 | 2 | yes |
+| `ADM-027` | Database Migration Console | platform-ops | 1 | 6 | yes |
+| `ADM-028` | Environment Registry | platform-ops | 2 | 2 | yes |
+| `ADM-029` | Deployment Monitor | subscription | 2 | 12 | yes |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | subscription | 3 | 7 | yes |
+| `ADM-031` | Security & Compliance Dashboard | reporting | 3 | 4 | yes |
+| `ADM-032` | WAF & Security Policy View | subscription | 3 | 7 | yes |
+| `ADM-033` | Backup & DR Status | subscription | 2 | 7 | yes |
+| `ADM-034` | Archival Job Monitor | subscription | 3 | 7 | yes |
+| `ADM-035` | Support & Escalation Console | platform-ops | 3 | 2 | yes |
+| `ADM-036` | Platform Notification Broadcast | platform-ops | 3 | 2 | yes |
+| `ADM-037` | AI Provider & Credentials | ai | 1 | 4 | **no** |
+

@@ -77,7 +77,7 @@ screens:
     status: notStarted
 - id: KSK-002
   name: Language Select
-  module: Sell
+  module: white-label
   purpose: Ask the only question that changes everything else.
   capability: C00
   wave: 2
@@ -121,9 +121,11 @@ screens:
     contract: white-label
     purpose: Full working configuration
     trigger: onLoad
+  modules:
+  - white-label
 - id: KSK-003
   name: What are you buying
-  module: Sell
+  module: catalogue
   purpose: Get to a product in one touch.
   capability: C00
   wave: 2
@@ -162,9 +164,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  modules:
+  - catalogue
 - id: KSK-004
   name: Choose tickets
-  module: Sell
+  module: catalogue
   purpose: Quantities, with targets a gloved hand can hit.
   capability: C00
   wave: 2
@@ -209,9 +213,11 @@ screens:
     contract: catalogue
     purpose: List generated variants
     trigger: onLoad
+  modules:
+  - catalogue
 - id: KSK-005
   name: Choose a session
-  module: Sell
+  module: catalogue
   purpose: Pick a time that still has room.
   capability: C00
   wave: 2
@@ -256,9 +262,11 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
+  modules:
+  - catalogue
 - id: KSK-006
   name: Review
-  module: Sell
+  module: orders
   purpose: Show what is being bought before money moves.
   capability: C00
   wave: 2
@@ -311,9 +319,12 @@ screens:
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
+  modules:
+  - orders
+  - promotions
 - id: KSK-007
   name: Payment
-  module: Sell
+  module: orders
   purpose: Take a card, and nothing else.
   capability: C00
   wave: 2
@@ -360,9 +371,11 @@ screens:
     contract: orders
     purpose: Take a payment against an order
     trigger: onAction
+  modules:
+  - orders
 - id: KSK-008
   name: Payment unresolved
-  module: Sell
+  module: orders
   purpose: Handle the state that has nobody standing next to it.
   capability: C00
   wave: 2
@@ -402,9 +415,11 @@ screens:
     contract: orders
     purpose: Ask the provider what actually happened
     trigger: onAction
+  modules:
+  - orders
 - id: KSK-009
   name: Ticket issued
-  module: Sell
+  module: orders
   purpose: Get the ticket into the guest’s hand.
   capability: C00
   wave: 2
@@ -447,9 +462,11 @@ screens:
     contract: orders
     purpose: Read an order
     trigger: onLoad
+  modules:
+  - orders
 - id: KSK-010
   name: Print failure
-  module: Sell
+  module: orders
   purpose: Recover when the paper runs out mid-sale.
   capability: C00
   wave: 2
@@ -490,9 +507,11 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+  modules:
+  - orders
 - id: KSK-011
   name: Collect a booking
-  module: Sell
+  module: retail
   purpose: Turn a reference into media.
   capability: C00
   wave: 2
@@ -535,9 +554,12 @@ screens:
     contract: orders
     purpose: Read an order
     trigger: onLoad
+  modules:
+  - retail
+  - orders
 - id: KSK-012
   name: Booking found
-  module: Sell
+  module: orders
   purpose: Confirm it is the right booking, then print.
   capability: C00
   wave: 2
@@ -576,9 +598,11 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+  modules:
+  - orders
 - id: KSK-013
   name: Call staff
-  module: Sell
+  module: marketing-crm
   purpose: Get a human, without leaving the kiosk.
   capability: C00
   wave: 2
@@ -617,6 +641,8 @@ screens:
     contract: marketing-crm
     purpose: Stop assisting
     trigger: onAction
+  modules:
+  - marketing-crm
 - id: KSK-014
   name: Out of service
   module: Sell
@@ -655,7 +681,7 @@ screens:
     status: notStarted
 - id: KSK-015
   name: Assistant
-  module: AI
+  module: catalogue
   purpose: Help a guest choose and pay, and nothing else.
   capability: C00
   wave: 2
@@ -711,3 +737,7 @@ screens:
     2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a
     guest through ticket selection and checkout cannot ship before the screens that do the selecting
     and the checking out.'
+  modules:
+  - catalogue
+  - ai
+  - marketing-crm

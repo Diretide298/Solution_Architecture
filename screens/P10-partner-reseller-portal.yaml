@@ -37,7 +37,7 @@ platform:
 screens:
 - id: PTR-001
   name: Partner Login / MFA
-  module: TODO
+  module: identity
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 2
   layout:
@@ -121,9 +121,13 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
+  - orders
+  - subscription
 - id: PTR-002
   name: Partner Dashboard
-  module: TODO
+  module: orders
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -226,9 +230,11 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
+  modules:
+  - orders
 - id: PTR-003
   name: Profile & Company Details
-  module: TODO
+  module: identity
   purpose: What we hold about staff, and what they can change.
   wave: 2
   layout:
@@ -279,9 +285,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
 - id: PTR-004
   name: Notifications
-  module: TODO
+  module: marketing-crm
   purpose: Work with notifications for this venue.
   wave: 3
   layout:
@@ -323,9 +331,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: PTR-005
   name: Inventory & Allocation View
-  module: TODO
+  module: orders
   purpose: See inventory & allocation view for this venue.
   wave: 2
   layout:
@@ -439,9 +449,12 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
+  modules:
+  - orders
+  - catalogue
 - id: PTR-006
   name: Product Catalog (B2B Pricing)
-  module: TODO
+  module: catalogue
   purpose: Find product catalog (b2b pricing) for this venue.
   wave: 2
   layout:
@@ -544,9 +557,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - catalogue
 - id: PTR-007
   name: Availability Search
-  module: TODO
+  module: catalogue
   purpose: Find something when the guest does not know what it is called.
   wave: 2
   layout:
@@ -588,9 +603,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - catalogue
 - id: PTR-008
   name: Booking Creation
-  module: TODO
+  module: orders
   purpose: Add booking creation for this venue.
   wave: 2
   layout:
@@ -686,9 +703,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: PTR-009
   name: Group / Bulk Booking
-  module: TODO
+  module: seating
   purpose: Work with group / bulk booking for this venue.
   wave: 3
   layout:
@@ -738,9 +757,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - seating
 - id: PTR-010
   name: Cart & Quote
-  module: TODO
+  module: promotions
   purpose: Work with cart & quote for this venue.
   wave: 3
   layout:
@@ -838,9 +859,12 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - promotions
+  - orders
 - id: PTR-011
   name: Quote Management
-  module: TODO
+  module: subscription
   purpose: Find quote management for this venue.
   wave: 3
   layout:
@@ -885,9 +909,11 @@ screens:
     contract: subscription
     purpose: What the partner earned and what is owed
     trigger: onLoad
+  modules:
+  - subscription
 - id: PTR-012
   name: Checkout / Credit Purchase
-  module: TODO
+  module: orders
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 2
   layout:
@@ -943,9 +969,11 @@ screens:
     in AED. **`creditLimit` is in the settlement currency**, so a limit in the wrong currency is a limit
     that moves with the exchange rate. Which rate converts the sale is `fxPolicy` and it is a commercial
     term, not a default.
+  modules:
+  - orders
 - id: PTR-013
   name: Credit Limit & Balance
-  module: TODO
+  module: orders
   purpose: See credit limit & balance for this venue.
   wave: 2
   layout:
@@ -991,9 +1019,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: PTR-014
   name: Settlement & Payment History
-  module: TODO
+  module: finance
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 3
   layout:
@@ -1049,9 +1079,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - finance
 - id: PTR-015
   name: Order History
-  module: TODO
+  module: orders
   purpose: Find order history for this venue.
   wave: 2
   layout:
@@ -1144,9 +1176,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: PTR-016
   name: Voucher / Ticket Download
-  module: TODO
+  module: orders
   purpose: Work with voucher / ticket download for this venue.
   wave: 2
   layout:
@@ -1235,9 +1269,11 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
+  modules:
+  - orders
 - id: PTR-017
   name: Commission Statement
-  module: TODO
+  module: subscription
   purpose: Answer a question about commission with numbers someone can check.
   wave: 3
   layout:
@@ -1280,9 +1316,11 @@ screens:
     contract: subscription
     purpose: Commercial agreements with B2B partners
     trigger: onLoad
+  modules:
+  - subscription
 - id: PTR-018
   name: Reports & Sales Performance
-  module: TODO
+  module: reporting
   purpose: Answer a question about reports with numbers someone can check.
   wave: 3
   layout:
@@ -1353,6 +1391,9 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - reporting
+  - finance
 - id: PTR-019
   name: API Credentials & Integration
   module: TODO
@@ -1392,7 +1433,7 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
 - id: PTR-020
   name: Sub-Agent Management
-  module: TODO
+  module: identity
   purpose: Add sub-agent management for this venue.
   wave: 3
   layout:
@@ -1440,9 +1481,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
 - id: PTR-021
   name: Support & Contact
-  module: TODO
+  module: marketing-crm
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -1504,3 +1547,5 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm

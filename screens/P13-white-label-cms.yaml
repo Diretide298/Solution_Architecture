@@ -50,7 +50,7 @@ platform:
 screens:
 - id: CMS-001
   name: Tenant Workspace
-  module: White Label
+  module: subscription
   purpose: Land a tenant somewhere that shows what is live and what is not.
   capability: C00
   wave: 2
@@ -169,9 +169,12 @@ screens:
     contract: subscription
     purpose: Amend tenant details
     trigger: onAction
+  modules:
+  - subscription
+  - identity
 - id: CMS-002
   name: Brand Kit
-  module: White Label
+  module: white-label
   purpose: Set the things every surface reads.
   capability: C00
   wave: 2
@@ -224,9 +227,12 @@ screens:
     contract: assets
     purpose: Confirm an upload and create the asset
     trigger: onAction
+  modules:
+  - white-label
+  - assets
 - id: CMS-003
   name: Typography
-  module: White Label
+  module: white-label
   purpose: Choose the two typefaces and the scale under them.
   capability: C00
   wave: 2
@@ -425,9 +431,11 @@ screens:
     contract: white-label
     purpose: Validate the working draft
     trigger: onAction
+  modules:
+  - white-label
 - id: CMS-004
   name: Logo & Assets
-  module: White Label
+  module: maintenance
   purpose: Hold the marks every surface needs, at the sizes it needs them.
   capability: C00
   wave: 2
@@ -490,9 +498,11 @@ screens:
     contract: maintenance
     purpose: Amend an asset
     trigger: onAction
+  modules:
+  - maintenance
 - id: CMS-005
   name: Theme Editor
-  module: White Label
+  module: white-label
   purpose: Tune the theme and watch it apply everywhere at once.
   capability: C00
   wave: 2
@@ -537,9 +547,11 @@ screens:
     contract: white-label
     purpose: Set colour theme
     trigger: onAction
+  modules:
+  - white-label
 - id: CMS-006
   name: Component Preview
-  module: White Label
+  module: white-label
   purpose: Check the theme against the components that carry it.
   capability: C00
   wave: 2
@@ -738,9 +750,11 @@ screens:
     contract: white-label
     purpose: Validate the working draft
     trigger: onAction
+  modules:
+  - white-label
 - id: CMS-007
   name: Page Builder
-  module: White Label
+  module: white-label
   purpose: Assemble a storefront page from blocks the tenant cannot break.
   capability: C00
   wave: 2
@@ -785,9 +799,11 @@ screens:
     contract: white-label
     purpose: Set homepage section order
     trigger: onAction
+  modules:
+  - white-label
 - id: CMS-008
   name: Content Blocks
-  module: White Label
+  module: white-label
   purpose: Define what a block can and cannot contain.
   capability: C00
   wave: 2
@@ -830,9 +846,11 @@ screens:
     contract: white-label
     purpose: List banners
     trigger: onLoad
+  modules:
+  - white-label
 - id: CMS-009
   name: Navigation & Menus
-  module: White Label
+  module: fnb
   purpose: Decide what appears in the header and the footer.
   capability: C00
   wave: 2
@@ -887,9 +905,11 @@ screens:
     contract: fnb
     purpose: Amend a menu
     trigger: onAction
+  modules:
+  - fnb
 - id: CMS-010
   name: Media Library
-  module: White Label
+  module: assets
   purpose: Hold the imagery, and know where it is used.
   capability: C00
   wave: 2
@@ -972,6 +992,9 @@ screens:
     contract: assets
     purpose: Amend metadata, tags or rights
     trigger: onAction
+  modules:
+  - assets
+  - orders
 - id: CMS-013
   name: SEO & Metadata
   module: White Label
@@ -1010,7 +1033,7 @@ screens:
     status: notStarted
 - id: CMS-011
   name: Translations
-  module: White Label
+  module: white-label
   purpose: Fill in what every language is missing.
   capability: C00
   wave: 2
@@ -1049,9 +1072,11 @@ screens:
     contract: white-label
     purpose: Set enabled languages and default
     trigger: onAction
+  modules:
+  - white-label
 - id: CMS-012
   name: RTL Preview
-  module: White Label
+  module: white-label
   purpose: See the site as an Arabic reader sees it.
   capability: C00
   wave: 2
@@ -1096,9 +1121,11 @@ screens:
     contract: white-label
     purpose: Validate the working draft
     trigger: onAction
+  modules:
+  - white-label
 - id: CMS-014
   name: Publishing Workflow
-  module: White Label
+  module: white-label
   purpose: Move a change from draft to live, with someone accountable.
   capability: C00
   wave: 2
@@ -1147,9 +1174,11 @@ screens:
     contract: white-label
     purpose: App status and recent changes
     trigger: onLoad
+  modules:
+  - white-label
 - id: CMS-015
   name: Version History
-  module: White Label
+  module: white-label
   purpose: See what changed and go back if it was wrong.
   capability: C00
   wave: 2
@@ -1196,9 +1225,11 @@ screens:
     contract: white-label
     purpose: Restore a previous version
     trigger: onAction
+  modules:
+  - white-label
 - id: CMS-016
   name: Site Settings
-  module: White Label
+  module: white-label
   purpose: The values the whole site inherits from.
   capability: C00
   wave: 2
@@ -1238,6 +1269,8 @@ screens:
     contract: white-label
     purpose: Full working configuration
     trigger: onLoad
+  modules:
+  - white-label
 - id: CMS-017
   name: Domain & Certificate
   module: White Label
@@ -1276,7 +1309,7 @@ screens:
     status: notStarted
 - id: CMS-018
   name: Consent & Legal
-  module: White Label
+  module: marketing-crm
   purpose: Manage the notices every consent is captured against.
   capability: C00
   wave: 2
@@ -1355,9 +1388,11 @@ screens:
     contract: marketing-crm
     purpose: Amend a guest profile
     trigger: onAction
+  modules:
+  - marketing-crm
 - id: CMS-019
   name: User Access
-  module: White Label
+  module: identity
   purpose: Say who in the tenant may change what.
   capability: C00
   wave: 2
@@ -1400,9 +1435,11 @@ screens:
     contract: identity
     purpose: List roles
     trigger: onLoad
+  modules:
+  - identity
 - id: CMS-020
   name: Change Log
-  module: White Label
+  module: white-label
   purpose: See who changed what, before the publish that carried it.
   capability: C00
   wave: 2
@@ -1441,3 +1478,5 @@ screens:
     contract: white-label
     purpose: Version history
     trigger: onLoad
+  modules:
+  - white-label

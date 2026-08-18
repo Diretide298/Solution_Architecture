@@ -78,7 +78,7 @@ screens:
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
 - id: ACC-002
   name: Registration Form
-  module: Applicant Journey
+  module: approvals
   wave: 3
   layout:
     template: form
@@ -119,6 +119,8 @@ screens:
     contract: approvals
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
+  modules:
+  - approvals
 - id: ACC-003
   name: Application Review & Submit
   module: Applicant Journey
@@ -194,7 +196,7 @@ screens:
   purpose: Find application status tracking for this venue.
 - id: ACC-005
   name: Accreditation Badge
-  module: Applicant Journey
+  module: approvals
   wave: 3
   layout:
     template: detail
@@ -235,9 +237,11 @@ screens:
     contract: approvals
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
+  modules:
+  - approvals
 - id: ACC-006
   name: Reviewer Queue
-  module: Reviewer (Internal)
+  module: queue
   wave: 3
   layout:
     template: list
@@ -276,9 +280,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: Find the right one quickly, and act on it without opening it.
+  modules:
+  - queue
 - id: ACC-007
   name: Reviewer Application Detail
-  module: Reviewer (Internal)
+  module: approvals
   wave: 3
   layout:
     template: detail
@@ -323,6 +329,8 @@ screens:
     contract: approvals
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
+  modules:
+  - approvals
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)

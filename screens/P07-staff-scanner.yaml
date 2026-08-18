@@ -41,7 +41,7 @@ platform:
 screens:
 - id: SCN-001
   name: Sign in
-  module: Access
+  module: shift
   purpose: PIN or badge. Session carries the workstation.
   capability: C00
   wave: 1
@@ -160,9 +160,12 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
+  modules:
+  - shift
+  - identity
 - id: SCN-002
   name: Access point & direction
-  module: Access
+  module: access
   purpose: Confirm what this device is doing before it does it.
   capability: C00
   wave: 1
@@ -223,9 +226,11 @@ screens:
     contract: access
     purpose: Update an access point
     trigger: onAction
+  modules:
+  - access
 - id: SCN-003
   name: Ready to scan
-  module: Access
+  module: access
   purpose: The screen the device sits on all day.
   capability: C00
   wave: 1
@@ -290,9 +295,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-004
   name: Admitted
-  module: Access
+  module: access
   purpose: Readable at arm's length, gone in 1.5s.
   capability: C00
   wave: 1
@@ -364,9 +371,12 @@ screens:
     contract: cross-cell
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
+  modules:
+  - access
+  - cross-cell
 - id: SCN-005
   name: Denied
-  module: Access
+  module: access
   purpose: A reason and a next action, never a boolean.
   capability: C00
   wave: 1
@@ -431,9 +441,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-006
   name: Override
-  module: Access
+  module: access
   purpose: The operation most likely to be examined after an incident.
   capability: C00
   wave: 1
@@ -497,9 +509,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-007
   name: Group admission
-  module: Access
+  module: access
   purpose: Partial admission is the normal case, not the error.
   capability: C00
   wave: 1
@@ -562,9 +576,11 @@ screens:
     contract: access
     purpose: Validate media at an access point and admit or deny
     trigger: onAction
+  modules:
+  - access
 - id: SCN-008
   name: Manual entry
-  module: Access
+  module: access
   purpose: Damaged media, dead phone battery, printed slip.
   capability: C00
   wave: 1
@@ -628,9 +644,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-009
   name: Ticket lookup
-  module: Access
+  module: access
   purpose: Reads. Does not admit, does not decrement.
   capability: C00
   wave: 1
@@ -693,9 +711,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-010
   name: Blacklisted
-  module: Access
+  module: access
   purpose: Denies outright regardless of entitlement.
   capability: C00
   wave: 1
@@ -742,9 +762,11 @@ screens:
     contract: access
     purpose: Remove a blacklist entry
     trigger: onAction
+  modules:
+  - access
 - id: SCN-011
   name: Delegated right
-  module: Access
+  module: cross-cell
   purpose: A ticket issued in another cell, redeemed here.
   capability: C00
   wave: 1
@@ -788,9 +810,11 @@ screens:
     contract: cross-cell
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
+  modules:
+  - cross-cell
 - id: SCN-012
   name: Offline scanning
-  module: Access
+  module: access
   purpose: Same loop, different truth. Amber says so.
   capability: C00
   wave: 1
@@ -853,9 +877,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-013
   name: Offline journal
-  module: Access
+  module: access
   purpose: What the device decided, before anyone confirmed it.
   capability: C00
   wave: 1
@@ -918,9 +944,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-014
   name: Sync & reconciliation
-  module: Access
+  module: access
   purpose: The screen nobody designs and everybody needs.
   capability: C00
   wave: 1
@@ -993,9 +1021,12 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
+  - orders
 - id: SCN-015
   name: Offline package
-  module: Access
+  module: access
   purpose: Rule changes land here, not instantly.
   capability: C00
   wave: 1
@@ -1059,9 +1090,11 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
+  modules:
+  - access
 - id: SCN-016
   name: Gate mode
-  module: Access
+  module: access
   purpose: Podium operation. Changes what the gate does.
   capability: C00
   wave: 1
@@ -1121,3 +1154,5 @@ screens:
     contract: access
     purpose: Update an access point
     trigger: onAction
+  modules:
+  - access

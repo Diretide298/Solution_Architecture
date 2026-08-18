@@ -43,7 +43,7 @@ platform:
 screens:
 - id: GST-001
   name: Home – Default
-  module: TODO
+  module: white-label
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -84,9 +84,11 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - white-label
 - id: GST-002
   name: Explore Categories
-  module: TODO
+  module: catalogue
   purpose: Find explore categories for this venue.
   wave: 1
   layout:
@@ -128,9 +130,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  modules:
+  - catalogue
 - id: GST-003
   name: Attractions List
-  module: TODO
+  module: catalogue
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -176,9 +180,12 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  modules:
+  - catalogue
+  - queue
 - id: GST-004
   name: Attraction Details
-  module: TODO
+  module: catalogue
   purpose: See attraction details for this venue.
   wave: 1
   layout:
@@ -226,9 +233,12 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  modules:
+  - catalogue
+  - queue
 - id: GST-005
   name: What's On
-  module: TODO
+  module: catalogue
   purpose: Find what's on for this venue.
   wave: 1
   layout:
@@ -272,9 +282,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  modules:
+  - catalogue
 - id: GST-006
   name: Event / Exhibition Details
-  module: TODO
+  module: catalogue
   purpose: See event / exhibition details for this venue.
   wave: 1
   layout:
@@ -318,9 +330,11 @@ screens:
     contract: catalogue
     purpose: Read a product
     trigger: onLoad
+  modules:
+  - catalogue
 - id: GST-007
   name: Select Date & Time
-  module: TODO
+  module: catalogue
   purpose: See select date & time for this venue.
   wave: 1
   layout:
@@ -367,9 +381,11 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
+  modules:
+  - catalogue
 - id: GST-008
   name: Tickets & Add-ons
-  module: TODO
+  module: orders
   purpose: Find tickets & add-ons for this venue.
   wave: 1
   layout:
@@ -411,9 +427,11 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: GST-009
   name: Review & Payment
-  module: TODO
+  module: orders
   purpose: Check what you are buying and pay for it.
   wave: 1
   layout:
@@ -478,9 +496,11 @@ screens:
     and F11 routed food payment through the AI concierge instead. **Card only, so tender currency equals
     base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not
     ours and is not recorded as ours.
+  modules:
+  - orders
 - id: GST-010
   name: Booking Confirmation
-  module: TODO
+  module: orders
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 1
   layout:
@@ -520,9 +540,11 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: GST-011
   name: Wallet Overview
-  module: TODO
+  module: retail
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -569,9 +591,11 @@ screens:
     contract: retail
     purpose: Wallet transaction history
     trigger: onLoad
+  modules:
+  - retail
 - id: GST-012
   name: My Tickets
-  module: TODO
+  module: orders
   purpose: Find my tickets for this venue.
   wave: 1
   layout:
@@ -613,9 +637,11 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: GST-013
   name: Ticket Details
-  module: TODO
+  module: orders
   purpose: Find ticket details for this venue.
   wave: 1
   layout:
@@ -657,9 +683,11 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: GST-014
   name: Ticket Transfer
-  module: TODO
+  module: orders
   purpose: Work with ticket transfer for this venue.
   wave: 2
   layout:
@@ -706,9 +734,11 @@ screens:
     contract: orders
     purpose: Claim transferred tickets
     trigger: onAction
+  modules:
+  - orders
 - id: GST-015
   name: Memberships
-  module: TODO
+  module: cross-cell
   purpose: Find memberships for this venue.
   wave: 2
   layout:
@@ -756,9 +786,12 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - cross-cell
+  - catalogue
 - id: GST-016
   name: My Reservations
-  module: TODO
+  module: orders
   purpose: Find my reservations for this venue.
   wave: 2
   layout:
@@ -806,9 +839,11 @@ screens:
     contract: orders
     purpose: Cancel a reservation
     trigger: onAction
+  modules:
+  - orders
 - id: GST-017
   name: Reservation Details
-  module: TODO
+  module: orders
   purpose: See reservation details for this venue.
   wave: 2
   layout:
@@ -852,9 +887,11 @@ screens:
     contract: orders
     purpose: Cancel a reservation
     trigger: onAction
+  modules:
+  - orders
 - id: GST-018
   name: Add to Calendar / Reminders
-  module: TODO
+  module: orders
   purpose: Find add to calendar / reminders for this venue.
   wave: 3
   layout:
@@ -900,9 +937,11 @@ screens:
     contract: orders
     purpose: List orders
     trigger: onLoad
+  modules:
+  - orders
 - id: GST-019
   name: Order History (Wallet)
-  module: TODO
+  module: orders
   purpose: Find order history (wallet) for this venue.
   wave: 2
   layout:
@@ -943,9 +982,11 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: GST-020
   name: Saved Items / Wishlist
-  module: TODO
+  module: marketing-crm
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -1011,9 +1052,11 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: GST-021
   name: Interactive Map
-  module: TODO
+  module: catalogue
   purpose: See where things are in relation to each other.
   wave: 2
   layout:
@@ -1058,9 +1101,12 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  modules:
+  - catalogue
+  - queue
 - id: GST-022
   name: Attraction Wait Times
-  module: TODO
+  module: queue
   purpose: See attraction wait times for this venue.
   wave: 2
   layout:
@@ -1105,9 +1151,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
     with the queue platform F21 runs on.
+  modules:
+  - queue
 - id: GST-023
   name: Virtual Queue / Join Queue
-  module: TODO
+  module: queue
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -1155,9 +1203,11 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - queue
 - id: GST-024
   name: F&B – Browse & Order
-  module: TODO
+  module: fnb
   purpose: Order food to where the guest is sitting, or for collection.
   wave: 2
   layout:
@@ -1220,9 +1270,11 @@ screens:
     - GST-003
     - GST-009
     fromFlows: true
+  modules:
+  - fnb
 - id: GST-025
   name: F&B – Order Tracking
-  module: TODO
+  module: fnb
   purpose: Track an order to the point it reaches the guest.
   wave: 2
   layout:
@@ -1273,9 +1325,11 @@ screens:
     - GST-002
     - GST-003
     fromFlows: true
+  modules:
+  - fnb
 - id: GST-026
   name: Retail / Merchandise
-  module: TODO
+  module: games
   purpose: Find retail / merchandise for this venue.
   wave: 2
   layout:
@@ -1325,9 +1379,12 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - games
+  - retail
 - id: GST-027
   name: Parking – Reserve & Pay
-  module: TODO
+  module: access
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 3
   layout:
@@ -1375,9 +1432,11 @@ screens:
     contract: access
     purpose: Change the plate, or revoke
     trigger: onAction
+  modules:
+  - access
 - id: GST-028
   name: Parking – Reservation Confirmed
-  module: TODO
+  module: access
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 3
   layout:
@@ -1424,9 +1483,11 @@ screens:
     contract: access
     purpose: Car parks at a venue, and how each integrates
     trigger: onLoad
+  modules:
+  - access
 - id: GST-029
   name: Venue Info & Services
-  module: TODO
+  module: fnb
   purpose: See venue info & services for this venue.
   wave: 2
   layout:
@@ -1472,9 +1533,11 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - fnb
 - id: GST-030
   name: In-Venue Notifications
-  module: TODO
+  module: fnb
   purpose: Work with in-venue notifications for this venue.
   wave: 2
   layout:
@@ -1518,9 +1581,11 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - fnb
 - id: GST-031
   name: AI Concierge – Home
-  module: TODO
+  module: fnb
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -1570,9 +1635,12 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error.
+  modules:
+  - fnb
+  - ai
 - id: GST-032
   name: AI Concierge – Chat
-  module: TODO
+  module: orders
   purpose: Add ai concierge – chat for this venue.
   wave: 2
   layout:
@@ -1646,9 +1714,14 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error.
+  modules:
+  - orders
+  - fnb
+  - marketing-crm
+  - ai
 - id: GST-033
   name: AI Concierge – Contextual Help
-  module: TODO
+  module: ai
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -1696,9 +1769,11 @@ screens:
     contract: ai
     purpose: Ask
     trigger: onAction
+  modules:
+  - ai
 - id: GST-034
   name: Lost & Found
-  module: TODO
+  module: fnb
   purpose: See lost & found for this venue.
   wave: 2
   layout:
@@ -1743,9 +1818,11 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - fnb
 - id: GST-035
   name: Feedback & Ratings
-  module: TODO
+  module: marketing-crm
   purpose: Work with feedback & ratings for this venue.
   wave: 3
   layout:
@@ -1785,9 +1862,11 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - marketing-crm
 - id: GST-036
   name: Loyalty & Rewards
-  module: TODO
+  module: marketing-crm
   purpose: Your points, your tier, and what is within reach.
   wave: 2
   layout:
@@ -1834,9 +1913,11 @@ screens:
     contract: marketing-crm
     purpose: List loyalty programmes
     trigger: onLoad
+  modules:
+  - marketing-crm
 - id: GST-037
   name: Offers & Promotions
-  module: TODO
+  module: promotions
   purpose: Find offers & promotions for this venue.
   wave: 2
   layout:
@@ -1886,9 +1967,11 @@ screens:
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
+  modules:
+  - promotions
 - id: GST-038
   name: Digital Companion Mode
-  module: TODO
+  module: white-label
   purpose: 'The in-venue home: your tickets, the map, and what is near you.'
   wave: 3
   layout:
@@ -1938,9 +2021,13 @@ screens:
     August — it reads as a framing for the in-venue capabilities rather than a capability of its own,
     and CF-92 asks whether it is a real screen or a name for a mode.'
   provenance: none — see CF-92
+  modules:
+  - white-label
+  - queue
+  - catalogue
 - id: GST-039
   name: Profile
-  module: TODO
+  module: marketing-crm
   purpose: What we hold about a guest, and what they can change.
   wave: 1
   layout:
@@ -1982,9 +2069,11 @@ screens:
     contract: marketing-crm
     purpose: Record a consent decision
     trigger: onAction
+  modules:
+  - marketing-crm
 - id: GST-040
   name: Help & Support
-  module: TODO
+  module: white-label
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -2038,9 +2127,12 @@ screens:
     contract: marketing-crm
     purpose: Raise a service case
     trigger: onAction
+  modules:
+  - white-label
+  - marketing-crm
 - id: GST-041
   name: Checkout Entry
-  module: TODO
+  module: orders
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 1
   layout:
@@ -2087,9 +2179,11 @@ screens:
     contract: orders
     purpose: Turn the cart into an order
     trigger: onAction
+  modules:
+  - orders
 - id: GST-042
   name: Simple Registration & OTP
-  module: TODO
+  module: identity
   purpose: Work with simple registration & otp for this venue.
   wave: 1
   layout:
@@ -2209,6 +2303,8 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - identity
 - id: GST-043
   name: Arabic / RTL Experience
   module: TODO
@@ -2251,7 +2347,7 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-044
   name: Multi-Currency & Pricing
-  module: TODO
+  module: finance
   purpose: See prices in your own currency, in the app, before and during the visit.
   wave: 2
   layout:
@@ -2307,9 +2403,12 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  modules:
+  - finance
+  - catalogue
 - id: GST-045
   name: Ticket Delivery & Sharing
-  module: TODO
+  module: orders
   purpose: Find ticket delivery & sharing for this venue.
   wave: 2
   layout:
@@ -2352,9 +2451,11 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: GST-046
   name: Branded Queue / Waiting Room
-  module: TODO
+  module: queue
   purpose: Find branded queue / waiting room for this venue.
   wave: 1
   layout:
@@ -2396,9 +2497,11 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - queue
 - id: GST-047
   name: Maintenance / Upgrade Page
-  module: TODO
+  module: white-label
   purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
@@ -2439,9 +2542,11 @@ screens:
   notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel
     7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not
     two screens. Both had the same single operation and the same purpose.
+  modules:
+  - white-label
 - id: GST-048
   name: Upsell / Cross-Sell
-  module: TODO
+  module: orders
   purpose: See upsell / cross-sell for this venue.
   wave: 2
   layout:
@@ -2487,9 +2592,12 @@ screens:
     contract: promotions
     purpose: Suggestions for a cart
     trigger: onAction
+  modules:
+  - orders
+  - promotions
 - id: GST-049
   name: Interactive Seat Selection
-  module: TODO
+  module: seating
   purpose: See interactive seat selection for this venue.
   wave: 2
   layout:
@@ -2536,9 +2644,11 @@ screens:
     contract: seating
     purpose: Recommend seats for a party
     trigger: onAction
+  modules:
+  - seating
 - id: GST-050
   name: Resource Booking – Cabana
-  module: TODO
+  module: catalogue
   purpose: Book a cabana or other capacity-based resource.
   wave: 3
   layout:
@@ -2592,9 +2702,12 @@ screens:
     purpose: Live remaining capacity
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.8
+  modules:
+  - catalogue
+  - orders
 - id: GST-051
   name: Plan Your Adventure – Start
-  module: TODO
+  module: queue
   purpose: Start a plan for the visit — which attractions, in what order — before arriving.
   wave: 3
   layout:
@@ -2641,9 +2754,12 @@ screens:
     purpose: List products
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
+  modules:
+  - queue
+  - catalogue
 - id: GST-052
   name: Suggested Itineraries
-  module: TODO
+  module: catalogue
   purpose: Curated plans a guest can take rather than build.
   wave: 3
   layout:
@@ -2690,9 +2806,11 @@ screens:
     purpose: List published bundles
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
+  modules:
+  - catalogue
 - id: GST-053
   name: Build Your Own Itinerary
-  module: TODO
+  module: orders
   purpose: Choose the attractions and the order yourself.
   wave: 3
   layout:
@@ -2747,9 +2865,13 @@ screens:
     purpose: Wait times across a venue
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
+  modules:
+  - orders
+  - catalogue
+  - queue
 - id: GST-054
   name: AI Optimized Itinerary
-  module: TODO
+  module: queue
   purpose: Let the assistant order the day around waits and opening times.
   wave: 3
   layout:
@@ -2803,9 +2925,13 @@ screens:
     purpose: Ask
     trigger: onAction
   provenance: MoM 10 August 2026 §4.9
+  modules:
+  - queue
+  - catalogue
+  - ai
 - id: GST-055
   name: Dynamic QR Ticket
-  module: TODO
+  module: orders
   purpose: Find dynamic qr ticket for this venue.
   wave: 1
   layout:
@@ -2847,9 +2973,11 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  modules:
+  - orders
 - id: GST-056
   name: Bundle Package
-  module: TODO
+  module: catalogue
   purpose: See bundle package for this venue.
   wave: 2
   layout:
@@ -2897,9 +3025,13 @@ screens:
     contract: orders
     purpose: Add something
     trigger: onAction
+  modules:
+  - catalogue
+  - promotions
+  - orders
 - id: GST-057
   name: Accessibility Information
-  module: TODO
+  module: white-label
   purpose: Step-free routes, facilities and what to expect.
   wave: 2
   layout:
@@ -2942,9 +3074,11 @@ screens:
     purpose: List custom content pages
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.1
+  modules:
+  - white-label
 - id: GST-058
   name: Resource Availability (Cabana)
-  module: TODO
+  module: catalogue
   purpose: See which cabanas are free, by area and date, before choosing one.
   wave: 3
   layout:
@@ -2993,9 +3127,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  modules:
+  - catalogue
 - id: GST-059
   name: Plan My Day – In Progress
-  module: TODO
+  module: queue
   purpose: The plan while you are in the venue, against live waits.
   wave: 3
   layout:
@@ -3042,9 +3178,12 @@ screens:
     purpose: List products
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
+  modules:
+  - queue
+  - catalogue
 - id: GST-061
   name: Menu Item Detail
-  module: In-Venue Experience
+  module: fnb
   purpose: Decide on a dish, choose modifiers, check allergens.
   capability: C05
   wave: 2
@@ -3088,9 +3227,11 @@ screens:
     exitTo:
     - GST-001
     - GST-062
+  modules:
+  - fnb
 - id: GST-062
   name: Shop & Drop Collection
-  module: In-Venue Experience
+  module: retail
   purpose: Collect shopping left earlier, using the ticket rather than a receipt.
   capability: C21
   wave: 3
@@ -3130,9 +3271,11 @@ screens:
     contract: retail
     purpose: Find a guest's dropped goods
     trigger: onLoad
+  modules:
+  - retail
 - id: GST-063
   name: Search
-  module: Discovery
+  module: catalogue
   purpose: Find something when you do not know what it is called.
   capability: C00
   wave: 1
@@ -3167,9 +3310,11 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.
+  modules:
+  - catalogue
 - id: GST-065
   name: Newsletter & Preferences
-  module: Marketing
+  module: marketing-crm
   purpose: What we may send you, and how.
   capability: C00
   wave: 3
@@ -3209,3 +3354,5 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with WEB-027. **Not on the wireframe board** — needs drawing. CF-93.
+  modules:
+  - marketing-crm
