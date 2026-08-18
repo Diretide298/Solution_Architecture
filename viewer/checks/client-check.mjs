@@ -199,6 +199,17 @@ console.log('\nread-only');
     }),
   });
   ok(wrote.status === 403, `POST /api/validation as a client → ${wrote.status} (want 403)`);
+
+  // Marking a verdict complete is a second way to write, added after the first
+  // and easy to leave open — it changes a row rather than inserting one, which
+  // is exactly the shape of thing that gets a different decorator by accident.
+  const closed = await fetch(`${API}/api/verdicts/1/done`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie: clientCookie },
+    body: JSON.stringify({ done: true }),
+  });
+  ok(closed.status === 403,
+     `POST /api/verdicts/1/done as a client → ${closed.status} (want 403)`);
 }
 
 // ── tidy up ───────────────────────────────────────────────────────────

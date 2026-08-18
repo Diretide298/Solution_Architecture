@@ -3116,7 +3116,7 @@ function renderBoardPage(board) {
     body.append(row);
   }
 
-  body.append(auth.verdictBlock('board', board.id, board.name));
+  body.append(auth.verdictBlock('board', board.id, board.name, { layer: 'frontend' }));
 
   const others = boards().filter((b) => b.id !== board.id);
   if (others.length) {
@@ -3446,7 +3446,7 @@ function renderScreen() {
   }
   if (screen.notes) body.append(el('div', 'journey-questions', screen.notes));
 
-  body.append(auth.verdictBlock('screen', screen.id, `${screen.id} ${screen.name}`));
+  body.append(auth.verdictBlock('screen', screen.id, `${screen.id} ${screen.name}`, { layer: 'frontend' }));
 
   markTreeSelection();
   renderSidePane();
@@ -5773,6 +5773,13 @@ function renderTableLinks() {
     return;
   }
 
+  // First in the rail, not last. It sat under "Operations that touch it",
+  // "Foreign keys", "Inferred keys" and "Keys with no table" — four sections
+  // long enough that on a table of any size the review was below the fold, and
+  // the backend schema read as the one layer with no sign-off at all. Nothing
+  // about it changed except where it is.
+  pane.append(auth.verdictBlock('table', table.name, table.name, { layer: 'backend' }));
+
   // ---- what reaches this table -------------------------------------------
   // The workbook's Where used sheet, whose own subtitle is the reason to lead
   // with it: what breaks if this table changes. A foreign key says what this
@@ -5950,8 +5957,6 @@ function renderTableLinks() {
       pane.append(row);
     }
   }
-
-  pane.append(auth.verdictBlock('table', table.name));
 }
 
 function sectionHead(title, count) {
@@ -6300,7 +6305,7 @@ async function renderReader(node, { scroll = true } = {}) {
   const validation = $('reader-validation');
   validation.innerHTML = '';
   if (node.type === 'operation') {
-    validation.append(auth.verdictBlock('operation', node.name, `${node.method} ${node.path}`));
+    validation.append(auth.verdictBlock('operation', node.name, `${node.method} ${node.path}`, { layer: 'contracts' }));
   }
 
   // metadata badges

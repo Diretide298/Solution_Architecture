@@ -309,3 +309,255 @@ a.member-id:hover { color: var(--accent); }
   .gap-row, .gap-row-quiet { grid-template-columns: minmax(0, 1fr); gap: 3px; }
   .stuck-row { grid-template-columns: minmax(0, 1fr); gap: 3px; }
 }
+
+/* ── the modules page ──────────────────────────────────────────────────
+   One card per delivery module. Shares this stylesheet with the domains
+   page because both answer the same shape of question — a rollup across
+   the layers rather than a view of one — and two files would drift. */
+
+.domain-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: var(--panel);
+}
+
+.domain-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.domain-card-name { font-weight: 600; font-size: 14px; }
+
+.domain-card-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.domain-fact { display: flex; align-items: baseline; gap: 5px; }
+.domain-fact b { font-size: 13px; color: var(--text); }
+
+.domain-card details { margin-top: 10px; font-size: 12px; }
+.domain-card summary { cursor: pointer; color: var(--text-dim); }
+.domain-card summary:hover { color: var(--text); }
+
+/* The dark operations, listed rather than counted — the names are what a
+   reader takes to the person who can say whether a page is missing. */
+.domain-card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.domain-card-list code {
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text-dim);
+}
+
+/* ── the platforms page ───────────────────────────────────────────────
+   A worklist, so the eye goes to the badge first: the number of things
+   missing is the only column that decides whether the card gets opened. */
+.plat-card {
+  border: 1px solid var(--line, #2a2f3a);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: var(--panel-2, #14171e);
+}
+.plat-card.plat-clean { opacity: 0.72; }
+.plat-card.open { opacity: 1; border-color: var(--accent, #6aa7ff); }
+
+.plat-head {
+  display: grid;
+  grid-template-columns: 46px minmax(140px, 1fr) minmax(140px, 1fr) minmax(160px, auto) 96px;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 11px 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.plat-head:hover { background: rgba(255, 255, 255, 0.03); }
+
+.plat-code {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 12px;
+  color: var(--muted, #8b93a7);
+}
+.plat-name { font-weight: 600; }
+.plat-app,
+.plat-counts { font-size: 12px; color: var(--muted, #8b93a7); }
+
+.plat-gap-badge {
+  justify-self: end;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(248, 113, 113, 0.14);
+  color: #f87171;
+}
+.plat-gap-badge.none {
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+}
+
+.plat-body {
+  padding: 4px 14px 14px;
+  border-top: 1px solid var(--line, #2a2f3a);
+}
+.plat-none { margin-top: 10px; }
+
+.plat-waves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 10px 0 4px;
+}
+.plat-waves-label { font-size: 12px; color: var(--muted, #8b93a7); }
+.plat-wave {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.plat-gap { margin-top: 16px; }
+.plat-gap-head { font-weight: 600; font-size: 13px; }
+.plat-gap-rows {
+  margin-top: 6px;
+  border: 1px solid var(--line, #2a2f3a);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.plat-gap-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.2fr) minmax(90px, 0.7fr) 52px minmax(0, 2fr);
+  gap: 10px;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.plat-gap-row:last-child { border-bottom: 0; }
+.plat-gap-a { font-family: var(--mono, ui-monospace, monospace); }
+.plat-gap-b,
+.plat-gap-c,
+.plat-gap-d { color: var(--muted, #8b93a7); }
+.plat-gap-more {
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--muted, #8b93a7);
+}
+
+@media (max-width: 860px) {
+  .plat-head { grid-template-columns: 40px 1fr 84px; }
+  .plat-app,
+  .plat-counts { display: none; }
+  .plat-gap-row { grid-template-columns: 1fr 1fr; }
+  .plat-gap-c, .plat-gap-d { display: none; }
+}
+
+/* ── what changed ─────────────────────────────────────────────────────
+   The headline reads as a row of deltas, because that is how it gets
+   repeated out loud. Everything under it is evidence. */
+.chg-pick-label { margin: 0 4px 0 0; align-self: center; }
+
+.chg-headline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chg-stat {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+}
+.chg-stat.up { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+.chg-stat.down { color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+
+.chg-fact { margin-bottom: 18px; }
+.chg-fact:last-child { margin-bottom: 0; }
+.chg-fact-head {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.chg-fact-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.chg-names {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 12px;
+  color: var(--muted, #8b93a7);
+  word-break: break-word;
+}
+
+.chg-tag {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.chg-tag.add { background: rgba(74, 222, 128, 0.14); color: #4ade80; }
+.chg-tag.del { background: rgba(248, 113, 113, 0.14); color: #f87171; }
+.chg-tag.chg { background: rgba(106, 167, 255, 0.14); color: #6aa7ff; }
+
+.chg-col-rows,
+.chg-file-rows {
+  border: 1px solid var(--line, #2a2f3a);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.chg-col-row,
+.chg-file-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 96px;
+  gap: 10px;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.chg-file-row { grid-template-columns: 24px minmax(0, 1fr) 92px; }
+.chg-col-row:last-child,
+.chg-file-row:last-child { border-bottom: 0; }
+.chg-col-name,
+.chg-file-name {
+  font-family: var(--mono, ui-monospace, monospace);
+  overflow-wrap: anywhere;
+}
+.chg-col-was,
+.chg-file-size {
+  color: var(--muted, #8b93a7);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.chg-col-more {
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--muted, #8b93a7);
+}

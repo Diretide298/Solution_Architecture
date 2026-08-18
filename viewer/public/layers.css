@@ -1607,3 +1607,146 @@ body[data-layer="decisions"] { --layer: #a78bfa; --layer-soft: rgba(167, 139, 25
   }
   .admin-when { grid-column: 1 / -1; }
 }
+
+/* ── the review table ─────────────────────────────────────────────────
+   A log read as a table: every column sortable, the note given room
+   because it is the part worth reading, and completed rows dimmed rather
+   than removed so "was this ever dealt with" stays answerable. */
+.review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  table-layout: fixed;
+}
+.review-table th,
+.review-table td {
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-wrap: anywhere;
+}
+.review-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel, #14171e);
+  border-bottom: 1px solid var(--line, #2a2f3a);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted, #8b93a7);
+  white-space: nowrap;
+}
+.review-table thead th.sorted { color: var(--text, #e6e9ef); }
+
+.rt-sort {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.rt-sort:hover { color: var(--text, #e6e9ef); }
+.rt-arrow { margin-left: 4px; }
+
+.review-row:hover { background: rgba(255, 255, 255, 0.025); }
+/* Dimmed, not hidden. The filter above is how somebody says they want only
+   the open ones; this is how the table still shows that work was finished. */
+.review-row.done { opacity: 0.5; }
+
+.rt-when { width: 108px; }
+.rt-verdict { width: 96px; }
+.rt-tag { width: 88px; }
+.rt-kind { width: 84px; }
+.rt-artefact { width: 17%; }
+.rt-note { width: auto; }
+.rt-who { width: 120px; }
+.rt-done { width: 132px; }
+
+.rt-when-text,
+.rt-kind-text,
+.rt-who-text { color: var(--muted, #8b93a7); white-space: nowrap; }
+.rt-artefact-link {
+  font-family: var(--mono, ui-monospace, monospace);
+  color: var(--accent, #6aa7ff);
+  text-decoration: none;
+}
+.rt-artefact-link:hover { text-decoration: underline; }
+.rt-note-text { color: var(--text, #e6e9ef); }
+.rt-none { color: var(--muted, #8b93a7); opacity: 0.7; font-style: italic; }
+
+/* Which side of the house it lands on. Same two colours everywhere they
+   appear — here, on the verdict block, and in the export legend. */
+.verdict-tag-chip,
+.rt-done-chip,
+.rt-open-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.verdict-tag-chip.frontend { background: rgba(167, 139, 250, 0.16); color: #a78bfa; }
+.verdict-tag-chip.backend { background: rgba(45, 212, 191, 0.16); color: #2dd4bf; }
+.rt-done-chip { background: rgba(74, 222, 128, 0.14); color: #4ade80; }
+.rt-open-chip { background: rgba(255, 255, 255, 0.06); color: var(--muted, #8b93a7); }
+
+.rt-done-stamp { display: block; }
+.rt-done-by {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted, #8b93a7);
+}
+.rt-done-button { margin-top: 5px; font-size: 11px; padding: 2px 8px; }
+
+/* The tag picker on the verdict form. */
+.verdict-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.verdict-tag-label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted, #8b93a7);
+}
+.verdict-tag-buttons { display: flex; gap: 4px; }
+.chip.verdict-tag { font-size: 11px; padding: 2px 10px; opacity: 0.6; }
+.chip.verdict-tag.chosen { opacity: 1; }
+.chip.verdict-tag.frontend.chosen {
+  background: rgba(167, 139, 250, 0.18);
+  color: #a78bfa;
+  border-color: rgba(167, 139, 250, 0.4);
+}
+.chip.verdict-tag.backend.chosen {
+  background: rgba(45, 212, 191, 0.18);
+  color: #2dd4bf;
+  border-color: rgba(45, 212, 191, 0.4);
+}
+.verdict-done-chip {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(74, 222, 128, 0.14);
+  color: #4ade80;
+}
+
+@media (max-width: 1100px) {
+  .rt-kind, .rt-who { display: none; }
+}
+
+/* Inside the table the verdict is a label, not a paragraph: "Needs work"
+   wrapped to two lines and broke out of its own pill. */
+.review-table .verdict-chip { white-space: nowrap; }

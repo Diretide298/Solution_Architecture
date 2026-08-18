@@ -32,7 +32,23 @@ const svgEl = (tag, attrs = {}) => {
 const VERDICTS = ['approved', 'needs-work', 'rejected'];
 const LABEL = { approved: 'Approved', 'needs-work': 'Needs work', rejected: 'Rejected' };
 const COLOUR = { approved: '#4ade80', 'needs-work': '#fbbf24', rejected: '#f87171' };
-const KINDS = { operation: 'APIs', table: 'Tables', screen: 'Wireframes', board: 'Boards' };
+const KINDS = {
+  operation: 'APIs', table: 'Tables', screen: 'Wireframes',
+  board: 'Boards', module: 'Modules',
+};
+
+// Where the reviewer was standing. Recorded on the verdict rather than derived
+// from its kind, so "how much of the frontend is signed off" can be asked
+// separately from "how much of the backend is" — which is the question a
+// delivery meeting asks and the kind alone was answering only by coincidence.
+const LAYERS = {
+  frontend: 'Frontend', contracts: 'Contracts', domain: 'Domain',
+  backend: 'Backend', modules: 'Modules', decisions: 'Decisions',
+};
+
+// Which side has to act on it, as the reviewer said rather than as the kind
+// implies. Two values, because the question is whose queue it is in.
+const TAGS = { frontend: 'Frontend', backend: 'Backend' };
 
 const DAY = 86400000;
 const when = (iso) => new Date(iso);
@@ -62,7 +78,11 @@ const median = (xs) => {
 const state = {
   all: [],
   accounts: [],
-  filter: { kind: '', verdict: '', person: '', window: '', text: '' },
+  filter: { kind: '', layer: '', tag: '', done: '', verdict: '', person: '', window: '', text: '' },
+  // Newest first, which is what a log is. Every column is sortable because the
+  // question changes: "what happened today" wants time, "what is still open"
+  // wants status, and "what did Asha say about the POS" wants the artefact.
+  sort: { key: 'at', dir: -1 },
 };
 
 // ── filtering ────────────────────────────────────────────────────────
@@ -73,6 +93,12 @@ function filtered() {
   const cutoff = f.window ? Date.now() - Number(f.window) * DAY : null;
   return state.all.filter((v) => {
     if (f.kind && v.target_kind !== f.kind) return false;
+    if (f.layer && (v.layer || '') !== f.layer) return false;
+    if (f.tag && (v.tag || '') !== f.tag) return false;
+    // "Open" is the absence of a completion date, not a flag — so a row that
+    // was marked done and then reopened reads as open again with no third state.
+    if (f.done === 'done' && !v.done_at) return false;
+    if (f.done === 'open' && v.done_at) return false;
     if (f.verdict && v.verdict !== f.verdict) return false;
     if (f.person && String(v.account_id) !== f.person) return false;
     if (cutoff && when(v.at).getTime() < cutoff) return false;
@@ -110,6 +136,16 @@ function renderHeadline(rows) {
     `${(rows.length / Math.max(artefacts.size, 1)).toFixed(1)} responses each`));
   box.append(stat(revisions, 'revisions',
     revisions ? 'someone changed their mind' : 'nothing has been revisited'));
+
+  // The only number on this strip that goes down. Counted over everything that
+  // asked for work — a rejection or a needs-work — because an approval is not
+  // a thing anybody has to come back and close.
+  const asked = rows.filter((v) => v.verdict !== 'approved');
+  const openWork = asked.filter((v) => !v.done_at).length;
+  box.append(stat(openWork, 'still open',
+    !asked.length ? 'nothing has been sent back'
+      : openWork ? `of ${asked.length} that asked for work`
+      : 'all of it has been marked done'));
   box.append(stat(
     `${Math.round((withNote / Math.max(rows.length, 1)) * 100)}%`,
     'gave a reason',
@@ -366,6 +402,51 @@ function renderPeople(rows) {
 
 // ── the list ─────────────────────────────────────────────────────────
 
+// The columns, in the order they get read: when it happened, what was said,
+// whose queue it lands in, what it was about, and whether anybody has been back
+// to it. `get` is both what is drawn and what is sorted on, so a column can
+// never sort by something other than what it shows.
+const COLUMNS = [
+  { key: 'at', label: 'When', cls: 'rt-when', get: (v) => when(v.at).getTime(),
+    draw: (v) => el('span', 'rt-when-text', fmt(when(v.at))) },
+  { key: 'verdict', label: 'Verdict', cls: 'rt-verdict', get: (v) => v.verdict,
+    draw: (v) => el('span', `verdict-chip ${v.verdict}`, LABEL[v.verdict] ?? v.verdict) },
+  { key: 'tag', label: 'Lands on', cls: 'rt-tag', get: (v) => v.tag ?? '',
+    draw: (v) => (v.tag
+      ? el('span', `verdict-tag-chip ${v.tag}`, TAGS[v.tag] ?? v.tag)
+      : el('span', 'rt-none', '—')) },
+  { key: 'target_kind', label: 'Kind', cls: 'rt-kind', get: (v) => v.target_kind,
+    draw: (v) => el('span', 'rt-kind-text', KINDS[v.target_kind] ?? v.target_kind) },
+  { key: 'target_id', label: 'Artefact', cls: 'rt-artefact', get: (v) => v.target_id,
+    draw: (v) => {
+      const link = el('a', 'rt-artefact-link', v.target_id);
+      link.href = `/#${encodeURIComponent(
+        v.target_kind === 'operation' ? v.target_id : `${v.target_kind}:${v.target_id}`)}`;
+      return link;
+    } },
+  { key: 'note', label: 'Why', cls: 'rt-note', get: (v) => v.note ?? '',
+    draw: (v) => (v.note
+      ? el('span', 'rt-note-text', v.note)
+      : el('span', 'rt-none', 'no reason given')) },
+  { key: 'by', label: 'Reviewer', cls: 'rt-who', get: (v) => v.by || v.by_email,
+    draw: (v) => el('span', 'rt-who-text', v.by || v.by_email) },
+];
+
+function sorted(rows) {
+  const col = COLUMNS.find((c) => c.key === state.sort.key)
+    ?? COLUMNS.find((c) => c.key === 'at');
+  const dir = state.sort.dir;
+  // A copy: `rows` is the filtered view and sorting it in place would reorder
+  // state.all through the shared references on the next pass.
+  return [...rows].sort((a, b) => {
+    const x = col.get(a);
+    const y = col.get(b);
+    if (x === y) return b.id - a.id;               // newest first inside a tie
+    if (typeof x === 'number' && typeof y === 'number') return (x - y) * dir;
+    return String(x).localeCompare(String(y)) * dir;
+  });
+}
+
 function renderRows(rows) {
   const host = $('rows');
   host.innerHTML = '';
@@ -376,15 +457,47 @@ function renderRows(rows) {
     return;
   }
 
+  const table = el('table', 'review-table');
+  const thead = el('thead');
+  const hrow = el('tr');
+  for (const col of COLUMNS) {
+    const th = el('th', `${col.cls}${state.sort.key === col.key ? ' sorted' : ''}`);
+    const button = el('button', 'rt-sort', col.label);
+    button.type = 'button';
+    if (state.sort.key === col.key) {
+      button.append(el('span', 'rt-arrow', state.sort.dir < 0 ? '▾' : '▴'));
+    }
+    button.onclick = () => {
+      // Clicking the sorted column reverses it; clicking another starts that
+      // one descending, because the first thing anybody wants from a new
+      // column is its largest or latest end.
+      if (state.sort.key === col.key) state.sort.dir *= -1;
+      else state.sort = { key: col.key, dir: -1 };
+      redraw();
+    };
+    th.append(button);
+    hrow.append(th);
+  }
+  // Not sortable: it is an action, and a column of buttons that reorders itself
+  // when pressed moves the next one out from under the cursor.
+  hrow.append(el('th', 'rt-done', 'Status'));
+  thead.append(hrow);
+  table.append(thead);
+
+  const body = el('tbody');
+  table.append(body);
+  host.append(table);
+
+  const ordered = sorted(rows);
   let shown = 0;
   const PAGE = 60;
   const more = el('button', 'lineage-more');
   more.type = 'button';
 
   const draw = () => {
-    for (const v of rows.slice(shown, shown + PAGE)) host.insertBefore(line(v), more);
-    shown += Math.min(PAGE, rows.length - shown);
-    const left = rows.length - shown;
+    for (const v of ordered.slice(shown, shown + PAGE)) body.append(tableRow(v));
+    shown += Math.min(PAGE, ordered.length - shown);
+    const left = ordered.length - shown;
     if (left > 0) more.textContent = `${left} more`;
     else more.remove();
   };
@@ -393,26 +506,78 @@ function renderRows(rows) {
   draw();
 }
 
-function line(v) {
-  const row = el('div', 'response-row');
-  row.append(el('span', `verdict-chip ${v.verdict}`, LABEL[v.verdict]));
-
-  const main = el('span', 'signoff-row-main');
-  const target = el('a', 'signoff-row-name', v.target_id);
-  target.href = `/#${encodeURIComponent(
-    v.target_kind === 'operation' ? v.target_id : `${v.target_kind}:${v.target_id}`)}`;
-  main.append(target);
-  if (v.note) main.append(el('span', 'response-note', v.note));
-  else main.append(el('span', 'response-note response-note-empty', 'no reason given'));
-  row.append(main);
-
-  row.append(el('span', 'signoff-row-group', KINDS[v.target_kind] ?? v.target_kind));
-
-  const who = el('span', 'signoff-row-who');
-  who.append(el('span', null, v.by || v.by_email));
-  who.append(el('span', 'signoff-row-when', fmt(when(v.at))));
-  row.append(who);
+function tableRow(v) {
+  const row = el('tr', `review-row${v.done_at ? ' done' : ''}`);
+  for (const col of COLUMNS) {
+    const cell = el('td', col.cls);
+    cell.append(col.draw(v));
+    row.append(cell);
+  }
+  row.append(doneCell(v));
   return row;
+}
+
+/**
+ * Mark complete, or put it back.
+ *
+ * The row is not removed when it is marked done — it is dimmed and stamped with
+ * who and when. A worklist that deletes what has been finished cannot answer
+ * "was this ever dealt with", which is the question asked three weeks later,
+ * and the filter above already gives anybody who wants only the open ones a way
+ * to say so.
+ */
+function doneCell(v) {
+  const cell = el('td', 'rt-done');
+  const me = auth.account();
+  const mayWrite = me && me.role !== 'client';
+
+  const stamp = el('span', 'rt-done-stamp');
+  const paint = () => {
+    stamp.innerHTML = '';
+    if (v.done_at) {
+      stamp.append(el('span', 'rt-done-chip', 'Done'));
+      stamp.append(el('span', 'rt-done-by',
+        `${v.done_by_name ? `${v.done_by_name} · ` : ''}${fmt(when(v.done_at))}`));
+    } else if (v.verdict === 'approved') {
+      stamp.append(el('span', 'rt-none', '—'));
+    } else {
+      stamp.append(el('span', 'rt-open-chip', 'Open'));
+    }
+  };
+  paint();
+  cell.append(stamp);
+
+  if (!mayWrite) return cell;
+  // An approval is not a thing anybody has to go and do, so there is nothing to
+  // close. Offering the button on one invites a tick that means nothing and
+  // makes the open count answer a different question than it says it does.
+  if (v.verdict === 'approved') return cell;
+
+  const button = el('button', 'chip rt-done-button', v.done_at ? 'Reopen' : 'Mark done');
+  button.type = 'button';
+  button.onclick = async () => {
+    button.disabled = true;
+    const want = !v.done_at;
+    try {
+      const result = await auth.markVerdictDone(v.id, want);
+      v.done_at = result.done_at;
+      v.done_by_name = result.done_by_name;
+      button.textContent = v.done_at ? 'Reopen' : 'Mark done';
+      button.closest('tr')?.classList.toggle('done', Boolean(v.done_at));
+      paint();
+      // The headline counts open work, so it has to hear about this. The rows
+      // are left alone deliberately: redrawing the table here would throw away
+      // the reader's scroll position on the row they just pressed.
+      renderHeadline(filtered());
+    } catch (error) {
+      $('error').textContent = error.message;
+      $('error').hidden = false;
+    } finally {
+      button.disabled = false;
+    }
+  };
+  cell.append(button);
+  return cell;
 }
 
 // ── controls ─────────────────────────────────────────────────────────
@@ -429,7 +594,21 @@ function segment(host, options, key) {
 }
 
 function renderControls() {
-  segment($('f-kind'), [['', 'All kinds'], ...Object.entries(KINDS)], 'kind');
+  // Only the kinds anything has actually been reviewed in — the same rule as
+  // the layers below. A button for a kind with nothing behind it says the
+  // review covers ground it has not been near.
+  const kinds = new Set(state.all.map((v) => v.target_kind));
+  segment($('f-kind'),
+    [['', 'All kinds'], ...Object.entries(KINDS).filter(([k]) => kinds.has(k))], 'kind');
+  // Only the layers anything has actually been reviewed in — six empty buttons
+  // would say the review is broader than it is.
+  const used = new Set(state.all.map((v) => v.layer).filter(Boolean));
+  if (used.size > 1) {
+    segment($('f-layer'),
+      [['', 'All layers'], ...Object.entries(LAYERS).filter(([k]) => used.has(k))], 'layer');
+  }
+  segment($('f-tag'), [['', 'Both sides'], ...Object.entries(TAGS)], 'tag');
+  segment($('f-done'), [['', 'Open and done'], ['open', 'Open'], ['done', 'Done']], 'done');
   segment($('f-verdict'), [['', 'All verdicts'], ...VERDICTS.map((k) => [k, LABEL[k]])], 'verdict');
 
   const person = $('f-person');
@@ -453,7 +632,7 @@ function renderControls() {
   text.oninput = () => { state.filter.text = text.value; redraw(); };
 
   $('f-clear').onclick = () => {
-    state.filter = { kind: '', verdict: '', person: '', window: '', text: '' };
+    state.filter = { kind: '', layer: '', verdict: '', person: '', window: '', text: '' };
     text.value = '';
     win.value = '';
     renderControls();
@@ -464,18 +643,45 @@ function renderControls() {
 }
 
 /** The filtered selection, as a file. Built in the page rather than served,
- *  so what you get is exactly what is on screen. */
+ *  so what you get is exactly what is on screen.
+ *
+ *  Every row is a verdict at a moment, not a current state — which is what
+ *  makes the file worth having. A summary has already thrown away the
+ *  revisions, the disagreement and the pace, and those are most of what says
+ *  whether a review is going well. Oldest first, because a history read top to
+ *  bottom should run forwards.
+ *
+ *  `layer` and `date` are here for the pivot a reader builds the moment they
+ *  open it — how much of the frontend was signed off in a week against how much
+ *  of the backend. Excel derives neither from a timestamp and a kind on its own.
+ */
 function exportCsv(rows) {
   const esc = (s) => `"${String(s ?? '').replace(/"/g, '""')}"`;
+  const day = (iso) => {
+    const d = new Date(iso);
+    return Number.isNaN(+d) ? '' : d.toISOString().slice(0, 10);
+  };
+  const ordered = [...rows].sort((a, b) => when(a.at) - when(b.at));
   const body = [
-    ['when', 'kind', 'artefact', 'verdict', 'reviewer', 'email', 'note'].join(','),
-    ...rows.map((v) => [v.at, v.target_kind, v.target_id, v.verdict, v.by, v.by_email, v.note]
-      .map(esc).join(',')),
-  ].join('\n');
-  const url = URL.createObjectURL(new Blob([body], { type: 'text/csv;charset=utf-8' }));
+    ['when', 'date', 'layer', 'lands on', 'kind', 'artefact', 'verdict',
+     'reviewer', 'email', 'status', 'done on', 'done by', 'note'].join(','),
+    ...ordered.map((v) => [
+      v.at, day(v.at), LAYERS[v.layer] ?? v.layer ?? '', TAGS[v.tag] ?? v.tag ?? '',
+      KINDS[v.target_kind] ?? v.target_kind, v.target_id,
+      LABEL[v.verdict] ?? v.verdict, v.by, v.by_email,
+      v.done_at ? 'Done' : 'Open', v.done_at ? day(v.done_at) : '', v.done_by_name ?? '',
+      v.note,
+    ].map(esc).join(',')),
+  ].join('\r\n');
+
+  // A BOM, because Excel on Windows reads a UTF-8 CSV as the system codepage
+  // without one — and these notes are full of the em dashes and curly quotes
+  // this package is written in, which would arrive as mojibake.
+  const url = URL.createObjectURL(
+    new Blob(['\uFEFF' + body], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'ticvai-review-activity.csv';
+  a.download = `ticvai-review-activity-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -487,13 +693,21 @@ function redraw() {
   renderContested(rows);
   renderPeople(rows);
   renderRows(rows);
-  for (const host of [$('f-kind'), $('f-verdict')]) {
-    const key = host.id === 'f-kind' ? 'kind' : 'verdict';
+  const LOOKUP = {
+    kind: KINDS, layer: LAYERS, tag: TAGS,
+    done: { open: 'Open', done: 'Done' },
+  };
+  for (const host of [$('f-kind'), $('f-layer'), $('f-tag'), $('f-done'), $('f-verdict')]) {
+    if (!host) continue;
+    const key = {
+      'f-kind': 'kind', 'f-layer': 'layer', 'f-tag': 'tag',
+      'f-done': 'done', 'f-verdict': 'verdict',
+    }[host.id];
     for (const b of host.querySelectorAll('button')) {
       const label = b.textContent;
-      const value = label.startsWith('All') ? '' :
-        (key === 'kind' ? Object.entries(KINDS).find(([, l]) => l === label)?.[0]
-                        : VERDICTS.find((k) => LABEL[k] === label));
+      const value = /^(All|Both|Open and)/.test(label) ? '' :
+        (LOOKUP[key] ? Object.entries(LOOKUP[key]).find(([, l]) => l === label)?.[0]
+                     : VERDICTS.find((k) => LABEL[k] === label));
       b.classList.toggle('active', (value ?? '') === state.filter[key]);
     }
   }

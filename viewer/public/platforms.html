@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TICVAI — platforms</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/domains.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
+    />
+  </head>
+  <!-- Behind the sign-in: this page records a verdict, and a verdict is worth
+       having only because it says who gave it. -->
+  <body class="admin-page domains-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">TICVAI</span>
+        <span class="brand-sub">platforms</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/changes.html">What changed</a>
+        <a class="chip" href="/domains.html">Domains</a>
+        <a class="chip" href="/reviews.html">Review activity</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main class="admin-main domains-main">
+      <section class="admin-panel">
+        <h1 class="auth-title">The platforms, and what each is missing</h1>
+        <p class="auth-note" id="lead">Loading…</p>
+
+        <p class="auth-note auth-fine">
+          A page listing what exists is a directory; one listing what is missing
+          is a worklist. Every gap below is <strong>derived</strong> — closure
+          over the lineage, the flows and the boards — so nothing here depends on
+          somebody having remembered to write it down. What no checker can derive
+          is whether a gap is a missing page or an endpoint nobody needs, and
+          that is what a verdict on a platform records.
+        </p>
+
+        <div class="invite-row">
+          <input id="filter" class="auth-input" type="text"
+                 placeholder="Filter by platform, app, module or screen…" />
+          <select id="sort" class="scope-select">
+            <option value="gaps">most gaps first</option>
+            <option value="code">in platform order</option>
+            <option value="size">largest first</option>
+            <option value="undrawn">most undrawn first</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <div id="platforms"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/platforms.js"></script>
+  </body>
+</html>

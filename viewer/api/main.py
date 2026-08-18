@@ -52,7 +52,17 @@ app.add_middleware(
 
 SESSION_COOKIE = "ticvai_session"
 VERDICTS = ("approved", "rejected", "needs-work")
-TARGET_KINDS = ("operation", "table", "screen", "board")
+TARGET_KINDS = ("operation", "table", "screen", "board", "module")
+
+# Which layer a verdict was given from. Recorded so the review can be read by
+# layer — how much of the frontend has been signed off against how much of the
+# backend — which the kind alone answers only while one kind means one layer.
+LAYERS = ("frontend", "contracts", "domain", "backend", "modules", "decisions")
+
+# Which side of the house the work lands on. Two values and deliberately only
+# two: the question it answers is "whose queue is this in", and a list long
+# enough to describe every nuance is a list nobody filters by.
+TAGS = ("frontend", "backend")
 
 
 @app.on_event("startup")
@@ -95,6 +105,12 @@ class VerdictIn(BaseModel):
     target_id: str
     verdict: str
     note: str = ""
+    # Optional: an older client does not send it, and the kind says what it
+    # would have been.
+    layer: str = ""
+    # Which side has to act. Chosen in the interface; defaulted from the kind
+    # when a caller says nothing.
+    tag: str = ""
 
 
 class Account(BaseModel):
@@ -108,11 +124,20 @@ class VerdictOut(BaseModel):
     id: int
     target_kind: str
     target_id: str
+    layer: str = ""
+    tag: str = ""
     verdict: str
     note: str
     by: str
     by_email: str
     at: str
+    # Null until somebody marks it complete. Both fields or neither.
+    done_at: Optional[str] = None
+    done_by_name: Optional[str] = None
+
+
+class DoneIn(BaseModel):
+    done: bool = True
 
 
 # ── who is asking ────────────────────────────────────────────────────
@@ -524,12 +549,22 @@ def record(body: VerdictIn, account: dict = Depends(require_writer)):
         raise HTTPException(400, f"A target is one of {', '.join(TARGET_KINDS)}.")
     if not body.target_id.strip():
         raise HTTPException(400, "A verdict needs something to be about.")
+    # A caller that says nothing gets the layer its kind implies, so a row is
+    # never left without one — an unlabelled verdict would be invisible to every
+    # per-layer count and look like it had never happened.
+    layer = body.layer.strip() or db.LAYER_OF.get(body.target_kind, "")
+    if layer and layer not in LAYERS:
+        raise HTTPException(400, f"A layer is one of {', '.join(LAYERS)}.")
+    tag = body.tag.strip() or db.TAG_OF.get(body.target_kind, "")
+    if tag and tag not in TAGS:
+        raise HTTPException(400, f"A tag is one of {', '.join(TAGS)}.")
 
     row_id = db.write(
-        """INSERT INTO verdict (target_kind, target_id, verdict, note, account_id, created_at)
-           VALUES (?, ?, ?, ?, ?, ?)""",
+        """INSERT INTO verdict
+             (target_kind, target_id, layer, tag, verdict, note, account_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
         (
-            body.target_kind, body.target_id.strip(), body.verdict,
+            body.target_kind, body.target_id.strip(), layer, tag, body.verdict,
             body.note.strip(), account["id"], security.stamp(),
         ),
     )
@@ -541,9 +576,12 @@ def history(target_kind: str, target_id: str):
     """Every verdict on one artefact, newest first. The newest is the current
     one; the rest are how it got there, which is the part worth keeping."""
     rows = db.all_rows(
-        """SELECT v.id, v.target_kind, v.target_id, v.verdict, v.note,
-                  v.created_at AS at, a.name AS by, a.email AS by_email
-             FROM verdict v JOIN account a ON a.id = v.account_id
+        """SELECT v.id, v.target_kind, v.target_id, v.layer, v.tag, v.verdict, v.note,
+                  v.created_at AS at, a.name AS by, a.email AS by_email,
+                  v.done_at, d.name AS done_by_name
+             FROM verdict v
+             JOIN account a ON a.id = v.account_id
+             LEFT JOIN account d ON d.id = v.done_by
             WHERE v.target_kind = ? AND v.target_id = ?
             ORDER BY v.id DESC""",
         (target_kind, target_id),
@@ -557,10 +595,12 @@ def summary(target_kind: Optional[str] = None):
     """The current verdict on everything judged so far — one row per artefact,
     which is what a sign-off report is made of."""
     sql = """
-        SELECT v.target_kind, v.target_id, v.verdict, v.note,
-               v.created_at AS at, a.name AS by, a.email AS by_email, v.id
+        SELECT v.target_kind, v.target_id, v.layer, v.tag, v.verdict, v.note,
+               v.created_at AS at, a.name AS by, a.email AS by_email, v.id,
+               v.done_at, d.name AS done_by_name
           FROM verdict v
           JOIN account a ON a.id = v.account_id
+          LEFT JOIN account d ON d.id = v.done_by
          WHERE v.id IN (SELECT MAX(id) FROM verdict GROUP BY target_kind, target_id)
     """
     args: tuple = ()
@@ -591,10 +631,13 @@ def verdicts(account: dict = Depends(require_account)):
     Signed in only. Who reviewed what, and how fast, is not public.
     """
     rows = db.all_rows(
-        """SELECT v.id, v.target_kind, v.target_id, v.verdict, v.note,
+        """SELECT v.id, v.target_kind, v.target_id, v.layer, v.tag, v.verdict, v.note,
                   v.created_at AS at, v.account_id,
-                  a.name AS by, a.email AS by_email, a.role AS by_role, a.active AS by_active
-             FROM verdict v JOIN account a ON a.id = v.account_id
+                  a.name AS by, a.email AS by_email, a.role AS by_role, a.active AS by_active,
+                  v.done_at, v.done_by, d.name AS done_by_name
+             FROM verdict v
+             JOIN account a ON a.id = v.account_id
+             LEFT JOIN account d ON d.id = v.done_by
             ORDER BY v.id DESC"""
     )
     people = db.all_rows(
@@ -604,6 +647,46 @@ def verdicts(account: dict = Depends(require_account)):
         "verdicts": [dict(r) for r in rows],
         "accounts": [dict(p) for p in people],
     }
+
+
+@app.post("/api/verdicts/{verdict_id}/done")
+def mark_done(verdict_id: int, body: DoneIn, account: dict = Depends(require_writer)):
+    """Mark one verdict complete, or put it back.
+
+    Not a new verdict and not an edit of the old one. A verdict is a thing
+    somebody said at a time and stays as said; this records that the thing they
+    asked for has since been done. Keeping them apart is what lets the review
+    read as a worklist — "needs work, and it has been dealt with" is a different
+    state from "approved", and collapsing the two would lose the fact that
+    somebody had to go and fix it.
+
+    Anybody who can record a verdict can mark one complete, including on
+    somebody else's row: the person who fixes a thing is usually not the person
+    who found it, and requiring the finder to come back and tick it is how a
+    worklist stops being kept.
+    """
+    row = db.one("SELECT id, done_at FROM verdict WHERE id = ?", (verdict_id,))
+    if not row:
+        raise HTTPException(404, "No such verdict.")
+
+    if body.done:
+        db.write(
+            "UPDATE verdict SET done_at = ?, done_by = ? WHERE id = ?",
+            (security.stamp(), account["id"], verdict_id),
+        )
+    else:
+        db.write(
+            "UPDATE verdict SET done_at = NULL, done_by = NULL WHERE id = ?",
+            (verdict_id,),
+        )
+
+    fresh = db.one(
+        """SELECT v.done_at, d.name AS done_by_name
+             FROM verdict v LEFT JOIN account d ON d.id = v.done_by
+            WHERE v.id = ?""",
+        (verdict_id,),
+    )
+    return {"id": verdict_id, "done_at": fresh["done_at"], "done_by_name": fresh["done_by_name"]}
 
 
 @app.get("/api/health")

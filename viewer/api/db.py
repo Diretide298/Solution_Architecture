@@ -70,10 +70,28 @@ CREATE TABLE IF NOT EXISTS verdict (
   -- every table verdict without parsing strings.
   target_kind TEXT    NOT NULL,
   target_id   TEXT    NOT NULL,
+  -- Which layer the reviewer was standing in when they said it. Derivable from
+  -- the kind today, and recorded anyway: it is what the reviewer was actually
+  -- looking at, and a kind that later appears in two layers would make the
+  -- derivation quietly wrong rather than absent.
+  layer       TEXT    NOT NULL DEFAULT '',
+  -- Which side of the house the work lands on, chosen by the reviewer rather
+  -- than derived. Separate from `layer` on purpose: the layer is where they
+  -- were standing, and the tag is who has to do something about it. A screen
+  -- that renders correctly against an endpoint that returns the wrong total is
+  -- seen in the frontend and fixed in the backend, and one column cannot say
+  -- both.
+  tag         TEXT    NOT NULL DEFAULT '',
   verdict     TEXT    NOT NULL,
   note        TEXT    NOT NULL DEFAULT '',
   account_id  INTEGER NOT NULL REFERENCES account(id),
-  created_at  TEXT    NOT NULL
+  created_at  TEXT    NOT NULL,
+  -- Marked complete by a reviewer once the thing they asked for is done. Not a
+  -- verdict and not a replacement for one: the verdict stays as said, and this
+  -- records that it has been dealt with. Nullable because "not done" is the
+  -- absence of a date rather than a flag that could disagree with one.
+  done_at     TEXT,
+  done_by     INTEGER REFERENCES account(id)
 );
 -- Verdicts are append-only: a row is a thing someone said at a time, and
 -- rewriting it would lose the fact that they once thought otherwise. The
@@ -105,9 +123,64 @@ def cursor(commit: bool = False) -> Iterator[sqlite3.Cursor]:
         conn.close()
 
 
+# kind -> the layer it is reviewed from. Used to fill the column in for rows
+# recorded before it existed, and as the fallback when a caller does not say.
+LAYER_OF = {
+    "screen": "frontend",
+    "board": "frontend",
+    "operation": "contracts",
+    "table": "backend",
+    "module": "modules",
+}
+
+# kind -> which side of the house it lands on by default. Only a starting
+# position for the control: a screen blocked on an endpoint is tagged backend
+# by the person who found it, which is the whole reason the tag is chosen and
+# not derived. An operation defaults to backend because somebody builds the
+# endpoint before anybody calls it.
+TAG_OF = {
+    "screen": "frontend",
+    "board": "frontend",
+    "operation": "backend",
+    "table": "backend",
+    "module": "backend",
+}
+
+
 def init() -> None:
     with cursor(commit=True) as cur:
         cur.executescript(SCHEMA)
+        # CREATE TABLE IF NOT EXISTS does nothing to a table that is already
+        # there, so a store made before `layer` existed keeps its old shape and
+        # every insert naming the column fails. Add it, then fill it in from the
+        # kind, which is what it would have said at the time.
+        have = {row[1] for row in cur.execute("PRAGMA table_info(verdict)")}
+        if "layer" not in have:
+            cur.execute("ALTER TABLE verdict ADD COLUMN layer TEXT NOT NULL DEFAULT ''")
+            for kind, layer in LAYER_OF.items():
+                cur.execute(
+                    "UPDATE verdict SET layer = ? WHERE target_kind = ? AND layer = ''",
+                    (layer, kind),
+                )
+        if "tag" not in have:
+            cur.execute("ALTER TABLE verdict ADD COLUMN tag TEXT NOT NULL DEFAULT ''")
+            # Backfilled from the kind, which is what it would have defaulted to
+            # had the column existed. A row left blank would drop out of every
+            # tag filter and read as untagged work rather than old work.
+            for kind, tag in TAG_OF.items():
+                cur.execute(
+                    "UPDATE verdict SET tag = ? WHERE target_kind = ? AND tag = ''",
+                    (tag, kind),
+                )
+        # Two columns, added together, checked separately: a store that got one
+        # and not the other is a store an interrupted migration left behind.
+        if "done_at" not in have:
+            cur.execute("ALTER TABLE verdict ADD COLUMN done_at TEXT")
+        if "done_by" not in have:
+            # No REFERENCES here: SQLite cannot add a column with a foreign key
+            # to an existing table, and the constraint on the fresh schema above
+            # is the one that matters for a store made from now on.
+            cur.execute("ALTER TABLE verdict ADD COLUMN done_by INTEGER")
 
 
 def fold(email: str) -> str:

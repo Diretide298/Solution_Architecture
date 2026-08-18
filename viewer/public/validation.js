@@ -135,11 +135,31 @@ export const redeemInvite = (token, name, password) =>
 
 export const verdictHistory = (kind, id) =>
   call(`/api/validation/${kind}/${encodeURIComponent(id)}`);
-export const recordVerdict = (kind, id, verdict, note) =>
+// The layer the reviewer is standing in. Sent with every verdict so the review
+// can be read per layer — how much of the frontend is signed off against how
+// much of the backend — rather than inferred from the kind afterwards.
+export const recordVerdict = (kind, id, verdict, note, layer, tag) =>
   call('/api/validation', {
     method: 'POST',
-    body: { target_kind: kind, target_id: id, verdict, note },
+    body: {
+      target_kind: kind, target_id: id, verdict, note,
+      layer: layer ?? '', tag: tag ?? '',
+    },
   });
+
+/** Mark a verdict complete, or put it back. Anybody who can record one can
+ *  close one — the person who fixes a thing is rarely the one who found it. */
+export const markVerdictDone = (id, done = true) =>
+  call(`/api/verdicts/${id}/done`, { method: 'POST', body: { done } });
+
+/** Which side of the house a kind lands on before anybody says otherwise.
+ *  Mirrors TAG_OF in db.py; the server defaults the same way if this is wrong,
+ *  so the two disagreeing costs a wrong pre-selection and never a wrong row. */
+export const TAGS = [['frontend', 'Frontend'], ['backend', 'Backend']];
+const TAG_OF = {
+  screen: 'frontend', board: 'frontend',
+  operation: 'backend', table: 'backend', platform: 'frontend',
+};
 export const validationSummary = (kind) =>
   call(`/api/validation${kind ? `?target_kind=${encodeURIComponent(kind)}` : ''}`);
 
@@ -173,7 +193,7 @@ const WHEN = (iso) => {
  * @param {string} id       the artefact, e.g. "orders.sales_order"
  * @param {string} label    what to call it in the heading
  */
-export function verdictBlock(kind, id, label = id) {
+export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
   const box = el('div', 'verdict-box');
   box.dataset.kind = kind;
   box.dataset.target = id;
@@ -208,8 +228,16 @@ export function verdictBlock(kind, id, label = id) {
     const status = el('div', 'verdict-current');
     if (current) {
       status.append(el('span', `verdict-chip ${current.verdict}`, verdictLabel(current.verdict)));
+      if (current.tag) status.append(el('span', `verdict-tag-chip ${current.tag}`, current.tag));
       status.append(el('span', 'verdict-by',
         `${current.by || current.by_email} · ${WHEN(current.at)}`));
+      // Shown next to the verdict rather than instead of it: "needs work, and
+      // it has been dealt with" is two facts, and dropping either one loses
+      // whether anybody ever went back to look.
+      if (current.done_at) {
+        status.append(el('span', 'verdict-done-chip',
+          `Done${current.done_by_name ? ` · ${current.done_by_name}` : ''} · ${WHEN(current.done_at)}`));
+      }
       if (current.note) status.append(el('p', 'verdict-note', current.note));
     } else {
       status.append(el('span', 'verdict-chip none', 'Not reviewed'));
@@ -266,6 +294,34 @@ export function verdictBlock(kind, id, label = id) {
     }
 
     const form = el('div', 'verdict-form');
+
+    // Which side has to act on it. Pre-selected from the kind and changeable,
+    // because the default is right most of the time and wrong exactly when it
+    // matters: a screen that draws the wrong total is found in the frontend
+    // and fixed in the backend, and only the person looking at it knows which.
+    let tag = TAG_OF[kind] ?? 'backend';
+    const tagRow = el('div', 'verdict-tag-row');
+    tagRow.append(el('span', 'verdict-tag-label', 'Lands on'));
+    const tagButtons = el('div', 'verdict-tag-buttons');
+    const paintTags = () => {
+      for (const b of tagButtons.querySelectorAll('button')) {
+        b.classList.toggle('chosen', b.dataset.tag === tag);
+        b.setAttribute('aria-pressed', String(b.dataset.tag === tag));
+      }
+    };
+    for (const [value, text] of TAGS) {
+      const button = el('button', `chip verdict-tag ${value}`, text);
+      button.type = 'button';
+      button.dataset.tag = value;
+      // No clearing this one. Every verdict lands on somebody, and an untagged
+      // row is one that drops out of both filters and gets worked on by nobody.
+      button.onclick = () => { tag = value; paintTags(); };
+      tagButtons.append(button);
+    }
+    tagRow.append(tagButtons);
+    paintTags();
+    form.append(tagRow);
+
     const note = document.createElement('textarea');
     note.className = 'verdict-note-input';
     note.rows = 2;
@@ -317,7 +373,7 @@ export function verdictBlock(kind, id, label = id) {
       for (const b of all) b.disabled = true;
       message.textContent = 'Recording…';
       try {
-        await recordVerdict(kind, id, chosen, note.value);
+        await recordVerdict(kind, id, chosen, note.value, layer, tag);
         note.value = '';
         setChosen(null);
         load();
