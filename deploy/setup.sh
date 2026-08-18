@@ -148,7 +148,7 @@ if [[ "$CODE" == "401" ]]; then
   echo "  gate holding — /api/index answers 401 without a session"
 else
   echo "  GATE NOT HOLDING — /api/index answered $CODE, expected 401" >&2
-  echo "  is TICVAI_OPEN=1 set? it must not be on a public address" >&2
+  echo "  is TICVAI_NO_GATE=1 set? it must not be on a public address" >&2
   exit 1
 fi
 
