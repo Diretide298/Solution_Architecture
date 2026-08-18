@@ -46,7 +46,10 @@ say() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 say "Packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y -qq python3 python3-venv python3-pip nginx curl ca-certificates
+# rsync is used for the copy step and sqlite3 for the nightly snapshot. Both
+# are usually present on Ubuntu and absent on a minimal Debian, which is
+# exactly the machine where discovering it halfway through is worst.
+apt-get install -y -qq python3 python3-venv python3-pip nginx curl ca-certificates rsync sqlite3
 
 # Node 22 or newer: server.mjs uses fetch, AbortSignal.timeout and node:sqlite.
 NODE_OK=0
@@ -116,7 +119,6 @@ systemctl daemon-reload
 systemctl enable --now ticvai-api.service ticvai-viewer.service
 systemctl restart ticvai-api.service ticvai-viewer.service
 # The verdicts are the only thing here nobody can regenerate.
-apt-get install -y -qq sqlite3
 systemctl enable --now ticvai-backup.timer
 
 # ----------------------------------------------------------------- nginx -----
