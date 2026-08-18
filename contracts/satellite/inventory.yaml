@@ -8,8 +8,8 @@ info:
   x-ticvai-requirements: 98
   x-ticvai-capabilities: [C13, C14]
   x-ticvai-platforms:
-    - "P06 Staff Ops App"
-    - "P08 Venue Back Office"
+    - "P06 Venue Staff App"
+    - "P08 Venue Management"
   description: >
     ## What this contract covers
 
@@ -21,7 +21,7 @@ info:
     | **Matrix domain** | 13 — Inventory Management |
     | **Requirements** | ~98 |
     | **Capabilities** | C13, C14 |
-    | **Consumed by** | P06 Staff Ops App · P08 Venue Back Office |
+    | **Consumed by** | P06 Venue Staff App · P08 Venue Management |
 
     ## How to read this file
 

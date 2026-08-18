@@ -32,7 +32,7 @@ platform:
   screenCount: 16
   wireframeBoard: wireframes/P07 Staff Scanner.dc.html
   designReferences:
-  - path: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+  - path: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
     note: Employee app reference. The scanner shares its visual language and its offline strip.
   operator: venue
   directions:
@@ -61,15 +61,19 @@ screens:
   navigation:
     exitTo:
     - SCN-002
+    - SCN-003
+    - SCN-004
     inferred: true
     fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-001
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. **createCashMovement removed 18 August** — attached by module resemblance,
+    not by what this screen does. A screen that does not handle money should not be able to move it
+    (CF-87's class).
   implementation:
     app: venue-scanner
     route: /access/sign-in
@@ -95,10 +99,6 @@ screens:
   - operationId: closeShift
     contract: shift
     purpose: Blind close-out
-    trigger: onAction
-  - operationId: createCashMovement
-    contract: shift
-    purpose: Record a cash lift or add
     trigger: onAction
   - operationId: forceLogout
     contract: identity
@@ -180,6 +180,9 @@ screens:
     offline: Fully offline. The access point list is in the bundle
   navigation:
     exitTo:
+    - SCN-001
+    - SCN-003
+    - SCN-004
     - SCN-015
     inferred: true
     fromFlows: true
@@ -187,7 +190,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-002
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -241,6 +244,8 @@ screens:
       who can see both knows what to trust'
   navigation:
     exitTo:
+    - SCN-001
+    - SCN-002
     - SCN-004
     inferred: true
     fromFlows: true
@@ -248,7 +253,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-003
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -307,6 +312,9 @@ screens:
   navigation:
     exitTo:
     - PTR-015
+    - SCN-001
+    - SCN-002
+    - SCN-003
     - SCN-010
     - SCN-014
     inferred: true
@@ -315,7 +323,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-004
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -386,7 +394,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-005
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -452,7 +460,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-006
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -517,7 +525,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-007
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -583,7 +591,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-008
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -648,7 +656,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-009
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -713,7 +721,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-010
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -763,7 +771,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-011
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -808,7 +816,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-012
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -873,7 +881,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-013
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -931,13 +939,16 @@ screens:
   navigation:
     exitTo:
     - ADM-003
+    - SCN-001
+    - SCN-002
+    - SCN-003
     inferred: true
     fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-014
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1002,6 +1013,8 @@ screens:
     offline: Cannot refresh. The existing bundle continues to be used and its age is shown
   navigation:
     exitTo:
+    - SCN-001
+    - SCN-002
     - SCN-003
     inferred: true
     fromFlows: true
@@ -1009,7 +1022,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-015
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1075,7 +1088,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P07 Staff Scanner.dc.html#scn-016
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:

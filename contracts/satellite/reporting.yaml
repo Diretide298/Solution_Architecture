@@ -8,8 +8,8 @@ info:
   x-ticvai-requirements: 332
   x-ticvai-capabilities: [C21, C97, AI-57]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
-    - "P09 Platform Admin Console"
+    - "P08 Venue Management"
+    - "P09 TICVAI Web"
   description: >
     ## What this contract covers
 
@@ -21,7 +21,7 @@ info:
     | **Matrix domain** | 8 — Unified Operations Dashboard  ·  cross-cutting |
     | **Requirements** | ~332 |
     | **Capabilities** | C21, C97, AI-57 |
-    | **Consumed by** | P08 Venue Back Office · P09 Platform Admin Console |
+    | **Consumed by** | P08 Venue Management · P09 TICVAI Web |
 
     ## How to read this file
 

@@ -12,7 +12,7 @@ wave: 2
 frequency: daily
 criticality: operational
 platforms:
-- P06 Staff App
+- P06 Venue Staff App
 offlineBehaviour: Offline-capable but not offline-mandatory. A technician losing signal in a plant room
   is an inconvenience; a gate losing signal is a queue. Tasks and notes queue locally and sync.
 trigger:

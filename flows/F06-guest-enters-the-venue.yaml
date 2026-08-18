@@ -12,7 +12,7 @@ wave: 1
 frequency: constant
 criticality: revenue
 platforms:
-- P07 Staff Scanner
+- P07 Venue Scanner
 offlineBehaviour: '**The whole flow runs offline.** A gate that cannot validate without a network is
   a queue. The handheld validates against a bundle loaded at shift start, journals every scan locally,
   and syncs when it can. The reconciliation step is not optional — it is where the server tells the

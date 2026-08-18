@@ -8,9 +8,9 @@ info:
   x-ticvai-requirements: 201
   x-ticvai-capabilities: [C09, C10, C23, C25, C26, C29]
   x-ticvai-platforms:
-    - "P07 Access Handheld"
+    - "P07 Venue Scanner"
     - "P04 POS"
-    - "P06 Staff Ops App"
+    - "P06 Venue Staff App"
   description: >
     ## What this contract covers
 
@@ -22,7 +22,7 @@ info:
     | **Matrix domain** | 3 — Admission and Access |
     | **Requirements** | ~201 |
     | **Capabilities** | C09, C10, C23, C25, C26, C29 |
-    | **Consumed by** | P07 Access Handheld · P04 POS · P06 Staff Ops App |
+    | **Consumed by** | P07 Venue Scanner · P04 POS · P06 Venue Staff App |
 
     ## How to read this file
 
@@ -1492,6 +1492,16 @@ components:
 
     TicketStatus:
       x-ticvai-persistence: "none — computed from entitlement and scans"
+      description: >
+        **A validation result, not a lifecycle**, despite the name. Computed at scan time from the
+        entitlement and its scan history — `isValid`, `entriesUsed`, `isInsideVenue`.
+
+        **The name misled a state model into anchoring on it** (`states/entitlement.yaml`, removed
+        18 August): six lifecycle states were checked against an object with no values, and
+        `check-states` warned about it for a day before anyone read the schema.
+
+        The entitlement's lifecycle is `orders.EntitlementStatus`. **This is what a gate learns
+        when it scans**, which is a different question with a similar name.
       type: object
       required: [ticketId, isValid]
       properties:

@@ -78,4 +78,15 @@ notes: '**`expired` and `cancelled` are not interchangeable.** One is time passi
   the truth is one ticket that changed hands.
 
 
-  **Cancellation follows the refund, never precedes it** — the order the refund state model settles.'
+  **Cancellation follows the refund, never precedes it** — the order the refund state model settles.
+
+
+  **Merged with `states/entitlement.yaml` on 18 August.** That file modelled `access.TicketStatus`,
+  which is **an object, not an enum** — a scan-response payload carrying `isValid`, `entriesUsed` and
+  `isInsideVenue`, computed at scan time from the entitlement and the scan history. Six states were
+  being checked against nothing, and `check-states` had warned about it since 17 August as its one standing
+  exception.
+
+
+  **The name is the trap.** `TicketStatus` reads like a lifecycle and is a validation result. The lifecycle
+  is `orders.EntitlementStatus`, which is this file.'

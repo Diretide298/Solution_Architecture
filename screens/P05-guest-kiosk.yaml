@@ -31,7 +31,7 @@ platform:
   screenCount: 15
   wireframeBoard: wireframes/P05 Guest Kiosk.dc.html
   designReferences:
-  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: Kiosk is white-labelled like the guest surfaces, not TICVAI-branded like the POS (14 August).
   operator: guest
   directions:
@@ -60,12 +60,14 @@ screens:
   navigation:
     exitTo:
     - KSK-002
+    - KSK-003
+    - KSK-004
     inferred: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -93,14 +95,16 @@ screens:
     offline: Not available
   navigation:
     exitTo:
+    - KSK-001
     - KSK-003
+    - KSK-004
     inferred: true
     fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-002
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -137,13 +141,15 @@ screens:
     offline: Not available
   navigation:
     exitTo:
+    - KSK-001
+    - KSK-002
     - KSK-004
     inferred: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-003
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -176,6 +182,9 @@ screens:
     offline: Not available
   navigation:
     exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
     - KSK-005
     inferred: true
     fromFlows: true
@@ -183,7 +192,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-004
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -220,6 +229,9 @@ screens:
     offline: Not available
   navigation:
     exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
     - KSK-006
     inferred: true
     fromFlows: true
@@ -227,7 +239,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-005
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -264,6 +276,9 @@ screens:
     offline: Not available
   navigation:
     exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
     - KSK-007
     inferred: true
     fromFlows: true
@@ -271,7 +286,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-006
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -317,6 +332,9 @@ screens:
     offline: Not available. **Card only, and card needs the acquirer**
   navigation:
     exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
     - KSK-009
     inferred: true
     fromFlows: true
@@ -324,9 +342,14 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-007
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
+    reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
+    is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk
+    accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic
+    currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate
+    is the scheme''s rather than ours.'
   implementation:
     app: guest-app
     route: /sell/payment
@@ -366,7 +389,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -407,7 +430,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-009
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -445,13 +468,16 @@ screens:
     offline: Not applicable
   navigation:
     exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
     - KSK-013
     inferred: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-010
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -492,7 +518,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -537,7 +563,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -578,7 +604,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-013
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -612,12 +638,14 @@ screens:
   navigation:
     exitTo:
     - KSK-001
+    - KSK-002
+    - KSK-003
     inferred: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-014
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -662,6 +690,7 @@ screens:
       broken assistant needs a person, and there is one in the building'
   navigation:
     exitTo:
+    - KSK-001
     - SUP-004
     inferred: true
     fromFlows: true
@@ -674,7 +703,7 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with
     no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
     and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is

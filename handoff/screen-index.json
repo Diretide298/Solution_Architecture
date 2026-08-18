@@ -75,6 +75,8 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-003",
    "WEB-004"
   ]
  },
@@ -107,6 +109,8 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-002",
    "WEB-004"
   ]
  },
@@ -138,6 +142,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-002",
+   "WEB-003",
    "WEB-005"
   ]
  },
@@ -175,7 +182,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
    "WEB-006",
+   "WEB-007",
+   "WEB-008",
    "WEB-010"
   ]
  },
@@ -207,6 +217,8 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-005",
    "WEB-007",
    "WEB-008",
    "WEB-010"
@@ -246,6 +258,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-005",
+   "WEB-006",
+   "WEB-008",
    "WEB-010"
   ]
  },
@@ -396,7 +412,10 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "WEB-011"
+   "WEB-001",
+   "WEB-011",
+   "WEB-012",
+   "WEB-013"
   ]
  },
  "WEB-011": {
@@ -449,7 +468,10 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "WEB-012"
+   "WEB-001",
+   "WEB-010",
+   "WEB-012",
+   "WEB-013"
   ]
  },
  "WEB-012": {
@@ -494,6 +516,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-010",
+   "WEB-011",
    "WEB-013"
   ]
  },
@@ -535,6 +560,9 @@
   "specified": true,
   "exits": [
    "WEB-001",
+   "WEB-010",
+   "WEB-011",
+   "WEB-012",
    "WEB-018"
   ]
  },
@@ -904,7 +932,10 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "WEB-023"
+   "WEB-001",
+   "WEB-022",
+   "WEB-023",
+   "WEB-024"
   ]
  },
  "WEB-022": {
@@ -934,7 +965,10 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "WEB-023"
+   "WEB-001",
+   "WEB-021",
+   "WEB-023",
+   "WEB-024"
   ]
  },
  "WEB-023": {
@@ -1015,6 +1049,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-021",
+   "WEB-022",
    "WEB-023"
   ]
  },
@@ -1045,6 +1082,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-026",
+   "WEB-027",
    "WEB-028"
   ]
  },
@@ -1079,6 +1119,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-025",
+   "WEB-027",
    "WEB-028"
   ]
  },
@@ -1123,6 +1166,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "WEB-001",
+   "WEB-025",
+   "WEB-026",
    "WEB-028"
   ]
  },
@@ -1702,7 +1748,11 @@
   "route": "/general/review-and-payment",
   "board": "wireframes/P02 Guest App.dc.html#gst-009",
   "operations": [
-   "transferOrderTickets"
+   "transferOrderTickets",
+   "createPayment",
+   "inquirePaymentStatus",
+   "checkoutCart",
+   "getCart"
   ],
   "services": [
    "OrderService"
@@ -1713,10 +1763,24 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "catalogue.envelope",
+   "catalogue.inventory_lease",
+   "ledger.fx_rate",
+   "orders.cart",
+   "orders.cart_line",
+   "orders.payment",
+   "orders.sales_order",
+   "orders.ticket_transfer",
+   "promotions.promotion"
   ],
   "writes": [
    "cache:idempotency",
+   "ledger.entry",
+   "ledger.journal_entry",
+   "orders.cart",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order",
    "orders.ticket_transfer"
   ],
   "storedProcedures": [],
@@ -1724,6 +1788,7 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "BO-020",
    "GST-001",
    "GST-002",
    "GST-003"
@@ -1936,7 +2001,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "ADM-003"
+   "ADM-003",
+   "GST-001",
+   "GST-002",
+   "GST-003"
   ]
  },
  "GST-016": {
@@ -2194,6 +2262,8 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "GST-001",
+   "GST-002",
    "GST-003",
    "GST-059"
   ]
@@ -2284,7 +2354,8 @@
   "exits": [
    "GST-001",
    "GST-002",
-   "GST-003"
+   "GST-003",
+   "GST-009"
   ]
  },
  "GST-025": {
@@ -2324,6 +2395,7 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "BO-021",
    "GST-001",
    "GST-002",
    "GST-003"
@@ -2360,7 +2432,10 @@
   "specified": true,
   "exits": [
    "BO-048",
-   "BO-069"
+   "BO-069",
+   "GST-001",
+   "GST-002",
+   "GST-003"
   ]
  },
  "GST-027": {
@@ -2506,6 +2581,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "GST-001",
+   "GST-002",
+   "GST-003",
    "GST-031"
   ]
  },
@@ -2557,6 +2635,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "GST-001",
+   "GST-002",
+   "GST-003",
    "GST-032"
   ]
  },
@@ -2639,6 +2720,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "GST-001",
+   "GST-002",
+   "GST-003",
    "GST-033"
   ]
  },
@@ -2651,12 +2735,10 @@
   "route": "/general/ai-concierge-contextual-help",
   "board": "wireframes/P02 Guest App.dc.html#gst-033",
   "operations": [
-   "createPayment",
    "sendAiMessage"
   ],
   "services": [
-   "AiService",
-   "OrderService"
+   "AiService"
   ],
   "stores": [
    "postgres",
@@ -2674,9 +2756,6 @@
    "ai.provider",
    "cache:answer",
    "cache:idempotency",
-   "ledger.fx_rate",
-   "orders.payment",
-   "orders.sales_order",
    "qdrant:knowledge"
   ],
   "writes": [
@@ -2685,9 +2764,6 @@
    "ai.proposed_action",
    "cache:answer",
    "cache:idempotency",
-   "ledger.entry",
-   "ledger.journal_entry",
-   "orders.payment",
    "qdrant:knowledge"
   ],
   "storedProcedures": [],
@@ -2695,7 +2771,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "BO-020"
+   "BO-020",
+   "GST-001",
+   "GST-002",
+   "GST-003"
   ]
  },
  "GST-034": {
@@ -2726,7 +2805,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "BO-021"
+   "BO-021",
+   "GST-001",
+   "GST-002",
+   "GST-003"
   ]
  },
  "GST-035": {
@@ -2771,7 +2853,7 @@
   "platformName": "Guest App",
   "operator": "guest",
   "app": "guest-app",
-  "route": "/general/loyalty-and-rewards",
+  "route": "/loyalty-rewards",
   "board": "wireframes/P02 Guest App.dc.html#gst-036",
   "operations": [
    "getLoyaltyPosition",
@@ -2789,7 +2871,7 @@
   ],
   "writes": [],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 2,
   "offline": true,
   "specified": true,
   "exits": [
@@ -3204,7 +3286,7 @@
   ]
  },
  "GST-047": {
-  "name": "Maintenance Page",
+  "name": "Maintenance / Upgrade Page",
   "platform": "P02",
   "platformName": "Guest App",
   "operator": "guest",
@@ -3727,36 +3809,6 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "BO-005"
-  ]
- },
- "GST-060": {
-  "name": "Maintenance / Upgrade Page",
-  "platform": "P02",
-  "platformName": "Guest App",
-  "operator": "guest",
-  "app": "guest-app",
-  "route": "/general/maintenance-upgrade-page",
-  "board": "wireframes/P02 Guest App.dc.html#gst-060",
-  "operations": [
-   "getTenantAppStatus"
-  ],
-  "services": [
-   "WhiteLabelService"
-  ],
-  "stores": [
-   "postgres"
-  ],
-  "reads": [
-   "whitelabel.config_version",
-   "whitelabel.tenant_config"
-  ],
-  "writes": [],
-  "storedProcedures": [],
-  "wave": 1,
-  "offline": true,
-  "specified": true,
-  "exits": [
    "GST-001",
    "GST-002",
    "GST-003"
@@ -3853,37 +3905,6 @@
    "GST-001"
   ]
  },
- "GST-064": {
-  "name": "Loyalty & Rewards",
-  "platform": "P02",
-  "platformName": "Guest App",
-  "operator": "guest",
-  "app": "guest-app",
-  "route": "/loyalty-rewards",
-  "board": "wireframes/P02 Guest App.dc.html#gst-001",
-  "operations": [
-   "getLoyaltyPosition",
-   "listLoyaltyProgrammes"
-  ],
-  "services": [
-   "MarketingCrmService",
-   "MarketingService"
-  ],
-  "stores": [
-   "postgres"
-  ],
-  "reads": [
-   "marketing.loyalty_programme"
-  ],
-  "writes": [],
-  "storedProcedures": [],
-  "wave": 2,
-  "offline": true,
-  "specified": true,
-  "exits": [
-   "GST-001"
-  ]
- },
  "GST-065": {
   "name": "Newsletter & Preferences",
   "platform": "P02",
@@ -3955,6 +3976,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -3976,7 +3998,9 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "POS-002"
+   "POS-002",
+   "POS-007",
+   "POS-009"
   ]
  },
  "POS-002": {
@@ -4085,6 +4109,7 @@
   "exits": [
    "BO-084",
    "GST-026",
+   "POS-001",
    "POS-003",
    "POS-004",
    "POS-005",
@@ -4148,8 +4173,11 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "POS-001",
    "POS-002",
-   "POS-005"
+   "POS-004",
+   "POS-005",
+   "POS-006"
   ]
  },
  "POS-004": {
@@ -4215,8 +4243,11 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "POS-001",
    "POS-002",
-   "POS-005"
+   "POS-003",
+   "POS-005",
+   "POS-006"
   ]
  },
  "POS-005": {
@@ -4270,6 +4301,7 @@
   "specified": true,
   "exits": [
    "BO-048",
+   "POS-001",
    "POS-002"
   ]
  },
@@ -4326,7 +4358,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "POS-002"
+   "POS-001",
+   "POS-002",
+   "POS-003",
+   "POS-004"
   ]
  },
  "POS-007": {
@@ -4362,6 +4397,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -4442,6 +4478,7 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "POS-001",
    "POS-002"
   ]
  },
@@ -4458,7 +4495,6 @@
    "acceptShiftVariance",
    "approveShiftOpen",
    "closeShift",
-   "createCashMovement",
    "getCurrentShift",
    "getShift",
    "listCashMovements",
@@ -4478,6 +4514,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -4490,7 +4527,6 @@
    "cache:idempotency",
    "ledger.journal_entry",
    "orders.cash_count_line",
-   "orders.cash_movement",
    "orders.no_sale_event",
    "orders.shift"
   ],
@@ -4499,7 +4535,9 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "POS-002"
+   "POS-001",
+   "POS-002",
+   "POS-007"
   ]
  },
  "POS-010": {
@@ -4560,8 +4598,11 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "POS-005",
-   "POS-002"
+   "POS-001",
+   "POS-002",
+   "POS-003",
+   "POS-004",
+   "POS-005"
   ]
  },
  "KSK-001": {
@@ -4582,7 +4623,9 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "KSK-002"
+   "KSK-002",
+   "KSK-003",
+   "KSK-004"
   ]
  },
  "KSK-002": {
@@ -4621,7 +4664,9 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "KSK-003"
+   "KSK-001",
+   "KSK-003",
+   "KSK-004"
   ]
  },
  "KSK-003": {
@@ -4650,6 +4695,8 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "KSK-001",
+   "KSK-002",
    "KSK-004"
   ]
  },
@@ -4683,6 +4730,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "KSK-001",
+   "KSK-002",
+   "KSK-003",
    "KSK-005"
   ]
  },
@@ -4721,6 +4771,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "KSK-001",
+   "KSK-002",
+   "KSK-003",
    "KSK-006"
   ]
  },
@@ -4770,6 +4823,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "KSK-001",
+   "KSK-002",
+   "KSK-003",
    "KSK-007"
   ]
  },
@@ -4808,6 +4864,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "KSK-001",
+   "KSK-002",
+   "KSK-003",
    "KSK-009"
   ]
  },
@@ -4918,6 +4977,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "KSK-001",
+   "KSK-002",
+   "KSK-003",
    "KSK-013"
   ]
  },
@@ -5047,7 +5109,9 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "KSK-001"
+   "KSK-001",
+   "KSK-002",
+   "KSK-003"
   ]
  },
  "KSK-015": {
@@ -5107,6 +5171,7 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "KSK-001",
    "SUP-004"
   ]
  },
@@ -5158,7 +5223,9 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "EMP-002"
+   "EMP-002",
+   "EMP-003",
+   "EMP-048"
   ]
  },
  "EMP-002": {
@@ -5211,6 +5278,8 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "EMP-001",
+   "EMP-003",
    "EMP-048"
   ]
  },
@@ -5228,7 +5297,6 @@
    "acceptShiftVariance",
    "approveShiftOpen",
    "closeShift",
-   "createCashMovement",
    "getIncident",
    "getShift",
    "listCashMovements",
@@ -5253,6 +5321,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "maintenance.incident",
    "orders.cash_count_line",
    "orders.cash_movement",
@@ -5267,7 +5336,6 @@
    "ledger.journal_entry",
    "maintenance.incident",
    "orders.cash_count_line",
-   "orders.cash_movement",
    "orders.no_sale_event",
    "orders.shift"
   ],
@@ -5276,7 +5344,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "EMP-004"
+   "EMP-001",
+   "EMP-002",
+   "EMP-004",
+   "EMP-048"
   ]
  },
  "EMP-048": {
@@ -5315,6 +5386,8 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "EMP-001",
+   "EMP-002",
    "EMP-003"
   ]
  },
@@ -5351,6 +5424,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -5894,6 +5968,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "EMP-001",
+   "EMP-002",
+   "EMP-003",
    "EMP-005"
   ]
  },
@@ -5949,6 +6026,9 @@
   "exits": [
    "BO-030",
    "BO-078",
+   "EMP-001",
+   "EMP-002",
+   "EMP-003",
    "EMP-007"
   ]
  },
@@ -6047,6 +6127,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "EMP-001",
+   "EMP-002",
+   "EMP-003",
    "EMP-009"
   ]
  },
@@ -6083,6 +6166,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -6210,7 +6294,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "BO-058"
+   "BO-058",
+   "EMP-001",
+   "EMP-002",
+   "EMP-003"
   ]
  },
  "EMP-031": {
@@ -6300,7 +6387,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "BO-005"
+   "BO-005",
+   "EMP-001",
+   "EMP-002",
+   "EMP-003"
   ]
  },
  "EMP-033": {
@@ -6950,6 +7040,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "EMP-001",
+   "EMP-002",
+   "EMP-003",
    "EMP-004"
   ]
  },
@@ -7511,7 +7604,6 @@
    "acceptShiftVariance",
    "approveShiftOpen",
    "closeShift",
-   "createCashMovement",
    "forceLogout",
    "getCurrentSession",
    "getGuestSession",
@@ -7547,6 +7639,7 @@
    "identity.role",
    "identity.session",
    "identity.sso_provider",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -7562,7 +7655,6 @@
    "identity.session",
    "ledger.journal_entry",
    "orders.cash_count_line",
-   "orders.cash_movement",
    "orders.no_sale_event",
    "orders.shift"
   ],
@@ -7571,7 +7663,9 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "SCN-002"
+   "SCN-002",
+   "SCN-003",
+   "SCN-004"
   ]
  },
  "SCN-002": {
@@ -7610,6 +7704,9 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "SCN-001",
+   "SCN-003",
+   "SCN-004",
    "SCN-015"
   ]
  },
@@ -7660,6 +7757,8 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "SCN-001",
+   "SCN-002",
    "SCN-004"
   ]
  },
@@ -7715,6 +7814,9 @@
   "specified": true,
   "exits": [
    "PTR-015",
+   "SCN-001",
+   "SCN-002",
+   "SCN-003",
    "SCN-010",
    "SCN-014"
   ]
@@ -8210,7 +8312,10 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "ADM-003"
+   "ADM-003",
+   "SCN-001",
+   "SCN-002",
+   "SCN-003"
   ]
  },
  "SCN-015": {
@@ -8260,6 +8365,8 @@
   "offline": true,
   "specified": true,
   "exits": [
+   "SCN-001",
+   "SCN-002",
    "SCN-003"
   ]
  },
@@ -8422,7 +8529,9 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "BO-003"
+   "BO-001",
+   "BO-003",
+   "BO-004"
   ]
  },
  "BO-003": {
@@ -8441,7 +8550,6 @@
    "getRefundPolicy",
    "applyManualDiscount",
    "createOrder",
-   "createRefund",
    "exchangeOrderLines",
    "getOrder",
    "getOrderStatement",
@@ -8485,11 +8593,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "ledger.entry",
-   "ledger.journal_entry",
    "orders.order_line",
    "orders.payment",
-   "orders.refund",
    "orders.refund_policy",
    "orders.sales_order",
    "queue.feed",
@@ -8500,6 +8605,8 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-002",
    "BO-004"
   ]
  },
@@ -8549,6 +8656,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-002",
+   "BO-003",
    "BO-005"
   ]
  },
@@ -8609,6 +8719,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-002",
+   "BO-003",
    "EMP-032"
   ]
  },
@@ -9330,6 +9443,11 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-007",
+   "BO-008",
+   "BO-009",
+   "GST-025",
    "GST-034"
   ]
  },
@@ -9850,6 +9968,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-007",
+   "BO-008",
+   "BO-009",
    "BO-031"
   ]
  },
@@ -10262,6 +10384,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -10322,6 +10445,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -10343,6 +10467,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-007",
+   "BO-008",
+   "BO-009",
    "BO-089"
   ]
  },
@@ -10379,6 +10507,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -10439,6 +10568,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
@@ -10756,6 +10886,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-007",
+   "BO-008",
+   "BO-009",
    "GST-026"
   ]
  },
@@ -10844,7 +10978,6 @@
    "getOrder",
    "createOrder",
    "applyManualDiscount",
-   "createRefund",
    "exchangeOrderLines",
    "getOrderStatement",
    "holdOrder",
@@ -10872,11 +11005,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
-   "ledger.journal_entry",
    "orders.order_line",
    "orders.payment",
-   "orders.refund",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -10932,6 +11062,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-007",
+   "BO-008",
+   "BO-009",
    "EMP-005"
   ]
  },
@@ -11187,6 +11321,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-007",
+   "BO-008",
+   "BO-009",
    "EMP-020"
   ]
  },
@@ -11763,7 +11901,6 @@
    "getOrder",
    "createOrder",
    "applyManualDiscount",
-   "createRefund",
    "exchangeOrderLines",
    "getOrderStatement",
    "holdOrder",
@@ -11791,11 +11928,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
-   "ledger.journal_entry",
    "orders.order_line",
    "orders.payment",
-   "orders.refund",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -11970,7 +12104,10 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "BO-075"
+   "BO-001",
+   "BO-075",
+   "BO-076",
+   "BO-077"
   ]
  },
  "BO-075": {
@@ -12014,7 +12151,11 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "ADM-020"
+   "ADM-020",
+   "BO-001",
+   "BO-074",
+   "BO-076",
+   "BO-077"
   ]
  },
  "BO-076": {
@@ -12144,6 +12285,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-079",
+   "BO-080",
+   "BO-081",
    "BO-084"
   ]
  },
@@ -12391,8 +12536,11 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
    "BO-052",
-   "BO-085"
+   "BO-085",
+   "BO-086",
+   "BO-087"
   ]
  },
  "BO-085": {
@@ -12438,6 +12586,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-084",
+   "BO-086",
+   "BO-087",
    "POS-005"
   ]
  },
@@ -12592,6 +12744,10 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "BO-001",
+   "BO-074",
+   "BO-075",
+   "BO-076",
    "BO-090"
   ]
  },
@@ -12633,7 +12789,11 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "BO-040"
+   "BO-001",
+   "BO-040",
+   "BO-074",
+   "BO-075",
+   "BO-076"
   ]
  },
  "BO-091": {
@@ -12670,7 +12830,9 @@
   "wave": 1,
   "offline": false,
   "specified": true,
-  "exits": []
+  "exits": [
+   "BO-001"
+  ]
  },
  "ADM-001": {
   "name": "Platform Login / MFA",
@@ -12793,6 +12955,8 @@
   "specified": true,
   "exits": [
    "ADM-001",
+   "ADM-003",
+   "ADM-004",
    "ADM-005",
    "ADM-006",
    "ADM-007",
@@ -12846,6 +13010,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-004",
    "SCN-004"
   ]
  },
@@ -12947,6 +13114,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-003",
    "ADM-012"
   ]
  },
@@ -13024,6 +13194,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-003",
    "ADM-007"
   ]
  },
@@ -13094,6 +13267,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-003",
    "BO-074"
   ]
  },
@@ -13155,6 +13331,7 @@
    "control.usage_record",
    "identity.sso_group_mapping",
    "identity.sso_provider",
+   "ledger.fx_rate",
    "platform.tenant"
   ],
   "writes": [
@@ -13464,6 +13641,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-003",
    "ADM-006"
   ]
  },
@@ -14076,6 +14256,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-003",
    "ADM-027"
   ]
  },
@@ -14118,6 +14301,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-003",
    "ADM-029"
   ]
  },
@@ -14273,6 +14459,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ADM-001",
+   "ADM-002",
+   "ADM-003",
    "ADM-023"
   ]
  },
@@ -14693,7 +14882,9 @@
   "wave": 1,
   "offline": false,
   "specified": true,
-  "exits": []
+  "exits": [
+   "ADM-001"
+  ]
  },
  "PTR-001": {
   "name": "Partner Login / MFA",
@@ -14754,6 +14945,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "PTR-002",
+   "PTR-003",
+   "PTR-004",
    "PTR-005"
   ]
  },
@@ -14770,7 +14964,6 @@
    "getB2bCredit",
    "applyManualDiscount",
    "createOrder",
-   "createRefund",
    "exchangeOrderLines",
    "getOrder",
    "getOrderStatement",
@@ -14803,13 +14996,10 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
-   "ledger.journal_entry",
    "orders.b2b_credit",
    "orders.credit_override",
    "orders.order_line",
    "orders.payment",
-   "orders.refund",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -14817,6 +15007,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "PTR-001",
+   "PTR-003",
+   "PTR-004",
    "PTR-007"
   ]
  },
@@ -14909,7 +15102,6 @@
    "createOrder",
    "applyManualDiscount",
    "createEnvelope",
-   "createRefund",
    "exchangeOrderLines",
    "getOrder",
    "getOrderStatement",
@@ -14948,11 +15140,8 @@
    "cache:idempotency",
    "catalogue.channel_allocation",
    "catalogue.envelope",
-   "ledger.entry",
-   "ledger.journal_entry",
    "orders.order_line",
    "orders.payment",
-   "orders.refund",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -14960,6 +15149,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "PTR-001",
+   "PTR-002",
+   "PTR-003",
    "PTR-008"
   ]
  },
@@ -15053,6 +15245,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "PTR-001",
+   "PTR-002",
+   "PTR-003",
    "PTR-008"
   ]
  },
@@ -15109,6 +15304,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "PTR-001",
+   "PTR-002",
+   "PTR-003",
    "PTR-016",
    "SCN-004"
   ]
@@ -15238,6 +15436,7 @@
   ],
   "reads": [
    "control.partner_agreement",
+   "ledger.fx_rate",
    "orders.refund",
    "orders.sales_order"
   ],
@@ -15430,7 +15629,10 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "BO-008"
+   "BO-008",
+   "PTR-001",
+   "PTR-002",
+   "PTR-003"
   ]
  },
  "PTR-016": {
@@ -15445,7 +15647,6 @@
    "reprintOrder",
    "applyManualDiscount",
    "createOrder",
-   "createRefund",
    "exchangeOrderLines",
    "getOrder",
    "getOrderStatement",
@@ -15474,11 +15675,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
-   "ledger.journal_entry",
    "orders.order_line",
    "orders.payment",
-   "orders.refund",
    "orders.sales_order"
   ],
   "storedProcedures": [],
@@ -15511,6 +15709,7 @@
   ],
   "reads": [
    "control.partner_agreement",
+   "ledger.fx_rate",
    "orders.refund",
    "orders.sales_order"
   ],
@@ -15741,6 +15940,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ACC-001",
+   "ACC-003",
+   "ACC-004",
    "ACC-007"
   ]
  },
@@ -15785,7 +15987,9 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "ACC-002"
+   "ACC-001",
+   "ACC-002",
+   "ACC-003"
   ]
  },
  "ACC-005": {
@@ -15815,7 +16019,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ACC-001",
    "ACC-002",
+   "ACC-003",
    "SCN-004"
   ]
  },
@@ -15847,7 +16053,9 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "ACC-007"
+   "ACC-001",
+   "ACC-007",
+   "ACC-008"
   ]
  },
  "ACC-007": {
@@ -15886,7 +16094,10 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "ACC-005"
+   "ACC-001",
+   "ACC-005",
+   "ACC-006",
+   "ACC-008"
   ]
  },
  "ACC-008": {
@@ -15907,6 +16118,8 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "ACC-001",
+   "ACC-006",
    "ACC-007"
   ]
  },
@@ -16094,6 +16307,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "SUP-001",
+   "SUP-002",
+   "SUP-003",
    "SUP-005"
   ]
  },
@@ -16146,7 +16362,9 @@
   "offline": false,
   "specified": true,
   "exits": [
-   "SUP-005"
+   "SUP-001",
+   "SUP-002",
+   "SUP-003"
   ]
  },
  "SUP-006": {
@@ -16242,6 +16460,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "SUP-001",
+   "SUP-002",
+   "SUP-003",
    "SUP-005"
   ]
  },
@@ -16457,6 +16678,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "CMS-001",
+   "CMS-003",
+   "CMS-004",
    "CMS-005"
   ]
  },
@@ -16636,6 +16860,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "CMS-001",
+   "CMS-002",
+   "CMS-003",
    "CMS-007"
   ]
  },
@@ -16769,6 +16996,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "CMS-001",
+   "CMS-002",
+   "CMS-003",
    "CMS-012"
   ]
  },
@@ -17009,6 +17239,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "CMS-001",
+   "CMS-002",
+   "CMS-003",
    "CMS-014"
   ]
  },
@@ -17048,6 +17281,9 @@
   "offline": false,
   "specified": true,
   "exits": [
+   "CMS-001",
+   "CMS-002",
+   "CMS-003",
    "CMS-015"
   ]
  },

@@ -8,8 +8,8 @@ info:
   x-ticvai-requirements: 107
   x-ticvai-capabilities: [C57, C105, C106]
   x-ticvai-platforms:
-    - "P13 White-Label CMS"
-    - "P08 Venue Back Office"
+    - "P13 Venue CMS"
+    - "P08 Venue Management"
   description: >
     ## What this contract covers
 
@@ -21,7 +21,7 @@ info:
     | **Matrix domain** | 17 — Guest Mobile App & Branding (builder) |
     | **Requirements** | ~107 |
     | **Capabilities** | C57, C105, C106 |
-    | **Consumed by** | P13 White-Label CMS · P08 Venue Back Office |
+    | **Consumed by** | P13 Venue CMS · P08 Venue Management |
 
     ## How to read this file
 
@@ -158,8 +158,7 @@ paths:
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P02 GST-001 Home – Default"
         - "P02 GST-038 Digital Companion Mode"
-        - "P02 GST-047 Maintenance Page"
-        - "P02 GST-060 Maintenance / Upgrade Page"
+        - "P02 GST-047 Maintenance / Upgrade Page"
         - "P05 KSK-002 Language Select"
         - "P09 ADM-016 White-Label Branding Management"
         - "P09 ADM-017 Domain & Certificate Management"

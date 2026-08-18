@@ -299,6 +299,9 @@ screens:
     entryFrom:
     - SUP-001
     exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
     - SUP-005
     inferred: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -382,7 +385,9 @@ screens:
     - SUP-005
     inferred: true
     exitTo:
-    - SUP-005
+    - SUP-001
+    - SUP-002
+    - SUP-003
     flowDerived: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
@@ -583,6 +588,9 @@ screens:
     entryFrom:
     - SUP-001
     exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
     - SUP-005
     inferred: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for

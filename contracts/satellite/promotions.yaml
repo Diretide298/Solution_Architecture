@@ -8,7 +8,7 @@ info:
   x-ticvai-requirements: 229
   x-ticvai-capabilities: [C05, C06, C07, C37, C86, C87, C88, C89, C90]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
+    - "P08 Venue Management"
     - "P04 POS"
     - "P01 Guest Web"
     - "P02 Guest App"
@@ -23,7 +23,7 @@ info:
     | **Matrix domain** | 4 — Bundles and Promotions |
     | **Requirements** | ~229 |
     | **Capabilities** | C05, C06, C07, C37, C86, C87, C88, C89, C90 |
-    | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App |
+    | **Consumed by** | P08 Venue Management · P04 POS · P01 Guest Web · P02 Guest App |
 
     ## How to read this file
 

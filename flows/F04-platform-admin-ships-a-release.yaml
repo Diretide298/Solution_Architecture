@@ -9,7 +9,7 @@ wave: 2
 frequency: weekly
 criticality: operational
 platforms:
-- P09 Platform Admin Console
+- P09 TICVAI Web
 offlineBehaviour: Not applicable. Control Plane only.
 trigger:
   description: A release is ready to move from staging to production across every cell.

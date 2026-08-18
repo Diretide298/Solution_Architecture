@@ -11,9 +11,9 @@ info:
     - "P04 POS"
     - "P01 Guest Web"
     - "P02 Guest App"
-    - "P05 Kiosk"
-    - "P10 Partner Portal"
-    - "P12 Support Console"
+    - "P05 Guest Kiosk"
+    - "P10 Partner Web"
+    - "P12 Venue Support"
   description: >
     ## What this contract covers
 
@@ -25,7 +25,7 @@ info:
     | **Matrix domain** | 2 — Ticketing Sales |
     | **Requirements** | ~343 |
     | **Capabilities** | C02, C03, C04, C34, C47 |
-    | **Consumed by** | P04 POS · P01 Guest Web · P02 Guest App · P05 Kiosk · P10 Partner Portal · P12 Support Console |
+    | **Consumed by** | P04 POS · P01 Guest Web · P02 Guest App · P05 Guest Kiosk · P10 Partner Web · P12 Venue Support |
 
     ## How to read this file
 
@@ -167,6 +167,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-014 Payment Link Landing"
+        - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
         - "P02 GST-053 Build Your Own Itinerary"
@@ -435,6 +436,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-014 Payment Link Landing"
+        - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
@@ -1042,18 +1044,12 @@ paths:
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
-        - "P08 BO-003 Queue Integration Setup"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 F&B Order Management"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-audience: [staff, partner]
       summary: Refund an order, wholly or in part
       description: >
@@ -1315,7 +1311,7 @@ paths:
       operationId: createPayment
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
-        - "P02 GST-033 AI Concierge – Contextual Help"
+        - "P02 GST-009 Review & Payment"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
@@ -1368,6 +1364,7 @@ paths:
     post:
       operationId: inquirePaymentStatus
       x-ticvai-consumed-by:
+        - "P02 GST-009 Review & Payment"
         - "P04 POS-005 Payment"
         - "P05 KSK-008 Payment unresolved"
         - "P06 EMP-035 Payment on device"
@@ -3217,6 +3214,42 @@ components:
         id: { type: string }
         orderId: { type: string }
         tender: { $ref: '#/components/schemas/TenderKind' }
+        tenderCurrency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: >
+            4.6.11. **What the guest actually handed over**, which is not always what the venue books. A
+            tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base
+            currency.
+
+            Equal to the base currency for almost every payment. **Present on all of them so the
+            foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in
+            which currency* and nothing recorded it until 18 August.
+        tenderAmount:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: The amount in `tenderCurrency`, at that currency's own scale.
+        fxRate:
+          type: number
+          nullable: true
+          description: >
+            The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment
+            reconciled next month is reconciled at the rate of the day it was taken.
+        fxRateSource:
+          type: string
+          nullable: true
+          enum: [manual, feed, cardScheme]
+          description: >
+            4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion
+            and told us** — dynamic currency conversion, the scheme's rate rather than ours.
+        changeCurrency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          nullable: true
+          description: >
+            4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving
+            change in five currencies needs five floats and five counts, and the variance becomes
+            unattributable.
         amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         changeAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         status:

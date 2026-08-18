@@ -8,7 +8,7 @@ info:
   x-ticvai-requirements: 327
   x-ticvai-capabilities: [C41, C42, C43, C44, C45, C46, C47, C48, C49, C50]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
+    - "P08 Venue Management"
   description: >
     ## What this contract covers
 
@@ -20,7 +20,7 @@ info:
     | **Matrix domain** | 5 — F&B & Guest Management (accounting and revenue recognition) |
     | **Requirements** | ~327 |
     | **Capabilities** | C41, C42, C43, C44, C45, C46, C47, C48, C49, C50 |
-    | **Consumed by** | P08 Venue Back Office |
+    | **Consumed by** | P08 Venue Management |
 
     ## How to read this file
 

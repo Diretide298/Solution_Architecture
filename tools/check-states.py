@@ -65,9 +65,10 @@ def check_duplicate_paths() -> None:
 def load_contracts() -> tuple[dict[str, list[str]], set[str]]:
     """Status enums by contract.SchemaName, and every operationId."""
     enums: dict[str, list[str]] = {}
+    object_schemas: dict[str, set[str]] = {}
     ops: set[str] = set()
     if not CONTRACTS.exists():
-        return enums, ops
+        return enums, ops, object_schemas
     for f in list((CONTRACTS / "spine").glob("*.yaml")) + list((CONTRACTS / "satellite").glob("*.yaml")):
         doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         ctx = f.stem
@@ -76,6 +77,8 @@ def load_contracts() -> tuple[dict[str, list[str]], set[str]]:
                 continue
             if sch.get("type") == "string" and "enum" in sch:
                 enums[f"{ctx}.{name}"] = sch["enum"]
+            elif isinstance(sch, dict) and sch.get("type") == "object":
+                object_schemas.setdefault(ctx, set()).add(name)
             # A lifecycle declared inline on a property rather than as a named enum. Thirty-one
             # of these existed on 17 August and the checker had never seen one, because it only
             # looked for schemas called *Status. `Payment.status` and `Refund.status` are two of
@@ -90,12 +93,12 @@ def load_contracts() -> tuple[dict[str, list[str]], set[str]]:
                     if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict):
                         if oid := op.get("operationId"):
                             ops.add(oid)
-    return enums, ops
+    return enums, ops, object_schemas
 
 
 def main() -> int:
     check_duplicate_paths()
-    enums, ops = load_contracts()
+    enums, ops, object_schemas = load_contracts()
     state_files = sorted(f for f in STATES.glob("*.yaml") if f.name != "_schema.yaml")
     event_files = sorted(f for f in EVENTS.glob("*.yaml") if f.name != "_schema.yaml")
 
@@ -130,10 +133,17 @@ def main() -> int:
                               "a state nobody has thought about")
             for s in sorted(states - declared):
                 ERRORS.append(f"{name}: '{s}' is in the model and not in the contract enum")
-        elif d.get("openQuestions"):
-            WARNINGS.append(f"{name}: enum {key} does not exist, and the model says so")
         else:
-            ERRORS.append(f"{name}: enum {key} not found in the contracts")
+            # An anchor that does not resolve is an error, and `openQuestions` used to downgrade
+            # it to a warning — so a model could excuse its own broken anchor by declaring an
+            # open question about something else. `states/entitlement.yaml` did exactly that for
+            # a day: it anchored on `access.TicketStatus`, which is an object with no values, and
+            # the warning read as a known exception rather than the defect it was.
+            hint = ""
+            if key.split(".", 1)[-1] in object_schemas.get(d["contract"], set()):
+                hint = (" — that schema exists and is an object, not an enum, so these states are "
+                        "checked against nothing")
+            ERRORS.append(f"{name}: enum {key} not found in the contracts{hint}")
 
         # 2. reachability
         reachable = set(d["initial"])

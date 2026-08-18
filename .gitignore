@@ -9,7 +9,7 @@ backend/node_modules/
 arabic-embed-eval/.venv/
 arabic-embed-eval/results/raw/
 
-# .NET build output under repos/ — 16 directories, none of it source
+# .NET build output under repos/ — none of it source
 repos/**/bin/
 repos/**/obj/
 
@@ -18,5 +18,8 @@ shot-*.png
 viewer/shot-*.png
 
 # The viewer's account store: real accounts, argon2 hashes and live session
-# tokens. This repository is public — a session row here is a working key.
+# tokens, plus SQLite's -wal and -shm siblings. This repository is public.
+# Also in .git/info/exclude, because a package drop overwrites this file.
 viewer/api/*.db
+viewer/api/*.db-shm
+viewer/api/*.db-wal

@@ -19,7 +19,9 @@ Checks:
   8. Every operation declares either a permission or an `x-ticvai-audience`. Fifty-four
      carried `x-ticvai-permission: null` with no statement of what protected them instead —
      unauthenticated by accident is indistinguishable from unauthenticated by design.
-  9. No operation writes a table documented as a read-only projection.
+  9. Every schema naming a table gives that table columns. 76 of 287 tables were empty on
+     18 August, including all 13 AI tables, and nothing failed.
+ 10. No operation writes a table documented as a read-only projection.
  10. ADR status leads with one of four values. "Accepted — split rule superseded by ADR-0014"
      read as live because it led with "Accepted".
  10. An ADR citing a superseded ADR names the supersession. On 17 August ADR-0021 reasoned from
@@ -135,6 +137,62 @@ def main() -> int:
         for _, key, first, again in _dupes:
             ERRORS.append(f"{f.name}: key '{key}' defined at line {first} and redefined at "
                           f"{again} — YAML keeps the last and discards the first without a word")
+
+    # 19. A platform code is written with the name its own screens file declares. On 18 August
+    # eight of twelve platforms were called something else in the contracts — P09 alone had two
+    # wrong names, "Platform Admin Console" and "Platform Admin", against a declared "TICVAI Web".
+    # The existing check catches a code that does not exist; it did not catch a code paired with
+    # the wrong name, which is the failure a reader actually hits.
+    import re as _re5
+    declared: dict[str, str] = {}
+    for f in sorted((ROOT / "screens").glob("P*.yaml")):
+        pl = (yaml.safe_load(f.read_text(encoding="utf-8")) or {}).get("platform") or {}
+        if pl.get("code"):
+            declared[pl["code"]] = pl.get("shortName") or pl.get("name")
+    # The conflict register quotes past wordings deliberately — "P11 Accreditation as a guest
+    # surface" is prose about a defect, not a platform name, and checking it would force the
+    # register to launder its own history.
+    for f in list(C.glob("*/*.yaml")) + list((ROOT / "docs").rglob("*.md")) + list(H.glob("*.md")):
+        if f.name in ("conflicts.md", "conflict-status.md"):
+            continue
+        text = f.read_text(encoding="utf-8", errors="replace")
+        # Only a code followed by words. `P12 SUP-001 Inbox` is a screen reference, not a name,
+        # and matching it produced 1,837 false errors on the first attempt.
+        for m in _re5.finditer(r"\b(P\d\d) ((?:[A-Z][a-z&-]*)(?: [A-Za-z&-]+){1,4})\b", text):
+            code, name = m.group(1), m.group(2).strip().rstrip("·|")
+            want = declared.get(code)
+            if not want or _re5.match(r"^[A-Z]{2,4}-\d", name):
+                continue
+            if name == want or name.startswith(want) or want.startswith(name):
+                continue
+            # a longer descriptive title that contains the short name is fine
+            if want.lower() in name.lower():
+                continue
+            ERRORS.append(f"{f.name}: writes '{code} {name}' — its screens file declares "
+                          f"'{want}'. One code, one name")
+
+    # 19. Every schema that names a table must give that table columns. The schema reference was
+    # derived once by an ad-hoc script and then hand-patched, so on 18 August **76 of 287 tables had
+    # no columns** — every table belonging to a contract written after that run, including all 13
+    # `ai.*` tables. Nothing failed, because a table with no columns is not an error to a checker
+    # that only asks whether the table exists. `tools/derive-schema.py` now regenerates them.
+    sref = H / "schema-reference.json"
+    if sref.exists():
+        ref = json.loads(sref.read_text(encoding="utf-8"))
+        cols = ref.get("cols", {})
+        for tier in ("spine", "satellite"):
+            for f in sorted((C / tier).glob("*.yaml")):
+                doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+                for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
+                    if not isinstance(body, dict):
+                        continue
+                    tbl = body.get("x-ticvai-persistence")
+                    if not isinstance(tbl, str) or "." not in tbl or "—" in tbl:
+                        continue
+                    tbl = tbl.split("+")[0].strip()
+                    if body.get("properties") and not cols.get(tbl):
+                        ERRORS.append(f"{f.name}: schema {sname} persists to {tbl} and that table has "
+                                      "no columns in the schema reference — run tools/derive-schema.py")
 
     # 13. The x-ticvai-* vocabularies are closed sets. `lastWriteWins` and `lastWriterWins` were
     # both in use on 17 August — one policy, two spellings, ten operations split between them, and

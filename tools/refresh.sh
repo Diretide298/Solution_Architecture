@@ -7,6 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+python3 tools/derive-schema.py
 python3 tools/link-screens-contracts.py
 
 python3 - <<'PY'

@@ -106,6 +106,9 @@ screens:
     - ACC-001
     inferred: true
     exitTo:
+    - ACC-001
+    - ACC-003
+    - ACC-004
     - ACC-007
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -182,7 +185,9 @@ screens:
     entryFrom:
     - ACC-001
     exitTo:
+    - ACC-001
     - ACC-002
+    - ACC-003
     inferred: true
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -216,7 +221,9 @@ screens:
     entryFrom:
     - ACC-001
     exitTo:
+    - ACC-001
     - ACC-002
+    - ACC-003
     - SCN-004
     inferred: true
     fromFlows: true
@@ -257,7 +264,9 @@ screens:
     entryFrom:
     - ACC-001
     exitTo:
+    - ACC-001
     - ACC-007
+    - ACC-008
     inferred: true
   apis:
   - operationId: getWaitTimes
@@ -297,7 +306,10 @@ screens:
     - ACC-001
     inferred: true
     exitTo:
+    - ACC-001
     - ACC-005
+    - ACC-006
+    - ACC-008
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -340,6 +352,8 @@ screens:
     entryFrom:
     - ACC-001
     exitTo:
+    - ACC-001
+    - ACC-006
     - ACC-007
     inferred: true
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived

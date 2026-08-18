@@ -32,7 +32,7 @@ platform:
   screenCount: 50
   wireframeBoard: wireframes/P06 Staff App.dc.html
   designReferences:
-  - path: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+  - path: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
     note: Employee app reference — dark theme, and the Home · Tasks · Scan · AI · More nav that CF-41
       is about.
   operator: venue
@@ -62,13 +62,15 @@ screens:
   navigation:
     exitTo:
     - EMP-002
+    - EMP-003
+    - EMP-048
     inferred: true
     fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-001
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -129,6 +131,8 @@ screens:
     offline: Cached from the last session
   navigation:
     exitTo:
+    - EMP-001
+    - EMP-003
     - EMP-048
     inferred: true
     fromFlows: true
@@ -136,7 +140,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-002
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -205,16 +209,21 @@ screens:
     offline: Last synced view, with its age. The pending count is always current because it is local
   navigation:
     exitTo:
+    - EMP-001
+    - EMP-002
     - EMP-004
+    - EMP-048
     inferred: true
     fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-003
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. **createCashMovement removed 18 August** — attached by module resemblance,
+    not by what this screen does. A screen that does not handle money should not be able to move it
+    (CF-87's class).
   implementation:
     app: venue-staff-app
     route: /operations/home-on-duty
@@ -240,10 +249,6 @@ screens:
   - operationId: closeShift
     contract: shift
     purpose: Blind close-out
-    trigger: onAction
-  - operationId: createCashMovement
-    contract: shift
-    purpose: Record a cash lift or add
     trigger: onAction
   - operationId: getIncident
     contract: maintenance
@@ -314,6 +319,8 @@ screens:
     offline: Works from the cached template. Completions queue
   navigation:
     exitTo:
+    - EMP-001
+    - EMP-002
     - EMP-003
     inferred: true
     fromFlows: true
@@ -321,7 +328,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-048
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -375,7 +382,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-009
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -464,7 +471,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-010
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -529,7 +536,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-011
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -595,7 +602,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-012
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -661,7 +668,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-013
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -727,7 +734,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-014
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -820,7 +827,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-015
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -885,7 +892,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-016
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -950,7 +957,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-017
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1023,7 +1030,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-018
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1068,6 +1075,9 @@ screens:
     offline: Local queue. Tasks completed offline sync on return
   navigation:
     exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     - EMP-005
     inferred: true
     fromFlows: true
@@ -1075,7 +1085,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-004
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1170,6 +1180,9 @@ screens:
     exitTo:
     - BO-030
     - BO-078
+    - EMP-001
+    - EMP-002
+    - EMP-003
     - EMP-007
     inferred: true
     fromFlows: true
@@ -1177,7 +1190,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-005
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1278,7 +1291,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-006
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1371,6 +1384,9 @@ screens:
     offline: Editable offline and synced at end of shift
   navigation:
     exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     - EMP-009
     inferred: true
     fromFlows: true
@@ -1378,7 +1394,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-007
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1431,7 +1447,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-008
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1520,7 +1536,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-019
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. Pulled to Wave 1 (CF-101). CF-57: the client named AI configuration assistance
     as a Wave 1 priority, and F20 is Wave 1.'
@@ -1563,13 +1579,16 @@ screens:
   navigation:
     exitTo:
     - BO-058
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
     fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-020
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. Pulled to Wave 1 (CF-101) with EMP-019 — **the question and the answer are
     one screen pair** and splitting them across waves ships half a feature.
@@ -1619,7 +1638,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-031
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1686,13 +1705,16 @@ screens:
   navigation:
     exitTo:
     - BO-005
+    - EMP-001
+    - EMP-002
+    - EMP-003
     inferred: true
     fromFlows: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-032
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1765,7 +1787,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-033
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1826,7 +1848,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-034
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -1960,9 +1982,10 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-035
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. Card on a handheld. **Tender currency equals base currency** — a staff member
+    taking payment away from a till has no float and cannot accept foreign cash.
   implementation:
     app: venue-staff-app
     route: /operations/payment-on-device
@@ -2013,7 +2036,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-036
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2098,7 +2121,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-037
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2152,7 +2175,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-039
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2205,7 +2228,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-047
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2258,7 +2281,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-050
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2315,7 +2338,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-021
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2368,7 +2391,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-022
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2421,7 +2444,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-023
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2475,7 +2498,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-024
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2524,7 +2547,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-025
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2566,6 +2589,9 @@ screens:
     offline: Queues locally with the highest sync priority
   navigation:
     exitTo:
+    - EMP-001
+    - EMP-002
+    - EMP-003
     - EMP-004
     inferred: true
     fromFlows: true
@@ -2573,7 +2599,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-026
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2630,7 +2656,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-027
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2688,7 +2714,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-028
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2754,7 +2780,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-029
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2839,7 +2865,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-030
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2892,7 +2918,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-038
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2945,7 +2971,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-040
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -2986,7 +3012,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-041
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -3027,7 +3053,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-042
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -3092,7 +3118,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-043
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -3178,7 +3204,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-044
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -3214,7 +3240,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-045
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -3251,7 +3277,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-046
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -3292,7 +3318,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-049
-    designReference: designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:

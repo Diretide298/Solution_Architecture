@@ -7,7 +7,7 @@ info:
   x-ticvai-module: "Cross-cutting — Control Plane release and environment management"
   x-ticvai-capabilities: [C96]
   x-ticvai-platforms:
-    - "P09 Platform Admin Console"
+    - "P09 TICVAI Web"
   description: >
     ## What this contract covers
 
@@ -18,7 +18,7 @@ info:
     | **Tier** | satellite — Control Plane |
     | **Matrix domain** | None. This scope arrived in the 30 July workshop and never reached the requirements matrix |
     | **Capabilities** | C96 |
-    | **Consumed by** | P09 Platform Admin Console |
+    | **Consumed by** | P09 TICVAI Web |
 
     ## Why this contract exists
 

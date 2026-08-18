@@ -18,7 +18,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 65
+  screenCount: 63
   app: guest-app
   appStatus: scaffolded
   packages:
@@ -37,7 +37,7 @@ platform:
     releaseCadence: fortnightly, gated by review
   wireframeBoard: wireframes/P02 Guest App.dc.html
   designReferences:
-  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: White Label Builder — the guest app is what the builder configures.
   operator: guest
 screens:
@@ -61,7 +61,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-001
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /catalogue, local` — no matching operation. Written before the contracts existed.
@@ -104,7 +104,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-002
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /catalogue` — no matching operation. Written before the contracts existed.
@@ -148,7 +148,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-003
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   implementation:
     app: guest-app
@@ -196,7 +196,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-004
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   implementation:
     app: guest-app
@@ -246,7 +246,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-005
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C84
   implementation:
     app: guest-app
@@ -292,7 +292,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-006
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C84
   implementation:
     app: guest-app
@@ -338,7 +338,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-007
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /performances, POST /leases` — no matching operation. Written before the contracts
@@ -387,7 +387,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-008
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `local` — no matching operation. Written before the contracts existed.
@@ -414,7 +414,7 @@ screens:
 - id: GST-009
   name: Review & Payment
   module: TODO
-  purpose: Take the money, and be unambiguous about whether it worked.
+  purpose: Check what you are buying and pay for it.
   wave: 1
   layout:
     template: form
@@ -424,21 +424,39 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: Terminal or gateway state, shown plainly
+    loading: Order summary, then the payment methods this venue accepts
     empty: —
-    error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
-      retries, and nothing is issued until it resolves'
-    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
+    error: '**Could not reach the gateway. The order is held, not lost** — and a payment whose outcome
+      is unknown goes to `inquirePaymentStatus` rather than being retried, because retrying an unknown
+      charge is how a guest is charged twice'
+    offline: '**Not available.** A payment needs the gateway, and pretending otherwise takes money we
+      cannot confirm'
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-009
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C47
   apis:
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Take a payment against an order
+    trigger: onAction
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: Ask the provider what actually happened
+    trigger: onAction
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
+    trigger: onLoad
   implementation:
     app: guest-app
     route: /general/review-and-payment
@@ -449,11 +467,17 @@ screens:
     - GST-001
     inferred: true
     exitTo:
+    - BO-020
     - GST-001
     - GST-002
     - GST-003
+    fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **`createPayment`
+    added 18 August** — the guest app's payment screen did not declare the operation that takes a payment,
+    and F11 routed food payment through the AI concierge instead. **Card only, so tender currency equals
+    base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not
+    ours and is not recorded as ours.
 - id: GST-010
   name: Booking Confirmation
   module: TODO
@@ -474,7 +498,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-010
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   apis:
   - operationId: transferOrderTickets
@@ -517,7 +541,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-011
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C37
   openQuestions:
   - Inventory cites `GET /wallet` — no matching operation. Written before the contracts existed.
@@ -565,7 +589,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-012
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /tickets` — no matching operation. Written before the contracts existed.
@@ -609,7 +633,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-013
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /tickets/{id}` — no matching operation. Written before the contracts existed.
@@ -653,7 +677,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-014
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `POST /tickets/{id}/transfer` — no matching operation. Written before the contracts
@@ -702,7 +726,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-015
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C03
   openQuestions:
   - Inventory cites `GET /memberships` — no matching operation. Written before the contracts existed.
@@ -717,6 +741,9 @@ screens:
     inferred: true
     exitTo:
     - ADM-003
+    - GST-001
+    - GST-002
+    - GST-003
     fromFlows: true
   apis:
   - operationId: getGuestLink
@@ -749,7 +776,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-016
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   implementation:
     app: guest-app
@@ -799,7 +826,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-017
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   implementation:
     app: guest-app
@@ -845,7 +872,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-018
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `local` — no matching operation. Written before the contracts existed.
@@ -894,7 +921,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-019
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C21
   apis:
   - operationId: transferOrderTickets
@@ -936,7 +963,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-020
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C58
   openQuestions:
   - Inventory cites `GET /wishlist` — no matching operation. Written before the contracts existed.
@@ -1003,7 +1030,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-021
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C39
   openQuestions:
   - Inventory cites `GET /venue-map` — no matching operation. Written before the contracts existed.
@@ -1051,7 +1078,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-022
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C82
   openQuestions:
   - Inventory cites `GET /queue/wait-times` — no matching operation. Written before the contracts existed.
@@ -1065,6 +1092,8 @@ screens:
     - GST-001
     inferred: true
     exitTo:
+    - GST-001
+    - GST-002
     - GST-003
     - GST-059
     fromFlows: true
@@ -1096,7 +1125,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-023
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C82
   apis:
   - operationId: joinQueue
@@ -1146,7 +1175,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-024
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C05
   apis:
   - operationId: listDiningOutlets
@@ -1189,6 +1218,8 @@ screens:
     - GST-001
     - GST-002
     - GST-003
+    - GST-009
+    fromFlows: true
 - id: GST-025
   name: F&B – Order Tracking
   module: TODO
@@ -1209,7 +1240,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-025
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C05
   apis:
   - operationId: getGuestOrderStatus
@@ -1237,9 +1268,11 @@ screens:
     - GST-001
     inferred: true
     exitTo:
+    - BO-021
     - GST-001
     - GST-002
     - GST-003
+    fromFlows: true
 - id: GST-026
   name: Retail / Merchandise
   module: TODO
@@ -1260,7 +1293,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-026
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C08
   openQuestions:
   - Inventory cites `GET /products?kind=retail` — no matching operation. Written before the contracts
@@ -1277,6 +1310,9 @@ screens:
     exitTo:
     - BO-048
     - BO-069
+    - GST-001
+    - GST-002
+    - GST-003
     fromFlows: true
   apis:
   - operationId: getGameCard
@@ -1310,7 +1346,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-027
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C23
   openQuestions:
   - Inventory cites `POST /parking-reservations` — no matching operation. Written before the contracts
@@ -1359,7 +1395,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-028
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C23
   openQuestions:
   - Inventory cites `GET /parking-reservations/{id}` — no matching operation. Written before the contracts
@@ -1408,7 +1444,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-029
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C17
   openQuestions:
   - Inventory cites `GET /venue-info` — no matching operation. Written before the contracts existed.
@@ -1456,7 +1492,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-030
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C61
   openQuestions:
   - Inventory cites `GET /notifications` — no matching operation. Written before the contracts existed.
@@ -1470,6 +1506,9 @@ screens:
     - GST-001
     inferred: true
     exitTo:
+    - GST-001
+    - GST-002
+    - GST-003
     - GST-031
     fromFlows: true
   apis:
@@ -1499,7 +1538,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-031
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-02
   openQuestions:
   - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
@@ -1513,6 +1552,9 @@ screens:
     - GST-001
     inferred: true
     exitTo:
+    - GST-001
+    - GST-002
+    - GST-003
     - GST-032
     fromFlows: true
   apis:
@@ -1548,7 +1590,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-032
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-02
   openQuestions:
   - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
@@ -1562,6 +1604,9 @@ screens:
     - GST-001
     inferred: true
     exitTo:
+    - GST-001
+    - GST-002
+    - GST-003
     - GST-033
     fromFlows: true
   apis:
@@ -1621,7 +1666,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-033
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-02
   openQuestions:
   - Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed.
@@ -1636,16 +1681,17 @@ screens:
     inferred: true
     exitTo:
     - BO-020
+    - GST-001
+    - GST-002
+    - GST-003
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
-    Still degrades to the manual planner rather than to an error.
+    Still degrades to the manual planner rather than to an error. **createPayment removed 18 August**
+    — attached by module resemblance, not by what this screen does. A screen that does not handle money
+    should not be able to move it (CF-87's class).
   apis:
-  - operationId: createPayment
-    contract: orders
-    purpose: Take a payment against an order
-    trigger: onAction
   - operationId: sendAiMessage
     contract: ai
     purpose: Ask
@@ -1670,7 +1716,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-034
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C18
   openQuestions:
   - Inventory cites `POST /lost-found/reports` — no matching operation. Written before the contracts
@@ -1686,6 +1732,9 @@ screens:
     inferred: true
     exitTo:
     - BO-021
+    - GST-001
+    - GST-002
+    - GST-003
     fromFlows: true
   apis:
   - operationId: getGuestOrderStatus
@@ -1714,7 +1763,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-035
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C62
   apis:
   - operationId: submitReview
@@ -1739,8 +1788,8 @@ screens:
 - id: GST-036
   name: Loyalty & Rewards
   module: TODO
-  purpose: Find loyalty & rewards for this venue.
-  wave: 3
+  purpose: Your points, your tier, and what is within reach.
+  wave: 2
   layout:
     template: detail
     regions:
@@ -1749,21 +1798,21 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: Content loads
-    empty: Nothing here yet, with what to do about it
-    error: Could not load
-    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
+    loading: Balance and tier
+    empty: Not enrolled — explains what joining gives you rather than showing zero
+    error: Could not load. **Redeeming is blocked** rather than attempted against an unknown balance
+    offline: Last known balance with its age. **Points earned since are not shown**, and that is said
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-036
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C64
   openQuestions:
   - Inventory cites `GET /loyalty` — no matching operation. Written before the contracts existed.
   implementation:
     app: guest-app
-    route: /general/loyalty-and-rewards
-    component: apps/guest-app/src/routes/general/LoyaltyAndRewardsDetail.tsx
+    route: /loyalty-rewards
+    component: apps/guest-app/src/routes/LoyaltyRewards.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1773,8 +1822,9 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing
+    this screen existed** — same two operations, same capability, and the fuzzy match against the client
+    storyboard is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two.
   apis:
   - operationId: getLoyaltyPosition
     contract: marketing-crm
@@ -1804,7 +1854,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-037
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C86
   openQuestions:
   - Inventory cites `GET /offers` — no matching operation. Written before the contracts existed.
@@ -1856,7 +1906,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-038
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C105
   apis:
   - operationId: getTenantAppStatus
@@ -1908,7 +1958,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-039
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C58
   openQuestions:
   - Inventory cites `GET /guests/me` — no matching operation. Written before the contracts existed.
@@ -1952,7 +2002,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-040
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C17
   openQuestions:
   - Inventory cites `GET /support` — no matching operation. Written before the contracts existed.
@@ -2009,7 +2059,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-041
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C56
   openQuestions:
   - Inventory cites `—` — no matching operation. Written before the contracts existed.
@@ -2057,7 +2107,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-042
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C56
   apis:
   - operationId: requestGuestOtp
@@ -2180,7 +2230,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-043
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C57
   openQuestions:
   - Inventory cites `—` — no matching operation. Written before the contracts existed.
@@ -2202,7 +2252,7 @@ screens:
 - id: GST-044
   name: Multi-Currency & Pricing
   module: TODO
-  purpose: Find multi-currency & pricing for this venue.
+  purpose: See prices in your own currency, in the app, before and during the visit.
   wave: 2
   layout:
     template: detail
@@ -2212,14 +2262,17 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: Content loads
-    empty: Nothing here yet, with what to do about it
-    error: Could not load
-    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
+    loading: Rates and prices, with the base currency shown first
+    empty: One currency configured at this venue — the selector is hidden rather than shown with a single
+      option
+    error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
+      rate is worse than no rate, because a guest who budgets against it arrives short
+    offline: '**Last known rates, with their age shown.** A rate is a number a guest may act on, and
+      an undated one they cannot judge'
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-044
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C107
   openQuestions:
   - Inventory cites `GET /currencies` — no matching operation. Written before the contracts existed.
@@ -2236,8 +2289,15 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Drawn in guest storyboard board 7 panel 4 — a selector across AED, USD, EUR, GBP and SAR with
+    *"payment will be processed in AED"* — and board 8 carries an AED selector in its header. **Confirmed
+    for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the
+    storyboard draws the app; both are client documents and the answer is both, which is what CF-93
+    concluded for every other guest capability. **Display only — the sale settles in base currency**
+    (CF-37), and that is stated on the screen rather than in a footnote. **`getRegionSettings` deliberately
+    not called** — a guest does not need the venue''s scope configuration to pick a currency. `listFxRates`
+    is the currency list: a rate exists only for a currency the venue enabled, so the two questions
+    have one answer.'
   apis:
   - operationId: listFxRates
     contract: finance
@@ -2267,7 +2327,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-045
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `POST /tickets/{id}/share` — no matching operation. Written before the contracts
@@ -2312,7 +2372,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-046
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C98
   openQuestions:
   - Inventory cites `GET /waiting-room` — no matching operation. Written before the contracts existed.
@@ -2337,7 +2397,7 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-047
-  name: Maintenance Page
+  name: Maintenance / Upgrade Page
   module: TODO
   purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
@@ -2356,7 +2416,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-047
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C57
   apis:
   - operationId: getTenantAppStatus
@@ -2376,8 +2436,9 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel
+    7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not
+    two screens. Both had the same single operation and the same purpose.
 - id: GST-048
   name: Upsell / Cross-Sell
   module: TODO
@@ -2398,7 +2459,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-048
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C88
   openQuestions:
   - Inventory cites `GET /recommendations` — no matching operation. Written before the contracts existed.
@@ -2445,7 +2506,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-049
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C53
   implementation:
     app: guest-app
@@ -2495,7 +2556,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-050
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C78
   openQuestions:
   - Inventory cites `POST /resource-bookings` — no matching operation. Written before the contracts
@@ -2514,7 +2575,9 @@ screens:
     - GST-002
     - GST-003
   notes: 'Minuted 10 Aug §4.8: *"resource bookings (e.g., cabana rental) decrement a capacity-based
-    inventory on booking"*.'
+    inventory on booking"*. **Distinct from GST-058**: this is one resource with a price and a booking
+    action; GST-058 is availability across areas. Confirmed against storyboard boards 7.10 and 8.8 on
+    18 August.'
   apis:
   - operationId: addCartLine
     contract: orders
@@ -2549,7 +2612,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-051
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-35
   openQuestions:
   - Inventory cites `POST /ai/itinerary` — no matching operation. Written before the contracts existed.
@@ -2598,7 +2661,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-052
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-35
   openQuestions:
   - Inventory cites `GET /itineraries/suggested` — no matching operation. Written before the contracts
@@ -2647,7 +2710,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-053
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `POST /itineraries` — no matching operation. Written before the contracts existed.
@@ -2705,7 +2768,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-054
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: AI-35
   openQuestions:
   - Inventory cites `POST /ai/itinerary/optimise` — no matching operation. Written before the contracts
@@ -2759,7 +2822,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-055
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C09
   openQuestions:
   - Inventory cites `GET /tickets/{id}/dynamic-qr` — no matching operation. Written before the contracts
@@ -2804,7 +2867,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-056
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C87
   implementation:
     app: guest-app
@@ -2854,7 +2917,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-057
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C17
   openQuestions:
   - Inventory cites `GET /accessibility` — no matching operation. Written before the contracts existed.
@@ -2882,7 +2945,7 @@ screens:
 - id: GST-058
   name: Resource Availability (Cabana)
   module: TODO
-  purpose: See resource availability (cabana) for this venue.
+  purpose: See which cabanas are free, by area and date, before choosing one.
   wave: 3
   layout:
     template: detail
@@ -2899,7 +2962,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-058
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C78
   openQuestions:
   - Inventory cites `GET /resources/availability` — no matching operation. Written before the contracts
@@ -2917,8 +2980,10 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: '**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability
+    across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now.
+    **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing
+    screen.'
   apis:
   - operationId: getAvailability
     contract: catalogue
@@ -2948,7 +3013,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-059
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   openQuestions:
   - Inventory cites `GET /itineraries/{id}` — no matching operation. Written before the contracts existed.
@@ -2962,7 +3027,9 @@ screens:
     - GST-001
     inferred: true
     exitTo:
-    - BO-005
+    - GST-001
+    - GST-002
+    - GST-003
     fromFlows: true
   notes: Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments.
   apis:
@@ -2975,48 +3042,6 @@ screens:
     purpose: List products
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
-- id: GST-060
-  name: Maintenance / Upgrade Page
-  module: TODO
-  purpose: Say what is wrong in a way that tells the person whether to wait or leave.
-  wave: 1
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-      - kind: primaryButton
-  states:
-    loading: Content loads
-    empty: Nothing here yet, with what to do about it
-    error: Could not load
-    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
-  wireframe:
-    status: drafted
-    board: wireframes/P02 Guest App.dc.html#gst-060
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
-  capability: C57
-  apis:
-  - operationId: getTenantAppStatus
-    contract: white-label
-    purpose: from page inventory
-    trigger: onLoad
-  implementation:
-    app: guest-app
-    route: /general/maintenance-upgrade-page
-    component: apps/guest-app/src/routes/general/MaintenanceUpgradePageDetail.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - GST-001
-    inferred: true
-    exitTo:
-    - GST-001
-    - GST-002
-    - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
 - id: GST-061
   name: Menu Item Detail
   module: In-Venue Experience
@@ -3049,7 +3074,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-061
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August.
   implementation:
     app: guest-app
@@ -3086,7 +3111,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-062
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
   implementation:
     app: guest-app
@@ -3140,49 +3165,8 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P02 Guest App.dc.html#gst-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.
-- id: GST-064
-  name: Loyalty & Rewards
-  module: Loyalty
-  purpose: Your points, your tier, and what is within reach.
-  capability: C00
-  wave: 2
-  layout:
-    template: list
-    regions:
-    - name: contentBody
-      components:
-      - kind: dataTable
-  apis:
-  - operationId: getLoyaltyPosition
-    contract: marketing-crm
-    purpose: A guest's points, tier and what is within reach
-    trigger: onLoad
-  - operationId: listLoyaltyProgrammes
-    contract: marketing-crm
-    purpose: List loyalty programmes
-    trigger: onLoad
-  states:
-    loading: Balance and tier
-    empty: Not enrolled — explains what joining gives you
-    error: Could not load. **Redeeming is blocked** rather than attempted against an unknown balance
-    offline: Last known balance with its age. **Points earned since are not shown**, and that is said
-  navigation:
-    exitTo:
-    - GST-001
-    inferred: true
-  implementation:
-    app: guest-app
-    route: /loyalty-rewards
-    component: apps/guest-app/src/routes/LoyaltyRewards.tsx
-    status: notStarted
-  wireframe:
-    status: notStarted
-    owner: to be drawn
-    board: wireframes/P02 Guest App.dc.html#gst-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
-  notes: Added 17 August for parity with WEB-024. **Not on the wireframe board** — needs drawing. CF-93.
 - id: GST-065
   name: Newsletter & Preferences
   module: Marketing
@@ -3223,5 +3207,5 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P02 Guest App.dc.html#gst-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with WEB-027. **Not on the wireframe board** — needs drawing. CF-93.

@@ -113,6 +113,9 @@ screens:
     isEntryPoint: true
     inferred: true
     exitTo:
+    - PTR-002
+    - PTR-003
+    - PTR-004
     - PTR-005
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -154,10 +157,6 @@ screens:
   - operationId: createOrder
     contract: orders
     purpose: Create an order
-    trigger: onAction
-  - operationId: createRefund
-    contract: orders
-    purpose: Refund an order, wholly or in part
     trigger: onAction
   - operationId: exchangeOrderLines
     contract: orders
@@ -217,11 +216,16 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
+    - PTR-001
+    - PTR-003
+    - PTR-004
     - PTR-007
     flowDerived: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
+    18 August** — attached by module resemblance, not by what this screen does. A screen that does not
+    handle money should not be able to move it (CF-87's class).
 - id: PTR-003
   name: Profile & Company Details
   module: TODO
@@ -355,10 +359,6 @@ screens:
     contract: catalogue
     purpose: Create a capacity envelope
     trigger: onAction
-  - operationId: createRefund
-    contract: orders
-    purpose: Refund an order, wholly or in part
-    trigger: onAction
   - operationId: exchangeOrderLines
     contract: orders
     purpose: Exchange lines for different products or dates
@@ -429,11 +429,16 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
     - PTR-008
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
+    18 August** — attached by module resemblance, not by what this screen does. A screen that does not
+    handle money should not be able to move it (CF-87's class).
 - id: PTR-006
   name: Product Catalog (B2B Pricing)
   module: TODO
@@ -575,6 +580,9 @@ screens:
     - PTR-002
     inferred: true
     exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
     - PTR-008
     flowDerived: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -668,6 +676,9 @@ screens:
     - PTR-007
     inferred: true
     exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
     - PTR-016
     - SCN-004
     flowDerived: true
@@ -926,7 +937,12 @@ screens:
     - PTR-003
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **The strongest multi-currency
+    case in the platform.** A partner is billed in `PartnerAgreement.settlementCurrency`, which is often
+    not the venue's — a UK operator selling a Dubai attraction is invoiced in GBP against sales booked
+    in AED. **`creditLimit` is in the settlement currency**, so a limit in the wrong currency is a limit
+    that moves with the exchange rate. Which rate converts the sale is `fxPolicy` and it is a commercial
+    term, not a default.
 - id: PTR-013
   name: Credit Limit & Balance
   module: TODO
@@ -1121,6 +1137,9 @@ screens:
     inferred: true
     exitTo:
     - BO-008
+    - PTR-001
+    - PTR-002
+    - PTR-003
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
@@ -1156,10 +1175,6 @@ screens:
   - operationId: createOrder
     contract: orders
     purpose: Create an order
-    trigger: onAction
-  - operationId: createRefund
-    contract: orders
-    purpose: Refund an order, wholly or in part
     trigger: onAction
   - operationId: exchangeOrderLines
     contract: orders
@@ -1217,7 +1232,9 @@ screens:
     - PTR-003
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
+    18 August** — attached by module resemblance, not by what this screen does. A screen that does not
+    handle money should not be able to move it (CF-87's class).
 - id: PTR-017
   name: Commission Statement
   module: TODO

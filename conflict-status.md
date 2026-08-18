@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**113 conflicts raised — CF-01 to CF-110, plus CF-33a and one screen-level item.**
+**122 conflicts raised — CF-01 to CF-119, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -8,17 +8,17 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **17** |
+| OPEN — client | **19** |
 | OPEN — Softlabs | **1** |
-| CLOSED | **89** |
+| CLOSED | **96** |
 | WITHDRAWN | **6** |
-| **Total** | **113** |
+| **Total** | **122** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**18 open, 89 closed.**
+**20 open, 96 closed.**
 
 
-## Open — needs a client decision — 17
+## Open — needs a client decision — 19
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -39,6 +39,8 @@ register.
 | **CF-85** | Four holding windows were set by me as defaults and all four are commercial decisions. Cart expiry and extension cap — how long a guest holds capacity | Qossai + Allam |
 | **CF-97** | A superseded ADR was cited as current, and nothing in the package could have stopped it. ADR-0021 reasoned from ADR-0001's *"Cell = Tenant × Jurisdict | Chinmay + Dinesh |
 | **CF-100** | Agent hours for the conversation queue are unstated, and the handover depends on them. Raised 17 August when CF-99 was closed. 22.8.5 requires seamles | Qossai + Allam |
+| **CF-112** | Two guest-facing screens are drawn in the client storyboards and specified nowhere. A branded queue / waiting room (guest board 7 panel 6) — queue pos | Chinmay + Qossai |
+| **CF-114** | Ten screens carry an entire contract, and the white-label builder is drawn tenant-facing while specified platform-facing. The median screen has four o | Chinmay + Qossai |
 
 ## Open — Softlabs to resolve — 1
 
@@ -46,7 +48,7 @@ register.
 |---|---|---|
 | **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
 
-## Closed — 89
+## Closed — 96
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -138,6 +140,13 @@ register.
 | **CF-108** | Two vocabularies for who may call an operation, collapsed into one — a decision rather than a patch, forced by the viewer's guest mode. `x-ticvai-auth | Chinmay |
 | **CF-109** | Vector store separation audited end to end, and the AI page now shows what AI is walled off from rather than only what it is. The separation holds at  | Chinmay |
 | **CF-110** | Step-by-step check of screens, APIs and the workbook — one real gap: the vector store and the four caches were in the workbook with no fields. They ap | Chinmay |
+| **CF-111** | Multi-currency belongs on both surfaces — decided by Chinmay, 18 August. Closed. CF-91 moved it to the web on 17 August because 2.6.33 and 2.9.1 both  |  |
+| **CF-113** | The client storyboards had never been read, and they settle four open items and contradict one closed one. Three PDFs in `sources/designs/` — 8 guest  | Chinmay |
+| **CF-115** | Storyboards mapped panel by panel against the screens — two duplicates merged, one pair confirmed distinct. 90 panels against 376 screens. The guest a | Chinmay |
+| **CF-116** | Multi-currency was modelled as a guest display feature and it is a payment concern on every surface that takes money — corrected 18 August. Three ques | Chinmay |
+| **CF-117** | Two package contradictions from an external run — one was eight platforms, not one, and the other was a state model excusing its own broken anchor. P0 | Chinmay |
+| **CF-118** | Multi-currency swept across every surface that takes money, and the sweep found three defects worse than the currency gap. (1) Ten money operations we | Chinmay |
+| **CF-119** | 76 of 287 tables had no columns, including all 13 AI tables, and nothing failed. The schema reference was derived once by an ad-hoc script that never  | Chinmay |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
 ## Withdrawn or absorbed — 6
@@ -155,7 +164,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-110, no gaps
+- **Numbering:** CF-01 to CF-119, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

@@ -40,10 +40,10 @@ platform:
     releaseCadence: monthly, never during trading
   wireframeBoard: wireframes/P04 Staff POS.dc.html
   designReferences:
-  - path: designs/Park_POS_dc.html
+  - path: sources/designs/Park_POS_dc.html
     note: Delivered client mockup. Six of the ten screens exist in it, and it is the source of the design
       tokens the boards use.
-  - path: designs/Park_POS_v1_dc.html
+  - path: sources/designs/Park_POS_v1_dc.html
     note: Delivered client mockup. Six of the ten screens exist in it, and it is the source of the design
       tokens the boards use.
   operator: venue
@@ -88,7 +88,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-001
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: SHIFT_OPEN
   apis:
   - operationId: openShift
@@ -155,6 +155,8 @@ screens:
     isEntryPoint: true
     exitTo:
     - POS-002
+    - POS-007
+    - POS-009
 - id: POS-002
   name: Sell — Ticket Catalogue
   module: Sell
@@ -211,7 +213,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-002
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: listProducts
@@ -379,7 +381,9 @@ screens:
     purpose: Load credits onto a card
     trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Ticket Catalogue / Product Selection". The mockup exposes Hold
-    Order and Discount as first-class buttons — neither existed as an operation until 14 August.'
+    Order and Discount as first-class buttons — neither existed as an operation until 14 August. Where
+    a foreign note is offered, the tender currency and rate are recorded on the payment. **The sale
+    is still booked in base currency** — 2.9.1: the sale finalises in local currency.'
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue
@@ -392,6 +396,7 @@ screens:
     exitTo:
     - BO-084
     - GST-026
+    - POS-001
     - POS-003
     - POS-004
     - POS-005
@@ -435,7 +440,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-003
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: getAvailability
@@ -513,8 +518,11 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-004
     - POS-005
+    - POS-006
 - id: POS-004
   name: Sell — Seat Map
   module: Sell
@@ -551,7 +559,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-004
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: getSeatAvailability
@@ -603,7 +611,9 @@ screens:
     purpose: Does this need approval, and from whom
     trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Reserved Seating / Seat Map". Booking fee is a separate line —
-    it is a fee, not part of the seat price, and reporting separates them.'
+    it is a fee, not part of the seat price, and reporting separates them. Foreign tender: **cash in
+    a currency the venue accepts, converted at the rate on the payment** (4.6.11). Change is given in
+    base currency only, so the till holds one float and one count per currency it takes in.'
   implementation:
     app: venue-pos
     route: /sell/sell-seat-map
@@ -613,8 +623,11 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-003
     - POS-005
+    - POS-006
 - id: POS-005
   name: Payment
   module: Payment
@@ -664,7 +677,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-005
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: createPayment
@@ -708,7 +721,10 @@ screens:
     purpose: Create an order
     trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
-    until 14 August. A tip posts to a liability, not to sales.'
+    until 14 August. A tip posts to a liability, not to sales. **The one surface that takes foreign
+    cash** (4.6.11). Records `tenderCurrency`, `tenderAmount` and the `fxRate` applied, and **gives
+    change in base currency only** — a till giving change in five currencies needs five floats and the
+    variance becomes unattributable.'
   implementation:
     app: venue-pos
     route: /payment/payment
@@ -721,6 +737,7 @@ screens:
     - POS-004
     exitTo:
     - BO-048
+    - POS-001
     - POS-002
     fromFlows: true
 - id: POS-006
@@ -753,7 +770,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-006
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_MODIFY
   apis:
   - operationId: listOrders
@@ -823,7 +840,10 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-003
+    - POS-004
 - id: POS-007
   name: Close Shift
   module: Shift
@@ -858,7 +878,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-007
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: SHIFT_CLOSE
   apis:
   - operationId: closeShift
@@ -959,7 +979,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-008
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: REPORT_VIEW
   apis:
   - operationId: runReport
@@ -1009,6 +1029,7 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
 - id: POS-009
   name: Staff Roster
@@ -1036,7 +1057,7 @@ screens:
     status: approved
     owner: client mockup
     board: wireframes/P04 Staff POS.dc.html#pos-009
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   permission: SHIFT_CLOSE_OTHER
   apis:
   - operationId: listShifts
@@ -1054,10 +1075,6 @@ screens:
   - operationId: closeShift
     contract: shift
     purpose: Blind close-out
-    trigger: onAction
-  - operationId: createCashMovement
-    contract: shift
-    purpose: Record a cash lift or add
     trigger: onAction
   - operationId: getCurrentShift
     contract: shift
@@ -1100,7 +1117,13 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-007
+  notes: Close counts each foreign currency separately (`foreignHoldings`). **A variance collapsed into
+    a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
+    removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
+    does not handle money should not be able to move it (CF-87's class).
 - id: POS-010
   name: Add to Existing Ticket
   module: Sell
@@ -1186,8 +1209,11 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
-    - POS-005
+    - POS-001
     - POS-002
+    - POS-003
+    - POS-004
+    - POS-005
   implementation:
     app: venue-pos
     route: /sell/add-to-existing-ticket
@@ -1196,5 +1222,5 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P04 Staff POS.dc.html#pos-010
-    designReference: designs/Park_POS_dc.html
+    designReference: sources/designs/Park_POS_dc.html
   notes: CF-58, from the 14 August MoM. Not in the delivered mockups.

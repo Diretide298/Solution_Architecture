@@ -37,7 +37,7 @@ platform:
     releaseCadence: continuous
   wireframeBoard: wireframes/P01 Guest Web.dc.html
   designReferences:
-  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: White Label Builder boards 1 and 2 — brand, app structure, homepage, content and publishing.
   operator: guest
 screens:
@@ -75,7 +75,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-001
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   apis:
   - operationId: getTenantAppStatus
@@ -132,13 +132,15 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-002
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   navigation:
     entryFrom:
     - WEB-001
     - WEB-003
     exitTo:
+    - WEB-001
+    - WEB-003
     - WEB-004
   implementation:
     app: guest-web
@@ -178,7 +180,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-003
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   implementation:
     app: guest-web
@@ -189,6 +191,8 @@ screens:
     entryFrom:
     - WEB-001
     exitTo:
+    - WEB-001
+    - WEB-002
     - WEB-004
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -229,7 +233,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-004
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   navigation:
     entryFrom:
@@ -237,6 +241,9 @@ screens:
     - WEB-002
     - WEB-003
     exitTo:
+    - WEB-001
+    - WEB-002
+    - WEB-003
     - WEB-005
   implementation:
     app: guest-web
@@ -280,13 +287,16 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-005
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C80
   navigation:
     entryFrom:
     - WEB-004
     exitTo:
+    - WEB-001
     - WEB-006
+    - WEB-007
+    - WEB-008
     - WEB-010
   implementation:
     app: guest-web
@@ -329,12 +339,14 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-006
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C81
   navigation:
     entryFrom:
     - WEB-005
     exitTo:
+    - WEB-001
+    - WEB-005
     - WEB-007
     - WEB-008
     - WEB-010
@@ -380,12 +392,16 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-007
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C51
   navigation:
     entryFrom:
     - WEB-006
     exitTo:
+    - WEB-001
+    - WEB-005
+    - WEB-006
+    - WEB-008
     - WEB-010
   notes: 'A map with no geometry falls back to category and best-available selection. Availability returns
     renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.'
@@ -421,7 +437,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-008
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C86
   implementation:
     app: guest-web
@@ -469,7 +485,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-009
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C79
   apis:
   - operationId: getWishlist
@@ -546,7 +562,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-010
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C02
   apis:
   - operationId: getCart
@@ -592,7 +608,10 @@ screens:
     - WEB-007
     - WEB-008
     exitTo:
+    - WEB-001
     - WEB-011
+    - WEB-012
+    - WEB-013
   implementation:
     app: guest-web
     route: /cart-and-checkout/shopping-cart
@@ -633,7 +652,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-011
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C03
   apis:
   - operationId: addToWishlist
@@ -676,7 +695,10 @@ screens:
     entryFrom:
     - WEB-010
     exitTo:
+    - WEB-001
+    - WEB-010
     - WEB-012
+    - WEB-013
   accessibility:
     focusOrder: First empty field, not the top of the form.
     announcements: Validation errors announced on blur, not on every keystroke.
@@ -711,7 +733,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-012
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C04
   apis:
   - operationId: transferOrderTickets
@@ -730,9 +752,16 @@ screens:
     entryFrom:
     - WEB-011
     exitTo:
+    - WEB-001
+    - WEB-010
+    - WEB-011
     - WEB-013
   notes: The unknown outcome is the one to build for. A payment taken but never confirmed must offer
-    inquiry, not a retry — a retry double-charges and the guest finds out.
+    inquiry, not a retry — a retry double-charges and the guest finds out. **Card only, so tender currency
+    equals base currency.** A guest paying with a foreign card is converted by their own issuer at their
+    own rate — that is not our conversion and is not recorded as one. The displayed comparison price
+    (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest
+    commits.
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -767,7 +796,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-013
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C03
   apis:
   - operationId: transferOrderTickets
@@ -787,6 +816,9 @@ screens:
     - WEB-012
     exitTo:
     - WEB-001
+    - WEB-010
+    - WEB-011
+    - WEB-012
     - WEB-018
   implementation:
     app: guest-web
@@ -812,7 +844,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-014
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C04
   apis:
   - operationId: getCart
@@ -859,7 +891,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-015
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   openQuestions:
   - CF-48 — Q2 Virtual Waiting Room. Edge infrastructure, not the Q1 queue contract. Build-or-buy decision
     outstanding with Dinesh and Qossai.
@@ -907,7 +939,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-016
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C36
   apis:
   - operationId: registerGuest
@@ -1032,7 +1064,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-017
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C36
   apis:
   - operationId: addToWishlist
@@ -1096,7 +1128,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-018
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C09
   notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1138,7 +1170,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-019
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C34
   apis:
   - operationId: transferOrderTickets
@@ -1179,7 +1211,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-020
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C36
   notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
     derived from the screen name and its operations on 17 August, not from a requirement.
@@ -1244,7 +1276,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-021
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C21
   implementation:
     app: guest-web
@@ -1255,7 +1287,10 @@ screens:
     entryFrom:
     - WEB-001
     exitTo:
+    - WEB-001
+    - WEB-022
     - WEB-023
+    - WEB-024
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   apis:
@@ -1289,7 +1324,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-022
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C31
   implementation:
     app: guest-web
@@ -1300,7 +1335,10 @@ screens:
     entryFrom:
     - WEB-001
     exitTo:
+    - WEB-001
+    - WEB-021
     - WEB-023
+    - WEB-024
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   apis:
@@ -1331,7 +1369,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-023
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C31
   apis:
   - operationId: transferOrderTickets
@@ -1371,7 +1409,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-024
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C93
   apis:
   - operationId: addToWishlist
@@ -1411,6 +1449,9 @@ screens:
     entryFrom:
     - WEB-001
     exitTo:
+    - WEB-001
+    - WEB-021
+    - WEB-022
     - WEB-023
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -1432,7 +1473,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-025
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C105
   notes: Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the
     screen name and its operations on 17 August, not from a requirement.
@@ -1450,6 +1491,9 @@ screens:
     entryFrom:
     - WEB-001
     exitTo:
+    - WEB-001
+    - WEB-026
+    - WEB-027
     - WEB-028
     inferred: true
 - id: WEB-026
@@ -1470,7 +1514,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-026
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C33
   apis:
   - operationId: submitReview
@@ -1486,6 +1530,9 @@ screens:
     entryFrom:
     - WEB-001
     exitTo:
+    - WEB-001
+    - WEB-025
+    - WEB-027
     - WEB-028
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -1508,7 +1555,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-027
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C59
   apis:
   - operationId: recordConsent
@@ -1548,6 +1595,9 @@ screens:
     entryFrom:
     - WEB-001
     exitTo:
+    - WEB-001
+    - WEB-025
+    - WEB-026
     - WEB-028
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -1570,7 +1620,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-028
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C105
   apis:
   - operationId: getTenantAppStatus
@@ -1611,7 +1661,7 @@ screens:
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-029
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C57
   notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's
     failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from
@@ -1677,7 +1727,7 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P01 Guest Web.dc.html#web-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-014. **Not on the wireframe board** — needs drawing. CF-93.
 - id: WEB-031
   name: My Reservations
@@ -1723,7 +1773,7 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P01 Guest Web.dc.html#web-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.
 - id: WEB-032
   name: Offers & Promotions
@@ -1767,7 +1817,7 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P01 Guest Web.dc.html#web-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.
 - id: WEB-033
   name: Shop
@@ -1816,7 +1866,7 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P01 Guest Web.dc.html#web-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
 - id: WEB-034
   name: Lost & Found
@@ -1856,7 +1906,7 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P01 Guest Web.dc.html#web-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-034. **Not on the wireframe board** — needs drawing. CF-93.
 - id: WEB-035
   name: Multi-Currency & Pricing
@@ -1880,10 +1930,11 @@ screens:
     purpose: List products
     trigger: onLoad
   states:
-    loading: Rates and prices
-    empty: One currency configured at this venue
+    loading: Rates and prices, with the base currency shown first
+    empty: One currency configured at this venue — the selector is hidden rather than shown with a single
+      option
     error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
-      rate is worse than no rate
+      rate is worse than no rate, because a guest who budgets against it arrives short
   navigation:
     exitTo:
     - WEB-001
@@ -1899,6 +1950,11 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P01 Guest Web.dc.html#web-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
-  notes: 'Added 17 August for parity with GST-044 (CF-91: the matrix asks for this on the web). **Not
-    on the wireframe board** — needs drawing. CF-93.'
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: 'Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display
+    multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. Wave 1 against the app''s
+    Wave 2, because **the website is where an overseas guest compares before booking** and the app is
+    where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the
+    wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not
+    need the venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a
+    rate exists only for a currency the venue enabled, so the two questions have one answer.'

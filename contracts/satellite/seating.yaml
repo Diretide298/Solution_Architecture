@@ -8,7 +8,7 @@ info:
   x-ticvai-requirements: 112
   x-ticvai-capabilities: [C51, C52, C53, C54, C55, C91]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
+    - "P08 Venue Management"
     - "P04 POS"
     - "P01 Guest Web"
     - "P02 Guest App"
@@ -23,7 +23,7 @@ info:
     | **Matrix domain** | 19 — Seat Management & Venue Mapping |
     | **Requirements** | ~112 |
     | **Capabilities** | C51, C52, C53, C54, C55, C91 |
-    | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App |
+    | **Consumed by** | P08 Venue Management · P04 POS · P01 Guest Web · P02 Guest App |
 
     ## How to read this file
 

@@ -12,7 +12,7 @@ wave: 2
 frequency: weekly
 criticality: safety
 platforms:
-- P06 Staff App
+- P06 Venue Staff App
 - P08 Staff Web
 - P02 Guest App
 offlineBehaviour: The employee app half works offline — a technician in a plant room has no signal and

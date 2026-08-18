@@ -15,7 +15,7 @@ frequency: weekly
 criticality: revenue
 platforms:
 - P10 Partner Web
-- P07 Staff Scanner
+- P07 Venue Scanner
 - P08 Staff Web
 offlineBehaviour: Partner portal is online only. The redemption half runs on the scanner and is fully
   offline — a coach party arriving at a gate does not wait for a partner's credit check.

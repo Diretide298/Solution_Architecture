@@ -9,7 +9,7 @@ wave: 3
 frequency: hourly
 criticality: operational
 platforms:
-- P12 Support Agent Console
+- P12 Venue Support
 offlineBehaviour: Case creation is offline-capable; resolution is not.
 trigger:
   description: A guest contacts support about an order.

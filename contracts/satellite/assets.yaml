@@ -8,8 +8,8 @@ info:
   x-ticvai-requirements: 15
   x-ticvai-capabilities: [C77]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
-    - "P13 White-Label CMS"
+    - "P08 Venue Management"
+    - "P13 Venue CMS"
     - "P02 Guest App"
     - "P01 Guest Web"
   description: >
@@ -23,7 +23,7 @@ info:
     | **Matrix domain** | 21 — Digital Asset Management |
     | **Requirements** | ~15 |
     | **Capabilities** | C77 |
-    | **Consumed by** | P08 Venue Back Office · P13 White-Label CMS · P02 Guest App · P01 Guest Web |
+    | **Consumed by** | P08 Venue Management · P13 Venue CMS · P02 Guest App · P01 Guest Web |
 
     ## How to read this file
 

@@ -217,6 +217,8 @@ screens:
     isEntryPoint: true
     exitTo:
     - ADM-001
+    - ADM-003
+    - ADM-004
     - ADM-005
     - ADM-006
     - ADM-007
@@ -296,6 +298,9 @@ screens:
     - ADM-002
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-004
     - SCN-004
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -456,6 +461,9 @@ screens:
     - ADM-002
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-012
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -489,6 +497,9 @@ screens:
     - ADM-002
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-007
     fromFlows: true
   apis:
@@ -700,6 +711,9 @@ screens:
     - ADM-002
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - BO-074
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -1325,6 +1339,9 @@ screens:
     - ADM-002
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-006
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -2385,6 +2402,9 @@ screens:
     - ADM-002
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-027
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -2451,6 +2471,9 @@ screens:
     - ADM-027
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-029
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -2647,6 +2670,9 @@ screens:
     - ADM-022
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-023
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
@@ -3215,7 +3241,8 @@ screens:
     error: '**Could not load. Saving is blocked.** A provider saved over an unread one can point a tenant
       at a model in the wrong jurisdiction'
   navigation:
-    exitTo: []
+    exitTo:
+    - ADM-001
     inferred: true
   implementation:
     app: ticvai-web
@@ -3226,7 +3253,7 @@ screens:
     status: notStarted
     owner: to be drawn
     board: wireframes/P09 Admin Web.dc.html#adm-001
-    designReference: designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
     a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
     board.**

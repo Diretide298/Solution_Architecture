@@ -26,26 +26,26 @@ trigger:
   - Push notification offer
 steps:
 - step: 1
-  screen: GST-030
+  screen: GST-024
   action: Scans the QR on the lounger
   operations:
   - claimLocationSession
   outcome: The platform knows where they are. **Codes rotate**, so a photographed QR does not order
     to someone else's seat next week
 - step: 2
-  screen: GST-031
+  screen: GST-024
   action: Browses the menu
   operations:
   - getGuestMenu
   outcome: Allergens are always present — 4.8.9
 - step: 3
-  screen: GST-032
+  screen: GST-024
   action: Builds an order
   operations:
   - createGuestFnbOrder
   outcome: Priced with any membership benefit applied
 - step: 4
-  screen: GST-033
+  screen: GST-009
   action: Pays
   operations:
   - createPayment
@@ -58,7 +58,7 @@ steps:
   - setKitchenTicketStatus
   outcome: A ticket appears at the right station
 - step: 6
-  screen: GST-034
+  screen: GST-025
   action: Tracks the order
   operations:
   - getGuestOrderStatus
@@ -120,3 +120,7 @@ primaryContract: fnb
 contracts:
 - fnb
 - orders
+notes: '**Repointed 18 August.** Steps 1–4 and 6 named `GST-030`–`GST-034`, which are In-Venue Notifications,
+  the three AI Concierge screens and Lost & Found — **the flow was written against a screen numbering
+  that later changed, and nothing noticed because every id still existed.** The food journey is `GST-024`
+  browse and order, `GST-009` payment, `GST-025` tracking.'

@@ -8,7 +8,7 @@ info:
   x-ticvai-capabilities: [C01]
   x-ticvai-platforms:
     - "P04 POS"
-    - "P08 Venue Back Office"
+    - "P08 Venue Management"
   description: >
     ## What this contract covers
 
@@ -19,7 +19,7 @@ info:
     | **Tier** | spine |
     | **Matrix domain** | 2 — Ticketing Sales (cash handling) |
     | **Capabilities** | C01 |
-    | **Consumed by** | P04 POS · P08 Venue Back Office |
+    | **Consumed by** | P04 POS · P08 Venue Management |
 
     ## How to read this file
 
@@ -883,11 +883,8 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
-        - "P07 SCN-001 Sign in"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
@@ -979,6 +976,33 @@ components:
           description: >
             **Reduces the expected close figure.** Cash skimmed for banking is not a shortfall, and
             a system that treats it as one makes every busy cashier look short.
+        foreignHoldings:
+          type: array
+          description: >
+            4.6.11 and 6.1.10. **Foreign cash accepted at this till, counted separately by currency.** A
+            till taking USD and EUR alongside AED has three counts and three variances — collapsing them
+            into a base-currency total makes a variance unattributable to the currency that caused it.
+
+            **No opening float in a foreign currency and no change given in one.** Foreign cash only ever
+            comes in, which is what keeps this to one number per currency rather than a full
+            reconciliation each.
+          items:
+            type: object
+            required: [currency, countedAmount]
+            properties:
+              currency: { type: string, pattern: '^[A-Z]{3}$' }
+              expectedAmount:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Money'
+                description: The sum of tenders taken in this currency during the shift.
+              countedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              baseEquivalent:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Money'
+                description: >
+                  **At the rates on the payments, not today's.** A shift closed on Friday and reviewed on
+                  Monday is reviewed at Friday's rates (CF-37).
         expectedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         countedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }

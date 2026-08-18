@@ -9,7 +9,7 @@ info:
   x-ticvai-capabilities: [C82, C99, C100]
   x-ticvai-platforms:
     - "P02 Guest App"
-    - "P06 Staff Ops App"
+    - "P06 Venue Staff App"
     - "Digital signage"
     - "Sensor feeds"
   description: >
@@ -23,7 +23,7 @@ info:
     | **Matrix domain** | 5 — F&B & Guest Management (Virtual Queue) |
     | **Requirements** | ~46 |
     | **Capabilities** | C82, C99, C100 |
-    | **Consumed by** | P02 Guest App · P06 Staff Ops App · Digital signage · Sensor feeds |
+    | **Consumed by** | P02 Guest App · P06 Venue Staff App · Digital signage · Sensor feeds |
 
     ## How to read this file
 

@@ -9,8 +9,8 @@ info:
   x-ticvai-capabilities: [C07, C28]
   x-ticvai-platforms:
     - "P04 POS"
-    - "P06 Staff Ops App"
-    - "P08 Venue Back Office"
+    - "P06 Venue Staff App"
+    - "P08 Venue Management"
     - "P02 Guest App"
     - "Game readers"
     - "Ticket-eater machines"
@@ -25,7 +25,7 @@ info:
     | **Matrix domain** | 9 — Games & F&B Integration |
     | **Requirements** | ~25 |
     | **Capabilities** | C07, C28 |
-    | **Consumed by** | P04 POS · P06 Staff Ops App · P08 Venue Back Office · P02 Guest App · Game readers · Ticket-eater machines |
+    | **Consumed by** | P04 POS · P06 Venue Staff App · P08 Venue Management · P02 Guest App · Game readers · Ticket-eater machines |
 
     ## How to read this file
 

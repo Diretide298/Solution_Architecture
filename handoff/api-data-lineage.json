@@ -1836,6 +1836,7 @@
   "path": "/payments/{paymentId}/capture",
   "reads": [
    "cache:idempotency",
+   "ledger.fx_rate",
    "orders.payment"
   ],
   "writes": [
@@ -2948,6 +2949,7 @@
   "path": "/shifts/{shiftId}/close",
   "reads": [
    "cache:idempotency",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.payment",
@@ -7216,7 +7218,8 @@
   "path": "/invoices/{invoiceId}/payment",
   "reads": [
    "cache:idempotency",
-   "control.invoice"
+   "control.invoice",
+   "ledger.fx_rate"
   ],
   "writes": [
    "cache:idempotency",
@@ -16723,6 +16726,7 @@
   "path": "/partner-agreements",
   "reads": [
    "cache:idempotency",
+   "ledger.fx_rate",
    "platform.tenant"
   ],
   "writes": [
@@ -16749,7 +16753,8 @@
   "path": "/partner-agreements/{agreementId}",
   "reads": [
    "cache:idempotency",
-   "control.partner_agreement"
+   "control.partner_agreement",
+   "ledger.fx_rate"
   ],
   "writes": [
    "cache:idempotency",
@@ -16798,6 +16803,7 @@
   "path": "/partner-agreements/{agreementId}/commission-statement",
   "reads": [
    "control.partner_agreement",
+   "ledger.fx_rate",
    "orders.refund",
    "orders.sales_order"
   ],
@@ -16864,6 +16870,7 @@
   "path": "/inter-entity-obligations/{obligationId}/settle",
   "reads": [
    "cache:idempotency",
+   "ledger.fx_rate",
    "ledger.inter_entity_obligation"
   ],
   "writes": [
@@ -17343,6 +17350,7 @@
   "path": "/deposit-boxes/close",
   "reads": [
    "cache:idempotency",
+   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.deposit_box"
   ],

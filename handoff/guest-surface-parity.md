@@ -107,7 +107,7 @@ ordering to a location · `GST-025` order tracking · `GST-030` in-venue notific
 | `WEB-032` Offers & Promotions | `GST-037` |
 | `WEB-033` Shop | `GST-026` |
 | `WEB-034` Lost & Found | `GST-034` |
-| **`WEB-035` Multi-Currency & Pricing** | **CF-91 — the matrix asks for this on the web** |
+| **`WEB-035` Multi-Currency & Pricing** | **CF-91, then CF-111 — the matrix asks for it on the web and the storyboard draws it on the app. Both surfaces carry it** |
 
 | Added to guest app | Mirrors |
 |---|---|
@@ -149,7 +149,7 @@ it.
 loyalty, newsletter. **8 capabilities, and each is a screen rather than a contract**, because
 the operations already exist.
 
-**Move to the web** — multi-currency, which the matrix asks for there and nowhere else.
+**Multi-currency on both** — the matrix asks for it on the web (2.6.33, 2.9.1) and guest storyboard board 7 draws it on the app. **Both are client documents**, and parity is the default this document argues for everywhere else (CF-111).
 
 **Raise with the client** — the five itinerary screens, cabana booking, accessibility
 information and companion mode. **Eight screens with no requirement behind them**, and the

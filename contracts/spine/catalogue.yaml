@@ -8,12 +8,12 @@ info:
   x-ticvai-requirements: 312
   x-ticvai-capabilities: [C20, C79, C80, C81, C84, C85, C102, C103, C104]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
+    - "P08 Venue Management"
     - "P04 POS"
     - "P01 Guest Web"
     - "P02 Guest App"
-    - "P05 Kiosk"
-    - "P10 Partner Portal"
+    - "P05 Guest Kiosk"
+    - "P10 Partner Web"
   description: >
     ## What this contract covers
 
@@ -25,7 +25,7 @@ info:
     | **Matrix domain** | 1 — Ticketing Catalogue |
     | **Requirements** | ~312 |
     | **Capabilities** | C20, C79, C80, C81, C84, C85, C102, C103, C104 |
-    | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App · P05 Kiosk · P10 Partner Portal |
+    | **Consumed by** | P08 Venue Management · P04 POS · P01 Guest Web · P02 Guest App · P05 Guest Kiosk · P10 Partner Web |
 
     ## How to read this file
 

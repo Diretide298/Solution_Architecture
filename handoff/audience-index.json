@@ -85,7 +85,7 @@
  },
  "totals": {
   "operations": 776,
-  "screens": 376,
+  "screens": 374,
   "flows": 24
  },
  "audiences": {
@@ -346,11 +346,9 @@
     "GST-057",
     "GST-058",
     "GST-059",
-    "GST-060",
     "GST-061",
     "GST-062",
     "GST-063",
-    "GST-064",
     "GST-065",
     "KSK-002",
     "KSK-003",
@@ -526,7 +524,7 @@
    ],
    "counts": {
     "operations": 96,
-    "screens": 111,
+    "screens": 109,
     "flows": 9,
     "contracts": 14,
     "tables": 95

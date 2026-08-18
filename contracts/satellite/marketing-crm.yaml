@@ -8,8 +8,8 @@ info:
   x-ticvai-requirements: 319
   x-ticvai-capabilities: [C32, C33, C59, C60, C61, C62, C63, C64, C65, C66, C93]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
-    - "P12 Support Console"
+    - "P08 Venue Management"
+    - "P12 Venue Support"
     - "P02 Guest App"
   description: >
     ## What this contract covers
@@ -22,7 +22,7 @@ info:
     | **Matrix domain** | 20 — Marketing & CRM |
     | **Requirements** | ~319 |
     | **Capabilities** | C32, C33, C59, C60, C61, C62, C63, C64, C65, C66, C93 |
-    | **Consumed by** | P08 Venue Back Office · P12 Support Console · P02 Guest App |
+    | **Consumed by** | P08 Venue Management · P12 Venue Support · P02 Guest App |
 
     ## How to read this file
 
@@ -530,7 +530,6 @@ paths:
       operationId: getLoyaltyPosition
       x-ticvai-consumed-by:
         - "P02 GST-036 Loyalty & Rewards"
-        - "P02 GST-064 Loyalty & Rewards"
       x-ticvai-audience: [guest]
       summary: A guest's points, tier and what is within reach
       description: >
@@ -2196,7 +2195,6 @@ paths:
       operationId: listLoyaltyProgrammes
       x-ticvai-consumed-by:
         - "P02 GST-036 Loyalty & Rewards"
-        - "P02 GST-064 Loyalty & Rewards"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: List loyalty programmes

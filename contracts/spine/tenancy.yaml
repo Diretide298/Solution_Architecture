@@ -7,10 +7,10 @@ info:
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
   x-ticvai-platforms:
-    - "P08 Venue Back Office"
+    - "P08 Venue Management"
     - "P04 POS"
-    - "P07 Access Handheld"
-    - "P09 Platform Admin"
+    - "P07 Venue Scanner"
+    - "P09 TICVAI Web"
   description: >
     ## What this contract covers
 
@@ -21,7 +21,7 @@ info:
     | **Tier** | spine |
     | **Matrix domain** | Cross-cutting — organisation hierarchy |
     | **Capabilities** | C95, C20 |
-    | **Consumed by** | P08 Venue Back Office · P04 POS · P07 Access Handheld · P09 Platform Admin |
+    | **Consumed by** | P08 Venue Management · P04 POS · P07 Venue Scanner · P09 TICVAI Web |
 
     ## How to read this file
 

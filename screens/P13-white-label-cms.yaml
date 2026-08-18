@@ -31,7 +31,7 @@ platform:
   screenCount: 20
   wireframeBoard: wireframes/P13 White-Label CMS.dc.html
   designReferences:
-  - path: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: The CMS **is** the White Label Builder. These six boards are the design, not a reference for
       one.
   reachesOtherPlatforms:
@@ -75,7 +75,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-001
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -188,6 +188,9 @@ screens:
     error: Could not load
   navigation:
     exitTo:
+    - CMS-001
+    - CMS-003
+    - CMS-004
     - CMS-005
     inferred: true
     fromFlows: true
@@ -195,7 +198,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-002
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -248,7 +251,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-003
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -449,7 +452,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-004
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -506,6 +509,9 @@ screens:
     error: Could not load
   navigation:
     exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     - CMS-007
     inferred: true
     fromFlows: true
@@ -513,7 +519,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-005
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -558,7 +564,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-006
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -751,6 +757,9 @@ screens:
     error: Could not load
   navigation:
     exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     - CMS-012
     inferred: true
     fromFlows: true
@@ -758,7 +767,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-007
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -803,7 +812,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-008
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -848,7 +857,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-009
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -905,7 +914,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-010
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -990,7 +999,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-013
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1026,7 +1035,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-011
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1059,6 +1068,9 @@ screens:
     error: Could not load
   navigation:
     exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     - CMS-014
     inferred: true
     fromFlows: true
@@ -1066,7 +1078,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-012
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1103,6 +1115,9 @@ screens:
     error: Could not load
   navigation:
     exitTo:
+    - CMS-001
+    - CMS-002
+    - CMS-003
     - CMS-015
     inferred: true
     fromFlows: true
@@ -1110,7 +1125,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-014
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1159,7 +1174,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-015
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1209,7 +1224,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-016
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1250,7 +1265,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-017
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1286,7 +1301,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-018
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1367,7 +1382,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-019
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1412,7 +1427,7 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P13 White-Label CMS.dc.html#cms-020
-    designReference: designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
