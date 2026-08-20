@@ -36,6 +36,55 @@ CORS to configure and one session cookie both halves can see.
 :8787 is open anyway because `/docs` lives there and talking to the API
 directly is useful. Nothing on any page depends on it being reachable.
 
+### Two names instead of one
+
+The arrangement above puts everything on one name and lets `server.mjs` forward
+what the accounts service owns. To give the service its own name instead —
+
+```
+   atlas.ainfinite.ai      →  :4173   the package, and the gate
+   atlasapi.ainfinite.ai   →  :8787   accounts, invites, verdicts, /docs
+```
+
+— the browser has to be told where to call, both halves have to agree the call
+is allowed, and, the part that is easy to miss, **one cookie has to be visible
+to both names**. Four variables in `/srv/ticvai/ecosystem.config.cjs`:
+
+```
+ticvai-viewer:  TICVAI_API_PUBLIC     = https://atlasapi.ainfinite.ai
+ticvai-api:     TICVAI_ORIGINS        = https://atlas.ainfinite.ai
+                TICVAI_COOKIE_DOMAIN  = .ainfinite.ai
+                TICVAI_SECURE_COOKIE  = 1
+```
+
+Then `pm2 restart ticvai-viewer ticvai-api --update-env`.
+
+`TICVAI_API_PUBLIC` is written into every page as `<meta name="ticvai-api">` and
+read by `validation.js`. It is a meta tag rather than a line in the eight HTML
+files because the address belongs to a deployment and those files are the same
+in all of them. `TICVAI_AUTH` is a different question and stays on loopback:
+that is this process asking the other one who you are, which never leaves the
+box.
+
+**`TICVAI_COOKIE_DOMAIN` is not optional here.** The gate in `lib/session.mjs`
+reads the session cookie off requests to :4173 to decide who is asking. A
+cookie set by `atlasapi` without a domain goes back to `atlasapi` and nowhere
+else, so :4173 would see no cookie, call everybody a stranger, and redirect
+every page to the sign-in door — which then signs you in successfully and
+bounces you straight back. Scope it to the shared parent and no higher; a
+domain cookie is sent to every host underneath it.
+
+`samesite=lax` is right either way. Sibling subdomains are the same *site*, and
+cross-site is what lax stops.
+
+The proxy in `server.mjs` stays in place and simply goes unused by the browser.
+Nothing has to be removed, and unsetting `TICVAI_API_PUBLIC` puts the one-origin
+arrangement back.
+
+Both names need a certificate — see below — and `atlasapi` puts `/docs` on the
+public internet, so put a basic-auth or an IP rule in front of it if that is not
+wanted.
+
 ### Why there is no nginx
 
 It was doing exactly one job — putting both halves on one origin — and the node
