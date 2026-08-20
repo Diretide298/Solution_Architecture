@@ -1,5 +1,9 @@
 # Handoff: Atlas — viewer UI redesign
 
+## Screens in this package
+The viewer shell (day + night) is specified below. The **invite** and **sign-in** pages (day + night each) have
+their own spec in `AUTH.md`, including the animated node field and the typing demonstration.
+
 ## Overview
 A redesign of the TICVAI viewer — the local browser for the delivery package (contracts, screens,
 flows, state models, migrations). Two files, one design: a **day** theme and a **night** theme of

@@ -38,21 +38,17 @@
             <span class="icon-menu" aria-hidden="true"></span>
           </button>
 
-          <!-- One image, not a typeset wordmark — the lockup carries the name and
-               the tagline rides in the alt. Both variants are in the DOM and CSS
-               shows the one this theme wants: the toggle is instant and a swapped
-               src would flash a blank box while the other file decodes. -->
+          <!-- One image, not a typeset wordmark: the lockup carries the name and
+               the tagline rides in the alt.
+
+               One file for both themes, too. The chrome is dark whichever theme
+               is on, so the white-ink cut is right in both — a day/night pair
+               here would be two names for the same picture. -->
           <a class="brand" href="/" aria-label="Atlas — the context layer for AI-assisted development">
             <img
-              class="brand-lockup brand-lockup-day"
-              src="/brand/atlas-lockup-day.png"
+              class="brand-lockup"
+              src="/brand/atlas-lockup.png"
               alt="Atlas — the context layer for AI-assisted development"
-            />
-            <img
-              class="brand-lockup brand-lockup-night"
-              src="/brand/atlas-lockup-night.png"
-              alt=""
-              aria-hidden="true"
             />
           </a>
 
@@ -160,7 +156,7 @@
             <span class="powered-label">Powered by</span>
             <span class="powered-name">Ainfinite<b>Core</b></span>
           </span>
-          <img class="powered-partner" src="/softlabs-logo.webp" alt="Softlabs Group" />
+          <img class="powered-partner" src="/brand/softlabs-logo.webp" alt="Softlabs Group" />
         </div>
       </aside>
 
@@ -592,6 +588,32 @@
           </div>
 
           <button id="signout" class="auth-button auth-button-quiet" type="button">Sign out</button>
+
+          <!-- Beside Sign out rather than hidden on the accounts page, because
+               the person who needs it is whoever just remembered where they
+               left a laptop, and they are not an admin by default. What it
+               costs is spelled out before it is armed: the label alone reads
+               like a tidier Sign out, and the part that surprises people is
+               that "everywhere" includes the browser they are reading it in. -->
+          <button id="signout-all" class="auth-button auth-button-quiet" type="button">
+            Sign out everywhere
+          </button>
+          <div id="signout-all-confirm" hidden>
+            <p class="auth-note auth-fine">
+              This ends every session on your account — every browser, every
+              device, <b>including this one</b>. You will be signed out here and
+              sent back to the door. Nothing else changes: your account stays
+              enabled, you can sign straight back in, and every verdict you have
+              recorded keeps your name on it.
+            </p>
+            <button id="signout-all-go" class="auth-button" type="button">
+              Yes, end every session
+            </button>
+            <button id="signout-all-cancel" class="auth-button auth-button-quiet" type="button">
+              Cancel
+            </button>
+          </div>
+          <p class="auth-error" id="signout-all-error" hidden></p>
         </div>
 
         <p class="auth-note auth-fine" id="account-offline" hidden>

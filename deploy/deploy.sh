@@ -147,7 +147,7 @@ module.exports = {
       name: 'ticvai-api',
       cwd: '$APP_DIR/viewer',
       script: '$APP_DIR/.venv/bin/python',
-      args: '-m uvicorn api.main:app --host 0.0.0.0 --port $API_PORT',
+      args: '-m uvicorn api.main:app --host 127.0.0.1 --port $API_PORT',
       interpreter: 'none',
       env: {
         TICVAI_DB: '$DB',
@@ -161,7 +161,7 @@ module.exports = {
       name: 'ticvai-viewer',
       cwd: '$APP_DIR/viewer',
       script: 'server.mjs',
-      args: '--host 0.0.0.0 --port $VIEWER_PORT',
+      args: '--host 127.0.0.1 --port $VIEWER_PORT',
       interpreter: 'node',
       env: {
         // Where the viewer forwards everything the accounts service owns.

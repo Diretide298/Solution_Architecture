@@ -376,14 +376,10 @@ body { overflow-x: auto; }
 .brand-name { font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
 .brand-sub { color: var(--text-faint); font-size: 11px; }
 
-/* The lockup is one image and both variants ship in the DOM; only the one this
-   theme wants is displayed. Swapping `src` instead would blank the corner of
-   the bar for as long as the other file takes to decode, every single toggle. */
+/* One lockup, both themes. The chrome is dark either way, so the white-ink cut
+   is correct in both and there is nothing for the toggle to swap. */
 .chrome .brand { gap: 0; }
 .brand-lockup { height: 46px; width: auto; display: block; }
-.brand-lockup-night { display: none; }
-:root[data-theme="dark"] .brand-lockup-day { display: none; }
-:root[data-theme="dark"] .brand-lockup-night { display: block; }
 
 /* ── the layer switch ──────────────────────────────────────────────
    A tray one step darker than the bar, so the pills sit *in* the chrome rather

@@ -4,6 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Atlas — accept your invite</title>
+    <script>
+      // Night by default here, whatever the app is set to. Both auth pages are
+      // designed night-first — the lattice, the scrim and the translucent card
+      // are built for a dark stage — and an explicit preference still wins.
+      // Inline and above the stylesheets on purpose: a module would paint the
+      // day palette first and flash.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { document.documentElement.dataset.theme = 'dark'; }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,15 +23,36 @@
     rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/auth.css" />
+    <link rel="stylesheet" href="/invite.css" />
     <link rel="icon" href="/brand/atlas-mark.png" />
   </head>
-  <body class="auth-page">
-    <main class="auth-card">
-      <div class="brand auth-brand">
-        <img class="brand-mark brand-mark-day" src="/brand/atlas-mark-light.svg" alt="" />
-        <img class="brand-mark brand-mark-night" src="/brand/atlas-mark-night.svg" alt="" aria-hidden="true" />
-        <span class="brand-name">Atlas</span>
-        <span class="brand-sub">contract graph</span>
+  <body class="invite-page">
+    <!-- Three stacked layers: the lattice, a radial wash that sinks it behind
+         the card without hiding it, and the card. Neither of the first two
+         listens for anything — see auth-bg.js. -->
+    <canvas class="auth-field" id="invite-field" aria-hidden="true"></canvas>
+    <div class="auth-scrim" aria-hidden="true"></div>
+
+    <main class="invite-card">
+      <!-- Two cuts of the lockup: the card is translucent over a dark stage by
+           night and a pale one by day, and each wordmark disappears on the
+           other. The handoff composed the day one from a mark plus typeset
+           Montserrat because no dark-wordmark file existed then; one does now,
+           so this is the swap it asked for. -->
+      <div class="invite-brand">
+        <img
+          class="auth-lockup auth-lockup-day"
+          src="/brand/atlast_blackfont.png"
+          alt="Atlas — the context layer for AI-assisted development"
+        />
+        <img
+          class="auth-lockup auth-lockup-night"
+          src="/brand/atlas-lockup.png"
+          alt=""
+          aria-hidden="true"
+        />
       </div>
 
       <!-- Three states, one at a time: checking the link, the form, and the
@@ -46,16 +79,22 @@
           invited you and cannot be changed here.
         </p>
 
-        <label class="auth-label" for="name">Your name</label>
-        <input id="name" class="auth-input" type="text" autocomplete="name"
-               placeholder="How your verdicts will be signed" />
+        <div class="auth-field-row">
+          <label class="auth-label" for="name">Your name</label>
+          <input id="name" class="auth-input" type="text" autocomplete="name"
+                 placeholder="How your verdicts will be signed" />
+        </div>
 
-        <label class="auth-label" for="password">Password</label>
-        <input id="password" class="auth-input" type="password"
-               autocomplete="new-password" placeholder="At least 12 characters" />
+        <div class="auth-field-row">
+          <label class="auth-label" for="password">Password</label>
+          <input id="password" class="auth-input" type="password"
+                 autocomplete="new-password" placeholder="At least 12 characters" />
+        </div>
 
-        <label class="auth-label" for="confirm">Password again</label>
-        <input id="confirm" class="auth-input" type="password" autocomplete="new-password" />
+        <div class="auth-field-row">
+          <label class="auth-label" for="confirm">Password again</label>
+          <input id="confirm" class="auth-input" type="password" autocomplete="new-password" />
+        </div>
 
         <p class="auth-error" id="error" hidden></p>
 
@@ -74,9 +113,25 @@
         </p>
         <a class="auth-button" href="/">Open the viewer</a>
       </section>
+
+      <!-- Who built it and who it is for. Outside the states, because it is
+           true of the page rather than of any one of them. -->
+      <div class="auth-foot">
+        <span class="auth-rings" aria-hidden="true">
+          <span class="auth-ring"></span><span class="auth-ring"></span>
+        </span>
+        <span class="auth-by">
+          <span class="auth-by-label">Powered by</span>
+          <span class="auth-by-name">Ainfinite<b>Core</b></span>
+        </span>
+        <img class="auth-partner" src="/brand/softlabs-logo.webp" alt="Softlabs Group" />
+      </div>
     </main>
 
     <script type="module">
+      import { startAuthBackground } from '/auth-bg.js';
+      startAuthBackground(document.getElementById('invite-field'));
+
       import { checkInvite, redeemInvite } from '/validation.js';
 
       const $ = (id) => document.getElementById(id);

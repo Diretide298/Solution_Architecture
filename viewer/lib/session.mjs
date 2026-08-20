@@ -31,14 +31,48 @@ const PUBLIC = new Set([
   '/login.html',
   '/invite.html',
   '/validation.js',
-  '/styles.css',
-  '/layers.css',
+  '/auth-bg.js',
+  '/login-demo.js',
   '/favicon.ico',
   '/api/health',
 ]);
 
+/**
+ * The brand, which both signed-out pages draw.
+ *
+ * Kept as a prefix rather than a list of filenames: the mark comes in a light
+ * and a night cut and gained a third file the week it was added, and a
+ * per-file allowlist is a thing that silently falls behind and leaves a broken
+ * image on the first page anybody ever sees. The extension check is what keeps
+ * it a brand directory and not an open one.
+ */
+const isBrandAsset = (pathname) =>
+  pathname.startsWith('/brand/')
+  && !pathname.includes('..')
+  && /\.(svg|png|webp)$/i.test(pathname);
+
+/**
+ * Every stylesheet, rather than the five that happened to be needed.
+ *
+ * This list has fallen behind five separate times — the brand assets, the
+ * partner logo, auth-bg.js, then auth.css — and each time the symptom was the
+ * same: a 302 where a file should be, on the one page whose entire audience is
+ * signed out, so nobody with an account could reproduce it. The last one cost
+ * an afternoon because a missing stylesheet let the background canvas fall back
+ * to its intrinsic 300x150 and the bug presented as "the animation is stuck".
+ *
+ * A stylesheet carries no package data. styles.css and layers.css — which hold
+ * every rule the viewer has — were already public, so admitting the rest leaks
+ * nothing that was not already out. Scripts stay named one by one, because a
+ * script can read and send, and that is a different bargain.
+ */
+const isStylesheet = (pathname) =>
+  pathname.endsWith('.css')
+  && !pathname.includes('..')
+  && pathname.lastIndexOf('/') === 0;
+
 export function isPublic(pathname) {
-  return PUBLIC.has(pathname);
+  return PUBLIC.has(pathname) || isBrandAsset(pathname) || isStylesheet(pathname);
 }
 
 export function readCookie(header, name = COOKIE) {

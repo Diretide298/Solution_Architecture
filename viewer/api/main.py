@@ -349,6 +349,45 @@ def logout(
     return {"ok": True}
 
 
+@app.post("/api/auth/logout-all")
+def logout_all(
+    response: Response,
+    account: dict = Depends(require_account),
+):
+    """Drop every session this account holds, on every device.
+
+    Sessions are the only thing touched. Verdicts, invites and the account row
+    itself are untouched, so this costs nothing but a sign-in — which is what
+    makes it safe to reach for on a shared machine or a lost laptop, where the
+    alternative is deactivating the account and losing the audit trail's author.
+
+    Deliberately not admin-gated: the person best placed to know a session has
+    escaped is the person it belongs to, and making them ask an admin first is
+    how a stolen cookie stays live overnight. An admin revoking *somebody
+    else's* sessions is the separate route below.
+    """
+    dropped = db.change("DELETE FROM session WHERE account_id = ?", (account["id"],))
+    # Including the caller's own. Signing out everywhere and staying signed in
+    # here would mean the one device you are holding is the one you cannot
+    # clear — and that is usually the point of pressing it.
+    response.delete_cookie(SESSION_COOKIE, path="/")
+    return {"ok": True, "dropped": dropped}
+
+
+@app.post("/api/accounts/{account_id}/logout-all")
+def logout_account(account_id: int, admin: dict = Depends(require_admin)):
+    """The same, done to somebody else. Admin only.
+
+    The honest tool for "that person has left" or "that laptop is gone": it ends
+    their sessions without disabling the account, so every verdict they recorded
+    keeps its author and the register still reads correctly.
+    """
+    if not db.one("SELECT id FROM account WHERE id = ?", (account_id,)):
+        raise HTTPException(404, "No such account.")
+    dropped = db.change("DELETE FROM session WHERE account_id = ?", (account_id,))
+    return {"ok": True, "dropped": dropped}
+
+
 def _set_session_cookie(response: Response, token: str) -> None:
     response.set_cookie(
         SESSION_COOKIE, token,

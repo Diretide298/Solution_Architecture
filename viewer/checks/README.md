@@ -48,3 +48,10 @@ like this fails quietly.
 
 `api/api-check.mjs`, `api/extras-check.mjs`, `api/gate-check.mjs` and `api/ui-auth-check.mjs`
 cover the accounts service and the sign-in gate, and run the same way.
+
+`api/logout-all-check.mjs` covers signing out everywhere — both the reviewer doing it
+to themselves and an admin doing it to somebody else. It is the one harness that needs
+**no browser**: it holds five cookie jars at once, because the claim is a counting one
+(that account's sessions, all of them, nobody else's) and a session is only observable
+by whether its cookie still answers. It enrols two throwaway reviewers, so give it a
+scratch store like the rest.

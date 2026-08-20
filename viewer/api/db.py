@@ -277,3 +277,16 @@ def write(sql: str, args: tuple = ()) -> int:
     with cursor(commit=True) as cur:
         cur.execute(sql, args)
         return cur.lastrowid
+
+
+def change(sql: str, args: tuple = ()) -> int:
+    """A write whose answer is *how many rows moved*, not what id was made.
+
+    `write` returns lastrowid, which is the right answer for an INSERT and a
+    meaningless one for a DELETE or an UPDATE — SQLite leaves it holding
+    whatever the connection inserted last, so a caller counting deletions with
+    it gets a number that looks plausible and is unrelated.
+    """
+    with cursor(commit=True) as cur:
+        cur.execute(sql, args)
+        return cur.rowcount

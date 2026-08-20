@@ -6774,7 +6774,20 @@ function renderAccountPanel() {
     $('account-email').textContent = who.email;
     $('account-role-note').textContent = who.role === 'admin' ? ', an admin' : '';
     $('account-admin').hidden = who.role !== 'admin';
+    // Never reopen already armed. This panel is opened and closed all day, and
+    // a confirm left standing from a change of mind ten minutes ago would sit
+    // one click from ending every session on the account.
+    disarmSignOutAll();
   }
+}
+
+/** Puts "Sign out everywhere" back to its resting state — asking nothing. */
+function disarmSignOutAll() {
+  $('signout-all').hidden = false;
+  $('signout-all-confirm').hidden = true;
+  $('signout-all-error').hidden = true;
+  $('signout-all-go').disabled = false;
+  $('signout-all-go').textContent = 'Yes, end every session';
 }
 
 /**
@@ -6946,6 +6959,41 @@ function bindAccountUI() {
   $('signout').onclick = async () => {
     await auth.signOut();
     closeAccountPanel();
+  };
+
+  // Two presses, and the second one is a different button under a paragraph
+  // that says what the first one only implies. Same shape as sending a verdict
+  // back on the reviews page: pressing the control opens it rather than doing
+  // it. confirm() would have been a line, and would have been a browser dialog
+  // nobody reads on a control whose entire problem is that people do not
+  // expect what it does.
+  $('signout-all').onclick = () => {
+    $('signout-all').hidden = true;
+    $('signout-all-confirm').hidden = false;
+    $('signout-all-error').hidden = true;
+    $('signout-all-go').focus();
+  };
+  $('signout-all-cancel').onclick = disarmSignOutAll;
+
+  $('signout-all-go').onclick = async () => {
+    $('signout-all-error').hidden = true;
+    $('signout-all-go').disabled = true;
+    $('signout-all-go').textContent = 'Ending every session…';
+    try {
+      await auth.logoutAll();
+      // Everywhere included here, so there is no signed-in viewer left behind
+      // this panel to return to. The door is the only honest place to land,
+      // and arriving there is also how somebody knows it worked.
+      location.replace('/login.html');
+    } catch (error) {
+      // Nothing was revoked, so nothing about the panel changes except this
+      // line. Leaving it armed is deliberate: the usual cause is the service
+      // being down for a moment, and the next press is the one that works.
+      $('signout-all-error').textContent = error.message;
+      $('signout-all-error').hidden = false;
+      $('signout-all-go').disabled = false;
+      $('signout-all-go').textContent = 'Yes, end every session';
+    }
   };
 
   auth.onAuthChange(() => {

@@ -111,6 +111,15 @@
           at the person who gave it. Deleting would either orphan the verdict or
           take it with them, and both lose something worth keeping.
         </p>
+        <!-- The two controls on a row look alike and are not alike, and the
+             cheaper one is the one wanted far more often. Saying which is
+             which here means the confirm on the row can be short. -->
+        <p class="auth-note auth-fine">
+          <b>End sessions</b> signs somebody out of every browser and stops
+          there. It is not <b>Disable</b>: the account still works, they can
+          sign back in, and nothing they have recorded moves. It is the answer
+          to a lost laptop or a shared machine, not to somebody leaving.
+        </p>
         <div id="accounts" class="admin-table"></div>
         <p class="auth-error" id="account-error" hidden></p>
       </section>
@@ -137,7 +146,7 @@
     <script type="module">
       import {
         authState, listAccounts, setAccountActive, setAccountRole,
-        createInvite, listInvites, revokeInvite, changePassword,
+        createInvite, listInvites, revokeInvite, changePassword, logoutAccount,
       } from '/validation.js';
 
       const $ = (id) => document.getElementById(id);
@@ -310,8 +319,76 @@
             };
             row.append(toggle);
           }
+          // Your own row does not get one. The route would take the session
+          // this page is running on without clearing the cookie, so the page
+          // would carry on looking signed in while every call from it failed.
+          // Signing yourself out everywhere lives in the account panel in the
+          // viewer, which knows to go to the door afterwards.
+          row.append(person.id === me.id ? el('span') : endSessionsControl(person, row));
           box.append(row);
         }
+      }
+
+      /**
+       * End one person's sessions, from the row they are on.
+       *
+       * Opens rather than acts, like Send back on the reviews page. The press
+       * that matters is the second one, and what sits between them is a
+       * sentence about which of the two controls on this row was just
+       * reached for — Disable and End sessions read the same at a glance and
+       * one of them takes somebody's account away.
+       *
+       * The count comes back and is shown, because "ended 3 sessions" and
+       * "they had none open" are different answers and the difference is
+       * usually the thing being checked.
+       */
+      function endSessionsControl(person, row) {
+        const cell = el('span', 'account-sessions');
+        const open = el('button', 'chip', 'End sessions');
+        open.type = 'button';
+        open.title = 'Sign them out of every browser, without touching the account.';
+        cell.append(open);
+
+        open.onclick = () => {
+          open.disabled = true;
+          const ask = el('div', 'account-sessions-ask');
+          ask.append(el('p', 'auth-note auth-fine',
+            `Signs ${person.email} out of every browser and device. The account `
+            + 'stays enabled — they can sign straight back in — and the '
+            + `${person.verdicts} verdict${person.verdicts === 1 ? '' : 's'} they have `
+            + `recorded ${person.verdicts === 1 ? 'keeps' : 'keep'} their name. `
+            + 'This is not Disable.'));
+
+          const cancel = el('button', 'chip', 'Cancel');
+          cancel.type = 'button';
+          cancel.onclick = () => { ask.remove(); open.disabled = false; };
+
+          const go = el('button', 'chip', 'End their sessions');
+          go.type = 'button';
+          go.onclick = async () => {
+            go.disabled = true;
+            cancel.disabled = true;
+            $('account-error').hidden = true;
+            try {
+              const { dropped } = await logoutAccount(person.id);
+              open.remove();
+              ask.innerHTML = '';
+              ask.append(el('p', 'auth-note auth-fine', dropped
+                ? `Ended ${dropped} session${dropped === 1 ? '' : 's'}. `
+                  + 'The account is untouched.'
+                : 'They had no sessions open. Nothing to end.'));
+            } catch (error) {
+              $('account-error').textContent = error.message;
+              $('account-error').hidden = false;
+              go.disabled = false;
+              cancel.disabled = false;
+            }
+          };
+
+          ask.append(go, cancel);
+          row.append(ask);
+        };
+        return cell;
       }
 
       // ── password ───────────────────────────────────────────────

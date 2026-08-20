@@ -149,6 +149,36 @@ export async function signOut() {
   return refreshSession();
 }
 
+/**
+ * End every session on this account, on every device, this browser included.
+ *
+ * Not a stronger sign-out but a different one. `signOut` clears the session in
+ * front of you, which is what leaving a desk needs. This is for the sessions
+ * you cannot reach — the laptop that was left somewhere, the browser on a
+ * machine you borrowed — and it costs whoever presses it nothing but signing
+ * in again. Nothing else moves: the account stays enabled and every verdict
+ * keeps its author, which is what makes it the thing to reach for rather than
+ * disabling the account.
+ *
+ * Unlike `signOut` this does not go anyway when the call fails. Signing out
+ * locally regardless would leave somebody believing their other devices were
+ * cleared when nothing had been revoked at all, and that is the one thing this
+ * control must never say wrongly. The caller shows the error instead.
+ */
+export async function logoutAll() {
+  const result = await call('/api/auth/logout-all', { method: 'POST' });
+  await refreshSession();
+  return result;
+}
+
+/** The same done to somebody else. Admin only, and deliberately not the same
+ *  as `setAccountActive(id, false)`: the account stays enabled, so they can
+ *  sign back in, and their verdicts are untouched. Answers with how many
+ *  sessions it dropped, which is the only way to tell "they had none open"
+ *  from "it did nothing". */
+export const logoutAccount = (id) =>
+  call(`/api/accounts/${id}/logout-all`, { method: 'POST' });
+
 export const createInvite = (email, role, days) =>
   call('/api/invites', { method: 'POST', body: { email, role, days } });
 export const listInvites = () => call('/api/invites');

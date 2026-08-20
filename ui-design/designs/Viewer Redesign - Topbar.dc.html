@@ -10,7 +10,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; padding: 0; background: #F5F5F5; overflow-x: auto; }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -25,13 +25,7 @@
 <div style="display:flex;flex-direction:column;height:100vh;min-width:1180px;background:#F5F5F5;color:#2E2E2E;font-size:14px">
 
   <header style="background:#333333;display:flex;align-items:center;gap:20px;padding:0 22px;height:64px;flex:none">
-    <span style="display:flex;align-items:center;gap:13px;flex:none">
-      <img src="softlabs-logo.webp" alt="Softlabs Group" style="width:118px;height:auto;display:block;filter:brightness(0) invert(1);opacity:.92" />
-      <span style="display:flex;flex-direction:column;line-height:1.2">
-        <span style="font-size:15px;font-weight:800;letter-spacing:-0.02em;color:#fff;white-space:nowrap">TICVAI</span>
-        <span style="font-size:9px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,.55);white-space:nowrap">AI project planner</span>
-      </span>
-    </span>
+    <img src="brand/atlas-lockup-day.png" alt="Atlas — the context layer for AI-assisted development" style="height:46px;width:auto;display:block;flex:none" />
     <span style="width:1px;height:26px;background:rgba(255,255,255,.13);flex:none"></span>
     <nav style="display:flex;align-items:center;gap:3px;background:#292929;border-radius:11px;padding:4px;flex:none">
       <sc-for list="{{ layers }}" as="l" hint-placeholder-count="5">
@@ -45,7 +39,7 @@
     <label style="display:flex;align-items:center;gap:10px;flex:0 1 210px;padding:9px 13px;border-radius:11px;background:#4A4A4A;border:1px solid #565656">
       <span style="width:13px;height:13px;border:1.6px solid #9A9A9A;border-radius:50%;display:block;flex:none"></span>
       <input type="search" placeholder="Search operations, schemas…" style="border:0;background:transparent;outline:none;font:inherit;font-size:13px;width:100%;color:#F7F7F7" />
-      <kbd style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;color:#B5B5B5;background:#52525210;background-color:#525252;border-radius:5px;padding:3px 6px;flex:none">⌘K</kbd>
+      <kbd style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;color:#B5B5B5;background-color:#525252;border-radius:5px;padding:3px 6px;flex:none">⌘K</kbd>
     </label>
     <span style="display:flex;align-items:center;gap:10px;flex:none">
       <span style="width:7px;height:7px;border-radius:50%;background:#48CFCB;box-shadow:0 0 0 4px rgba(72,207,203,.2);display:block" title="Watching for changes"></span>
@@ -87,7 +81,7 @@
         </div>
         <label style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:#fff;border:1px solid #E4E4E4">
           <span style="width:13px;height:13px;border:1.6px solid #9A9A9A;border-radius:50%;display:block;flex:none"></span>
-          <input type="search" placeholder="{{ filterHint }}" style="border:0;background:transparent;outline:none;font:inherit;font-size:13px;width:100%;color:#2E2E2E" />
+          <input type="search" placeholder="{{ filterHint }}" style="border:0;background:transparent;outline:none;font:inherit;font-size:13px;width:100%;color:#F7F7F7" />
         </label>
       </div>
 
@@ -123,6 +117,9 @@
           <span style="font-size:8.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#ADADAD">Powered by</span>
           <span style="font-size:12.5px;font-weight:700;letter-spacing:-0.01em;color:#F7F7F7">Ainfinite<span style="color:#48CFCB">Core</span></span>
         </span>
+        <span style="flex:1"></span>
+        <span style="width:1px;height:22px;background:rgba(255,255,255,.14);flex:none"></span>
+        <img src="softlabs-logo.webp" alt="Softlabs Group" style="width:78px;height:auto;display:block;flex:none;filter:brightness(0) invert(1);opacity:.66" />
       </div>
     </aside>
 
@@ -260,21 +257,21 @@
 
             <div style="position:relative;background:#FFFFFF;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:20px;overflow:auto">
               <div style="position:absolute;inset:0;background-image:radial-gradient(#E4E4E4 1px,transparent 1px);background-size:22px 22px;opacity:.9"></div>
-              <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:16px">
+              <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:20px">
                 <sc-for list="{{ entities }}" as="e" hint-placeholder-count="8">
-                  <div style="background:#fff;border:1px solid {{ e.border }};border-radius:11px;overflow:hidden;box-shadow:0 1px 3px rgba(66,66,66,.07)">
-                    <div style="padding:9px 12px;background:{{ e.head }};display:flex;align-items:center;gap:8px">
-                      <span style="width:6px;height:6px;border-radius:50%;background:{{ e.dot }};display:block;flex:none"></span>
-                      <span style="font-size:12.5px;font-weight:700;letter-spacing:-0.01em;color:{{ e.headFg }}">{{ e.name }}</span>
+                  <div style="background:#fff;border:1.5px solid {{ e.border }};border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(66,66,66,.10)">
+                    <div style="padding:11px 14px;background:{{ e.head }};display:flex;align-items:center;gap:9px">
+                      <span style="width:8px;height:8px;border-radius:50%;background:{{ e.dot }};display:block;flex:none"></span>
+                      <span style="font-size:14.5px;font-weight:700;letter-spacing:-0.01em;color:{{ e.headFg }}">{{ e.name }}</span>
                       <span style="flex:1"></span>
-                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ e.countFg }}">{{ e.count }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500;color:{{ e.countFg }}">{{ e.count }}</span>
                     </div>
-                    <div style="padding:6px 0 7px;display:flex;flex-direction:column">
+                    <div style="padding:8px 0 10px;display:flex;flex-direction:column">
                       <sc-for list="{{ e.fields }}" as="f" hint-placeholder-count="5">
-                        <span style="display:flex;align-items:baseline;gap:10px;padding:4px 12px">
-                          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:{{ f.nameFg }};font-weight:{{ f.weight }}">{{ f.n }}</span>
+                        <span style="display:flex;align-items:baseline;gap:12px;padding:6px 14px">
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:{{ f.nameFg }};font-weight:{{ f.weight }}">{{ f.n }}</span>
                           <span style="flex:1;border-bottom:1px dotted #F5F5F5;min-width:8px"></span>
-                          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8A8A8A;white-space:nowrap">{{ f.t }}</span>
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#8A8A8A;white-space:nowrap">{{ f.t }}</span>
                         </span>
                       </sc-for>
                     </div>
