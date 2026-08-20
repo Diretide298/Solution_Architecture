@@ -57,9 +57,17 @@ const API_META = API_PUBLIC
  * What the accounts service owns. Deliberately a list rather than "anything
  * under /api": the viewer answers most of /api itself, and /api/events is a
  * long-lived stream that must not be forwarded.
+ *
+ * The thirteen this server answers for itself are /api/index, /api/detail,
+ * /api/session, /api/tooltips, /api/domains, /api/domain, /api/journeys,
+ * /api/backend, /api/decisions, /api/events, /api/file, /api/lineage and
+ * /api/tree. None of them exist in the accounts service, so adding one to this
+ * pattern does not move it — it deletes it, and the symptom is a 404 carrying
+ * FastAPI's `{"detail":"Not Found"}` from a route this file plainly defines.
+ * `session` was in here and is the reason /api/session was 404ing.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|validation|verdicts|mentions|mentionable|health|session)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
 
 /**
  * Hand a request to the accounts service and give its answer back unchanged.
