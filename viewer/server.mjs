@@ -627,15 +627,16 @@ const server = http.createServer(async (req, res) => {
     const body = await readFile(file);
 
     // The one thing a page cannot know for itself: which address the accounts
-    // service answers on. Inserted after <head> rather than before </head> so
-    // it is in place before the module scripts at the foot of the page run,
-    // and only on html — every other file goes out untouched.
+    // service answers on. Inserted high in <head> so it is in place long before
+    // the module scripts at the foot of the page read it, but after the charset
+    // declaration — that one has to stay inside the first 1024 bytes or the
+    // browser starts sniffing. Only html; every other file goes out untouched.
     if (API_META && path.extname(file) === '.html') {
-      return send(
-        res, 200,
-        body.toString('utf8').replace(/<head(\s[^>]*)?>/i, (open) => `${open}\n    ${API_META}`),
-        MIME['.html'], req,
-      );
+      const html = body.toString('utf8');
+      const anchor = /<meta\s+charset=[^>]*>/i.test(html)
+        ? /<meta\s+charset=[^>]*>/i
+        : /<head(\s[^>]*)?>/i;
+      return send(res, 200, html.replace(anchor, (m) => `${m}\n    ${API_META}`), MIME['.html'], req);
     }
 
     // app.js alone is 270 KB of text, and the boards are larger still
