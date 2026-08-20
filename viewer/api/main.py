@@ -34,18 +34,24 @@ app = FastAPI(
 # the browser treats calls here as cross-origin. Credentials must be allowed for
 # the session cookie to be sent at all, and allowing credentials rules out "*".
 #
-# A deployment puts both behind one address, where there is no cross-origin call
-# to permit and this list is simply unused. TICVAI_ORIGINS is for the case in
-# between — a server whose two halves are still on separate ports — and takes a
-# comma-separated list. It is never "*": that combined with credentials would
-# let any site on the internet read this one using the visitor's own session.
+# The deployment gives the two halves their own names, so the call from the
+# reading server to here is cross-origin and its origin has to be named. It is
+# named here rather than left to TICVAI_ORIGINS so that a deploy that forgets an
+# environment variable still signs people in; the variable stays for any further
+# name — a staging host, a second front end — without a code change.
+#
+# It is never "*". Two reasons, and the first one alone settles it: a browser
+# refuses a credentialed response that answers "*", so every call here would
+# fail exactly the way a rejected origin does. The second is that if it did work
+# it would let any site on the internet read this one using the visitor's own
+# session.
 _extra = [o.strip() for o in os.environ.get("TICVAI_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:4173", "http://127.0.0.1:4173",
         "http://localhost:8787", "http://127.0.0.1:8787",
-        
+        "https://atlas.ainfinite.ai",
     ] + _extra,
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE"],
