@@ -637,6 +637,27 @@ export class BoxDiagram {
           : border;
       ctx.stroke();
 
+      // A caption above the box, not inside it.
+      //
+      // The header band is already carrying the table name and a badge, and a
+      // third thing in it would crowd the name — which is the one word a
+      // reader is scanning for. Above the box there is empty gutter, and a
+      // caption there reads as a label on the box rather than as content.
+      // Shown from the zoom where the table name is legible, not higher. A
+      // label that appears only when you are already zoomed in on one box
+      // cannot answer "which of these is a parent", which is the question.
+      if (node.caption && k > 0.3) {
+        // Sized off the same floor as the title, so it stays legible when the
+        // whole schema is fitted — which is the zoom this question gets asked
+        // at. Offset from the actual font size rather than from k, or at low
+        // zoom the label would sit on top of the box it labels.
+        const capSize = textSize(8, k, 6);
+        ctx.font = `600 ${capSize}px ui-sans-serif, system-ui, sans-serif`;
+        ctx.fillStyle = node.captionColor ?? faint;
+        ctx.textAlign = 'left';
+        ctx.fillText(node.caption.toUpperCase(), left + 1 * k, top - capSize * 0.62);
+      }
+
       // header band in the node's own colour
       ctx.save();
       ctx.beginPath();

@@ -87,11 +87,11 @@
    "operations": 2
   },
   {
-   "contract": "approvals",
+   "contract": "assets",
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "approvals",
    "operations": 1
   },
   {

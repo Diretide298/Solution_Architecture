@@ -2,394 +2,21 @@ import { Graph, colorForNode } from './graph.js';
 import { StructureTree, kindColor } from './structure.js';
 import { BoxDiagram } from './boxdiagram.js';
 import { StateMachine } from './statemachine.js';
-import { installTips, tip, tipFor, GLOSSARY } from './tips.js';
+import { installTips, tip, tipFor } from './tips.js';
 import * as auth from './validation.js';
+import {
+  renderDecisions, openDoc, renderTimeline, renderSupersession, renderRegister,
+  renderDecision, openDecision,
+} from './layer-decisions.js';
 
-// ── layers ───────────────────────────────────────────────────────────
-// The three parts of the system, and the views that belong to each. Adding a
-// layer — services, say — is one entry here plus its render function; nothing
-// else in the app hard-codes the list.
-const LAYERS = [
-  {
-    key: 'frontend',
-    label: 'Frontend',
-    hint: 'screens, journeys and the apps that implement them',
-    tip:
-      'What a person sees. **screens/** defines each one, **flows/** traces a job across ' +
-      'several, **frontend/** says which app builds them, and **wireframes/** draws them. ' +
-      'Every operation a screen names is resolved against the contracts.',
-    modes: [
-      ['screen', 'Screen'], ['journey', 'Journey'], ['apps', 'Apps'],
-      ['waves', 'Waves'], ['audit', 'Audit'],
-    ],
-    groups: [['platforms', 'Platforms'], ['modules', 'Modules'], ['waves', 'Waves']],
-  },
-  {
-    key: 'contracts',
-    label: 'Contracts',
-    hint: 'the API — the join between the other two layers',
-    tip:
-      'The 24 OpenAPI contracts. **The API is the join between every other layer**, so this ' +
-      'sits in the middle and everything else is drawn by resolving against it. Hand-authored; ' +
-      'servers and clients are generated from it, never the reverse.',
-    modes: [
-      ['graph', 'Graph'], ['structure', 'Structure'], ['er', 'ER'],
-      ['lineage', 'Lineage'], ['reader', 'Reader'], ['audit', 'Audit'],
-    ],
-    groups: [['contracts', 'Contracts'], ['modules', 'Modules'], ['platforms', 'Platforms']],
-  },
-  {
-    key: 'domain',
-    label: 'Domain',
-    hint: 'states/ and events/ — the legal moves, and what crosses the outbox',
-    tip:
-      'The two artefacts that check each other. **states/** says which moves between statuses ' +
-      'are legal — 38 enums declare what states exist and none says which transitions are ' +
-      'allowed. **events/** says what goes through the outbox when one happens.',
-    modes: [['states', 'States'], ['events', 'Events'], ['audit', 'Audit']],
-    groups: [['entities', 'Entities'], ['contexts', 'Contexts']],
-  },
-  {
-    key: 'backend',
-    label: 'Backend',
-    hint: 'the SQL in backend/, against the schema reference in handoff/',
-    tip:
-      'The database. The versioned SQL in **backend/** checked against the schema reference in ' +
-      '**handoff/**, so a table that exists can be told from one that is only planned — and ' +
-      'every table traces back to the contract schema it came from.',
-    modes: [
-      ['data', 'Data'], ['migrations', 'Migrations'], ['routing', 'Routing'], ['audit', 'Audit'],
-    ],
-    groups: [['modules', 'Schemas'], ['status', 'Status'], ['migration', 'Migration']],
-  },
-  {
-    key: 'decisions',
-    label: 'Decisions',
-    hint: 'docs/ — the ADRs, the registers, and the authorisation spec',
-    tip:
-      'Why the shape is the shape. Everything else here is machine-readable and can be checked ' +
-      'mechanically; **docs/** is prose, and prose is where the reasons live. One thing in it is ' +
-      'executable — the permission vectors — so the viewer runs them rather than listing them.',
-    modes: [['decisions', 'Decisions'], ['audit', 'Audit']],
-    groups: [['decisions', 'Decisions'], ['registers', 'Registers']],
-  },
-];
-
-/**
- * What each view is for, in one place. Shown on hover over the mode buttons,
- * and reused by the manual — a view whose purpose has to be explained in a
- * conversation is a view nobody opens twice.
- */
-const MODE_TIPS = {
-  graph: {
-    title: 'Graph',
-    body:
-      'The contracts as a network, in five scopes. **Spine** is the architecture picture — ' +
-      'contracts joined by the events between them. The others show `$ref`s, permissions, and ' +
-      'the neighbourhood of whatever is selected.',
-  },
-  structure: {
-    title: 'Structure',
-    body:
-      'What is actually inside one contract file, as a block diagram. Every mapping and ' +
-      'sequence is a block; scalars are rows inside their parent, so an operation is one card ' +
-      'rather than eleven boxes.',
-  },
-  er: {
-    title: 'ER',
-    body:
-      'The schemas of one contract as entity boxes, with every `$ref` between them drawn. ' +
-      'API entities — not database tables, which are the Backend layer.',
-  },
-  reader: {
-    title: 'Reader',
-    body:
-      'The YAML itself, syntax highlighted, with every `$ref` and every permission string ' +
-      'clickable. Unresolved refs are underlined in red.',
-  },
-  screen: {
-    title: 'Screen',
-    body:
-      'One screen: its wireframe, its regions and components, the four states it must handle, ' +
-      'every operation it calls, and where it can be reached from.',
-  },
-  journey: {
-    title: 'Journey',
-    body:
-      'One job a person came to do, traced across screens and the operations each step calls — ' +
-      'with the branches, because a flow with only a happy path describes a demo.',
-  },
-  apps: {
-    title: 'Apps',
-    body:
-      'What actually gets built: the app manifests, their routes, the contracts each consumes, ' +
-      'and the platform wireframes.',
-  },
-  states: {
-    title: 'States',
-    body:
-      'The legal moves between the states of one entity. The contracts declare what states ' +
-      'exist; nothing but this says which transitions are allowed.',
-  },
-  events: {
-    title: 'Events',
-    body:
-      'What crosses `platform.outbox`: who publishes each fact, who consumes it, what the ' +
-      'payload is, and what happens on a redelivery.',
-  },
-  data: {
-    title: 'Data',
-    body:
-      'The database. Zoomed out, the schemas and how they reference each other; drilled in, ' +
-      'one schema’s tables with every column. Green exists in SQL, blue is still only planned.',
-  },
-  migrations: {
-    title: 'Migrations',
-    body: 'The versioned SQL in `backend/` — what each file creates, and the prose beside it.',
-  },
-  routing: {
-    title: 'Routing',
-    body: 'ADR-0016 made visible: every operation split across primary-write, primary-read, replica and analytical.',
-  },
-  lineage: {
-    title: 'Lineage',
-    body:
-      'Which tables each operation actually touches, plus its service and stored procedure — the ' +
-      'join between the Contracts layer and the Backend layer, which nothing else here can make. ' +
-      '**336 of 654 resolve to a table**; the rest mostly return a computed projection and ' +
-      'correctly resolve to none.',
-  },
-  waves: {
-    title: 'Waves',
-    body:
-      'Delivery sequencing. All 347 screens across three waves and twelve platforms, with the ' +
-      '**192 that name no operation** marked — a screen somebody can draw and nobody can build.',
-  },
-  decisions: {
-    title: 'Decisions',
-    body:
-      'The ADRs, the registers, and the authorisation spec **executed rather than listed** — ' +
-      'each permission vector resolved against the rule, because a failing vector is a build failure.',
-  },
-  audit: {
-    title: 'Audit',
-    body:
-      'Everything wrong with **this layer**, from resolving the files rather than reading them. ' +
-      'The badge counts errors. Click a finding to open what it is about.',
-  },
-};
-
-const layerOf = (key) => LAYERS.find((l) => l.key === key) ?? LAYERS[1];
-const VIEWS = [
-  'graph', 'structure', 'er', 'lineage', 'journey', 'screen', 'apps', 'waves',
-  'states', 'events', 'data', 'migrations', 'routing', 'reader', 'decisions', 'audit',
-];
-
-// ── state ────────────────────────────────────────────────────────────
-const state = {
-  index: null,
-  nodesById: new Map(),
-  incoming: new Map(), // node id -> edges pointing at it
-  outgoing: new Map(), // node id -> edges leaving it
-  byFile: new Map(), // file path -> nodes defined in it
-  selectedId: null,
-  layer: 'contracts',
-  mode: 'graph',
-  structureFile: null, // file currently diagrammed
-  treeCache: new Map(),
-  detailLoaded: new Set(), // contracts whose held-back fields have been merged in
-  erScope: null,
-  journeyId: null,
-  journeys: null,
-  backend: null,
-  domain: null,
-  lineage: null, // operation -> tables, and screen -> everything
-  tooltips: null, // the delivery's own hover text, 340 entries
-  decisions: null, // the ADRs, the registers and the permission vectors
-  lineageScope: 'operations',
-  lineageFilter: '',
-  lineageUnresolved: true,
-  decisionsScope: 'adrs',
-  decisionsFilter: '',
-  adrId: null,
-  wavesUnbuilt: true,
-  wavesOffline: false,
-  machineId: null, // state model on screen
-  stateName: null, // state selected within it
-  eventId: null, // event opened in the events view, or null for the catalogue
-  screenId: null,
-  boardId: null, // a UI/UX board opened in place of a screen
-  tableName: null,
-  dataModule: null,
-  dataRows: true,
-  // each layer groups its sidebar by something different, so this is per layer
-  groupBy: {
-    frontend: 'platforms', contracts: 'contracts', domain: 'entities',
-    backend: 'modules', decisions: 'decisions',
-  },
-  sideFilter: '',
-  graphScope: 'spine',
-  typeFilter: new Set(['operation', 'schema']),
-  auditFilter: 'all',
-  expandedFiles: new Set(),
-  fileCache: new Map(),
-  drawer: null, // 'left' | 'right' | null — only meaningful below the phone breakpoint
-};
-
-const groupBy = () => state.groupBy[state.layer];
-
-// ── drawers ──────────────────────────────────────────────────────────
-// On a phone both rails are off-canvas. The state is one field; CSS does the
-// animation off body.dataset, so nothing here measures or positions anything.
-function setDrawer(next) {
-  state.drawer = next;
-  if (next) document.body.dataset.drawer = next;
-  else delete document.body.dataset.drawer;
-  $('drawer-left-toggle').setAttribute('aria-expanded', String(next === 'left'));
-  $('drawer-right-toggle').setAttribute('aria-expanded', String(next === 'right'));
-}
-
-/**
- * The links pane is a reverse index of a selection. Before there is one — and
- * on the Decisions layer, which never fills it — the toggle would open an
- * empty drawer, so it is not offered. Read off the pane rather than a list of
- * views, so a view that starts filling it needs no change here.
- */
-function syncLinksToggle() {
-  const pane = $('links-pane');
-  const filled = state.layer !== 'decisions'
-    && [...pane.children].some((child) => !child.classList.contains('pane-empty'));
-  $('drawer-right-toggle').hidden = !filled;
-  if (!filled && state.drawer === 'right') setDrawer(null);
-}
-
-const $ = (id) => document.getElementById(id);
-const el = (tag, className, text) => {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  // A node passed here used to be stringified into "[object HTMLSpanElement]"
-  // and rendered as that, in the page, where a reader would see it. Append it
-  // instead, which is plainly what the caller meant.
-  if (text instanceof Node) node.append(text);
-  else if (text != null) node.textContent = text;
-  return node;
-};
-
-const TYPE_LABEL = {
-  file: 'contract',
-  operation: 'operation',
-  schema: 'schema',
-  param: 'parameter',
-  response: 'response',
-  requestBody: 'request body',
-  securityScheme: 'security scheme',
-  permission: 'permission',
-};
-
-const escapeHtml = (s) =>
-  s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-
-/**
- * The `notes` fields in states/ and events/ are prose with **bold** and `code`
- * in it, and the bold is always the sentence that matters — "**held → refunded
- * is not a transition.**". Escaped first, so only these two ever become markup.
- */
-// ── explaining things ────────────────────────────────────────────────
-// Two sources, and the delivery's own words always win over the viewer's.
-
-/**
- * A component kind, region or pattern, explained from `screens/_components.yaml`
- * — the file that exists precisely so the vocabulary is shared and reviewed. A
- * kind that is not in there is a finding, so that is what the tip says.
- */
-function vocabularyTip(element, name) {
-  const entry = state.journeys?.vocabulary?.[name];
-  if (!entry) {
-    return tip(element, name,
-      `Not in the shared component library. A \`kind\` used on a screen must exist in ` +
-      `screens/_components.yaml — free-text names are how one product ends up with four date pickers.`);
-  }
-  // 14 of the 46 entries are primitives the library describes only by naming —
-  // `textField`, `toggle`, `primaryButton`. Saying so is better than an empty
-  // panel, and the states it must handle are useful on their own.
-  const described = [entry.description, entry.notes].filter(Boolean).join('\n\n');
-  return tip(
-    element,
-    `${entry.id} — ${entry.group}`,
-    described ||
-      'In the shared component library, which declares the states it must handle but no ' +
-      'description — one of the primitives taken as self-evident.',
-    entry.states.length ? `must handle: ${entry.states.join(', ')}` : null
-  );
-}
-
-/**
- * The delivery's own hover text, from `handoff/tooltips.json` — 340 entries
- * across nine categories, generated from the contracts, the schema reference and
- * the ADRs.
- *
- * This is the half a glossary cannot hold. `GLOSSARY` explains what a *kind* of
- * thing is — what "ambient" means, what a spine contract is. This explains the
- * individual thing: what `platform.outbox` is for, what `catalogue` covers, what
- * ADR-0013 decided. So the two compose, and where both have something the
- * delivery's own words win, for the same reason a component description does.
- *
- * `extra` carries the metadata that shipped alongside the tip — column counts,
- * operation counts, whether a platform is offline-capable — because the file
- * went to the trouble of including it and it is exactly what you want on the
- * same card.
- */
-function deliveryTip(element, category, key, { fallback = null } = {}) {
-  const entry = state.tooltips?.entries?.[category]?.[key];
-  // 202 of the 230 table tips say only "Derived from access.AccessPoint." — where
-  // the row came from, which the viewer already shows, rather than why the thing
-  // exists, which it cannot. The delivery's own README calls that "the same
-  // failure wearing text", so a caller with something better to say wins here.
-  if (!entry?.tip || (entry.restated && fallback)) {
-    if (fallback) return tip(element, fallback.title, fallback.body, fallback.extra);
-    return element;
-  }
-  const facts = [];
-  const note = (label, value) => {
-    if (value === undefined || value === null || value === '') return;
-    facts.push(typeof value === 'boolean' ? (value ? label : null) : `${label} ${value}`);
-  };
-  note('columns', entry.columns);
-  note('tables', entry.tables);
-  note('operations', entry.operations);
-  note('screens', entry.screens);
-  note('steps', entry.steps);
-  note('branches', entry.branches);
-  note('tier', entry.tier);
-  note('offline-capable', entry.offline);
-  const title = entry.title ?? entry.name ?? entry.short ?? key;
-  return tip(element, title, entry.tip, facts.filter(Boolean).join(' · ') || null);
-}
-
-/** A permission, explained from the vocabulary in `shared/permissions.yaml`. */
-function permissionTip(element, name) {
-  const node = state.nodesById?.get(`perm:${name}`);
-  if (node && !node.declared) {
-    return tip(element, name,
-      `**No contract declares this permission.** It is used here but is not in the enum in ` +
-      `shared/permissions.yaml, which is the single source for backend authz, frontend ` +
-      `navigation and AI scoping — so nothing will grant it.`);
-  }
-  return tip(
-    element,
-    name,
-    `A permission from the single enum in **shared/permissions.yaml** — the one source used for ` +
-    `backend authorisation, frontend navigation and AI scoping. Whoever holds it can do this; ` +
-    `whoever does not never sees the control.`,
-    node?.useCount ? `used by ${node.useCount} operation${node.useCount === 1 ? '' : 's'}` : null
-  );
-}
-
-const inlineMarkdown = (text) =>
-  escapeHtml(String(text ?? ''))
-    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
-
+// The shared vocabulary — layers, modes, state, the DOM helpers and the tip
+// wiring. All of it used to be declared here; it moved to core.js so the layer
+// modules could import it without importing the router.
+import {
+  LAYERS, MODE_TIPS, layerOf, VIEWS, state, groupBy, setDrawer, syncLinksToggle,
+  $, el, TYPE_LABEL, escapeHtml, vocabularyTip, deliveryTip, permissionTip,
+  inlineMarkdown, renderBoxLegend,
+} from './core.js';
 // ── boot ─────────────────────────────────────────────────────────────
 let graph;
 let tree;
@@ -1056,7 +683,7 @@ function updateAuditBadge() {
 }
 
 // ── mode switching ───────────────────────────────────────────────────
-function setMode(mode) {
+export function setMode(mode) {
   // a keyboard shortcut can name a view another layer owns — follow it there
   if (!layerOf(state.layer).modes.some(([m]) => m === mode)) {
     const owner = LAYERS.find((l) => l.modes.some(([m]) => m === mode));
@@ -1127,6 +754,10 @@ function setMode(mode) {
   if (mode === 'waves') renderWaves();
   if (mode === 'lineage') renderLineage();
   if (mode === 'decisions') renderDecisions();
+  if (mode === 'timeline') renderTimeline();
+  if (mode === 'supersession') renderSupersession();
+  if (mode === 'register') renderRegister();
+  if (mode === 'decision') renderDecision();
   if (mode === 'migrations') renderMigrations();
   if (mode === 'routing') renderRouting();
 }
@@ -3693,6 +3324,14 @@ function renderStateLinks() {
   pane.append(sectionHead(name ?? m.entity, name ? `state of ${m.entity}` : `${m.contract}.${m.enum}`));
 
   if (!name) {
+    // The model is the reviewable thing, not the individual state. Which
+    // moves are legal is a decision somebody makes once for the whole entity —
+    // signing off `paid` on its own would be signing off a fragment of an
+    // argument. First in the rail for the same reason it is on a table: a
+    // review below four sections of detail is a review nobody scrolls to.
+    pane.append(auth.verdictBlock('state', m.id, `${m.entity} — ${m.stats.states} states`,
+      { layer: 'domain' }));
+
     const facts = el('div', 'links-section');
     facts.append(sectionHead('The model', m.stats.states));
     for (const [label, value] of [
@@ -4394,8 +4033,23 @@ function buildData(module, { inferred = true, ambient = false } = {}) {
   const isDefaultPartition = (table) =>
     Boolean(table.ddl?.partitionOf) && (backend.columns[table.name] ?? []).length === 0;
 
+  // The anchor filter, when one is set, replaces the schema as the population.
+  //
+  // "Everything anchored only on scope_node" is "everything purely
+  // tenancy-scoped", and that question crosses schemas — asking it inside one
+  // schema would answer a different and much less useful question.
+  const anchor = state.dataAnchor;
+  const onlyAnchor = state.dataAnchorOnly;
+
   for (const table of backend.tables) {
     if (isDefaultPartition(table)) continue;
+    if (anchor) {
+      const anchors = table.anchors ?? [];
+      if (!anchors.includes(anchor)) continue;
+      if (onlyAnchor && anchors.length !== 1) continue;
+      included.set(table.name, table);
+      continue;
+    }
     if (everything || table.module === module) included.set(table.name, table);
   }
 
@@ -4433,7 +4087,45 @@ function buildData(module, { inferred = true, ambient = false } = {}) {
 
   const isOwn = (table) => everything || table.module === module;
 
+  // Which boxes are a parent of another box on screen.
+  //
+  // Two sources, because they answer slightly different questions and both
+  // are true. A `child` edge in relationships.csv is the stated parentage —
+  // "this row belongs to that row". The lineage block adds the tables other
+  // tables reach on their way to a schema root. A box gets the caption if
+  // either says something hangs off it *and that something is also on screen*:
+  // labelling a box "parent" of a table the reader cannot see explains nothing.
+  const parents = new Set();
+  if (stated) {
+    for (const edge of relevant) {
+      if (edge.kind === 'child' && included.has(edge.from) && included.has(edge.to)) {
+        parents.add(edge.to);
+      }
+    }
+  }
+  for (const table of included.values()) {
+    const via = table.reachesRootVia;
+    const named = table.parent ?? (via ? (/->\s*(.+)$/.exec(via)?.[1] ?? '').trim() : '');
+    if (named && included.has(named)) parents.add(named);
+  }
+
+  // Both captions in the accent purple, and told apart by the word rather than
+  // by colour. Green already means "created by a migration" in this legend and
+  // amber means "from another schema" — giving green a second meaning above
+  // the box would make the legend say two things at once.
+  const CAPTION = '#a78bfa';
+
+  const captionOf = (table) => {
+    // Root beats parent: a schema root is the parent of everything below it,
+    // and saying only "parent" of the table the whole schema hangs from would
+    // be the weaker of two true statements.
+    if (table.isSchemaRoot) return ['schema root', CAPTION];
+    if (parents.has(table.name)) return ['parent', CAPTION];
+    return [null, null];
+  };
+
   const nodes = [...included.values()].map((table) => {
+    const [caption, captionColor] = captionOf(table);
     const columns = backend.columns[table.name] ?? [];
     const own = isOwn(table);
     return {
@@ -4443,6 +4135,8 @@ function buildData(module, { inferred = true, ambient = false } = {}) {
       // green means the migration exists and this table is really there;
       // blue means it is derived from the contracts and still only planned
       color: !own ? '#fbbf24' : table.ddl ? '#34d399' : '#60a5fa',
+      caption,
+      captionColor,
       rows: columns.map((column) => {
         const target =
           column.keyTable ??
@@ -4538,6 +4232,31 @@ function renderData({ focus } = {}) {
     return;
   }
 
+  // The anchors, ordered by how much of the package answers to each — the
+  // useful ones are at the top rather than in alphabetical order, and the
+  // count is the honest shape of the package: 289 of 353 on scope_node.
+  const anchorPick = $('data-anchor');
+  if (!anchorPick.options.length) {
+    const tally = new Map();
+    for (const t of backend.tables) {
+      for (const a of t.anchors ?? []) tally.set(a, (tally.get(a) ?? 0) + 1);
+    }
+    const none = el('option', null, 'any anchor · scope by schema');
+    none.value = '';
+    anchorPick.append(none);
+    for (const [name, n] of [...tally].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))) {
+      const option = el('option', null, `anchored on ${name} · ${n}`);
+      option.value = name;
+      anchorPick.append(option);
+    }
+  }
+  anchorPick.value = state.dataAnchor ?? '';
+  $('data-anchor-only-wrap').hidden = !state.dataAnchor;
+  $('data-anchor-only').checked = state.dataAnchorOnly;
+  // The schema selector means nothing while an anchor is set, because the
+  // anchor crosses schemas. Disabled rather than left live and ignored.
+  picker.disabled = Boolean(state.dataAnchor);
+
   if (picker.options.length !== backend.modules.length + 1) {
     picker.innerHTML = '';
     const everything = el('option', null, `whole database · ${backend.modules.length} schemas`);
@@ -4575,7 +4294,31 @@ function renderData({ focus } = {}) {
   data.setData(nodes, edges);
   data.setSelected(state.tableName && !wholeDatabase ? `table:${state.tableName}` : null);
 
-  if (wholeDatabase) {
+  // An anchor drives the population, so it also owns the sentence describing
+  // it — otherwise the hint reports a schema that is not what is on screen.
+  if (state.dataAnchor) {
+    // Counted off the tables, not the diagram nodes. Nodes include the ones
+    // pulled in to make an edge land, so counting those reported 296 where the
+    // package says 289 — a viewer disagreeing with its own source by seven.
+    const anchored = backend.tables.filter((t) => {
+      const anchors = t.anchors ?? [];
+      return anchors.includes(state.dataAnchor)
+        && (!state.dataAnchorOnly || anchors.length === 1);
+    });
+    const schemas = new Set(anchored.map((t) => t.module).filter(Boolean)).size;
+    const roots = anchored.filter((t) => t.isSchemaRoot).length;
+    $('data-hint').textContent =
+      `${anchored.length} of ${backend.tables.length} tables anchored on ${state.dataAnchor}`
+      + (state.dataAnchorOnly ? ' and nothing else' : '')
+      + ` · across ${schemas} schema${schemas === 1 ? '' : 's'}`
+      + (roots ? ` · ${roots} schema root${roots === 1 ? '' : 's'}` : '');
+    renderBoxLegend($('data-legend'), [
+      ['#a78bfa', `anchored on ${state.dataAnchor}`],
+    ], 'an anchor is where a table’s own outbound keys stop · '
+       + '“anchored only on scope_node” is “purely tenancy-scoped”'
+       + ' · PARENT above a box = something on screen hangs off it'
+       + ' · SCHEMA ROOT = nothing above it');
+  } else if (wholeDatabase) {
     const crossings = edges.reduce((a, e) => a + Number(e.label), 0);
     const withDdl = backend.tables.filter((t) => t.ddl).length;
     $('data-hint').textContent =
@@ -4612,12 +4355,16 @@ function renderData({ focus } = {}) {
       ['#34d399', 'created by a migration'],
       ['#60a5fa', 'derived from the contracts, not written yet'],
       ['#fbbf24', 'table from another schema'],
-    ], built.stated
+    ], (built.stated
       ? 'thick = child (belongs to) · plain = reference · solid = declared, dashed = inferred' +
         (built.hiddenAmbient
           ? ` · ${built.hiddenAmbient} ambient keys hidden — venue, principal, subject, tenant`
           : '')
-      : 'solid = a REFERENCES clause or a contract $ref · dashed = inferred from a *_id column name');
+      : 'solid = a REFERENCES clause or a contract $ref · dashed = inferred from a *_id column name')
+      // The caption above a box, explained where the box is. A label nobody can
+      // decode is a label that costs space and gives nothing back.
+      + ' · PARENT above a box = something on screen hangs off it'
+      + ' · SCHEMA ROOT = nothing above it, everything in the schema reaches it');
   }
 
   // the layout is seeded in a knot and spreads as it settles, so framing it
@@ -5323,305 +5070,7 @@ function renderWaves() {
 }
 
 // ── decisions ────────────────────────────────────────────────────────
-function renderDecisions() {
-  const body = $('decisions-body');
-  const decisions = state.decisions;
-  body.innerHTML = '';
 
-  if (!decisions?.present) {
-    body.append(el('p', 'pane-empty', 'No docs/ in this package.'));
-    $('decisions-hint').textContent = '';
-    return;
-  }
-
-  const s = decisions.stats;
-  $('decisions-hint').textContent =
-    `${s.adrs} ADRs · ${s.documents} documents · ${s.vectorsPassed}/${s.vectors} vectors pass · ` +
-    `${s.artefactGaps} open artefact gaps`;
-
-  const needle = state.decisionsFilter.trim().toLowerCase();
-  const hit = (text) => !needle || String(text ?? '').toLowerCase().includes(needle);
-
-  if (state.decisionsScope === 'permissions') return renderPermissionVectors(body, hit);
-  if (state.decisionsScope === 'gaps') return renderArtefactGaps(body, hit);
-  if (state.decisionsScope === 'registers') return renderRegisters(body, hit);
-  return renderAdrs(body, hit);
-}
-
-function renderAdrs(body, hit) {
-  const adrs = state.decisions.adrs.filter(
-    (a) => hit(a.title) || hit(a.id) || hit(a.decision) || hit(a.closes)
-  );
-  body.append(el('div', 'journey-section-label', `${adrs.length} decisions`));
-
-  for (const adr of adrs) {
-    const card = el('div', 'adr-card');
-    const head = el('div', 'adr-card-head');
-    const number = el('span', 'adr-number', `ADR-${adr.id}`);
-    deliveryTip(number, 'adrs', adr.id);
-    head.append(number);
-    const title = el('button', 'adr-title', adr.title);
-    title.onclick = () => openDoc(adr.file);
-    head.append(title);
-
-    const verdict = el('span', `adr-status ${String(adr.verdict ?? '').toLowerCase()}`, adr.verdict ?? '—');
-    if (adr.partlySuperseded) {
-      verdict.classList.add('partial');
-      tip(verdict, 'Accepted, and partly superseded',
-        `**${adr.qualifier}** — which is the case that misleads: it reads as current in a list, and ` +
-        `the part that was superseded is not current.`);
-    } else {
-      tip(verdict, adr.status ?? 'No status',
-        adr.status
-          ? 'The decision’s standing. Only Accepted is binding.'
-          : '**This ADR states no status**, so whether it is binding cannot be told from the file.');
-    }
-    head.append(verdict);
-    if (adr.date) head.append(el('span', 'adr-date', adr.date));
-    card.append(head);
-
-    if (adr.decision) {
-      const text = el('div', 'adr-decision');
-      text.innerHTML = inlineMarkdown(adr.decision);
-      card.append(text);
-    }
-
-    const meta = el('div', 'adr-meta');
-    for (const [label, value] of [
-      ['closes', adr.closes], ['withdraws', adr.withdraws], ['supersedes', adr.supersedes],
-    ]) {
-      if (!value) continue;
-      const chip = el('span', 'jchip');
-      chip.append(el('span', null, label), el('b', null, value));
-      meta.append(chip);
-    }
-    for (const target of adr.constrains) {
-      const chip = el('span', 'adr-constrains', target);
-      tip(chip, 'Constrains', `**${target}** is bound by this decision. Changing it needs this ADR revisited first.`);
-      meta.append(chip);
-    }
-    if (adr.amended) {
-      const chip = el('span', 'adr-amended', 'amended');
-      tip(chip, 'Amended after acceptance',
-        'The accepted date is not the date of what this ADR now says. Read the amendment before acting on the decision.');
-      meta.append(chip);
-    }
-    if (meta.children.length) card.append(meta);
-    body.append(card);
-  }
-}
-
-function renderPermissionVectors(body, hit) {
-  const spec = state.decisions.permissions;
-  if (!spec) {
-    body.append(el('p', 'pane-empty', 'No permission-vectors.json in this package.'));
-    return;
-  }
-
-  const head = el('div', 'journey-head');
-  head.append(el('h2', 'journey-title', 'Authorisation, executed'));
-  const chips = el('div', 'journey-chips');
-  const pass = el('span', `jchip ${spec.stats.failed ? 'warn' : 'ok'}`);
-  pass.append(el('span', null, 'vectors'), el('b', null, `${spec.stats.passed} of ${spec.stats.total} pass`));
-  chips.append(pass);
-  if (spec.fixture) {
-    const chip = el('span', 'jchip');
-    chip.append(el('span', null, 'fixture'), el('b', null, spec.fixture));
-    chips.append(chip);
-  }
-  head.append(chips);
-  head.append(el('div', 'journey-trigger',
-    spec.note ??
-    'Each vector is a set of grants, a query and the verdict the platform must reach.'));
-  head.append(el('div', 'journey-trigger',
-    'The viewer resolves each one against the rule rather than listing it: a grant applies when its ' +
-    'permission matches and its scope is an ancestor of the query; any applicable DENY wins, however ' +
-    'specific the ALLOW; nothing bubbles upward.'));
-  body.append(head);
-
-  const rows = spec.vectors.filter((v) => hit(v.id) || hit(v.proves) || hit(v.query.permission));
-  body.append(el('div', 'journey-section-label', `${rows.length} vectors`));
-
-  for (const vector of rows) {
-    const card = el('div', `vector-card${vector.pass ? '' : ' failed'}`);
-    const head2 = el('div', 'vector-head');
-    head2.append(el('span', 'vector-id', vector.id));
-    head2.append(el('span', 'vector-proves', vector.proves));
-    const mark = el('span', `vector-verdict ${vector.pass ? 'pass' : 'fail'}`,
-      vector.pass ? vector.actual : `${vector.actual} ≠ ${vector.expect}`);
-    tip(mark, vector.pass ? 'Resolves as specified' : 'Does not resolve as specified',
-      vector.pass
-        ? `The rule produces **${vector.actual}**, which is what the spec requires.`
-        : `The spec requires **${vector.expect}** and the rule produces **${vector.actual}**. ` +
-          `The file says a failing vector is a build failure.`);
-    head2.append(mark);
-    card.append(head2);
-
-    const grants = el('div', 'vector-grants');
-    if (!vector.grants.length) {
-      const chip = el('span', 'vector-grant none', 'no grants');
-      tip(chip, 'Nothing granted', 'The default-deny case. Absence of a grant is a denial, not an error.');
-      grants.append(chip);
-    }
-    for (const grant of vector.grants) {
-      const chip = el('span', `vector-grant ${grant.effect.toLowerCase()}`);
-      chip.append(el('b', null, grant.effect));
-      chip.append(el('span', null, grant.permission));
-      chip.append(el('span', 'vector-scope', grant.scope));
-      grants.append(chip);
-    }
-    card.append(grants);
-
-    const query = el('div', 'vector-query');
-    query.append(el('span', 'vector-label', 'asks'));
-    query.append(el('b', null, vector.query.permission));
-    query.append(el('span', 'vector-scope', vector.query.scope));
-    card.append(query);
-    body.append(card);
-  }
-}
-
-function renderArtefactGaps(body, hit) {
-  const gaps = state.decisions.gaps.filter((g) => hit(g.class) || hit(g.verdict));
-  const s = state.decisions.stats;
-
-  const head = el('div', 'journey-head');
-  head.append(el('h2', 'journey-title', 'What the requirements demand and the package does not have'));
-  const chips = el('div', 'journey-chips');
-  for (const [label, value, cls] of [
-    ['classes', s.artefactClasses, ''],
-    ['open', s.artefactGaps, 'warn'],
-    ['requirements behind them', s.requirementsUnserved, 'warn'],
-  ]) {
-    const chip = el('span', `jchip ${cls}`);
-    chip.append(el('span', null, label), el('b', null, String(value)));
-    chips.append(chip);
-  }
-  head.append(chips);
-  head.append(el('div', 'journey-trigger',
-    'The delivery’s own audit, not the viewer’s. Every other view here measures what is present; ' +
-    'this is the only one that counts what is absent — and it is derived from the requirement text ' +
-    'rather than from a checklist.'));
-  body.append(head);
-
-  body.append(el('div', 'journey-section-label', `${gaps.length} artefact classes`));
-  const max = Math.max(1, ...gaps.map((g) => g.requirements));
-  const table = el('div', 'routing-table');
-  for (const gap of gaps) {
-    const line = el('div', 'routing-row');
-    const name = el('span', `gap-name ${gap.state}`, gap.class);
-    const said = gap.verdict.replace(/^[✅🟡🔴]\s*/, '');
-    tip(name, gap.class,
-      gap.state === 'blocked'
-        // Not a gap in the package. Somebody outside it owes an answer, and
-        // saying which is the only thing that moves it.
-        ? `**Blocked — waiting on ${said}**
-
-Not ours to close.`
-        : gap.state === 'covered' ? `Covered — ${said}` : `**${said}**`,
-      gap.holding ? `holding: ${gap.holding}` : null);
-    line.append(name);
-
-    const bar = el('div', 'routing-bar');
-    bar.style.width = `${(gap.requirements / max) * 100}%`;
-    const seg = el('div', 'routing-seg', String(gap.requirements));
-    seg.style.flexGrow = '1';
-    seg.style.background = {
-      missing: '#f87171',
-      partial: '#fbbf24',
-      // blocked is not the same as absent: the work cannot start until a
-      // workshop happens or the client answers, so colouring it red would put
-      // somebody else's decision on our side of the ledger.
-      blocked: '#60a5fa',
-      covered: '#34d399',
-    }[gap.state] ?? '#34d399';
-    bar.append(seg);
-    line.append(bar);
-    line.append(el('span', 'routing-total', gap.state));
-    table.append(line);
-  }
-  body.append(table);
-
-  const legend = el('div', 'inline-legend');
-  body.append(legend);
-  renderBoxLegend(legend,
-    [['#f87171', 'nothing behind it'], ['#fbbf24', 'partial'],
-     ['#60a5fa', 'blocked — waiting on someone else'], ['#34d399', 'covered']],
-    'bar length is the number of requirements that need an artefact of this class');
-}
-
-function renderRegisters(body, hit) {
-  const docs = state.decisions.documents.filter(
-    (d) => hit(d.title) || hit(d.lead) || hit(d.id)
-  );
-  const GROUPS = [
-    ['register', 'Registers — living reference data'],
-    ['handoff', 'Handoff — the build artefacts and the narratives beside them'],
-    ['architecture', 'Architecture — how it is built'],
-    ['active', 'Active — what is in flight'],
-    ['guide', 'Guides'],
-  ];
-
-  for (const [group, label] of GROUPS) {
-    const list = docs.filter((d) => d.group === group);
-    if (!list.length) continue;
-    body.append(el('div', 'journey-section-label', `${label} · ${list.length}`));
-    const grid = el('div', 'doc-grid');
-    for (const doc of list) {
-      const card = el('button', 'doc-card');
-      card.append(el('span', 'doc-title', doc.title));
-      if (doc.lead) card.append(el('span', 'doc-lead', doc.lead));
-      const meta = el('span', 'doc-meta');
-      meta.append(el('span', null, doc.file));
-      if (doc.rows) meta.append(el('b', null, `${doc.rows} rows`));
-      card.append(meta);
-      tip(card, doc.title, doc.lead || 'No lead paragraph.',
-        `${doc.lines} lines · ${doc.tables.length} table${doc.tables.length === 1 ? '' : 's'}`);
-      card.onclick = () => openDoc(doc.file);
-      grid.append(card);
-    }
-    body.append(grid);
-  }
-}
-
-/** Prose has no node in the graph, so it opens in the reader as source. */
-async function openDoc(file) {
-  const view = $('view-reader');
-  setMode('reader');
-  $('reader-empty').hidden = true;
-  $('reader-body').hidden = false;
-  $('reader-head').innerHTML = '';
-  $('reader-meta').innerHTML = '';
-  $('reader-head').append(el('h1', 'reader-title', file.split('/').pop()));
-  $('reader-meta').append(el('span', 'reader-file', file));
-  const source = $('reader-source');
-  source.textContent = 'Loading…';
-  try {
-    const text = await fetch(`/api/file?path=${encodeURIComponent(file)}`).then((r) => {
-      if (!r.ok) throw new Error(String(r.status));
-      return r.text();
-    });
-    source.innerHTML = '';
-    const pre = el('pre', 'doc-source');
-    pre.textContent = text;
-    source.append(pre);
-    if (view) view.scrollTop = 0;
-  } catch {
-    source.textContent = `Could not read ${file}`;
-  }
-}
-
-function renderBoxLegend(container, entries, note) {
-  container.innerHTML = '';
-  for (const [color, label] of entries) {
-    const row = el('div', 'legend-row');
-    const dot = el('span', 'legend-dot');
-    dot.style.background = color;
-    row.append(dot, el('span', null, label));
-    container.append(row);
-  }
-  container.append(el('div', 'legend-row', note));
-}
 
 // ── right pane ───────────────────────────────────────────────────────
 /** Each layer answers "what links to this" about a different kind of thing. */
@@ -5764,14 +5213,191 @@ function renderScreenLinks() {
 }
 
 /** For a table: the contract schema behind it, its children, and its keys. */
+/**
+ * The schema itself, when no single table is selected.
+ *
+ * This was "Select a table." — an instruction where the answer to the question
+ * should be. A schema is a reviewable thing in its own right: whether `orders`
+ * is the right set of tables with the right boundary is a decision somebody
+ * makes once, and it is not the sum of 23 separate opinions about each table.
+ * Reviewing it per table is how a boundary never gets reviewed at all.
+ */
+function renderSchemaLinks(pane) {
+  const name = state.dataModule;
+  const module = (state.backend?.modules ?? []).find((m) => m.name === name);
+  if (!module) {
+    // The scope selector above the diagram is what picks a schema, not the
+    // left rail — the rail groups tables by schema but does not scope to one.
+    // Naming the wrong control is worse than naming none.
+    pane.append(el('p', 'pane-empty',
+      state.dataModule === ALL_SCHEMAS
+        ? 'The whole database is in scope. Pick one schema in the selector above to review it, '
+          + 'or click a table to review that.'
+        : 'Pick a schema in the selector above the diagram, or click a table to review that.'));
+    return;
+  }
+
+  const tables = (state.backend?.tables ?? []).filter((t) => t.module === name);
+  const written = tables.filter((t) => t.ddl).length;
+  pane.append(sectionHead(name, `${tables.length} tables`));
+  pane.append(auth.verdictBlock('schema', name, `${name} — ${tables.length} tables`,
+    { layer: 'backend' }));
+
+  const facts = el('div', 'impl-card');
+  for (const [label, value] of [
+    // Two counts, both named, because they disagree and the viewer is not the
+    // place to decide which is right. `module.tables` is what the Modules sheet
+    // declares; the other is how many tables actually carry this schema. They
+    // sum to 267 against 358 across the package, so the sheet is behind — and a
+    // reviewer signing off a boundary should see that rather than one number
+    // picked quietly on their behalf.
+    ['Tables carrying it', String(tables.length)],
+    ['On the Modules sheet', String(module.tables ?? '—')],
+    // `ddl` is the marker the rest of the viewer uses for written-as-SQL — 39
+    // across the package, which is the figure in the sidebar note. Not
+    // `migration`, which every one of the 358 has and which would report the
+    // whole database as built.
+    ['Written as SQL', `${written} of ${tables.length}`],
+    ['Tier', module.tier ?? '—'],
+  ]) {
+    const row = el('div', 'impl-row');
+    row.append(el('span', 'impl-label', label), el('code', null, value));
+    facts.append(row);
+  }
+  if (module.tables != null && module.tables !== tables.length) {
+    const warn = el('div', 'pane-warn');
+    warn.innerHTML = `The Modules sheet says <b>${module.tables}</b> tables and `
+      + `<b>${tables.length}</b> carry this schema. The sheet is the stale one — it is `
+      + `hand-maintained and the schema assignment is derived.`;
+    pane.append(warn);
+  }
+  pane.append(facts);
+
+  pane.append(sectionHead('Its tables', tables.length));
+  for (const t of tables) {
+    const row = el('div', `link-item${t.ddl ? '' : ' planned'}`);
+    row.append(el('span', 'link-name', t.name));
+    row.append(el('span', 'link-file', t.ddl ? 'written' : 'planned'));
+    row.onclick = () => selectTable(t.name);
+    pane.append(row);
+  }
+}
+
+
+/**
+ * Where a table hangs, walked to its schema root.
+ *
+ * `handoff/schema-reference.json` gained this on 20 August and nothing read it.
+ * `reachesRootVia` names the immediate parent and the column that reaches it —
+ * "sales_order_id -> orders.sales_order" — so the chain is walked one hop at a
+ * time rather than read off `parent`, which only 46 of the 353 tables carry.
+ *
+ * Guarded against a cycle: the data is derived and should be acyclic, but a
+ * viewer that hangs on bad input is worse than one that reports it.
+ */
+function lineageChain(table) {
+  const byName = new Map((state.backend?.tables ?? []).map((t) => [t.name, t]));
+  const chain = [];
+  const seen = new Set([table.name]);
+  let current = table;
+
+  while (current && !current.isSchemaRoot) {
+    const via = current.reachesRootVia;
+    if (!via) break;
+    const m = /^(.*?)\s*->\s*(.+)$/.exec(via);
+    if (!m) break;
+    const [, column, parentName] = [null, m[1].trim(), m[2].trim()];
+    if (seen.has(parentName)) {
+      chain.push({ column, name: parentName, cycle: true });
+      break;
+    }
+    seen.add(parentName);
+    chain.push({ column, name: parentName, table: byName.get(parentName) ?? null });
+    current = byName.get(parentName);
+    if (chain.length > 12) break;
+  }
+  return chain;
+}
+
+/** The "where it hangs" block: the chain up, and what it is anchored on. */
+function renderLineageSection(pane, table) {
+  const chain = lineageChain(table);
+  const anchors = table.anchors ?? [];
+  if (!chain.length && !anchors.length && !table.isSchemaRoot && !table.isAnchor) return;
+
+  pane.append(sectionHead('Where it hangs', chain.length || (table.isSchemaRoot ? 1 : 0)));
+  const card = el('div', 'impl-card lineage-card');
+
+  if (table.isSchemaRoot) {
+    card.append(el('p', 'lineage-root-note',
+      'A schema root — nothing above it. Every table below reaches this one.'));
+  }
+
+  if (chain.length) {
+    const list = el('div', 'lineage-chain');
+    // The table itself first, so the chain reads as a path rather than a list
+    // of ancestors with the subject missing from its own lineage.
+    list.append(lineageStep(table.name, null, { self: true }));
+    for (const step of chain) {
+      list.append(lineageStep(step.name, step.column, {
+        root: step.table?.isSchemaRoot,
+        cycle: step.cycle,
+      }));
+    }
+    card.append(list);
+    if (table.depth != null) {
+      const row = el('div', 'impl-row');
+      row.append(el('span', 'impl-label', 'Depth'),
+        el('code', null, `${table.depth} from ${table.schemaRoot ?? 'its root'}`));
+      card.append(row);
+    }
+  }
+
+  if (anchors.length) {
+    const row = el('div', 'impl-row lineage-anchor-row');
+    row.append(el('span', 'impl-label', 'Anchored on'));
+    const chips = el('div', 'lineage-anchors');
+    for (const a of anchors) {
+      const chip = el('button', 'lineage-anchor', a);
+      chip.type = 'button';
+      // Clicking an anchor is the question the brief asked for: everything
+      // anchored on this. `scope_node` alone answers "what is purely
+      // tenancy-scoped", which the diagram could not be asked before.
+      chip.onclick = () => { state.dataAnchor = a; renderData(); fillSidePane(); };
+      chip.title = `Show every table anchored on ${a}`;
+      chips.append(chip);
+    }
+    row.append(chips);
+    card.append(row);
+  }
+  if (table.isAnchor) {
+    card.append(el('p', 'lineage-root-note',
+      'An anchor — other tables’ keys stop here rather than passing through.'));
+  }
+
+  pane.append(card);
+}
+
+function lineageStep(name, column, { self = false, root = false, cycle = false } = {}) {
+  const step = el('div', `lineage-step${self ? ' self' : ''}${root ? ' root' : ''}`);
+  if (column) {
+    step.append(el('span', 'lineage-via', column));
+  }
+  const link = el('button', 'lineage-name', name);
+  link.type = 'button';
+  if (!self) link.onclick = () => selectTable(name);
+  else link.disabled = true;
+  step.append(link);
+  if (root) step.append(el('span', 'lineage-tag', 'schema root'));
+  if (cycle) step.append(el('span', 'lineage-tag cycle', 'cycle — chain stops here'));
+  return step;
+}
+
 function renderTableLinks() {
   const pane = $('links-pane');
   pane.innerHTML = '';
   const table = (state.backend?.tables ?? []).find((t) => t.name === state.tableName);
-  if (!table) {
-    pane.append(el('p', 'pane-empty', 'Select a table.'));
-    return;
-  }
+  if (!table) return renderSchemaLinks(pane);
 
   // First in the rail, not last. It sat under "Operations that touch it",
   // "Foreign keys", "Inferred keys" and "Keys with no table" — four sections
@@ -5779,6 +5405,10 @@ function renderTableLinks() {
   // the backend schema read as the one layer with no sign-off at all. Nothing
   // about it changed except where it is.
   pane.append(auth.verdictBlock('table', table.name, table.name, { layer: 'backend' }));
+
+  // Where it hangs, immediately under the review — the first question a
+  // reviewer asks about a table they do not recognise is what it belongs to.
+  renderLineageSection(pane, table);
 
   // ---- what reaches this table -------------------------------------------
   // The workbook's Where used sheet, whose own subtitle is the reason to lead
@@ -7098,7 +6728,10 @@ function renderBellPanel() {
     : 'Nobody has named you yet.';
   $('bell-seen').hidden = unseen === 0;
 
-  for (const m of mentionCache.slice(0, 8)) {
+  // Everything, not the newest eight. The list scrolls, so a cap here bought
+  // nothing and cost the reader the difference between "that is all of them"
+  // and "that is as many as this box felt like drawing".
+  for (const m of mentionCache) {
     const row = el('div', `bell-row${m.seen_at ? '' : ' unread'}`);
     const head = el('div', 'bell-row-head');
     head.append(el('span', 'bell-who', m.by || m.by_email));
@@ -7312,13 +6945,64 @@ function bindUI() {
   }
   $('decisions-filter').oninput = (e) => { state.decisionsFilter = e.target.value; renderDecisions(); };
 
+  // ── the four decision views ──────────────────────────────────────
+  for (const button of $('timeline-scope').querySelectorAll('button')) {
+    button.classList.toggle('active', button.dataset.scope === state.timelineScope);
+    button.onclick = () => {
+      state.timelineScope = button.dataset.scope;
+      for (const other of $('timeline-scope').querySelectorAll('button')) {
+        other.classList.toggle('active', other === button);
+      }
+      renderTimeline();
+    };
+  }
+  $('timeline-filter').oninput = (e) => { state.timelineFilter = e.target.value; renderTimeline(); };
+
+  $('supersession-all').onchange = (e) => {
+    state.supersessionAll = e.target.checked;
+    renderSupersession();
+  };
+
+  $('register-pick').onchange = (e) => {
+    state.registerId = e.target.value;
+    // The state filter belongs to the conflicts register and means nothing on
+    // any other, so it is dropped rather than carried across and silently
+    // matching nothing.
+    state.registerState = '';
+    renderRegister();
+  };
+  $('register-filter').oninput = (e) => { state.registerFilter = e.target.value; renderRegister(); };
+
+  $('decision-pick').onchange = (e) => { state.adrId = e.target.value; renderDecision(); };
+
   $('data-scope').onchange = (e) => {
     state.dataModule = e.target.value;
     data.userAdjusted = false;
     renderData();
     data.resize();
     data.fit();
+    // Changing the scope changes what the rail is about — it now describes a
+    // different schema, or none. Without this the rail kept describing the
+    // schema that was scoped when it was last drawn.
+    if (!state.tableName) fillSidePane();
   };
+  $('data-anchor').onchange = (e) => {
+    state.dataAnchor = e.target.value || null;
+    if (!state.dataAnchor) state.dataAnchorOnly = false;
+    data.userAdjusted = false;
+    renderData();
+    data.resize();
+    data.fit();
+    fillSidePane();
+  };
+  $('data-anchor-only').onchange = (e) => {
+    state.dataAnchorOnly = e.target.checked;
+    data.userAdjusted = false;
+    renderData();
+    data.resize();
+    data.fit();
+  };
+
   $('data-rows').onchange = (e) => {
     state.dataRows = e.target.checked;
     data.showRows = state.dataRows;

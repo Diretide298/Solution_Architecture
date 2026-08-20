@@ -29,12 +29,23 @@ const svgEl = (tag, attrs = {}) => {
   return node;
 };
 
-const VERDICTS = ['approved', 'needs-work', 'rejected'];
-const LABEL = { approved: 'Approved', 'needs-work': 'Needs work', rejected: 'Rejected' };
+// Every value, in the order the form offers them, so the pace chart and the
+// filters both cover the whole vocabulary rather than the three it started with.
+const VERDICTS = auth.VERDICTS.map(([k]) => k);
+// Labels come from one place so the page and the form can never disagree about
+// what a value is called.
+const LABEL = Object.fromEntries(auth.VERDICTS);
 const COLOUR = { approved: '#4ade80', 'needs-work': '#fbbf24', rejected: '#f87171' };
+
+// How the team answered — the tracker's "Our verdict" column, in the tracker's
+// own colours: green for the two that mean the thing exists now, slate for a
+// question answered, khaki for a point taken, grey for nothing to do.
+const RESPONSE_LABEL = Object.fromEntries(auth.RESPONSES);
+
 const KINDS = {
   operation: 'APIs', table: 'Tables', screen: 'Wireframes',
   board: 'Boards', module: 'Modules',
+  state: 'State models', schema: 'Schemas',
 };
 
 // Where the reviewer was standing. Recorded on the verdict rather than derived
@@ -151,7 +162,7 @@ function renderHeadline(rows) {
   // The only number on this strip that goes down. Counted over everything that
   // asked for work — a rejection or a needs-work — because an approval is not
   // a thing anybody has to come back and close.
-  const asked = rows.filter((v) => v.verdict !== 'approved');
+  const asked = rows.filter((v) => auth.asksForWork(v.verdict));
   const openWork = asked.filter((v) => !auth.isSettled(v)).length;
   box.append(stat(openWork, 'still open',
     !asked.length ? 'nothing has been sent back'
@@ -619,7 +630,12 @@ function doneCell(v) {
   const paint = () => {
     stamp.innerHTML = '';
     if (auth.isSettled(v)) {
-      stamp.append(el('span', 'rt-done-chip', 'Done'));
+      // The response rather than the word "Done": five different answers all
+      // showing as one word is what the tracker had already outgrown.
+      const how = v.done_response;
+      stamp.append(how
+        ? el('span', `response-chip ${how}`, RESPONSE_LABEL[how] ?? how)
+        : el('span', 'rt-done-chip', 'Done'));
       stamp.append(el('span', 'rt-done-by',
         `${v.done_by_name ? `${v.done_by_name} · ` : ''}${fmt(when(v.done_at))}`));
     } else if (v.sent_back_at) {
@@ -633,7 +649,7 @@ function doneCell(v) {
       if (v.sent_back_note) {
         stamp.append(el('span', 'rt-sentback-note', v.sent_back_note));
       }
-    } else if (v.verdict === 'approved') {
+    } else if (!auth.asksForWork(v.verdict)) {
       stamp.append(el('span', 'rt-none', '—'));
     } else {
       stamp.append(el('span', 'rt-open-chip', 'Open'));
@@ -650,35 +666,60 @@ function doneCell(v) {
   // An approval is not a thing anybody has to go and *do*, so there is nothing
   // to close: a tick on one would mean nothing and would make the open count
   // answer a different question than it says it does.
-  if (!mayWrite || v.verdict === 'approved') {
+  if (!mayWrite || !auth.asksForWork(v.verdict)) {
     cell.append(discardButton(v));
     return cell;
   }
 
-  const button = el('button', 'chip rt-done-button', auth.isSettled(v) ? 'Reopen' : 'Mark done');
-  button.type = 'button';
-  button.onclick = async () => {
-    button.disabled = true;
-    const want = !auth.isSettled(v);
+  const settled = auth.isSettled(v);
+
+  const apply = async (want, response) => {
     try {
-      const result = await auth.markVerdictDone(v.id, want);
+      const result = await auth.markVerdictDone(v.id, want, response);
       v.done_at = result.done_at;
       v.done_by_name = result.done_by_name;
-      button.textContent = auth.isSettled(v) ? 'Reopen' : 'Mark done';
-      button.closest('tr')?.classList.toggle('done', auth.isSettled(v));
-      paint();
-      // The headline counts open work, so it has to hear about this. The rows
-      // are left alone deliberately: redrawing the table here would throw away
-      // the reader's scroll position on the row they just pressed.
+      v.done_response = result.done_response ?? '';
+      cell.replaceWith(doneCell(v));
+      // The headline counts open work, so it has to hear about this.
       renderHeadline(filtered());
     } catch (error) {
       $('error').textContent = error.message;
       $('error').hidden = false;
-    } finally {
-      button.disabled = false;
     }
   };
-  cell.append(button);
+
+  if (settled) {
+    const reopen = el('button', 'chip rt-done-button', 'Reopen');
+    reopen.type = 'button';
+    reopen.onclick = () => { reopen.disabled = true; apply(false, ''); };
+    cell.append(reopen);
+  } else {
+    // Closing is answering, so the control is the five answers rather than one
+    // button called Done. Folded behind a press because five chips on every row
+    // of a sixty-row table is a wall, and only one row is being answered at a
+    // time.
+    const open = el('button', 'chip rt-done-button', 'Respond');
+    open.type = 'button';
+    open.onclick = () => {
+      open.remove();
+      const picker = el('div', 'response-picker');
+      for (const [value, label] of auth.RESPONSES) {
+        const pick = el('button', `chip response-set ${value}`, label);
+        pick.type = 'button';
+        pick.onclick = () => {
+          for (const b of picker.querySelectorAll('button')) b.disabled = true;
+          apply(true, value);
+        };
+        picker.append(pick);
+      }
+      const cancel = el('button', 'chip response-cancel', 'Cancel');
+      cancel.type = 'button';
+      cancel.onclick = () => { picker.replaceWith(open); };
+      picker.append(cancel);
+      cell.append(picker);
+    };
+    cell.append(open);
+  }
   cell.append(sendBackControl(v, paint));
   cell.append(discardButton(v));
   return cell;
@@ -897,14 +938,15 @@ function exportCsv(rows) {
   const ordered = [...rows].sort((a, b) => when(a.at) - when(b.at));
   const body = [
     ['when', 'date', 'review', 'layer', 'lands on', 'kind', 'artefact', 'verdict',
-     'reviewer', 'email', 'status', 'done on', 'done by', 'sent back because',
-     'note'].join(','),
+     'reviewer', 'email', 'status', 'our verdict', 'done on', 'done by',
+     'sent back because', 'note'].join(','),
     ...ordered.map((v) => [
       v.at, day(v.at), AUDIENCES[v.audience ?? 'internal'] ?? v.audience,
       LAYERS[v.layer] ?? v.layer ?? '', TAGS[v.tag] ?? v.tag ?? '',
       KINDS[v.target_kind] ?? v.target_kind, v.target_id,
       LABEL[v.verdict] ?? v.verdict, v.by, v.by_email,
       auth.isSettled(v) ? 'Done' : v.sent_back_at ? 'Sent back' : 'Open',
+      RESPONSE_LABEL[v.done_response] ?? v.done_response ?? '',
       v.done_at ? day(v.done_at) : '', v.done_by_name ?? '',
       v.sent_back_note ?? '',
       v.note,
@@ -918,7 +960,15 @@ function exportCsv(rows) {
     new Blob(['\uFEFF' + body], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;
-  a.download = `ticvai-review-activity-${new Date().toISOString().slice(0, 10)}.csv`;
+  // The export is what is on screen — every filter above applies to it. Which
+  // is right, and is exactly why the name has to say so: a filtered file called
+  // ticvai-review-activity-2026-08-20.csv reads as the whole review a week
+  // later, and nothing inside it says otherwise.
+  // `day` is already the function that formats a row's date, so this one is
+  // named for what it is rather than shadowing it.
+  const narrowed = Object.values(state.filter).some(Boolean);
+  const today = new Date().toISOString().slice(0, 10);
+  a.download = `ticvai-review-activity-${today}${narrowed ? '-filtered' : ''}.csv`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

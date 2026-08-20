@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 9
+  x-ticvai-screen-count: 10
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -186,6 +186,16 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getVenueSettings
+      x-ticvai-consumed-by:
+        - "P08 BO-100 Venue Home"
+        - "P08 BO-101 Orders & Money"
+        - "P08 BO-102 Sell"
+        - "P08 BO-103 Access & Venue"
+        - "P08 BO-104 Food & Beverage"
+        - "P08 BO-105 Stock & Supply"
+        - "P08 BO-106 People & Access Rights"
+        - "P08 BO-107 Guests & Marketing"
+        - "P08 BO-108 Venue Operations"
       summary: Operational settings for this venue
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE

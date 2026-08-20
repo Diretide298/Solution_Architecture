@@ -136,6 +136,53 @@ properties:
                 Required where the platform is offline-capable. Served from the local bundle,
                 queued, or refused with a reason.
             denied: { type: string }
+        entryState:
+          type: object
+          description: >
+            **What the screen arrives holding, and where it came from.** 280 screens call an operation
+            with a path parameter and not one route declared it — `GST-013 Ticket Details` calls
+            `getEntitlement(entitlementId)` on the route `/general/ticket-details`, so **the screen
+            cannot know which ticket it is showing.**
+
+            141 of those have no `entryFrom` either, so **nothing upstream can supply the id.** Raised
+            on 20 August: screens start abruptly, and what is already loaded is unstated.
+
+            A screen that needs a parameter must say so, and say what hands it over. **The alternative
+            is a frontend team guessing, and guessing differently on each screen.**
+          properties:
+            params:
+              type: array
+              description: Path or query parameters the screen cannot render without.
+              items:
+                type: object
+                required: [name, from]
+                properties:
+                  name:
+                    type: string
+                  from:
+                    type: string
+                    description: >
+                      The screen id that supplies it, `session` where it comes from the signed-in
+                      principal or the workstation, or `deepLink` where a guest may arrive cold from
+                      an email or a QR code. **`deepLink` is the one that needs an unhappy path** —
+                      a link opened three weeks late lands on something expired.
+                  optional:
+                    type: boolean
+                    default: false
+            preloaded:
+              type: array
+              description: >
+                What the previous screen already has and hands over, so the screen renders before its
+                own fetch returns. **The difference between a detail screen that flashes a skeleton and
+                one that shows the row you just tapped.**
+              items:
+                type: string
+            coldEntry:
+              type: string
+              description: >
+                What happens when somebody arrives with no upstream screen — a bookmark, a deep link, a
+                refresh. **Every screen taking a parameter can be reached cold**, and a screen with no
+                answer here is one that renders empty and blames the network.
         navigation:
           type: object
           properties:

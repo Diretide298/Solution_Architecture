@@ -111,6 +111,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+        - "P08 BO-100 Venue Home"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
       summary: List shifts

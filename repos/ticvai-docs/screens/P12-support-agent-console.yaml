@@ -116,6 +116,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: SUP-002
   name: Agent Dashboard
   module: TODO
@@ -191,6 +196,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: SUP-003
   name: Availability & Routing Settings
   module: TODO
@@ -320,6 +330,14 @@ screens:
     **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace
     move; the rest of the console stays Wave 3.
   density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    - name: conversationId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: SUP-005
   name: Live Chat Workspace
   module: TODO
@@ -407,6 +425,13 @@ screens:
     with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting
     can wait.
   density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: SUP-004
+    - name: conversationId
+      from: SUP-004
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: SUP-006
   name: Knowledge Base Search
   module: TODO
@@ -612,6 +637,17 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: SUP-007
   name: Canned Response Management
   module: TODO
@@ -740,3 +776,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.

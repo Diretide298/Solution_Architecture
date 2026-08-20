@@ -124,6 +124,13 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: accountId
+      from: deepLink
+    - name: sessionId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-002
   name: Partner Dashboard
   module: TODO
@@ -231,6 +238,15 @@ screens:
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
   density: compact
+  entryState:
+    params:
+    - name: accountId
+      from: PTR-001
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: PTR-003
   name: Profile & Company Details
   module: TODO
@@ -287,6 +303,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: principalId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: PTR-004
   name: Notifications
   module: TODO
@@ -333,6 +354,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: messageId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-005
   name: Inventory & Allocation View
   module: TODO
@@ -451,6 +477,15 @@ screens:
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
   density: compact
+  entryState:
+    params:
+    - name: envelopeId
+      from: deepLink
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: PTR-006
   name: Product Catalog (B2B Pricing)
   module: TODO
@@ -559,6 +594,14 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: priceListId
+      from: deepLink
+    - name: productId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: PTR-007
   name: Availability Search
   module: TODO
@@ -706,6 +749,13 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: PTR-009
   name: Group / Bulk Booking
   module: TODO
@@ -760,6 +810,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: blockId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-010
   name: Cart & Quote
   module: TODO
@@ -862,6 +917,15 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: lineId
+      from: deepLink
+    - name: promotionId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-011
   name: Quote Management
   module: TODO
@@ -912,6 +976,11 @@ screens:
     purpose: What the partner earned and what is owed
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: agreementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-012
   name: Checkout / Credit Purchase
   module: TODO
@@ -972,6 +1041,11 @@ screens:
     that moves with the exchange rate. Which rate converts the sale is `fxPolicy` and it is a commercial
     term, not a default.
   density: compact
+  entryState:
+    params:
+    - name: paymentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-013
   name: Credit Limit & Balance
   module: TODO
@@ -1022,6 +1096,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: accountId
+      from: PTR-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: PTR-014
   name: Settlement & Payment History
   module: TODO
@@ -1083,6 +1162,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: settlementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-015
   name: Order History
   module: TODO
@@ -1181,6 +1265,13 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: PTR-016
   name: Voucher / Ticket Download
   module: TODO
@@ -1274,6 +1365,11 @@ screens:
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: PTR-008
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: PTR-017
   name: Commission Statement
   module: TODO
@@ -1321,6 +1417,11 @@ screens:
     purpose: Commercial agreements with B2B partners
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: agreementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-018
   name: Reports & Sales Performance
   module: TODO
@@ -1396,6 +1497,14 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: PTR-019
   name: API Credentials & Integration
   module: TODO
@@ -1487,6 +1596,11 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: grantId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: PTR-021
   name: Support & Contact
   module: TODO
@@ -1553,3 +1667,8 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.

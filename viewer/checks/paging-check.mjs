@@ -2,6 +2,7 @@
 // are the kind of change that looks fine and quietly loses rows, so the checks
 // are about what is still reachable, not about what is fast.
 import puppeteer from 'puppeteer-core';
+import { authed } from './_session.mjs';
 const VIEWER = 'http://localhost:4173';
 let pass = 0, fail = 0;
 const check = (n, ok, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ` — ${d}` : ''}`); ok ? pass++ : fail++; };
@@ -9,8 +10,8 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ── the payload, before any browser is involved ──────────────────────
 {
-  const slim = await (await fetch(`${VIEWER}/api/index`)).json();
-  const full = await (await fetch(`${VIEWER}/api/index?full=1`)).json();
+  const slim = await (await authed(`${VIEWER}/api/index`)).json();
+  const full = await (await authed(`${VIEWER}/api/index?full=1`)).json();
   check('the index still carries every node', slim.nodes.length === full.nodes.length,
     `${slim.nodes.length} nodes`);
   check('and every edge', slim.edges.length === full.edges.length, `${slim.edges.length} edges`);
@@ -27,7 +28,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const files = [...new Set(full.nodes.map((n) => n.file))];
   let missing = 0, checked = 0;
   for (const file of files) {
-    const detail = await (await fetch(`${VIEWER}/api/detail?file=${encodeURIComponent(file)}`)).json();
+    const detail = await (await authed(`${VIEWER}/api/detail?file=${encodeURIComponent(file)}`)).json();
     for (const node of full.nodes.filter((n) => n.file === file)) {
       const heavy = ['description', 'properties'].filter((k) => k in node);
       if (!heavy.length) continue;
@@ -38,7 +39,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   check('every held-back field comes back from /api/detail', missing === 0,
     `${checked} nodes checked across ${files.length} contracts, ${missing} wrong`);
 
-  const gz = await fetch(`${VIEWER}/api/index`, { headers: { 'accept-encoding': 'gzip' } });
+  const gz = await authed(`${VIEWER}/api/index`, { headers: { 'accept-encoding': 'gzip' } });
   check('the index is served compressed', gz.headers.get('content-encoding') === 'gzip');
 }
 
@@ -58,7 +59,7 @@ await wait(3000);
 
 // ── the reader still has its prose ───────────────────────────────────
 {
-  const full = await (await fetch(`${VIEWER}/api/index?full=1`)).json();
+  const full = await (await authed(`${VIEWER}/api/index?full=1`)).json();
   const node = full.nodes.find((n) => n.type === 'operation' && (n.description ?? '').length > 60);
   await page.goto(`${VIEWER}/#${encodeURIComponent(node.id)}`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#layers button', { timeout: 25000 });

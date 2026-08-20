@@ -9,12 +9,12 @@
 | Contracts | 14 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 152 |
+| Operations with no screen | 147 |
 | Waves | wave1 25 · wave2 20 · wave3 1 |
 
 ## Gaps
 
-### 152 operations with no screen here
+### 147 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -43,7 +43,6 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `getMyMemberships` | catalogue | GET | A guest's own memberships, benefits and history |
 | `importProductCatalogue` | catalogue | POST | Parse a catalogue file into a preview |
 | `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
 | `leaveWaitlist` | catalogue | DELETE | Stop waiting |
@@ -60,7 +59,8 @@
 | `closeTableVisit` | fnb | POST | Settle and close a visit |
 | `completeProductionRun` | fnb | POST | Record what was actually made |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
-| … | | | 112 more |
+| `createTableReservation` | fnb | POST | Book a table in advance |
+| … | | | 107 more |
 
 ### 1 modules split across waves
 

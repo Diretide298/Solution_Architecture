@@ -100,6 +100,11 @@ screens:
     only a health check.** Pranay asked for guest details and tickets; Chitrangi asked for search. All
     three existed and none were wired. **Rewired on the 20 August review.**
   density: comfortable
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-002
   name: Explore Categories
   module: TODO
@@ -250,6 +255,12 @@ screens:
     purpose: Wait times across a venue
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: productId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: GST-005
   name: What's On
   module: TODO
@@ -299,6 +310,11 @@ screens:
     purpose: List products
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-006
   name: Event / Exhibition Details
   module: TODO
@@ -347,6 +363,15 @@ screens:
     purpose: Read a product
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: performanceId
+      from: deepLink
+    - name: productId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event. **A shared product link after the product retired.** Shows what replaced it where a successor
+      exists, and the catalogue where none does.'
 - id: GST-007
   name: Select Date & Time
   module: TODO
@@ -398,6 +423,11 @@ screens:
     purpose: Live remaining capacity
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-008
   name: Tickets & Add-ons
   module: TODO
@@ -444,6 +474,13 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-009
   name: Review & Payment
   module: TODO
@@ -513,6 +550,17 @@ screens:
     base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not
     ours and is not recorded as ours.
   density: comfortable
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: orderId
+      from: deepLink
+    - name: paymentId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-010
   name: Booking Confirmation
   module: TODO
@@ -556,6 +604,13 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-011
   name: Wallet Overview
   module: TODO
@@ -608,6 +663,11 @@ screens:
     purpose: Wallet transaction history
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: subjectId
+      from: GST-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-012
   name: My Tickets
   module: TODO
@@ -664,6 +724,16 @@ screens:
     only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read
     one. Raised by Pranay. **Rewired on the 20 August review.**
   density: comfortable
+  entryState:
+    params:
+    - name: entitlementId
+      from: deepLink
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
+      used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A
+      guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded
+      or the performance passed, says which and offers the order list rather than an error.'
 - id: GST-013
   name: Ticket Details
   module: TODO
@@ -723,6 +793,16 @@ screens:
     credential is a separate call** — a list of tickets is a convenience and the credential admits somebody.
     **Rewired on the 20 August review.**
   density: comfortable
+  entryState:
+    params:
+    - name: entitlementId
+      from: deepLink
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
+      used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A
+      guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded
+      or the performance passed, says which and offers the order list rather than an error.'
 - id: GST-014
   name: Ticket Transfer
   module: TODO
@@ -773,6 +853,15 @@ screens:
     purpose: Claim transferred tickets
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: transferId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-015
   name: Memberships
   module: TODO
@@ -842,6 +931,13 @@ screens:
     another country resolves through the guest link**, and the flow checker caught what the screen edit
     did not.
   density: comfortable
+  entryState:
+    params:
+    - name: guestLinkId
+      from: deepLink
+    - name: subjectId
+      from: GST-001
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-016
   name: My Reservations
   module: TODO
@@ -894,6 +990,11 @@ screens:
     purpose: Cancel a reservation
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: reservationId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-017
   name: Reservation Details
   module: TODO
@@ -942,6 +1043,11 @@ screens:
     purpose: Cancel a reservation
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: reservationId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-018
   name: Add to Calendar / Reminders
   module: TODO
@@ -998,6 +1104,13 @@ screens:
     purpose: Generate an Apple or Google wallet pass
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-019
   name: Order History (Wallet)
   module: TODO
@@ -1049,6 +1162,13 @@ screens:
     was the only declared operation**, which is not history. Raised by Pranay. **Rewired on the 20 August
     review.**
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-020
   name: Saved Items / Wishlist
   module: TODO
@@ -1106,6 +1226,13 @@ screens:
     that seven operations were attached in bulk to three unrelated screens. **Rewired on the 20 August
     review.**
   density: comfortable
+  entryState:
+    params:
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: GST-001
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-021
   name: Interactive Map
   module: TODO
@@ -1171,6 +1298,11 @@ screens:
     purpose: The navigation graph, ready to route over
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: mapId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-022
   name: Attraction Wait Times
   module: TODO
@@ -1270,6 +1402,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-024
   name: F&B – Browse & Order
   module: TODO
@@ -1337,6 +1474,17 @@ screens:
     - GST-009
     fromFlows: true
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: outletId
+      from: deepLink
+    - name: venueId
+      from: session
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-025
   name: F&B – Order Tracking
   module: TODO
@@ -1391,6 +1539,15 @@ screens:
     - GST-003
     fromFlows: true
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: sessionId
+      from: session
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-026
   name: Retail / Merchandise
   module: TODO
@@ -1445,6 +1602,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: cardCode
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-027
   name: Parking – Reserve & Pay
   module: TODO
@@ -1496,6 +1658,12 @@ screens:
     purpose: Change the plate, or revoke
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: entitlementId
+      from: deepLink
+    coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
+      used, transferred — because *not found* to somebody holding a ticket is the wrong answer.'
 - id: GST-028
   name: Parking – Reservation Confirmed
   module: TODO
@@ -1596,6 +1764,11 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-030
   name: In-Venue Notifications
   module: TODO
@@ -1698,6 +1871,14 @@ screens:
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error.
   density: comfortable
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: outletId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: GST-032
   name: AI Concierge – Chat
   module: TODO
@@ -1776,6 +1957,18 @@ screens:
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error.
   density: comfortable
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: conversationId
+      from: deepLink
+    - name: orderId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom. **A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.
 - id: GST-033
   name: AI Concierge – Contextual Help
   module: TODO
@@ -1828,6 +2021,12 @@ screens:
     purpose: Ask
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: GST-034
   name: Lost & Found
   module: TODO
@@ -1876,6 +2075,13 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-035
   name: Feedback & Ratings
   module: TODO
@@ -2025,6 +2231,11 @@ screens:
     purpose: Evaluate promotions against a cart
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: promotionId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-038
   name: Digital Companion Mode
   module: TODO
@@ -2125,6 +2336,11 @@ screens:
     purpose: Record a consent decision
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: subjectId
+      from: GST-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-040
   name: Help & Support
   module: TODO
@@ -2233,6 +2449,11 @@ screens:
     purpose: Turn the cart into an order
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-042
   name: Simple Registration & OTP
   module: TODO
@@ -2356,6 +2577,15 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: challengeId
+      from: deepLink
+    - name: methodId
+      from: deepLink
+    - name: providerId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-043
   name: Arabic / RTL Experience
   module: TODO
@@ -2503,6 +2733,13 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-046
   name: Branded Queue / Waiting Room
   module: TODO
@@ -2642,6 +2879,11 @@ screens:
     purpose: Suggestions for a cart
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-049
   name: Interactive Seat Selection
   module: TODO
@@ -2693,6 +2935,12 @@ screens:
     purpose: Recommend seats for a party
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
 - id: GST-050
   name: Resource Booking – Cabana
   module: TODO
@@ -2751,6 +2999,11 @@ screens:
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.8
   density: comfortable
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-051
   name: Plan Your Adventure – Start
   module: TODO
@@ -2912,6 +3165,11 @@ screens:
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
   density: comfortable
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: GST-054
   name: AI Optimized Itinerary
   module: TODO
@@ -2970,6 +3228,12 @@ screens:
     trigger: onAction
   provenance: MoM 10 August 2026 §4.9
   density: comfortable
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: GST-055
   name: Dynamic QR Ticket
   module: TODO
@@ -3015,6 +3279,13 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: GST-056
   name: Bundle Package
   module: TODO
@@ -3067,6 +3338,13 @@ screens:
     purpose: Add something
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: bundleId
+      from: deepLink
+    - name: cartId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-057
   name: Accessibility Information
   module: TODO
@@ -3265,6 +3543,11 @@ screens:
     - GST-001
     - GST-062
   density: comfortable
+  entryState:
+    params:
+    - name: outletId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: GST-062
   name: Shop & Drop Collection
   module: In-Venue Experience
@@ -3394,3 +3677,8 @@ screens:
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with WEB-027. **Not on the wireframe board** — needs drawing. CF-93.
   density: comfortable
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.

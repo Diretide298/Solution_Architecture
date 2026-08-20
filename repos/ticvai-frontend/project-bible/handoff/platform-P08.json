@@ -10,79 +10,84 @@
  "generated": "2026-08-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 99,
-  "operations": 382,
+  "screens": 108,
+  "operations": 383,
   "contracts": 23,
   "modules": 8,
-  "undrawn": 26,
-  "operationsWithNoScreen": 240
+  "undrawn": 35,
+  "operationsWithNoScreen": 239
  },
  "waves": {
-  "wave1": 45,
+  "wave1": 54,
   "wave2": 50,
   "wave3": 4
  },
  "modules": [
   {
+   "module": "Orders & Money",
+   "screens": 29,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Access & Venue",
+   "screens": 25,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Sell",
+   "screens": 15,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "People & Access Rights",
+   "screens": 12,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Stock & Supply",
+   "screens": 10,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
    "module": "Venue Operations",
-   "screens": 72,
-   "waves": [
-    1,
-    2,
-    3
-   ]
-  },
-  {
-   "module": "Finance",
-   "screens": 6,
+   "screens": 8,
    "waves": [
     1,
     2
    ]
   },
   {
-   "module": "Inventory",
-   "screens": 6,
-   "waves": [
-    1,
-    2
-   ]
-  },
-  {
-   "module": "Queue Management",
-   "screens": 5,
-   "waves": [
-    1
-   ]
-  },
-  {
-   "module": "Approvals",
+   "module": "Food & Beverage",
    "screens": 5,
    "waves": [
     1,
-    2,
-    3
-   ]
-  },
-  {
-   "module": "venue-map",
-   "screens": 3,
-   "waves": [
     2
    ]
   },
   {
-   "module": "Parking",
-   "screens": 1,
+   "module": "Guests & Marketing",
+   "screens": 4,
    "waves": [
+    1,
     2
-   ]
-  },
-  {
-   "module": "AI",
-   "screens": 1,
-   "waves": [
-    1
    ]
   }
  ],
@@ -124,11 +129,11 @@
    "operations": 15
   },
   {
-   "contract": "shift",
+   "contract": "queue",
    "operations": 13
   },
   {
-   "contract": "queue",
+   "contract": "shift",
    "operations": 13
   },
   {
@@ -140,12 +145,12 @@
    "operations": 11
   },
   {
-   "contract": "venue-map",
+   "contract": "tenancy",
    "operations": 10
   },
   {
-   "contract": "tenancy",
-   "operations": 9
+   "contract": "venue-map",
+   "operations": 10
   },
   {
    "contract": "resources",
@@ -184,7 +189,7 @@
   {
    "id": "BO-001",
    "name": "Queue Directory",
-   "module": "Queue Management",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/queue-management/queue-directory",
    "operations": 19,
@@ -193,7 +198,7 @@
   {
    "id": "BO-002",
    "name": "Queue Configuration",
-   "module": "Queue Management",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/queue-management/queue-configuration",
    "operations": 14,
@@ -202,7 +207,7 @@
   {
    "id": "BO-003",
    "name": "Queue Integration Setup",
-   "module": "Queue Management",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/queue-management/queue-integration-setup",
    "operations": 21,
@@ -211,7 +216,7 @@
   {
    "id": "BO-004",
    "name": "Manual Wait Time Entry",
-   "module": "Queue Management",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/queue-management/manual-wait-time-entry",
    "operations": 11,
@@ -220,7 +225,7 @@
   {
    "id": "BO-005",
    "name": "Queue Monitor",
-   "module": "Queue Management",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/queue-management/queue-monitor",
    "operations": 19,
@@ -229,7 +234,7 @@
   {
    "id": "BO-006",
    "name": "Parking Configuration",
-   "module": "Parking",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/parking/parking-configuration",
    "operations": 4,
@@ -238,7 +243,7 @@
   {
    "id": "BO-007",
    "name": "Product Directory",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/product-directory",
    "operations": 10,
@@ -247,7 +252,7 @@
   {
    "id": "BO-008",
    "name": "Product Detail & Variants",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/product-detail-variants",
    "operations": 3,
@@ -256,7 +261,7 @@
   {
    "id": "BO-009",
    "name": "Pricing Rules",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/pricing-rules",
    "operations": 7,
@@ -265,7 +270,7 @@
   {
    "id": "BO-010",
    "name": "Promotions & Coupons",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/promotions-coupons",
    "operations": 15,
@@ -274,7 +279,7 @@
   {
    "id": "BO-011",
    "name": "Packages & Bundles",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/packages-bundles",
    "operations": 4,
@@ -283,7 +288,7 @@
   {
    "id": "BO-012",
    "name": "Membership Products",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/membership-products",
    "operations": 12,
@@ -292,7 +297,7 @@
   {
    "id": "BO-013",
    "name": "Channel & Distribution",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/channel-distribution",
    "operations": 6,
@@ -301,7 +306,7 @@
   {
    "id": "BO-014",
    "name": "Catalogue Publishing",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/catalogue-publishing",
    "operations": 10,
@@ -310,7 +315,7 @@
   {
    "id": "BO-015",
    "name": "Session Calendar",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/session-calendar",
    "operations": 11,
@@ -319,7 +324,7 @@
   {
    "id": "BO-016",
    "name": "Session Template",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/session-template",
    "operations": 11,
@@ -328,7 +333,7 @@
   {
    "id": "BO-017",
    "name": "Capacity Management",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/capacity-management",
    "operations": 6,
@@ -337,7 +342,7 @@
   {
    "id": "BO-018",
    "name": "Allocation & Holds",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/allocation-holds",
    "operations": 5,
@@ -346,7 +351,7 @@
   {
    "id": "BO-019",
    "name": "Closures & Blackouts",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/closures-blackouts",
    "operations": 11,
@@ -355,7 +360,7 @@
   {
    "id": "BO-020",
    "name": "Timed Entry Rules",
-   "module": "Venue Operations",
+   "module": "Food & Beverage",
    "wave": 2,
    "route": "/venue-operations/timed-entry-rules",
    "operations": 11,
@@ -364,7 +369,7 @@
   {
    "id": "BO-021",
    "name": "Order Search",
-   "module": "Venue Operations",
+   "module": "Food & Beverage",
    "wave": 1,
    "route": "/venue-operations/order-search",
    "operations": 2,
@@ -373,7 +378,7 @@
   {
    "id": "BO-022",
    "name": "Order Detail",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/order-detail",
    "operations": 14,
@@ -382,7 +387,7 @@
   {
    "id": "BO-023",
    "name": "Refunds & Exchanges",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/refunds-exchanges",
    "operations": 14,
@@ -391,7 +396,7 @@
   {
    "id": "BO-024",
    "name": "Payment Exceptions",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/payment-exceptions",
    "operations": 4,
@@ -400,7 +405,7 @@
   {
    "id": "BO-025",
    "name": "Chargebacks & Disputes",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/chargebacks-disputes",
    "operations": 5,
@@ -409,7 +414,7 @@
   {
    "id": "BO-026",
    "name": "Group Bookings",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/group-bookings",
    "operations": 14,
@@ -418,7 +423,7 @@
   {
    "id": "BO-027",
    "name": "Reissue & Media Replacement",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/reissue-media-replacement",
    "operations": 4,
@@ -427,7 +432,7 @@
   {
    "id": "BO-028",
    "name": "Refund Approval Queue",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/refund-approval-queue",
    "operations": 1,
@@ -436,7 +441,7 @@
   {
    "id": "BO-029",
    "name": "Report Builder",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/report-builder",
    "operations": 9,
@@ -445,7 +450,7 @@
   {
    "id": "BO-030",
    "name": "Access Point Directory",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/access-point-directory",
    "operations": 16,
@@ -454,7 +459,7 @@
   {
    "id": "BO-031",
    "name": "Access Point Configuration",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/access-point-configuration",
    "operations": 7,
@@ -463,7 +468,7 @@
   {
    "id": "BO-032",
    "name": "Admission Profiles",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/admission-profiles",
    "operations": 3,
@@ -472,7 +477,7 @@
   {
    "id": "BO-033",
    "name": "Blacklist Management",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/blacklist-management",
    "operations": 3,
@@ -481,7 +486,7 @@
   {
    "id": "BO-034",
    "name": "Scan Activity",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/scan-activity",
    "operations": 7,
@@ -490,7 +495,7 @@
   {
    "id": "BO-035",
    "name": "Override Audit",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/override-audit",
    "operations": 7,
@@ -508,7 +513,7 @@
   {
    "id": "BO-037",
    "name": "Offline Package Status",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/offline-package-status",
    "operations": 4,
@@ -517,7 +522,7 @@
   {
    "id": "BO-038",
    "name": "Reconciliation Queue",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/reconciliation-queue",
    "operations": 9,
@@ -526,7 +531,7 @@
   {
    "id": "BO-039",
    "name": "Shift Directory",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/shift-directory",
    "operations": 13,
@@ -535,7 +540,7 @@
   {
    "id": "BO-040",
    "name": "Variance Approval",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/variance-approval",
    "operations": 13,
@@ -544,7 +549,7 @@
   {
    "id": "BO-041",
    "name": "Cash Movements",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/cash-movements",
    "operations": 13,
@@ -553,7 +558,7 @@
   {
    "id": "BO-042",
    "name": "Banking & Safe",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/banking-safe",
    "operations": 13,
@@ -562,7 +567,7 @@
   {
    "id": "BO-043",
    "name": "Daily Reconciliation",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/daily-reconciliation",
    "operations": 7,
@@ -580,7 +585,7 @@
   {
    "id": "BO-045",
    "name": "Menu Management",
-   "module": "Venue Operations",
+   "module": "Food & Beverage",
    "wave": 2,
    "route": "/venue-operations/menu-management",
    "operations": 5,
@@ -589,7 +594,7 @@
   {
    "id": "BO-046",
    "name": "Kitchen Display",
-   "module": "Venue Operations",
+   "module": "Food & Beverage",
    "wave": 2,
    "route": "/venue-operations/kitchen-display",
    "operations": 5,
@@ -598,7 +603,7 @@
   {
    "id": "BO-047",
    "name": "F&B Order Management",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/f-b-order-management",
    "operations": 14,
@@ -607,7 +612,7 @@
   {
    "id": "BO-048",
    "name": "Retail Products",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/retail-products",
    "operations": 4,
@@ -616,7 +621,7 @@
   {
    "id": "BO-049",
    "name": "Stock Levels",
-   "module": "Venue Operations",
+   "module": "Stock & Supply",
    "wave": 2,
    "route": "/venue-operations/stock-levels",
    "operations": 2,
@@ -625,7 +630,7 @@
   {
    "id": "BO-050",
    "name": "Stock Count",
-   "module": "Venue Operations",
+   "module": "Stock & Supply",
    "wave": 2,
    "route": "/venue-operations/stock-count",
    "operations": 2,
@@ -634,7 +639,7 @@
   {
    "id": "BO-051",
    "name": "Purchase Orders",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/purchase-orders",
    "operations": 13,
@@ -643,7 +648,7 @@
   {
    "id": "BO-052",
    "name": "Goods Receipt",
-   "module": "Venue Operations",
+   "module": "Stock & Supply",
    "wave": 2,
    "route": "/venue-operations/goods-receipt",
    "operations": 10,
@@ -652,7 +657,7 @@
   {
    "id": "BO-053",
    "name": "Staff Directory",
-   "module": "Venue Operations",
+   "module": "People & Access Rights",
    "wave": 1,
    "route": "/venue-operations/staff-directory",
    "operations": 4,
@@ -661,7 +666,7 @@
   {
    "id": "BO-054",
    "name": "Role Assignment",
-   "module": "Venue Operations",
+   "module": "People & Access Rights",
    "wave": 1,
    "route": "/venue-operations/role-assignment",
    "operations": 2,
@@ -670,7 +675,7 @@
   {
    "id": "BO-055",
    "name": "Rota & Scheduling",
-   "module": "Venue Operations",
+   "module": "People & Access Rights",
    "wave": 2,
    "route": "/venue-operations/rota-scheduling",
    "operations": 4,
@@ -679,7 +684,7 @@
   {
    "id": "BO-056",
    "name": "Time & Attendance",
-   "module": "Venue Operations",
+   "module": "People & Access Rights",
    "wave": 2,
    "route": "/venue-operations/time-attendance",
    "operations": 3,
@@ -688,7 +693,7 @@
   {
    "id": "BO-057",
    "name": "Training & Certification",
-   "module": "Venue Operations",
+   "module": "People & Access Rights",
    "wave": 3,
    "route": "/venue-operations/training-certification",
    "operations": 1,
@@ -706,7 +711,7 @@
   {
    "id": "BO-059",
    "name": "Sales Reports",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/sales-reports",
    "operations": 9,
@@ -724,7 +729,7 @@
   {
    "id": "BO-061",
    "name": "Scheduled Reports",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 3,
    "route": "/venue-operations/scheduled-reports",
    "operations": 9,
@@ -733,7 +738,7 @@
   {
    "id": "BO-062",
    "name": "Venue Profile",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/venue-profile",
    "operations": 4,
@@ -742,7 +747,7 @@
   {
    "id": "BO-063",
    "name": "Opening Hours & Calendar",
-   "module": "Venue Operations",
+   "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/opening-hours-calendar",
    "operations": 11,
@@ -760,7 +765,7 @@
   {
    "id": "BO-065",
    "name": "Venue Configuration",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/venue-configuration",
    "operations": 4,
@@ -769,7 +774,7 @@
   {
    "id": "BO-066",
    "name": "Notification Settings",
-   "module": "Venue Operations",
+   "module": "People & Access Rights",
    "wave": 2,
    "route": "/venue-operations/notification-settings",
    "operations": 4,
@@ -787,7 +792,7 @@
   {
    "id": "BO-068",
    "name": "Audit Log",
-   "module": "Venue Operations",
+   "module": "Guests & Marketing",
    "wave": 2,
    "route": "/venue-operations/audit-log",
    "operations": 1,
@@ -796,7 +801,7 @@
   {
    "id": "BO-069",
    "name": "Asset Register",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/venue-operations/asset-register",
    "operations": 11,
@@ -805,7 +810,7 @@
   {
    "id": "BO-070",
    "name": "Work Orders",
-   "module": "Venue Operations",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/work-orders",
    "operations": 13,
@@ -814,7 +819,7 @@
   {
    "id": "BO-071",
    "name": "Planned Maintenance",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 3,
    "route": "/venue-operations/planned-maintenance",
    "operations": 3,
@@ -823,7 +828,7 @@
   {
    "id": "BO-072",
    "name": "Incident Log",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/venue-operations/incident-log",
    "operations": 5,
@@ -832,7 +837,7 @@
   {
    "id": "BO-073",
    "name": "Lost & Found Register",
-   "module": "Venue Operations",
+   "module": "Guests & Marketing",
    "wave": 2,
    "route": "/venue-operations/lost-found-register",
    "operations": 2,
@@ -841,7 +846,7 @@
   {
    "id": "BO-074",
    "name": "Chart of Accounts",
-   "module": "Finance",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/finance/chart-of-accounts",
    "operations": 8,
@@ -850,7 +855,7 @@
   {
    "id": "BO-075",
    "name": "Account Mapping",
-   "module": "Finance",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/finance/account-mapping",
    "operations": 7,
@@ -859,7 +864,7 @@
   {
    "id": "BO-076",
    "name": "Revenue Recognition",
-   "module": "Finance",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/finance/revenue-recognition",
    "operations": 4,
@@ -868,7 +873,7 @@
   {
    "id": "BO-077",
    "name": "FX Rates & Variances",
-   "module": "Finance",
+   "module": "Orders & Money",
    "wave": 2,
    "route": "/finance/fx-rates-variances",
    "operations": 4,
@@ -877,7 +882,7 @@
   {
    "id": "BO-078",
    "name": "Requisitions",
-   "module": "Inventory",
+   "module": "Stock & Supply",
    "wave": 1,
    "route": "/inventory/requisitions",
    "operations": 8,
@@ -886,7 +891,7 @@
   {
    "id": "BO-079",
    "name": "Stock Count",
-   "module": "Inventory",
+   "module": "Stock & Supply",
    "wave": 1,
    "route": "/inventory/stock-count",
    "operations": 6,
@@ -895,7 +900,7 @@
   {
    "id": "BO-080",
    "name": "Stock Transfers",
-   "module": "Inventory",
+   "module": "Stock & Supply",
    "wave": 2,
    "route": "/inventory/stock-transfers",
    "operations": 4,
@@ -904,7 +909,7 @@
   {
    "id": "BO-081",
    "name": "Inventory Items",
-   "module": "Inventory",
+   "module": "Stock & Supply",
    "wave": 2,
    "route": "/inventory/inventory-items",
    "operations": 7,
@@ -913,7 +918,7 @@
   {
    "id": "BO-082",
    "name": "Stock Movements",
-   "module": "Inventory",
+   "module": "Stock & Supply",
    "wave": 2,
    "route": "/inventory/stock-movements",
    "operations": 2,
@@ -922,7 +927,7 @@
   {
    "id": "BO-083",
    "name": "Suppliers",
-   "module": "Inventory",
+   "module": "Stock & Supply",
    "wave": 2,
    "route": "/inventory/suppliers",
    "operations": 3,
@@ -931,7 +936,7 @@
   {
    "id": "BO-084",
    "name": "Approval Inbox",
-   "module": "Approvals",
+   "module": "People & Access Rights",
    "wave": 1,
    "route": "/approvals/approval-inbox",
    "operations": 3,
@@ -940,7 +945,7 @@
   {
    "id": "BO-085",
    "name": "Approval Request",
-   "module": "Approvals",
+   "module": "People & Access Rights",
    "wave": 1,
    "route": "/approvals/approval-request",
    "operations": 5,
@@ -949,7 +954,7 @@
   {
    "id": "BO-086",
    "name": "Approval Matrix",
-   "module": "Approvals",
+   "module": "People & Access Rights",
    "wave": 2,
    "route": "/approvals/approval-matrix",
    "operations": 2,
@@ -958,7 +963,7 @@
   {
    "id": "BO-087",
    "name": "Approval Delegations",
-   "module": "Approvals",
+   "module": "People & Access Rights",
    "wave": 2,
    "route": "/approvals/approval-delegations",
    "operations": 3,
@@ -967,7 +972,7 @@
   {
    "id": "BO-088",
    "name": "Approval Analytics",
-   "module": "Approvals",
+   "module": "People & Access Rights",
    "wave": 3,
    "route": "/approvals/approval-analytics",
    "operations": 1,
@@ -976,7 +981,7 @@
   {
    "id": "BO-089",
    "name": "Journal Entries",
-   "module": "Finance",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/finance/journal-entries",
    "operations": 6,
@@ -985,7 +990,7 @@
   {
    "id": "BO-090",
    "name": "Period Close",
-   "module": "Finance",
+   "module": "Orders & Money",
    "wave": 1,
    "route": "/finance/period-close",
    "operations": 6,
@@ -994,7 +999,7 @@
   {
    "id": "BO-091",
    "name": "AI Policy & Spend",
-   "module": "AI",
+   "module": "Guests & Marketing",
    "wave": 1,
    "route": "/ai/policy",
    "operations": 3,
@@ -1003,7 +1008,7 @@
   {
    "id": "BO-092",
    "name": "Venue Maps",
-   "module": "venue-map",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/venue-mapping/venue-maps",
    "operations": 2,
@@ -1012,7 +1017,7 @@
   {
    "id": "BO-093",
    "name": "Map Import & Labelling",
-   "module": "venue-map",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/venue-mapping/map-import",
    "operations": 3,
@@ -1021,7 +1026,7 @@
   {
    "id": "BO-094",
    "name": "Map Editor & Publish",
-   "module": "venue-map",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/venue-mapping/map-editor",
    "operations": 6,
@@ -1030,7 +1035,7 @@
   {
    "id": "BO-095",
    "name": "Resources",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/resources/directory",
    "operations": 2,
@@ -1039,7 +1044,7 @@
   {
    "id": "BO-096",
    "name": "Resource Calendar",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/resources/calendar",
    "operations": 2,
@@ -1048,7 +1053,7 @@
   {
    "id": "BO-097",
    "name": "Check Out & Check In",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/resources/check-out",
    "operations": 4,
@@ -1057,7 +1062,7 @@
   {
    "id": "BO-098",
    "name": "Qualifications",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/resources/qualifications",
    "operations": 1,
@@ -1066,10 +1071,91 @@
   {
    "id": "BO-099",
    "name": "Session Manifest",
-   "module": "Venue Operations",
+   "module": "Access & Venue",
    "wave": 2,
    "route": "/resources/session-manifest",
    "operations": 2,
+   "drawn": false
+  },
+  {
+   "id": "BO-100",
+   "name": "Venue Home",
+   "module": "Venue Operations",
+   "wave": 1,
+   "route": "/home",
+   "operations": 2,
+   "drawn": false
+  },
+  {
+   "id": "BO-101",
+   "name": "Orders & Money",
+   "module": "Orders & Money",
+   "wave": 1,
+   "route": "/orders-money",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-102",
+   "name": "Sell",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/sell",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-103",
+   "name": "Access & Venue",
+   "module": "Access & Venue",
+   "wave": 1,
+   "route": "/access-venue",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-104",
+   "name": "Food & Beverage",
+   "module": "Food & Beverage",
+   "wave": 1,
+   "route": "/food-beverage",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-105",
+   "name": "Stock & Supply",
+   "module": "Stock & Supply",
+   "wave": 1,
+   "route": "/stock-supply",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-106",
+   "name": "People & Access Rights",
+   "module": "People & Access Rights",
+   "wave": 1,
+   "route": "/people-access-rights",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-107",
+   "name": "Guests & Marketing",
+   "module": "Guests & Marketing",
+   "wave": 1,
+   "route": "/guests-marketing",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "BO-108",
+   "name": "Venue Operations",
+   "module": "Venue Operations",
+   "wave": 1,
+   "route": "/venue-operations",
+   "operations": 1,
    "drawn": false
   }
  ],
@@ -2456,12 +2542,6 @@
     "summary": "Read region settings"
    },
    {
-    "operation": "getVenueSettings",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Operational settings for this venue"
-   },
-   {
     "operation": "getWorkstation",
     "contract": "tenancy",
     "verb": "GET",
@@ -2518,7 +2598,7 @@
   ],
   "modulesSplitAcrossWaves": [
    {
-    "module": "Approvals",
+    "module": "Access & Venue",
     "waves": [
      1,
      2,
@@ -2526,14 +2606,44 @@
     ]
    },
    {
-    "module": "Finance",
+    "module": "Food & Beverage",
     "waves": [
      1,
      2
     ]
    },
    {
-    "module": "Inventory",
+    "module": "Guests & Marketing",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "Orders & Money",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "People & Access Rights",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "Sell",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "Stock & Supply",
     "waves": [
      1,
      2
@@ -2543,8 +2653,7 @@
     "module": "Venue Operations",
     "waves": [
      1,
-     2,
-     3
+     2
     ]
    }
   ],
@@ -2678,6 +2787,51 @@
     "id": "BO-099",
     "name": "Session Manifest",
     "wave": 2
+   },
+   {
+    "id": "BO-100",
+    "name": "Venue Home",
+    "wave": 1
+   },
+   {
+    "id": "BO-101",
+    "name": "Orders & Money",
+    "wave": 1
+   },
+   {
+    "id": "BO-102",
+    "name": "Sell",
+    "wave": 1
+   },
+   {
+    "id": "BO-103",
+    "name": "Access & Venue",
+    "wave": 1
+   },
+   {
+    "id": "BO-104",
+    "name": "Food & Beverage",
+    "wave": 1
+   },
+   {
+    "id": "BO-105",
+    "name": "Stock & Supply",
+    "wave": 1
+   },
+   {
+    "id": "BO-106",
+    "name": "People & Access Rights",
+    "wave": 1
+   },
+   {
+    "id": "BO-107",
+    "name": "Guests & Marketing",
+    "wave": 1
+   },
+   {
+    "id": "BO-108",
+    "name": "Venue Operations",
+    "wave": 1
    }
   ],
   "flowsNamingAMissingScreen": []

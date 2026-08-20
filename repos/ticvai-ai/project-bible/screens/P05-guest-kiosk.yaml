@@ -63,13 +63,16 @@ screens:
     - KSK-003
     - KSK-004
     inferred: true
+    isEntryPoint: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
     designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates
+    to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
+    existed in the schema and five platforms used none, so every screen in them read as unreachable.
   implementation:
     app: guest-app
     route: /sell/attract-loop
@@ -216,6 +219,12 @@ screens:
     purpose: List generated variants
     trigger: onLoad
   density: touchLarge
+  entryState:
+    params:
+    - name: productId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: KSK-005
   name: Choose a session
   module: Sell
@@ -322,6 +331,11 @@ screens:
     purpose: Evaluate promotions against a cart
     trigger: onAction
   density: touchLarge
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: KSK-007
   name: Payment
   module: Sell
@@ -417,6 +431,11 @@ screens:
     purpose: Ask the provider what actually happened
     trigger: onAction
   density: touchLarge
+  entryState:
+    params:
+    - name: paymentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: KSK-009
   name: Ticket issued
   module: Sell
@@ -464,6 +483,13 @@ screens:
     purpose: Read an order
     trigger: onLoad
   density: touchLarge
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: KSK-010
   name: Print failure
   module: Sell
@@ -508,6 +534,13 @@ screens:
     purpose: Transfer tickets to another guest
     trigger: onAction
   density: touchLarge
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: KSK-011
   name: Collect a booking
   module: Sell
@@ -555,6 +588,13 @@ screens:
     purpose: Read an order
     trigger: onLoad
   density: touchLarge
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: KSK-012
   name: Booking found
   module: Sell
@@ -597,6 +637,13 @@ screens:
     purpose: Transfer tickets to another guest
     trigger: onAction
   density: touchLarge
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: KSK-013
   name: Call staff
   module: Sell
@@ -639,6 +686,11 @@ screens:
     purpose: Stop assisting
     trigger: onAction
   density: touchLarge
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: KSK-014
   name: Out of service
   module: Sell
@@ -736,6 +788,12 @@ screens:
     guest through ticket selection and checkout cannot ship before the screens that do the selecting
     and the checking out.'
   density: touchLarge
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: KSK-016
   name: Order Food
   module: Sell
@@ -788,6 +846,11 @@ screens:
     board: null
   notes: BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
     are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.
+  entryState:
+    params:
+    - name: outletId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: KSK-017
   name: Shop
   module: Sell
@@ -839,3 +902,8 @@ screens:
     board: null
   notes: BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops
     for a guest surface — `createRetailSale` is a till operation.
+  entryState:
+    params:
+    - name: outletId
+      from: KSK-016
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.

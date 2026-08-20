@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 63,
-  "operations": 91,
+  "operations": 97,
   "contracts": 16,
   "modules": 4,
   "undrawn": 2,
-  "operationsWithNoScreen": 27
+  "operationsWithNoScreen": 22
  },
  "waves": {
   "wave1": 20,
@@ -58,15 +58,15 @@
  "contracts": [
   {
    "contract": "identity",
-   "operations": 21
+   "operations": 23
   },
   {
    "contract": "marketing-crm",
-   "operations": 15
+   "operations": 13
   },
   {
    "contract": "orders",
-   "operations": 12
+   "operations": 13
   },
   {
    "contract": "fnb",
@@ -74,6 +74,10 @@
   },
   {
    "contract": "catalogue",
+   "operations": 8
+  },
+  {
+   "contract": "access",
    "operations": 7
   },
   {
@@ -81,11 +85,11 @@
    "operations": 5
   },
   {
-   "contract": "retail",
+   "contract": "queue",
    "operations": 4
   },
   {
-   "contract": "queue",
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -94,10 +98,6 @@
   },
   {
    "contract": "white-label",
-   "operations": 3
-  },
-  {
-   "contract": "access",
    "operations": 3
   },
   {
@@ -113,11 +113,11 @@
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "cross-cell",
    "operations": 1
   },
   {
-   "contract": "cross-cell",
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -128,7 +128,7 @@
    "module": "TODO",
    "wave": 1,
    "route": "/general/home-default",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -227,7 +227,7 @@
    "module": "TODO",
    "wave": 1,
    "route": "/general/my-tickets",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -236,7 +236,7 @@
    "module": "TODO",
    "wave": 1,
    "route": "/general/ticket-details",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -254,7 +254,7 @@
    "module": "TODO",
    "wave": 2,
    "route": "/general/memberships",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -281,7 +281,7 @@
    "module": "TODO",
    "wave": 3,
    "route": "/general/add-to-calendar-reminders",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -290,7 +290,7 @@
    "module": "TODO",
    "wave": 2,
    "route": "/general/order-history-wallet",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -299,7 +299,7 @@
    "module": "TODO",
    "wave": 3,
    "route": "/general/saved-items-wishlist",
-   "operations": 7,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -699,12 +699,6 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "getMyMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's own memberships, benefits and history"
-   },
-   {
     "operation": "listGuestMemberships",
     "contract": "catalogue",
     "verb": "GET",
@@ -721,18 +715,6 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Everything the platform holds about one guest"
-   },
-   {
-    "operation": "grantDelegation",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Let one guest act for another"
-   },
-   {
-    "operation": "listDelegations",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Who may act for this guest, and for whom they may act"
    },
    {
     "operation": "createReferral",
@@ -783,12 +765,6 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "updateMyProfile",
-    "contract": "marketing-crm",
-    "verb": "PATCH",
-    "summary": "A guest correcting their own details"
-   },
-   {
     "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -805,12 +781,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "List an entitlement for resale"
-   },
-   {
-    "operation": "issueWalletPass",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Generate an Apple or Google wallet pass"
    },
    {
     "operation": "listPaymentTokens",

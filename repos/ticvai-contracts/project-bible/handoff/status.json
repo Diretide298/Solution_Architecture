@@ -5,13 +5,13 @@
  "counts": {
   "operations": 932,
   "contracts": 28,
-  "tables": 357,
-  "relationships": 848,
+  "tables": 358,
+  "relationships": 854,
   "states": 112,
   "events": 29,
   "flows": 27,
   "adrs": 26,
-  "screens": 383,
+  "screens": 392,
   "platforms": 13,
   "apps": 11
  },
@@ -33,8 +33,8 @@
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 383,
-    "total": 383,
+    "done": 392,
+    "total": 392,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -68,15 +68,15 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 336,
-    "total": 357,
+    "done": 337,
+    "total": 358,
     "percent": 94,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
     "name": "Screens with operations",
-    "done": 370,
-    "total": 383,
+    "done": 379,
+    "total": 392,
     "percent": 97,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
@@ -96,7 +96,7 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 650,
+    "done": 651,
     "total": 932,
     "percent": 70,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
@@ -120,7 +120,7 @@
    {
     "name": "Tables written",
     "done": 0,
-    "total": 357,
+    "total": 358,
     "percent": 0,
     "note": "DDL is generated when the design stops moving (ADR-0024)."
    },
@@ -169,7 +169,7 @@
   "build": 0
  },
  "waves": {
-  "wave1": 139,
+  "wave1": 148,
   "wave2": 184,
   "wave3": 60
  },
@@ -221,7 +221,7 @@
    "name": "Venue Management",
    "app": "venue-management-web",
    "operator": "venue",
-   "screens": 99
+   "screens": 108
   },
   {
    "code": "P09",

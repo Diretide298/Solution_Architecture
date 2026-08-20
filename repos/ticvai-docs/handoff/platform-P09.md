@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 1 |
-| Operations with no screen | 85 |
+| Operations with no screen | 84 |
 | Waves | wave1 11 · wave2 16 · wave3 10 |
 
 ## Gaps
 
-### 85 operations with no screen here
+### 84 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getReportExecution` | reporting | GET | Execution status and result |
 | `getReportExport` | reporting | GET | Export status and download link |
 | `getReportResult` | reporting | GET | Paged result rows |
-| … | | | 45 more |
+| … | | | 44 more |
 
 ### 1 modules split across waves
 

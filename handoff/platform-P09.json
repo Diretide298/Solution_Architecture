@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 1,
-  "operationsWithNoScreen": 85
+  "operationsWithNoScreen": 84
  },
  "waves": {
   "wave1": 11,
@@ -842,12 +842,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Read region settings"
-   },
-   {
-    "operation": "getVenueSettings",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Operational settings for this venue"
    },
    {
     "operation": "getWorkstation",

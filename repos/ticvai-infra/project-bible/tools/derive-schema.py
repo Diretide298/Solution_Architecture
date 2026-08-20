@@ -196,6 +196,8 @@ def main() -> int:
                 break
 
     derived: dict[str, list[dict]] = {}
+    standalone_wins: set = set()
+    parent_key: dict = {}
     for child, (parent_schema, parent_table) in sorted(child_of.items()):
         body = all_schemas.get(parent_schema) or {}
         # the array of objects on the parent — the rows of the child
@@ -223,6 +225,19 @@ def main() -> int:
         elif items.get("type") in ("string", "integer", "number"):
             items = {"properties": {snake(key).rstrip("s"): dict(items)},
                      "required": [snake(key).rstrip("s")]}
+        # **`allOf` has to be flattened here too.** `OrderLine` is `CreateOrderLine` plus a server
+        # block, so `items.properties` is empty and the child pass produced one column — the parent
+        # key alone — which `len(cols) > 1` then discarded. **The result was `order_line` with no
+        # `order_id`**, while its sibling `cart_line` had `cart_id`, and nothing compared them.
+        if "allOf" in items:
+            merged_props, merged_req = {}, set(items.get("required") or [])
+            for part in items["allOf"]:
+                if "$ref" in part:
+                    part = all_schemas.get(part["$ref"].split("/")[-1]) or {}
+                merged_props.update(part.get("properties") or {})
+                merged_req |= set(part.get("required") or [])
+            items = {"properties": merged_props, "required": sorted(merged_req)}
+
         req = set(items.get("required") or [])
         cols = [{
             "column": snake(parent_table.split(".")[-1]) + "_id",
@@ -246,6 +261,16 @@ def main() -> int:
             })
         if len(cols) > 1:
             derived[child] = cols
+            # **A table declared twice loses its parent key.** `orders.order_line` is both a
+            # standalone `OrderLine` schema and the child half of `orders.sales_order +
+            # orders.order_line`, and the standalone pass overwrites this one — so the line kept
+            # its variant and performance and lost `order_id`.
+            #
+            # Its sibling `cart_line` carries `cart_id` and nothing flagged the difference: **a
+            # line with no order is a row nobody can join, and the ER diagram simply drew it
+            # floating.** Found on 20 August by a reviewer looking at the picture.
+            standalone_wins.discard(child)
+            parent_key[child] = cols[0]
 
     for sname, table in sorted(persisted.items()):
         body = all_schemas.get(sname) or {}
@@ -265,6 +290,8 @@ def main() -> int:
                 "table": table,
                 **({"references": fk} if fk else {}),
             })
+        if table in parent_key and not any(c["column"] == parent_key[table]["column"] for c in cols):
+            cols.insert(0, dict(parent_key[table]))
         for c in cols:
             e = edges.get((table, c["column"]))
             if e:
@@ -275,6 +302,17 @@ def main() -> int:
                 c["referenceHow"] = e.get("how", "convention")
                 c["enforced"] = "yes" if "DDL" in str(e.get("how", "")) else "no"
         if cols:
+            # **Merge, do not overwrite.** `orders.order_line` is declared twice — standalone as
+            # `OrderLine` and as the child half of `orders.sales_order + orders.order_line` — and
+            # the standalone schema carries no properties at all, so overwriting dropped the
+            # `order_id` the child pass had just derived.
+            #
+            # Its sibling `cart_line` has `cart_id` and nothing flagged the difference. **A line
+            # with no order is a row nobody can join**, and the ER diagram drew it floating.
+            prior = derived.get(table)
+            if prior:
+                have = {c["column"] for c in cols}
+                cols = [c for c in prior if c["column"] not in have] + cols
             derived[table] = cols
 
     filled = [t for t in derived if not existing.get(t)]

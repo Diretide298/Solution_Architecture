@@ -167,6 +167,48 @@ def main() -> int:
     }
     (HANDOFF / "relationship-graph.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
 
+    # `handoff/relationships.csv` is what the viewer's ER diagram draws from, and it was
+    # hand-maintained: **515 rows against this graph's 846**, and it marked
+    # `identity.grant.principal_id` as `ambient` where the graph has it declared.
+    #
+    # The viewer hides ambient edges by default — `principal_id` is a real foreign key and it was
+    # **drawn as nothing**, which is what a reviewer saw. **A stale copy that downgrades an edge is
+    # worse than a missing one**: the diagram looks complete and the line is absent.
+    #
+    # The two vocabularies differ, so the mapping is explicit rather than a pass-through:
+    #   declared / convention foreign key -> `reference`, drawn as the ordinary case
+    #   an edge into the row's own parent -> `child`, drawn strongly
+    #   lineage coupling                  -> `ambient`, hidden unless asked for
+    # **A child is a row that cannot exist without its parent, not merely one with a required
+    # foreign key.** A first pass marked every required FK as parentage and produced 335 child
+    # edges out of 848 — including `access.entitlement.product_id`, which is a reference: a product
+    # does not own the entitlements issued against it, and deleting one must not take them.
+    #
+    # The reliable signal is the name. `orders.order_line` names `orders.sales_order` in its own
+    # table name; `access.entitlement` does not name `catalogue.product`. That is exactly the
+    # `<parent>_<thing>` relationship the schema deriver already uses to fill child tables.
+    child_edges = set()
+    for r in rels:
+        if r["how"] == "lineage":
+            continue
+        parent_short = r["to"].split(".")[-1]
+        own_short = r["frm"].split(".")[-1]
+        same_schema = r["frm"].split(".")[0] == r["to"].split(".")[0]
+        if same_schema and own_short.startswith(parent_short + "_"):
+            child_edges.add((r["frm"], r["col"], r["to"]))
+    lines = ["from_table,from_column,to_table,edge_kind,how,cross_schema,required"]
+    for r in sorted(rels, key=lambda x: (x["frm"], x["col"])):
+        if r["how"] == "lineage":
+            kind = "ambient"
+        elif (r["frm"], r["col"], r["to"]) in child_edges:
+            kind = "child"
+        else:
+            kind = "reference"
+        lines.append(",".join([r["frm"], r["col"], r["to"], kind, r["how"],
+                               r["cross"], r["required"]]))
+    (HANDOFF / "relationships.csv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"  {len(rels)} rows → handoff/relationships.csv")
+
     by_kind: dict[str, int] = {}
     for r in rels:
         by_kind[r["how"]] = by_kind.get(r["how"], 0) + 1

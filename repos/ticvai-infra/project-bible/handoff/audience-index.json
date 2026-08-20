@@ -90,8 +90,8 @@
   }
  },
  "totals": {
-  "operations": 927,
-  "screens": 383,
+  "operations": 932,
+  "screens": 392,
   "flows": 27
  },
  "audiences": {
@@ -107,6 +107,7 @@
     "registerPartner",
     "requestGuestOtp",
     "startSsoAuthorization",
+    "verifyGuestEmail",
     "verifyGuestOtp"
    ],
    "screens": [],
@@ -130,16 +131,17 @@
     "identity.role",
     "identity.session",
     "identity.sso_provider",
+    "marketing.message_dispatch",
     "pii.subject",
     "pii.subject_contact",
     "pii.subject_document"
    ],
    "counts": {
-    "operations": 10,
+    "operations": 11,
     "screens": 0,
     "flows": 2,
     "contracts": 2,
-    "tables": 14
+    "tables": 15
    }
   },
   "device": {
@@ -250,6 +252,9 @@
     "getBundle",
     "getCart",
     "getCouponCode",
+    "getEntitlement",
+    "getEntitlementCredential",
+    "getEntitlementHistory",
     "getFacePassEnrolment",
     "getGameCard",
     "getGiftCard",
@@ -305,6 +310,7 @@
     "listLostItems",
     "listLoyaltyProgrammes",
     "listMerchandise",
+    "listMyEntitlements",
     "listOrders",
     "listParkingFacilities",
     "listPaymentTokens",
@@ -343,7 +349,8 @@
     "updateMyProfile",
     "updateParkingEntitlement",
     "updateTableReservation",
-    "uploadGuestDocument"
+    "uploadGuestDocument",
+    "verifyGuestEmail"
    ],
    "screens": [
     "GST-001",
@@ -493,6 +500,7 @@
     "access.entitlement",
     "access.parking_entitlement",
     "access.parking_facility",
+    "access.scan_event",
     "ai.chunk_ref",
     "ai.conversation",
     "ai.interaction",
@@ -532,6 +540,7 @@
     "games.play",
     "identity.grant",
     "identity.guest_session",
+    "identity.otp_challenge",
     "inventory.stock_level",
     "ledger.entry",
     "ledger.fx_rate",
@@ -555,6 +564,7 @@
     "marketing.lost_item",
     "marketing.loyalty_position",
     "marketing.loyalty_programme",
+    "marketing.message_dispatch",
     "marketing.referral",
     "marketing.review",
     "marketing.wishlist_item",
@@ -616,11 +626,11 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 128,
+    "operations": 133,
     "screens": 111,
     "flows": 11,
     "contracts": 16,
-    "tables": 124
+    "tables": 127
    }
   },
   "partner": {
@@ -1274,6 +1284,9 @@
     "getDashboard",
     "getDeferredRevenue",
     "getDueMaintenance",
+    "getEntitlement",
+    "getEntitlementCredential",
+    "getEntitlementHistory",
     "getEntitlementUsage",
     "getEvent",
     "getExpiringRights",
@@ -1469,6 +1482,7 @@
     "listMfaMethods",
     "listMigrations",
     "listModifierGroups",
+    "listMyEntitlements",
     "listOrderRefunds",
     "listOrders",
     "listOutlets",
@@ -1990,6 +2004,15 @@
     "BO-097",
     "BO-098",
     "BO-099",
+    "BO-100",
+    "BO-101",
+    "BO-102",
+    "BO-103",
+    "BO-104",
+    "BO-105",
+    "BO-106",
+    "BO-107",
+    "BO-108",
     "CMS-001",
     "CMS-002",
     "CMS-003",
@@ -2440,8 +2463,8 @@
     "workforce.shift_swap"
    ],
    "counts": {
-    "operations": 842,
-    "screens": 225,
+    "operations": 846,
+    "screens": 234,
     "flows": 22,
     "contracts": 28,
     "tables": 301

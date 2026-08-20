@@ -22,11 +22,36 @@
 const sameOrigin = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 const API = localStorage.getItem('ticvai-api') ?? (sameOrigin ? '' : 'http://localhost:8787');
 
+/** What a *review* can say. Three values, unchanged: this is somebody judging
+ *  an artefact, and the vocabulary for answering one lives below. */
 export const VERDICTS = [
   ['approved', 'Approved'],
   ['needs-work', 'Needs work'],
   ['rejected', 'Rejected'],
 ];
+
+/**
+ * How the team answered a review — the tracker's "Our verdict" column.
+ *
+ * Deliberately not more verdicts. A verdict is what the reviewer thinks; this
+ * is what was done about it, and they are different columns in the spreadsheet
+ * for the same reason they are different fields here. "Needs work" answered by
+ * "Built" is a complete exchange; two verdicts in a row is an argument.
+ *
+ * Recorded when an item is closed, so closing now says *how* rather than only
+ * that it happened.
+ */
+export const RESPONSES = [
+  ['built', 'Built'],
+  ['wired', 'Wired'],
+  ['answered', 'Answered'],
+  ['accepted', 'Accepted'],
+  ['approved-no-action', 'Approved — no action'],
+];
+
+/** The two verdicts that put work in a queue. Everything else is a resolution. */
+export const ASKS_FOR_WORK = new Set(['needs-work', 'rejected']);
+export const asksForWork = (verdict) => ASKS_FOR_WORK.has(verdict);
 
 /** Cached so every verdict block on a page does not ask again. */
 let session = { signedIn: false, account: null, reachable: true };
@@ -149,8 +174,8 @@ export const recordVerdict = (kind, id, verdict, note, layer, tag) =>
 
 /** Mark a verdict complete, or put it back. Anybody who can record one can
  *  close one — the person who fixes a thing is rarely the one who found it. */
-export const markVerdictDone = (id, done = true) =>
-  call(`/api/verdicts/${id}/done`, { method: 'POST', body: { done } });
+export const markVerdictDone = (id, done = true, response = '') =>
+  call(`/api/verdicts/${id}/done`, { method: 'POST', body: { done, response } });
 
 /** Reject a completion, with a reason. Admin only, and the note is required —
  *  it is the only thing that tells whoever did the work what to do next. */

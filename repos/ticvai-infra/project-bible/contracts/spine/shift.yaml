@@ -111,6 +111,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+        - "P08 BO-100 Venue Home"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
       summary: List shifts
@@ -1017,10 +1018,39 @@ components:
         closedAt: { type: string, format: date-time, nullable: true }
 
     Denomination:
-      x-ticvai-persistence: "none — reference data in region_settings"
+      x-ticvai-persistence: "platform.denomination"
+      description: >
+        **Raised in review by Tanmay: denominations belong in a table, not in JSON.** He is right,
+        and the reason is stronger than storage tidiness — **`orders.cash_movement.denominations`
+        was a jsonb blob, so a note that stops circulating has nothing to deactivate.**
+
+        The UAE set he supplied is the seed. **His list carries `Coin, 0, COIN`** — a zero-valued
+        coin, which is a transcription slip rather than a denomination, and it is the kind of row a
+        table refuses and a JSON blob accepts silently.
+
+        **Ordered for counting, not by value.** A cashier counts notes highest first and coins in
+        the order they sit in the drawer, and `sortOrder` is what makes the count screen match the
+        physical tray."
       type: object
       required: [value, count]
       properties:
+        id: { type: string, format: uuid }
+        currencyCode: { type: string }
+        displayName:
+          type: string
+          description: What the cashier reads — *AED 500*, *Coin*. Localised, because a count screen is read at speed.
+        kind: { type: string, enum: [note, coin] }
+        sortOrder:
+          type: integer
+          description: >
+            **Counting order, not value order.** Notes highest first, coins as they sit in the tray.
+        isActive:
+          type: boolean
+          default: true
+          description: >
+            **The field that makes this a table.** A note withdrawn from circulation is deactivated
+            and stays in the count history — **a JSON blob cannot deactivate anything**, and
+            deleting the value would rewrite every past cash-up that used it.
         value:
           $ref: '../shared/common.yaml#/components/schemas/Money'
         count:

@@ -16,7 +16,7 @@ Every number below is counted from the files in this package, not from memory.
 | Permissions | 128 | Every operation declares one or an `x-ticvai-auth` model |
 | **Tables designed** | **278** | 2,025 columns |
 | **Tables written as DDL** | **0** | Deliberate — see below |
-| Relationships | 499 | 272 of 357 tables carry one; the six that do not are correct |
+| Relationships | 499 | 272 of 358 tables carry one; the six that do not are correct |
 | Screens defined | **364** | Across 13 platforms, all linked to a board |
 | **Screens specified — states written** | **364** | Of 364 |
 | Screens with operations declared | 318 | Of 364 |

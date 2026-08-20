@@ -52,8 +52,19 @@ app.add_middleware(
 )
 
 SESSION_COOKIE = "ticvai_session"
+# What a *review* can say. Three values: this is somebody judging an artefact.
 VERDICTS = ("approved", "rejected", "needs-work")
-TARGET_KINDS = ("operation", "table", "screen", "board", "module")
+
+# How the team answered one — the tracker's "Our verdict" column, kept apart
+# from the reviewer's because they are two different statements. "Needs work"
+# answered by "Built" is a complete exchange; two verdicts in a row is an
+# argument. Recorded when an item is closed, so closing says how and not only
+# that it happened.
+RESPONSES = ("built", "wired", "answered", "accepted", "approved-no-action")
+
+# The two verdicts that put work in a queue. Everything else is a resolution.
+ASKS_FOR_WORK = ("needs-work", "rejected")
+TARGET_KINDS = ("operation", "table", "screen", "board", "module", "state", "schema")
 
 # Which layer a verdict was given from. Recorded so the review can be read by
 # layer — how much of the frontend has been signed off against how much of the
@@ -136,6 +147,7 @@ class VerdictOut(BaseModel):
     # Null until somebody marks it complete. Both fields or neither.
     done_at: Optional[str] = None
     done_by_name: Optional[str] = None
+    done_response: str = ""
     # Set when an admin did not accept the completion. Whether the row counts
     # as done is decided by which of the two timestamps is later.
     sent_back_at: Optional[str] = None
@@ -145,6 +157,8 @@ class VerdictOut(BaseModel):
 
 class DoneIn(BaseModel):
     done: bool = True
+    # How it was answered. Required when closing, meaningless when reopening.
+    response: str = ""
 
 
 class SendBackIn(BaseModel):
@@ -715,7 +729,7 @@ def history(target_kind: str, target_id: str):
         """SELECT v.id, v.target_kind, v.target_id, v.layer, v.tag, v.audience,
                   v.verdict, v.note,
                   v.created_at AS at, a.name AS by, a.email AS by_email,
-                  v.done_at, d.name AS done_by_name,
+                  v.done_at, v.done_response, d.name AS done_by_name,
                   v.sent_back_at, v.sent_back_note, k.name AS sent_back_by_name
              FROM verdict v
              JOIN account a ON a.id = v.account_id
@@ -748,7 +762,7 @@ def summary(target_kind: Optional[str] = None, audience: str = "internal"):
     sql = """
         SELECT v.target_kind, v.target_id, v.layer, v.tag, v.audience, v.verdict, v.note,
                v.created_at AS at, a.name AS by, a.email AS by_email, v.id,
-               v.done_at, d.name AS done_by_name,
+               v.done_at, v.done_response, d.name AS done_by_name,
                v.sent_back_at, v.sent_back_note, k.name AS sent_back_by_name
           FROM verdict v
           JOIN account a ON a.id = v.account_id
@@ -796,7 +810,7 @@ def verdicts(account: dict = Depends(require_account)):
                   v.verdict, v.note,
                   v.created_at AS at, v.account_id,
                   a.name AS by, a.email AS by_email, a.role AS by_role, a.active AS by_active,
-                  v.done_at, v.done_by, d.name AS done_by_name,
+                  v.done_at, v.done_by, v.done_response, d.name AS done_by_name,
                   v.sent_back_at, v.sent_back_note, k.name AS sent_back_by_name
              FROM verdict v
              JOIN account a ON a.id = v.account_id
@@ -834,23 +848,31 @@ def mark_done(verdict_id: int, body: DoneIn, account: dict = Depends(require_wri
         raise HTTPException(404, "No such verdict.")
 
     if body.done:
+        # Closing says how. A bare "done" was the thing the tracker's own sheet
+        # had already outgrown: five different answers all arriving as one word
+        # tells nobody whether a thing was built, wired, answered or simply
+        # agreed with.
+        response = body.response.strip()
+        if response and response not in RESPONSES:
+            raise HTTPException(400, f"A response is one of {', '.join(RESPONSES)}.")
         db.write(
-            "UPDATE verdict SET done_at = ?, done_by = ? WHERE id = ?",
-            (security.stamp(), account["id"], verdict_id),
+            "UPDATE verdict SET done_at = ?, done_by = ?, done_response = ? WHERE id = ?",
+            (security.stamp(), account["id"], response, verdict_id),
         )
     else:
         db.write(
-            "UPDATE verdict SET done_at = NULL, done_by = NULL WHERE id = ?",
+            "UPDATE verdict SET done_at = NULL, done_by = NULL, done_response = '' "
+            "WHERE id = ?",
             (verdict_id,),
         )
 
     fresh = db.one(
-        """SELECT v.done_at, d.name AS done_by_name
+        """SELECT v.done_at, v.done_response, d.name AS done_by_name
              FROM verdict v LEFT JOIN account d ON d.id = v.done_by
             WHERE v.id = ?""",
         (verdict_id,),
     )
-    return {"id": verdict_id, "done_at": fresh["done_at"], "done_by_name": fresh["done_by_name"]}
+    return {"id": verdict_id, **dict(fresh)}
 
 
 @app.post("/api/verdicts/{verdict_id}/send-back")

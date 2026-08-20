@@ -634,6 +634,43 @@ export async function buildBackend(root, contractSchemas = []) {
     }
   }
 
+  // ---- where each table hangs ---------------------------------------------
+  //
+  // `handoff/schema-reference.json` gained a `lineage` block on 20 August:
+  // where a table's own outbound keys stop (`anchors`), which table it hangs
+  // off (`parent`), and which root it reaches (`schemaRoot`). None of it was
+  // reaching the viewer, so the diagram could draw a child edge and still not
+  // say what the parentage was — and `platform.scope_node` being reached by
+  // 289 of 353 tables is the shape of the whole package, invisible.
+  //
+  // Attached per table rather than kept as a side map: every consumer of a
+  // table already has the table.
+  let lineage = {};
+  try {
+    const raw = await readFile(path.join(root, 'handoff', 'schema-reference.json'), 'utf8');
+    lineage = JSON.parse(raw).lineage ?? {};
+  } catch {
+    problems.push({
+      severity: 'warning',
+      kind: 'backend-no-lineage',
+      file: 'handoff/schema-reference.json',
+      message:
+        'No lineage block in the schema reference, so the diagram cannot say where a table '
+        + 'hangs or what it is anchored on. Run tools/derive-schema-roots.py.',
+    });
+  }
+  for (const t of tables) {
+    const line = lineage[t.name];
+    if (!line) continue;
+    t.parent = line.parent ?? null;
+    t.schemaRoot = line.schemaRoot ?? null;
+    t.isSchemaRoot = Boolean(line.isSchemaRoot);
+    t.anchors = line.anchors ?? [];
+    t.isAnchor = Boolean(line.isAnchor);
+    t.depth = line.depth ?? null;
+    t.reachesRootVia = line.reachesRootVia ?? null;
+  }
+
   // ---- columns, grouped by their table ------------------------------------
   const columns = {};
   for (const r of columnRows) {
@@ -788,6 +825,10 @@ export async function buildBackend(root, contractSchemas = []) {
       written: modules.filter((m) => m.written).length,
       linked: tables.filter((t) => t.schemaId).length,
       childTables: tables.filter((t) => t.childOf).length,
+      withLineage: tables.filter((t) => t.schemaRoot || t.isSchemaRoot).length,
+      schemaRoots: tables.filter((t) => t.isSchemaRoot).length,
+      anchors: tables.filter((t) => t.isAnchor).length,
+      withParent: tables.filter((t) => t.parent).length,
       references: tables.reduce((a, t) => a + (t.references?.length ?? 0), 0),
       foreignKeys: tables.reduce((a, t) => a + (t.foreignKeys?.length ?? 0), 0),
       // what the DDL actually creates, as opposed to what is planned

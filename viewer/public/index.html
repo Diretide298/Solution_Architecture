@@ -287,6 +287,56 @@
           <div class="sheet-body" id="decisions-body"></div>
         </section>
 
+        <!-- The sequence is the argument. ADR-0018 makes sense only after
+             ADR-0011, and a register sorted by number hides that. -->
+        <section class="view sheet" id="view-timeline" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="timeline-scope">
+              <button data-scope="all">Everything</button>
+              <button data-scope="adrs">Decisions</button>
+              <button data-scope="conflicts">Conflicts</button>
+            </div>
+            <input id="timeline-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="timeline-hint"></div>
+          </div>
+          <div class="sheet-body" id="timeline-body"></div>
+        </section>
+
+        <!-- Which decision replaced which. check-package already enforces
+             this and it was invisible here. -->
+        <section class="view sheet" id="view-supersession" hidden>
+          <div class="graph-toolbar">
+            <label class="toggle"><input type="checkbox" id="supersession-all" /> <span>Show every decision, not only the ones involved</span></label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="supersession-hint"></div>
+          </div>
+          <div class="sheet-body" id="supersession-body"></div>
+        </section>
+
+        <!-- A dataset, so a table rather than a file tree. -->
+        <section class="view sheet" id="view-register" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="register-pick"></select>
+            <div class="seg" id="register-state"></div>
+            <input id="register-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="register-hint"></div>
+          </div>
+          <div class="sheet-body" id="register-body"></div>
+        </section>
+
+        <!-- One decision as prose, with what cites it resolved as links.
+             The body used to be a tooltip. -->
+        <section class="view sheet" id="view-decision" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="decision-pick"></select>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="decision-hint"></div>
+          </div>
+          <div class="sheet-body" id="decision-body"></div>
+        </section>
+
         <!-- ── domain layer ───────────────────────────────────────── -->
         <!-- states/ and events/. The contracts declare 38 status enums and not
              one of them says which moves are legal; these two files do, and
@@ -326,6 +376,16 @@
             <label class="toggle" title="Relationships read from *_id column names rather than declared anywhere">
               <input type="checkbox" id="data-inferred" checked />
               <span data-tip-title="Inferred keys" data-tip="Relationships the viewer worked out from *_id column names, because nothing declares them. Drawn dashed and counted separately, so a guess is never mistaken for a fact. Dropped entirely for any table the DDL covers.">Inferred keys</span>
+            </label>
+            <!-- An anchor is where a table's own outbound keys stop. Asking
+                 "everything anchored only on scope_node" is asking "everything
+                 purely tenancy-scoped" — a question that crosses every schema,
+                 so this replaces the scope rather than narrowing it. -->
+            <select class="scope-select" id="data-anchor"></select>
+            <label class="toggle" id="data-anchor-only-wrap" hidden
+                   title="Anchored on this and nothing else — the tables that answer to one spine only.">
+              <input type="checkbox" id="data-anchor-only" />
+              <span>Only this</span>
             </label>
             <!-- venue_id, principal, subject, tenant: true of nearly every table,
                  so they say nothing about this one. Off by default. -->

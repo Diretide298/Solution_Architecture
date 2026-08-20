@@ -16,147 +16,163 @@ wave: 2
 frequency: daily
 criticality: revenue
 primaryContract: resources
-contracts: [resources, catalogue, orders, retail, marketing-crm]
-platforms: [P02, P08]
-
+contracts:
+- resources
+- catalogue
+- orders
+- retail
+- marketing-crm
+platforms:
+- P02
+- P08
 trigger:
-  description: >
-    A guest at the poolside wants a cabana for the afternoon. **They do not want cabana seven** —
-    they want a cabana, and a system that makes them choose one has leaked its model.
-  entryScreen: GST-021
+  description: 'A guest at the poolside wants a cabana for the afternoon. **They do not want cabana
+    seven** — they want a cabana, and a system that makes them choose one has leaked its model.
 
-offlineBehaviour: >
-  **Check-out and check-in complete locally; booking does not.** An attendant handing over a
-  stroller at a poolside kiosk with no signal must not be blocked, and the deposit hold reconciles
+    '
+  entryScreen: GST-021
+offlineBehaviour: '**Check-out and check-in complete locally; booking does not.** An attendant handing
+  over a stroller at a poolside kiosk with no signal must not be blocked, and the deposit hold reconciles
   on sync.
 
-  **Booking cannot go offline** — two devices booking the same cabana while both are offline is
-  the double-booking the whole conflict-detection design exists to prevent, and no local check can
-  see the other device.
+  **Booking cannot go offline** — two devices booking the same cabana while both are offline is the
+  double-booking the whole conflict-detection design exists to prevent, and no local check can see the
+  other device.
 
+  '
 steps:
-  - step: 1
-    screen: GST-021
-    action: The guest finds cabanas on the venue map and taps one.
-    operations: [getVenueMap]
-    outcome: The map resolves the cabana zone to a bookable resource kind.
+- step: 1
+  screen: GST-021
+  action: The guest finds cabanas on the venue map and taps one.
+  operations:
+  - getVenueMap
+  outcome: The map resolves the cabana zone to a bookable resource kind.
+- step: 2
+  screen: BO-096
+  action: The attendant checks what is free for the requested window.
+  operations:
+  - getResourceAvailability
+  outcome: 'Free windows, with setup and teardown already subtracted. **A cabana booked until 16:00
+    with a 30-minute turnaround is not free at 16:00**, and a client computing this from bookings would
+    have offered it.
 
-  - step: 2
-    screen: BO-096
-    action: The attendant checks what is free for the requested window.
-    operations: [getResourceAvailability]
-    outcome: >
-      Free windows, with setup and teardown already subtracted. **A cabana booked until 16:00 with
-      a 30-minute turnaround is not free at 16:00**, and a client computing this from bookings
-      would have offered it.
-    duration: under 2s
+    '
+  duration: under 2s
+- step: 3
+  screen: BO-096
+  action: The attendant books it, without choosing which one.
+  operations:
+  - bookResource
+  outcome: 'The platform picks a specific cabana and says which. **Refused on conflict, including setup
+    and teardown** — this is the step the whole context exists for.
 
-  - step: 3
-    screen: BO-096
-    action: The attendant books it, without choosing which one.
-    operations: [bookResource]
-    outcome: >
-      The platform picks a specific cabana and says which. **Refused on conflict, including setup
-      and teardown** — this is the step the whole context exists for.
+    '
+- step: 4
+  screen: BO-097
+  action: The guest arrives; the attendant hands it over and holds a deposit.
+  operations:
+  - checkOutResource
+  - authoriseStoredValue
+  outcome: '**The deposit is held, not taken.** A deposit taken and refunded is two transactions and
+    a fee; held and released is neither, and a guest who returns a lounger intact should not wait three
+    days for their money.
 
-  - step: 4
-    screen: BO-097
-    action: The guest arrives; the attendant hands it over and holds a deposit.
-    operations: [checkOutResource, authoriseStoredValue]
-    outcome: >
-      **The deposit is held, not taken.** A deposit taken and refunded is two transactions and a
-      fee; held and released is neither, and a guest who returns a lounger intact should not wait
-      three days for their money.
+    The condition note is captured here, and **it is the only defence against a dispute on the way back.**
 
-      The condition note is captured here, and **it is the only defence against a dispute on the
-      way back.**
+    '
+- step: 5
+  screen: BO-097
+  action: The guest leaves; the attendant checks it in and settles the deposit.
+  operations:
+  - checkInResource
+  - releaseStoredValue
+  outcome: 'Released in full, or partly captured against damage. **Partial capture is the normal case
+    for a damaged item** and the reason two-phase spend was worth building.
 
-  - step: 5
-    screen: BO-097
-    action: The guest leaves; the attendant checks it in and settles the deposit.
-    operations: [checkInResource, releaseStoredValue]
-    outcome: >
-      Released in full, or partly captured against damage. **Partial capture is the normal case for
-      a damaged item** and the reason two-phase spend was worth building.
-
+    '
 branches:
-  - at: 2
-    condition: Nothing is free in the requested window.
-    behaviour: >
-      The response says **why** — booked, setup, teardown, maintenance or closed. An attendant
-      looking for something free needs to know whether to wait or to look elsewhere, and *"not
-      available"* answers neither.
-    severity: recoverable
-    resolvedBy: getResourceAvailability
+- at: 2
+  condition: Nothing is free in the requested window.
+  behaviour: 'The response says **why** — booked, setup, teardown, maintenance or closed. An attendant
+    looking for something free needs to know whether to wait or to look elsewhere, and *"not available"*
+    answers neither.
 
-  - at: 3
-    condition: Two attendants book the same cabana in the same second.
-    behaviour: >
-      One wins and the other is refused with the conflicting window named. **Two bookings on one
-      cabana is a guest arriving to find somebody in their chair**, so this is refused at the
-      server and never resolved optimistically at the client.
-    severity: recoverable
-    resolvedBy: bookResource
+    '
+  severity: recoverable
+  resolvedBy: getResourceAvailability
+- at: 3
+  condition: Two attendants book the same cabana in the same second.
+  behaviour: 'One wins and the other is refused with the conflicting window named. **Two bookings on
+    one cabana is a guest arriving to find somebody in their chair**, so this is refused at the server
+    and never resolved optimistically at the client.
 
-  - at: 4
-    condition: The guest has no card, or the hold is declined.
-    behaviour: >
-      The booking stands and the check-out does not. **A declined deposit is not a cancelled
-      booking** — the guest may pay another way, and voiding their afternoon because a card failed
-      is the wrong default.
-    severity: requiresStaff
+    '
+  severity: recoverable
+  resolvedBy: bookResource
+- at: 4
+  condition: The guest has no card, or the hold is declined.
+  behaviour: 'The booking stands and the check-out does not. **A declined deposit is not a cancelled
+    booking** — the guest may pay another way, and voiding their afternoon because a card failed is
+    the wrong default.
 
-  - at: 5
-    condition: The item comes back damaged.
-    behaviour: >
-      Part of the deposit is captured and **the resource routes to `maintenance` directly from
-      `checkedOut`**, not through `available`. Routing it through available leaves a window in
-      which the next guest books a broken item.
-    severity: requiresStaff
-    resolvedBy: checkInResource
+    '
+  severity: requiresStaff
+  resolvedBy: BO-097
+- at: 5
+  condition: The item comes back damaged.
+  behaviour: 'Part of the deposit is captured and **the resource routes to `maintenance` directly from
+    `checkedOut`**, not through `available`. Routing it through available leaves a window in which the
+    next guest books a broken item.
 
-  - at: 5
-    condition: Nobody brings it back.
-    behaviour: >
-      The booking goes `overdue` on a timer, which is **not a failure state** — a guest running
-      late is the normal case and the deposit is already held. Past a threshold the whole deposit
-      captures and **the resource is retired rather than freed**: a stroller nobody returned must
-      not appear as available.
-    severity: requiresStaff
+    '
+  severity: requiresStaff
+  resolvedBy: checkInResource
+- at: 5
+  condition: Nobody brings it back.
+  behaviour: 'The booking goes `overdue` on a timer, which is **not a failure state** — a guest running
+    late is the normal case and the deposit is already held. Past a threshold the whole deposit captures
+    and **the resource is retired rather than freed**: a stroller nobody returned must not appear as
+    available.
 
-  - at: 1
-    condition: The venue has no map, or the cabana is not placed on it.
-    behaviour: >
-      The guest browses resources as a list instead. **The map is how they find it, not how it
-      works** — a venue without one still rents cabanas.
-    severity: recoverable
+    '
+  severity: requiresStaff
+  resolvedBy: BO-096
+- at: 1
+  condition: The venue has no map, or the cabana is not placed on it.
+  behaviour: 'The guest browses resources as a list instead. **The map is how they find it, not how
+    it works** — a venue without one still rents cabanas.
 
+    '
+  severity: recoverable
+  resolvedBy: listResources
 exitStates:
-  - state: completed
-    description: Returned in good condition, deposit released, resource available again.
-  - state: completedWithDamage
-    description: >
-      Returned damaged. Deposit partly captured, resource in maintenance. **A separate exit state
-      because it is a different day for the venue** — one is revenue, the other is a repair and a
-      conversation.
-  - state: notReturned
-    description: >
-      Deposit captured in full, resource retired. **Rare and it must be visible** — a venue losing
-      loungers steadily has an operational problem the booking numbers will not show.
-  - state: cancelled
-    description: Cancelled before check-out. The window returns to the pool.
+- state: completed
+  description: Returned in good condition, deposit released, resource available again.
+- state: completedWithDamage
+  description: 'Returned damaged. Deposit partly captured, resource in maintenance. **A separate exit
+    state because it is a different day for the venue** — one is revenue, the other is a repair and
+    a conversation.
 
-notes: >
-  **This flow is why a resource is not a product.** A product with an availability envelope sells
+    '
+- state: notReturned
+  description: 'Deposit captured in full, resource retired. **Rare and it must be visible** — a venue
+    losing loungers steadily has an operational problem the booking numbers will not show.
+
+    '
+- state: cancelled
+  description: Cancelled before check-out. The window returns to the pool.
+notes: '**This flow is why a resource is not a product.** A product with an availability envelope sells
   the slot in steps 1 to 3 and has nothing to say about steps 4 and 5 — and steps 4 and 5 are where
   a venue loses money.
 
-  **The booking outlives the order**, which is why `orders` could not carry it: an order completes
-  at step 3 and the rental is still out at step 5.
+  **The booking outlives the order**, which is why `orders` could not carry it: an order completes at
+  step 3 and the rental is still out at step 5.
 
+  '
 openQuestions:
-  - >
-    **Whether a guest may book a cabana themselves from `GST-021`, or only through an attendant.**
-    The contract allows both — `bookResource` is guest-callable — and the venue has not said which
-    it wants. Self-service raises the no-show rate and cuts the queue at the desk, and that is a
-    commercial trade rather than a design one.
+- '**Whether a guest may book a cabana themselves from `GST-021`, or only through an attendant.** The
+  contract allows both — `bookResource` is guest-callable — and the venue has not said which it wants.
+  Self-service raises the no-show rate and cuts the queue at the desk, and that is a commercial trade
+  rather than a design one.
+
+  '

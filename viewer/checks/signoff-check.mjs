@@ -3,6 +3,7 @@
 // not the other, so the checks are mostly about the join — that "not reviewed"
 // is a row rather than an absence, and that a row leads somewhere.
 import puppeteer from 'puppeteer-core';
+import { authed } from './_session.mjs';
 const VIEWER = 'http://localhost:4173';
 const API = 'http://localhost:8787';
 let pass = 0, fail = 0;
@@ -27,14 +28,19 @@ await page.evaluate(async (api) => {
 
 // The populations, straight from the reader, so the page's own numbers can be
 // checked against something that did not come from the page.
-const index = await (await fetch(`${VIEWER}/api/index`)).json();
-const backend = await (await fetch(`${VIEWER}/api/backend`)).json();
-const journeys = await (await fetch(`${VIEWER}/api/journeys`)).json();
+const index = await (await authed(`${VIEWER}/api/index`)).json();
+const backend = await (await authed(`${VIEWER}/api/backend`)).json();
+const journeys = await (await authed(`${VIEWER}/api/journeys`)).json();
+const domain = await (await authed(`${VIEWER}/api/domain`)).json();
 const population = {
   operation: index.nodes.filter((n) => n.type === 'operation').length,
   table: (backend.tables ?? []).length,
   screen: (journeys.screens ?? []).length,
   board: (journeys.boards ?? []).length,
+  // Added when the Domain and Backend layers gained a review of their own: a
+  // state model and a schema are each judged once, not per state or per table.
+  state: (domain.machines ?? []).length,
+  schema: (backend.modules ?? []).length,
 };
 
 // One verdict of each kind, so every card has something in it. Recorded through
@@ -45,6 +51,8 @@ const targets = {
   table: backend.tables[0].name,
   screen: journeys.screens[0].id,
   board: journeys.boards[0].id,
+  state: domain.machines[0].id,
+  schema: backend.modules[0].name,
 };
 for (const [kind, id] of Object.entries(targets)) {
   const ok = await page.evaluate(async (api, k, i) => (await fetch(`${api}/api/validation`, {
@@ -63,11 +71,16 @@ const cards = await page.evaluate(() => [...document.querySelectorAll('.signoff-
   label: c.querySelector('.signoff-card-label').textContent,
   count: c.querySelector('.signoff-card-count').textContent,
 })));
-check('there is a card for each of the four kinds', cards.length === 4,
-  cards.map((c) => c.label).join(', '));
+// Driven by `population` rather than a hard-coded four. This read `=== 4` and
+// broke the day the Domain and Backend layers gained a review of their own —
+// a harness that has to be edited to admit a new kind is a harness that fails
+// for the wrong reason, and it fails loudest exactly when something was added.
+const KIND_ORDER = ['operation', 'table', 'screen', 'board', 'state', 'schema'];
+check(`there is a card for each of the ${KIND_ORDER.length} kinds`,
+  cards.length === KIND_ORDER.length, cards.map((c) => c.label).join(', '));
 
 const denominators = cards.map((c) => Number(/of (\d+)/.exec(c.count)[1]));
-const expected = [population.operation, population.table, population.screen, population.board];
+const expected = KIND_ORDER.map((k) => population[k]);
 check('each card counts against the whole population, not just what was judged',
   denominators.join(',') === expected.join(','),
   `${denominators.join(', ')} vs ${expected.join(', ')} from the reader`);

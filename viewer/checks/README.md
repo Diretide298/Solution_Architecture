@@ -18,10 +18,21 @@ on an empty database.
 | `paging-check.mjs` | the boot payload is split and compressed, every held-back field comes back from `/api/detail`, and the long list is built a group and a page at a time without losing a row |
 | `contract-trace-check.mjs` | a schema names the tables it is stored as, an operation names the tables it reaches, and an operation the lineage never resolved says so rather than reading as "touches nothing" |
 | `signoff-check.mjs` | the overview counts against the whole population rather than what was judged, unreviewed artefacts sort first, and a row leads to the artefact — including the three kinds that had no deep link until it needed one |
+| `pages-check.mjs` | every page loads, every layer renders every one of its modes, and **nothing anywhere logs a console error** |
 
-`signoff-check.mjs` **records four real verdicts** against real artefacts, because
-checking the join against a fake population would check nothing. Point the service
-at a scratch store before running it —
+`pages-check.mjs` is the cheap one to run after any edit to a module under
+`public/`. `node --check` proves a file parses; it says nothing about whether the
+names in it resolve. Three separate edits produced a file that parsed cleanly,
+rendered its static HTML, and threw at module scope — leaving a page with a
+header and nothing under it. A static version of this check was tried and pulled:
+it could not tell a regex literal from a reference and reported eighteen things
+that were fine. The browser either throws or it does not.
+
+`signoff-check.mjs` **records one real verdict per kind** — six of them now that
+state models and schemas are reviewable — against real artefacts, because checking
+the join against a fake population would check nothing.
+
+Point the service at a scratch store before running it —
 
 ```
 TICVAI_DB=/tmp/scratch.db python -m uvicorn api.main:app --port 8787

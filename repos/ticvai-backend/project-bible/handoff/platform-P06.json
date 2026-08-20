@@ -15,7 +15,7 @@
   "contracts": 14,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 148
+  "operationsWithNoScreen": 147
  },
  "waves": {
   "wave1": 25,
@@ -75,7 +75,7 @@
    "operations": 4
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -83,7 +83,7 @@
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "tenancy",
    "operations": 2
   },
   {
@@ -1336,12 +1336,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Read region settings"
-   },
-   {
-    "operation": "getVenueSettings",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Operational settings for this venue"
    },
    {
     "operation": "getWorkstation",

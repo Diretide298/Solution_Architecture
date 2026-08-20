@@ -12902,6 +12902,386 @@
   "specified": true,
   "exits": []
  },
+ "BO-100": {
+  "name": "Venue Home",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/home",
+  "board": null,
+  "operations": [
+   "getVenueSettings",
+   "listShifts"
+  ],
+  "services": [
+   "ShiftService",
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "orders.shift",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-101",
+   "BO-102",
+   "BO-103",
+   "BO-104",
+   "BO-105",
+   "BO-106",
+   "BO-107",
+   "BO-108"
+  ]
+ },
+ "BO-101": {
+  "name": "Orders & Money",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/orders-money",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-008",
+   "BO-022",
+   "BO-023",
+   "BO-024",
+   "BO-025",
+   "BO-026",
+   "BO-027",
+   "BO-028",
+   "BO-029",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
+   "BO-043",
+   "BO-047",
+   "BO-048",
+   "BO-051",
+   "BO-059",
+   "BO-061",
+   "BO-062",
+   "BO-065",
+   "BO-070",
+   "BO-074",
+   "BO-075",
+   "BO-076",
+   "BO-077",
+   "BO-089",
+   "BO-090"
+  ]
+ },
+ "BO-102": {
+  "name": "Sell",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/sell",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-007",
+   "BO-009",
+   "BO-010",
+   "BO-011",
+   "BO-012",
+   "BO-013",
+   "BO-014",
+   "BO-015",
+   "BO-016",
+   "BO-017",
+   "BO-018",
+   "BO-019",
+   "BO-037",
+   "BO-063"
+  ]
+ },
+ "BO-103": {
+  "name": "Access & Venue",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/access-venue",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-001",
+   "BO-002",
+   "BO-003",
+   "BO-004",
+   "BO-005",
+   "BO-006",
+   "BO-030",
+   "BO-031",
+   "BO-032",
+   "BO-033",
+   "BO-034",
+   "BO-035",
+   "BO-038",
+   "BO-069",
+   "BO-071",
+   "BO-072",
+   "BO-092",
+   "BO-093",
+   "BO-094",
+   "BO-095",
+   "BO-096",
+   "BO-097",
+   "BO-098",
+   "BO-099"
+  ]
+ },
+ "BO-104": {
+  "name": "Food & Beverage",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/food-beverage",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-020",
+   "BO-021",
+   "BO-045",
+   "BO-046"
+  ]
+ },
+ "BO-105": {
+  "name": "Stock & Supply",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/stock-supply",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-049",
+   "BO-050",
+   "BO-052",
+   "BO-078",
+   "BO-079",
+   "BO-080",
+   "BO-081",
+   "BO-082",
+   "BO-083"
+  ]
+ },
+ "BO-106": {
+  "name": "People & Access Rights",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/people-access-rights",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-053",
+   "BO-054",
+   "BO-055",
+   "BO-056",
+   "BO-057",
+   "BO-066",
+   "BO-084",
+   "BO-085",
+   "BO-086",
+   "BO-087",
+   "BO-088"
+  ]
+ },
+ "BO-107": {
+  "name": "Guests & Marketing",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/guests-marketing",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-068",
+   "BO-073",
+   "BO-091"
+  ]
+ },
+ "BO-108": {
+  "name": "Venue Operations",
+  "platform": "P08",
+  "platformName": "Venue Management",
+  "operator": "venue",
+  "app": "venue-management-web",
+  "route": "/venue-operations",
+  "board": null,
+  "operations": [
+   "getVenueSettings"
+  ],
+  "services": [
+   "TenancyService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:resolution",
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "storedProcedures": [],
+  "wave": 1,
+  "offline": false,
+  "specified": true,
+  "exits": [
+   "BO-036",
+   "BO-044",
+   "BO-058",
+   "BO-060",
+   "BO-064",
+   "BO-067"
+  ]
+ },
  "ADM-001": {
   "name": "Platform Login / MFA",
   "platform": "P09",

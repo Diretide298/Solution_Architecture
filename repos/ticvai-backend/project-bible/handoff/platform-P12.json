@@ -41,11 +41,11 @@
    "operations": 16
   },
   {
-   "contract": "identity",
+   "contract": "reporting",
    "operations": 8
   },
   {
-   "contract": "reporting",
+   "contract": "identity",
    "operations": 8
   },
   {

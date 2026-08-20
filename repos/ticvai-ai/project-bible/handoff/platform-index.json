@@ -78,7 +78,7 @@
    "contracts": 14,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 148
+   "operationsWithNoScreen": 147
   },
   "waves": {
    "wave1": 25,
@@ -107,15 +107,15 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 99,
-   "operations": 382,
+   "screens": 108,
+   "operations": 383,
    "contracts": 23,
    "modules": 8,
-   "undrawn": 26,
-   "operationsWithNoScreen": 240
+   "undrawn": 35,
+   "operationsWithNoScreen": 239
   },
   "waves": {
-   "wave1": 45,
+   "wave1": 54,
    "wave2": 50,
    "wave3": 4
   }
@@ -130,7 +130,7 @@
    "contracts": 8,
    "modules": 2,
    "undrawn": 1,
-   "operationsWithNoScreen": 85
+   "operationsWithNoScreen": 84
   },
   "waves": {
    "wave1": 11,

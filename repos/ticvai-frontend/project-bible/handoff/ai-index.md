@@ -13,7 +13,7 @@
 | **Tables** | 48 |
 | **Screens** | 22 |
 | **Flows** | 3 |
-| **Documents** | 9 |
+| **Documents** | 10 |
 | **Open conflicts** | 0 |
 
 ## Reached outside the contract
@@ -198,6 +198,7 @@
 | [AI scope — for confirmation](../docs/active/ai-scope-for-confirmation.md) |  | 1 |
 | [Optimisation assessment — RAG, caching, backend, frontend](../docs/active/optimisation-assessment.md) |  | 4 |
 | [Optimisation adoption plan](../docs/active/optimisation-plan.md) |  | 3 |
+| [Viewer — what changed in the package on 20 August](../docs/active/viewer-update-brief-20aug.md) |  | 1 |
 | [ADR-0007: Hybrid repository topology](../docs/adr/0007-hybrid-repository-topology.md) | Accepted | 1 |
 | [ADR-0020 — Where AI runs, and what it is isolated from](../docs/adr/0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 14 |
 | [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](../docs/adr/0021-qdrant-partitioning.md) | Proposed · 17 August 2026 | 4 |

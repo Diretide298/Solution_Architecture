@@ -30,6 +30,69 @@ const PUBLIC = path.join(here, 'public');
 // Where the accounts service listens. Same host in every deployment — this is
 // a loopback call, not a trip over the network.
 const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
+
+/**
+ * What the accounts service owns. Deliberately a list rather than "anything
+ * under /api": the viewer answers most of /api itself, and /api/events is a
+ * long-lived stream that must not be forwarded.
+ */
+const API_ROUTES =
+  /^\/(api\/(auth|accounts|invites|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
+
+/**
+ * Hand a request to the accounts service and give its answer back unchanged.
+ *
+ * The header that matters is set-cookie: sign-in, sign-out and redeem all work
+ * by setting one, and a proxy that drops it produces a login that returns 200
+ * and leaves you signed out. getSetCookie() is used rather than reading the
+ * header directly because there can be more than one and the plain accessor
+ * folds them into a single comma-joined string that no browser will parse.
+ */
+async function proxyToApi(req, res, url) {
+  const body = ['GET', 'HEAD'].includes(req.method)
+    ? undefined
+    : await new Promise((resolve, reject) => {
+      const parts = [];
+      req.on('data', (c) => parts.push(c));
+      req.on('end', () => resolve(Buffer.concat(parts)));
+      req.on('error', reject);
+    });
+
+  const headers = {};
+  for (const name of ['cookie', 'content-type', 'accept', 'user-agent']) {
+    if (req.headers[name]) headers[name] = req.headers[name];
+  }
+
+  try {
+    const answer = await fetch(`${AUTH_BASE}${url.pathname}${url.search}`, {
+      method: req.method,
+      headers,
+      body: body && body.length ? body : undefined,
+      redirect: 'manual',
+    });
+
+    const out = {
+      'Content-Type': answer.headers.get('content-type') ?? 'application/json',
+      'Cache-Control': 'no-store',
+    };
+    const cookies = answer.headers.getSetCookie?.() ?? [];
+    if (cookies.length) out['Set-Cookie'] = cookies;
+    const location = answer.headers.get('location');
+    if (location) out.Location = location;
+
+    res.writeHead(answer.status, out);
+    res.end(Buffer.from(await answer.arrayBuffer()));
+  } catch (error) {
+    // The viewer is up and the accounts service is not. Say which, because
+    // "500" here sends somebody to read the wrong log.
+    res.writeHead(502, { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' });
+    res.end(JSON.stringify({
+      error: 'the accounts service is not answering',
+      detail: error.message,
+      upstream: AUTH_BASE,
+    }));
+  }
+}
 // Named for what it does rather than what it undoes, and deliberately not
 // TICVAI_OPEN — there is already an --open flag that opens a browser, and a
 // switch that turns off authentication must not be one letter from it.
@@ -308,6 +371,22 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   try {
+    // --- the accounts service, on this origin -------------------------------
+    // Everything the accounts service owns is answered here by forwarding it,
+    // so one port serves the whole application. That is the only thing nginx
+    // was doing: not load, not TLS, just putting both halves on one origin.
+    //
+    // It has to be one origin. Split across two ports the browser calls it
+    // cross-site, and a cross-site cookie needs SameSite=None, which needs
+    // Secure, which needs HTTPS — and this deployment is deliberately on plain
+    // http for now. So the session would simply stop being sent.
+    //
+    // Before the gate, because the gate asks this service who you are, and
+    // /api/auth/login is how you become anybody.
+    if (API_ROUTES.test(url.pathname)) {
+      return proxyToApi(req, res, url);
+    }
+
     // --- the gate ----------------------------------------------------------
     // Before anything is read from disk. The sign-in page and the two files it
     // needs are the only things a stranger is given; everything else — every

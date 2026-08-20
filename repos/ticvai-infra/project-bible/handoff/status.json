@@ -3,15 +3,15 @@
  "generated": "2026-08-20",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 927,
+  "operations": 932,
   "contracts": 28,
-  "tables": 356,
-  "relationships": 846,
+  "tables": 358,
+  "relationships": 854,
   "states": 112,
   "events": 29,
   "flows": 27,
   "adrs": 26,
-  "screens": 383,
+  "screens": 392,
   "platforms": 13,
   "apps": 11
  },
@@ -19,22 +19,22 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 927,
-    "total": 927,
+    "done": 932,
+    "total": 932,
     "percent": 100,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 927,
-    "total": 927,
+    "done": 932,
+    "total": 932,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 383,
-    "total": 383,
+    "done": 392,
+    "total": 392,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -68,15 +68,15 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 336,
-    "total": 356,
+    "done": 337,
+    "total": 358,
     "percent": 94,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
     "name": "Screens with operations",
-    "done": 370,
-    "total": 383,
+    "done": 379,
+    "total": 392,
     "percent": 97,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
@@ -96,9 +96,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 640,
-    "total": 927,
-    "percent": 69,
+    "done": 651,
+    "total": 932,
+    "percent": 70,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
    {
@@ -120,7 +120,7 @@
    {
     "name": "Tables written",
     "done": 0,
-    "total": 356,
+    "total": 358,
     "percent": 0,
     "note": "DDL is generated when the design stops moving (ADR-0024)."
    },
@@ -169,7 +169,7 @@
   "build": 0
  },
  "waves": {
-  "wave1": 139,
+  "wave1": 148,
   "wave2": 184,
   "wave3": 60
  },
@@ -221,7 +221,7 @@
    "name": "Venue Management",
    "app": "venue-management-web",
    "operator": "venue",
-   "screens": 99
+   "screens": 108
   },
   {
    "code": "P09",
@@ -268,7 +268,7 @@
  ],
  "conflicts": {
   "open": 7,
-  "closed": 143,
+  "closed": 144,
   "withdrawn": 6,
   "blocking": 0,
   "byOwner": {

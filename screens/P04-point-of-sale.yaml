@@ -159,6 +159,11 @@ screens:
     - POS-007
     - POS-009
   density: touchLarge
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: POS-002
   name: Sell — Ticket Catalogue
   module: Sell
@@ -408,6 +413,18 @@ screens:
     - POS-010
     fromFlows: true
   density: touchLarge
+  entryState:
+    params:
+    - name: cardCode
+      from: deepLink
+    - name: orderId
+      from: POS-006
+    - name: productId
+      from: deepLink
+    - name: promotionId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: POS-003
   name: Sell — Timed Entry
   module: Sell
@@ -531,6 +548,13 @@ screens:
     - POS-005
     - POS-006
   density: touchLarge
+  entryState:
+    params:
+    - name: leaseId
+      from: deepLink
+    - name: productId
+      from: POS-002
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: POS-004
   name: Sell — Seat Map
   module: Sell
@@ -638,6 +662,14 @@ screens:
     - POS-005
     - POS-006
   density: touchLarge
+  entryState:
+    params:
+    - name: holdId
+      from: deepLink
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
 - id: POS-005
   name: Payment
   module: Payment
@@ -752,6 +784,13 @@ screens:
     - POS-002
     fromFlows: true
   density: touchLarge
+  entryState:
+    params:
+    - name: paymentId
+      from: deepLink
+    - name: saleId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: POS-006
   name: Held Orders
   module: Sell
@@ -859,6 +898,11 @@ screens:
     - POS-003
     - POS-004
   density: touchLarge
+  entryState:
+    params:
+    - name: orderId
+      from: POS-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: POS-007
   name: Close Shift
   module: Shift
@@ -964,6 +1008,11 @@ screens:
     - POS-009
     inferred: true
   density: touchLarge
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: POS-008
   name: Reports
   module: Reports
@@ -1052,6 +1101,14 @@ screens:
     - POS-001
     - POS-002
   density: touchLarge
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: POS-009
   name: Staff Roster
   module: Shift
@@ -1148,6 +1205,11 @@ screens:
     removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
     does not handle money should not be able to move it (CF-87's class).
   density: touchLarge
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: POS-010
   name: Add to Existing Ticket
   module: Sell
@@ -1217,3 +1279,10 @@ screens:
     to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same
     shape as CF-87, one level up: that attached sibling operations, this attached a whole contract.'
   density: touchLarge
+  entryState:
+    params:
+    - name: mediaCode
+      from: deepLink
+    - name: mediaId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.

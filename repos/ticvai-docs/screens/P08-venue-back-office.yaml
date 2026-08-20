@@ -20,7 +20,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 99
+  screenCount: 108
   app: venue-management-web
   appStatus: scaffolded
   packages:
@@ -41,7 +41,7 @@ platform:
 screens:
 - id: BO-001
   name: Queue Directory
-  module: Queue Management
+  module: Access & Venue
   purpose: See every queue in the venue and whether its data is arriving.
   capability: C05
   wave: 1
@@ -144,14 +144,15 @@ screens:
     purpose: Amend queue configuration
     trigger: onAction
   notes: A queue on the manual adaptor shows "manual" rather than "no feed". It is configured and working;
-    treating it as unconfigured makes the health view lie.
+    treating it as unconfigured makes the health view lie. **Was the declared entry point to the whole
+    back office until 20 August**, which is why 93 screens were unreachable. Now reached from BO-100
+    through its section.
   implementation:
     app: venue-management-web
     route: /queue-management/queue-directory
     component: apps/venue-management-web/src/routes/queue-management/QueueDirectoryList.tsx
     status: notStarted
   navigation:
-    isEntryPoint: true
     exitTo:
     - BO-002
     - BO-003
@@ -159,9 +160,18 @@ screens:
     - BO-005
     inferred: true
   density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    - name: feedId
+      from: deepLink
+    - name: queueId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-002
   name: Queue Configuration
-  module: Queue Management
+  module: Access & Venue
   purpose: Create a queue and set how it behaves.
   capability: C05
   wave: 1
@@ -266,9 +276,16 @@ screens:
     - BO-004
     fromFlows: true
   density: compact
+  entryState:
+    params:
+    - name: performanceId
+      from: BO-001
+    - name: queueId
+      from: BO-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-003
   name: Queue Integration Setup
-  module: Queue Management
+  module: Access & Venue
   purpose: Connect a queue to an on-site system, or leave it on manual entry.
   capability: C05
   wave: 1
@@ -418,9 +435,20 @@ screens:
     - BO-004
     fromFlows: true
   density: compact
+  entryState:
+    params:
+    - name: feedId
+      from: BO-001
+    - name: orderId
+      from: deepLink
+    - name: venueId
+      from: session
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-004
   name: Manual Wait Time Entry
-  module: Queue Management
+  module: Access & Venue
   purpose: Set a wait time by hand, whether or not a feed exists.
   capability: C05
   wave: 1
@@ -512,9 +540,16 @@ screens:
     - BO-005
     fromFlows: true
   density: compact
+  entryState:
+    params:
+    - name: queueId
+      from: BO-001
+    - name: refundId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-005
   name: Queue Monitor
-  module: Queue Management
+  module: Access & Venue
   purpose: Watch queues during operation and call parties forward.
   capability: C05
   wave: 1
@@ -638,9 +673,16 @@ screens:
   notes: 'Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1
     flow cannot step through a Wave 2 screen.'
   density: compact
+  entryState:
+    params:
+    - name: campaignId
+      from: deepLink
+    - name: queueId
+      from: BO-001
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-006
   name: Parking Configuration
-  module: Parking
+  module: Access & Venue
   purpose: Change how parking behaves here, and see which level the current value came from.
   capability: C39
   wave: 2
@@ -698,9 +740,14 @@ screens:
     purpose: Configure a car park and its integration
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: accessPointId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-007
   name: Product Directory
-  module: Venue Operations
+  module: Sell
   purpose: Find anything sellable at this venue.
   capability: C00
   wave: 1
@@ -777,9 +824,15 @@ screens:
     purpose: Update a product
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: productId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: BO-008
   name: Product Detail & Variants
-  module: Venue Operations
+  module: Orders & Money
   purpose: Define what is sold and the ticket types under it.
   capability: C00
   wave: 1
@@ -830,7 +883,7 @@ screens:
   density: compact
 - id: BO-009
   name: Pricing Rules
-  module: Venue Operations
+  module: Sell
   purpose: Set what something costs, and when that changes.
   capability: C00
   wave: 1
@@ -897,9 +950,14 @@ screens:
     purpose: Amend a price list
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: priceListId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-010
   name: Promotions & Coupons
-  module: Venue Operations
+  module: Sell
   purpose: Issue a code and control what it does.
   capability: C00
   wave: 2
@@ -996,9 +1054,16 @@ screens:
     purpose: Amend a promotion
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: campaignId
+      from: deepLink
+    - name: promotionId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-011
   name: Packages & Bundles
-  module: Venue Operations
+  module: Sell
   purpose: Sell several products as one line.
   capability: C00
   wave: 2
@@ -1051,9 +1116,14 @@ screens:
     purpose: Report that a workstation applied a bundle
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-012
   name: Membership Products
-  module: Venue Operations
+  module: Sell
   purpose: Define what a membership includes.
   capability: C00
   wave: 2
@@ -1138,9 +1208,15 @@ screens:
     purpose: Update a product
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: productId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: BO-013
   name: Channel & Distribution
-  module: Venue Operations
+  module: Sell
   purpose: Decide where each product can be sold.
   capability: C00
   wave: 2
@@ -1201,9 +1277,14 @@ screens:
     purpose: Amend an envelope
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: envelopeId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-014
   name: Catalogue Publishing
-  module: Venue Operations
+  module: Sell
   purpose: Push catalogue changes live, or schedule them.
   capability: C00
   wave: 1
@@ -1280,9 +1361,15 @@ screens:
     purpose: Update a product
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: productId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: BO-015
   name: Session Calendar
-  module: Venue Operations
+  module: Sell
   purpose: See what is scheduled and how full it is.
   capability: C00
   wave: 1
@@ -1363,9 +1450,17 @@ screens:
     purpose: Amend a performance
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
 - id: BO-016
   name: Session Template
-  module: Venue Operations
+  module: Sell
   purpose: Define the pattern the calendar is generated from.
   capability: C00
   wave: 1
@@ -1448,9 +1543,17 @@ screens:
     purpose: Amend a performance
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
 - id: BO-017
   name: Capacity Management
-  module: Venue Operations
+  module: Sell
   purpose: Change how many people a session can take.
   capability: C00
   wave: 1
@@ -1513,9 +1616,14 @@ screens:
     purpose: Amend an envelope
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: envelopeId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-018
   name: Allocation & Holds
-  module: Venue Operations
+  module: Sell
   purpose: See who is holding capacity, and release it.
   capability: C00
   wave: 2
@@ -1572,9 +1680,14 @@ screens:
     purpose: Extend a lease TTL
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: leaseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-019
   name: Closures & Blackouts
-  module: Venue Operations
+  module: Sell
   purpose: Stop selling something, for a reason.
   capability: C00
   wave: 2
@@ -1655,9 +1768,17 @@ screens:
     purpose: Amend a performance
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
 - id: BO-020
   name: Timed Entry Rules
-  module: Venue Operations
+  module: Food & Beverage
   purpose: Control how early and how late a ticket admits.
   capability: C00
   wave: 2
@@ -1743,9 +1864,18 @@ screens:
     purpose: Configure stations and item routing
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: ticketId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-021
   name: Order Search
-  module: Venue Operations
+  module: Food & Beverage
   purpose: Find any order taken at this venue.
   capability: C00
   wave: 1
@@ -1790,9 +1920,16 @@ screens:
     purpose: Track an order
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-022
   name: Order Detail
-  module: Venue Operations
+  module: Orders & Money
   purpose: See everything about one order in one place.
   capability: C00
   wave: 1
@@ -1885,9 +2022,16 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-023
   name: Refunds & Exchanges
-  module: Venue Operations
+  module: Orders & Money
   purpose: Give money back, or move the booking.
   capability: C00
   wave: 1
@@ -1981,9 +2125,16 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-024
   name: Payment Exceptions
-  module: Venue Operations
+  module: Orders & Money
   purpose: Resolve payments that never resolved themselves.
   capability: C00
   wave: 1
@@ -2040,9 +2191,14 @@ screens:
     purpose: Ask the provider what actually happened
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: paymentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-025
   name: Chargebacks & Disputes
-  module: Venue Operations
+  module: Orders & Money
   purpose: Answer the acquirer with the evidence attached.
   capability: C00
   wave: 2
@@ -2099,9 +2255,14 @@ screens:
     purpose: List settlement batches
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: settlementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-026
   name: Group Bookings
-  module: Venue Operations
+  module: Orders & Money
   purpose: Handle a booking that arrives as a school, not a guest.
   capability: C00
   wave: 2
@@ -2194,9 +2355,16 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-027
   name: Reissue & Media Replacement
-  module: Venue Operations
+  module: Orders & Money
   purpose: Replace media a guest has lost or damaged.
   capability: C00
   wave: 2
@@ -2253,9 +2421,16 @@ screens:
     purpose: Replace the file behind an asset
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: mediaCode
+      from: deepLink
+    - name: mediaId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-028
   name: Refund Approval Queue
-  module: Venue Operations
+  module: Orders & Money
   purpose: Approve the refunds a cashier is not allowed to make alone.
   capability: C00
   wave: 1
@@ -2298,7 +2473,7 @@ screens:
   density: compact
 - id: BO-029
   name: Report Builder
-  module: Venue Operations
+  module: Orders & Money
   purpose: Build the report nobody wrote down, without asking for a release.
   capability: C00
   wave: 2
@@ -2371,9 +2546,17 @@ screens:
     purpose: Publish a new version of a definition
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: BO-030
   name: Access Point Directory
-  module: Venue Operations
+  module: Access & Venue
   purpose: See every gate and what it is doing.
   capability: C00
   wave: 1
@@ -2476,9 +2659,14 @@ screens:
     purpose: Assign, reprioritise or amend
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: workOrderId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-031
   name: Access Point Configuration
-  module: Venue Operations
+  module: Access & Venue
   purpose: Define what a gate is and where it is.
   capability: C00
   wave: 1
@@ -2545,9 +2733,14 @@ screens:
     purpose: Take an asset out of service or return it
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: assetId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-032
   name: Admission Profiles
-  module: Venue Operations
+  module: Access & Venue
   purpose: Set the rules a gate enforces, including offline.
   capability: C00
   wave: 1
@@ -2598,9 +2791,14 @@ screens:
     purpose: Update an admission profile
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: profileId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-033
   name: Blacklist Management
-  module: Venue Operations
+  module: Access & Venue
   purpose: Bar a media code outright.
   capability: C00
   wave: 1
@@ -2651,9 +2849,14 @@ screens:
     purpose: Remove a blacklist entry
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: mediaCode
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-034
   name: Scan Activity
-  module: Venue Operations
+  module: Access & Venue
   purpose: See what the gates have been doing.
   capability: C00
   wave: 1
@@ -2720,7 +2923,7 @@ screens:
   density: compact
 - id: BO-035
   name: Override Audit
-  module: Venue Operations
+  module: Access & Venue
   purpose: Review every admission that broke a rule.
   capability: C00
   wave: 1
@@ -2872,9 +3075,14 @@ screens:
     purpose: Amend a guest profile
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-037
   name: Offline Package Status
-  module: Venue Operations
+  module: Sell
   purpose: Know what each device is enforcing right now.
   capability: C00
   wave: 1
@@ -2927,9 +3135,14 @@ screens:
     purpose: Report that a workstation applied a bundle
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-038
   name: Reconciliation Queue
-  module: Venue Operations
+  module: Access & Venue
   purpose: Handle scans the server disagreed with.
   capability: C00
   wave: 1
@@ -3003,9 +3216,14 @@ screens:
     purpose: Amend queue configuration
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: queueId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-039
   name: Shift Directory
-  module: Venue Operations
+  module: Orders & Money
   purpose: See every till, open or closed.
   capability: C00
   wave: 1
@@ -3094,9 +3312,14 @@ screens:
     purpose: Suspend a shift so another user can log in
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-040
   name: Variance Approval
-  module: Venue Operations
+  module: Orders & Money
   purpose: Accept or refuse a till that did not balance.
   capability: C00
   wave: 1
@@ -3188,9 +3411,14 @@ screens:
     purpose: Suspend a shift so another user can log in
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-041
   name: Cash Movements
-  module: Venue Operations
+  module: Orders & Money
   purpose: Track money in and out of a drawer that is not a sale.
   capability: C00
   wave: 2
@@ -3280,9 +3508,14 @@ screens:
     purpose: Suspend a shift so another user can log in
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-042
   name: Banking & Safe
-  module: Venue Operations
+  module: Orders & Money
   purpose: Move the day’s cash out of the tills.
   capability: C00
   wave: 2
@@ -3372,9 +3605,14 @@ screens:
     purpose: Suspend a shift so another user can log in
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-043
   name: Daily Reconciliation
-  module: Venue Operations
+  module: Orders & Money
   purpose: Prove the day balances before anyone goes home.
   capability: C00
   wave: 1
@@ -3440,6 +3678,11 @@ screens:
     purpose: Resolve a settlement exception
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: settlementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-044
   name: F&B Outlets
   module: Venue Operations
@@ -3523,9 +3766,14 @@ screens:
     purpose: Amend an outlet
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: outletId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-045
   name: Menu Management
-  module: Venue Operations
+  module: Food & Beverage
   purpose: Change what is on sale and what is in it.
   capability: C00
   wave: 2
@@ -3584,9 +3832,14 @@ screens:
     purpose: Amend a menu
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: menuId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-046
   name: Kitchen Display
-  module: Venue Operations
+  module: Food & Beverage
   purpose: Show the kitchen what to make, in order.
   capability: C00
   wave: 2
@@ -3643,9 +3896,14 @@ screens:
     purpose: Configure stations and item routing
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: ticketId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-047
   name: F&B Order Management
-  module: Venue Operations
+  module: Orders & Money
   purpose: Fix an order that has gone wrong.
   capability: C00
   wave: 2
@@ -3740,9 +3998,16 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-048
   name: Retail Products
-  module: Venue Operations
+  module: Orders & Money
   purpose: Manage what the shop sells.
   capability: C00
   wave: 2
@@ -3797,9 +4062,14 @@ screens:
     purpose: Amend a merchandise item
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: merchandiseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-049
   name: Stock Levels
-  module: Venue Operations
+  module: Stock & Supply
   purpose: Know what is on the shelf and what is on order.
   capability: C00
   wave: 2
@@ -3846,7 +4116,7 @@ screens:
   density: compact
 - id: BO-050
   name: Stock Count
-  module: Venue Operations
+  module: Stock & Supply
   purpose: Count the shelf and account for the difference.
   capability: C00
   wave: 2
@@ -3893,7 +4163,7 @@ screens:
   density: compact
 - id: BO-051
   name: Purchase Orders
-  module: Venue Operations
+  module: Orders & Money
   purpose: Order more of what is running out.
   capability: C00
   wave: 2
@@ -3984,9 +4254,16 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-052
   name: Goods Receipt
-  module: Venue Operations
+  module: Stock & Supply
   purpose: Book in what actually arrived.
   capability: C00
   wave: 2
@@ -4067,9 +4344,16 @@ screens:
     purpose: Issue the order to the supplier
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: purchaseOrderId
+      from: deepLink
+    - name: receiptId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-053
   name: Staff Directory
-  module: Venue Operations
+  module: People & Access Rights
   purpose: Find anyone who works at this venue.
   capability: C00
   wave: 1
@@ -4122,9 +4406,14 @@ screens:
     purpose: Update or deactivate a principal
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: principalId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-054
   name: Role Assignment
-  module: Venue Operations
+  module: People & Access Rights
   purpose: Give somebody the permissions their job needs.
   capability: C00
   wave: 1
@@ -4171,7 +4460,7 @@ screens:
   density: compact
 - id: BO-055
   name: Rota & Scheduling
-  module: Venue Operations
+  module: People & Access Rights
   purpose: Decide who is on which gate, when.
   capability: C00
   wave: 2
@@ -4224,9 +4513,14 @@ screens:
     purpose: Ask someone to take your shift
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: assignmentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-056
   name: Time & Attendance
-  module: Venue Operations
+  module: People & Access Rights
   purpose: Record who actually turned up.
   capability: C00
   wave: 2
@@ -4275,9 +4569,14 @@ screens:
     purpose: Clock in, clock out, or take a break
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: recordId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-057
   name: Training & Certification
-  module: Venue Operations
+  module: People & Access Rights
   purpose: Know who is allowed to do what.
   capability: C00
   wave: 3
@@ -4395,9 +4694,17 @@ screens:
     purpose: Publish a new version of a definition
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: BO-059
   name: Sales Reports
-  module: Venue Operations
+  module: Orders & Money
   purpose: See what sold, through which channel.
   capability: C00
   wave: 1
@@ -4470,6 +4777,14 @@ screens:
     purpose: Publish a new version of a definition
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: BO-060
   name: Attendance & Footfall
   module: Venue Operations
@@ -4573,9 +4888,17 @@ screens:
     purpose: Admit a group on one read
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: BO-061
   name: Scheduled Reports
-  module: Venue Operations
+  module: Orders & Money
   purpose: Send a report to somebody without them asking.
   capability: C00
   wave: 3
@@ -4648,9 +4971,17 @@ screens:
     purpose: Publish a new version of a definition
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: BO-062
   name: Venue Profile
-  module: Venue Operations
+  module: Orders & Money
   purpose: The facts every other surface reads.
   capability: C00
   wave: 1
@@ -4705,9 +5036,14 @@ screens:
     purpose: Where an order can be delivered
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-063
   name: Opening Hours & Calendar
-  module: Venue Operations
+  module: Sell
   purpose: Say when the venue is open, including the exceptions.
   capability: C00
   wave: 1
@@ -4788,6 +5124,14 @@ screens:
     purpose: Amend a performance
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
 - id: BO-064
   name: Zones & Areas
   module: Venue Operations
@@ -4867,9 +5211,16 @@ screens:
     purpose: Rename or deactivate a scope node
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: accessPointId
+      from: deepLink
+    - name: scopeNodeId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-065
   name: Venue Configuration
-  module: Venue Operations
+  module: Orders & Money
   purpose: Set the venue-level values everything inherits from.
   capability: C00
   wave: 1
@@ -4924,9 +5275,14 @@ screens:
     purpose: Where an order can be delivered
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-066
   name: Notification Settings
-  module: Venue Operations
+  module: People & Access Rights
   purpose: Decide what this venue tells people, and how.
   capability: C00
   wave: 2
@@ -4981,6 +5337,11 @@ screens:
     purpose: Who has acknowledged, and who has not
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: announcementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-067
   name: Integrations
   module: Venue Operations
@@ -5020,7 +5381,7 @@ screens:
   density: compact
 - id: BO-068
   name: Audit Log
-  module: Venue Operations
+  module: Guests & Marketing
   purpose: See who changed what at this venue.
   capability: C00
   wave: 2
@@ -5063,7 +5424,7 @@ screens:
   density: compact
 - id: BO-069
   name: Asset Register
-  module: Venue Operations
+  module: Access & Venue
   purpose: Know what equipment exists and where.
   capability: C00
   wave: 2
@@ -5144,9 +5505,16 @@ screens:
     purpose: Replay plays recorded offline
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: assetId
+      from: deepLink
+    - name: gameId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-070
   name: Work Orders
-  module: Venue Operations
+  module: Orders & Money
   purpose: Get something fixed, and know it was.
   capability: C00
   wave: 2
@@ -5237,9 +5605,16 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: BO-071
   name: Planned Maintenance
-  module: Venue Operations
+  module: Access & Venue
   purpose: Schedule the work that stops the emergencies.
   capability: C00
   wave: 3
@@ -5290,7 +5665,7 @@ screens:
   density: compact
 - id: BO-072
   name: Incident Log
-  module: Venue Operations
+  module: Access & Venue
   purpose: Record what happened, while it is fresh.
   capability: C00
   wave: 2
@@ -5347,9 +5722,14 @@ screens:
     purpose: Investigate, escalate or close an incident
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: incidentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-073
   name: Lost & Found Register
-  module: Venue Operations
+  module: Guests & Marketing
   purpose: Match what was lost to what was handed in.
   capability: C00
   wave: 2
@@ -5396,7 +5776,7 @@ screens:
   density: compact
 - id: BO-074
   name: Chart of Accounts
-  module: Finance
+  module: Orders & Money
   purpose: Accounts, cost centres and legal entities.
   capability: C00
   wave: 1
@@ -5468,9 +5848,14 @@ screens:
     board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts
     blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.
   density: compact
+  entryState:
+    params:
+    - name: accountId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-075
   name: Account Mapping
-  module: Finance
+  module: Orders & Money
   purpose: Which product or movement posts to which account.
   capability: C00
   wave: 1
@@ -5539,9 +5924,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense.
   density: compact
+  entryState:
+    params:
+    - name: taxCodeId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-076
   name: Revenue Recognition
-  module: Finance
+  module: Orders & Money
   purpose: Deferred revenue, its ageing, and the schedules that release it.
   capability: C00
   wave: 2
@@ -5598,7 +5988,7 @@ screens:
   density: compact
 - id: BO-077
   name: FX Rates & Variances
-  module: Finance
+  module: Orders & Money
   purpose: Rates, and the price variances waiting for review.
   capability: C00
   wave: 2
@@ -5652,9 +6042,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: varianceId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-078
   name: Requisitions
-  module: Inventory
+  module: Stock & Supply
   purpose: Raise, track and approve a request to buy something.
   capability: C00
   wave: 1
@@ -5726,9 +6121,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: requisitionId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-079
   name: Stock Count
-  module: Inventory
+  module: Stock & Supply
   purpose: Count what is there, blind, and resolve the variance.
   capability: C00
   wave: 1
@@ -5791,9 +6191,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: countId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-080
   name: Stock Transfers
-  module: Inventory
+  module: Stock & Supply
   purpose: Move stock between venues, and receive what arrives.
   capability: C00
   wave: 2
@@ -5847,9 +6252,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: transferId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-081
   name: Inventory Items
-  module: Inventory
+  module: Stock & Supply
   purpose: What the venue stocks, and where.
   capability: C00
   wave: 2
@@ -5915,9 +6325,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: itemId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-082
   name: Stock Movements
-  module: Inventory
+  module: Stock & Supply
   purpose: Every movement, and why it happened.
   capability: C00
   wave: 2
@@ -5966,7 +6381,7 @@ screens:
   density: compact
 - id: BO-083
   name: Suppliers
-  module: Inventory
+  module: Stock & Supply
   purpose: Who we buy from, and what they quoted.
   capability: C00
   wave: 2
@@ -6016,9 +6431,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: supplierId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-084
   name: Approval Inbox
-  module: Approvals
+  module: People & Access Rights
   purpose: What is waiting on this person, sorted by what breaches soonest.
   capability: C00
   wave: 1
@@ -6072,9 +6492,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: requestId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-085
   name: Approval Request
-  module: Approvals
+  module: People & Access Rights
   purpose: One request, its subject, and the decision.
   capability: C00
   wave: 1
@@ -6135,9 +6560,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: requestId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-086
   name: Approval Matrix
-  module: Approvals
+  module: People & Access Rights
   purpose: What needs approval here, and who grants it.
   capability: C00
   wave: 2
@@ -6186,7 +6616,7 @@ screens:
   density: compact
 - id: BO-087
   name: Approval Delegations
-  module: Approvals
+  module: People & Access Rights
   purpose: Who is standing in for whom, and until when.
   capability: C00
   wave: 2
@@ -6237,9 +6667,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: delegationId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-088
   name: Approval Analytics
-  module: Approvals
+  module: People & Access Rights
   purpose: Volumes, decision times and where requests get stuck.
   capability: C00
   wave: 3
@@ -6283,7 +6718,7 @@ screens:
   density: compact
 - id: BO-089
   name: Journal Entries
-  module: Finance
+  module: Orders & Money
   purpose: Every posting, and the ones waiting for approval.
   capability: C00
   wave: 1
@@ -6348,9 +6783,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-090
   name: Period Close
-  module: Finance
+  module: Orders & Money
   purpose: Close a fiscal period, and see what is stopping it.
   capability: C00
   wave: 1
@@ -6414,9 +6854,14 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
+  entryState:
+    params:
+    - name: periodId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-091
   name: AI Policy & Spend
-  module: AI
+  module: Guests & Marketing
   purpose: What the assistant may do here, what it has cost, and what happens at the ceiling.
   capability: C00
   wave: 1
@@ -6465,7 +6910,7 @@ screens:
   density: compact
 - id: BO-092
   name: Venue Maps
-  module: venue-map
+  module: Access & Venue
   wave: 2
   purpose: Every map for this venue, and which is published.
   apis:
@@ -6501,7 +6946,7 @@ screens:
   density: compact
 - id: BO-093
   name: Map Import & Labelling
-  module: venue-map
+  module: Access & Venue
   wave: 2
   purpose: Upload a plan, check what was read, and review what the assistant suggests.
   apis:
@@ -6542,9 +6987,14 @@ screens:
     status: notStarted
     board: null
   density: compact
+  entryState:
+    params:
+    - name: mapId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-094
   name: Map Editor & Publish
-  module: venue-map
+  module: Access & Venue
   wave: 2
   purpose: Place booths, toilets, exits, rides and restaurants, then publish.
   apis:
@@ -6599,9 +7049,16 @@ screens:
     status: notStarted
     board: null
   density: compact
+  entryState:
+    params:
+    - name: mapId
+      from: deepLink
+    - name: pathId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-095
   name: Resources
-  module: Venue Operations
+  module: Access & Venue
   wave: 2
   purpose: Every bookable object at this venue, and whether it is free.
   apis:
@@ -6651,7 +7108,7 @@ screens:
     forty rows, because guest twelve returned stroller twelve.
 - id: BO-096
   name: Resource Calendar
-  module: Venue Operations
+  module: Access & Venue
   wave: 2
   purpose: See what is free, and book it without double-booking.
   apis:
@@ -6702,9 +7159,14 @@ screens:
     board: null
   notes: CF-125. **Conflict detection before assignment is the whole point** — two bookings on one cabana
     is a guest arriving to find somebody in their chair, and it must be impossible rather than unlikely.
+  entryState:
+    params:
+    - name: resourceId
+      from: BO-095
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-097
   name: Check Out & Check In
-  module: Venue Operations
+  module: Access & Venue
   wave: 2
   purpose: Hand it over with a deposit, take it back, settle.
   apis:
@@ -6770,9 +7232,16 @@ screens:
     here because this screen calls them** — F25 named them at steps 4 and 5 and the screen did not,
     which the flow checker refused. **A step calling an operation its screen does not declare is one
     of the two out of step**, and in this case it was the screen.
+  entryState:
+    params:
+    - name: authorisationId
+      from: deepLink
+    - name: bookingId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: BO-098
   name: Qualifications
-  module: Venue Operations
+  module: Access & Venue
   wave: 2
   purpose: What a person is certified to do, and until when.
   apis:
@@ -6813,9 +7282,14 @@ screens:
     board: null
   notes: CF-125. **Expiry is the field that makes this worth having** — a certification with no expiry
     is one nobody renews.
+  entryState:
+    params:
+    - name: resourceId
+      from: BO-095
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: BO-099
   name: Session Manifest
-  module: Venue Operations
+  module: Access & Venue
   wave: 2
   purpose: Who is in a session, in what order.
   apis:
@@ -6860,3 +7334,589 @@ screens:
     status: notStarted
     board: null
   notes: CF-125, CF-129. Distinct from duration, which variants already handle.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+- id: BO-100
+  name: Venue Home
+  module: Venue Operations
+  wave: 1
+  purpose: The screen a venue manager opens in the morning, and the only way into everything else.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What this venue is configured to do
+    trigger: onLoad
+  - operationId: listShifts
+    contract: shift
+    purpose: Who is on and what has been taken
+    trigger: onLoad
+  states:
+    loading: The tiles render in place; each resolves on its own so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue on its first morning.** No shifts, no orders, no stock. The state links
+      to the opening checklist rather than showing eight empty tiles — **a dashboard of zeroes teaches
+      a new manager nothing.**'
+    emptyNoResults: Nothing happened in the window selected. Yesterday and today are the useful defaults.
+    emptyNoAccess: '**Sections you cannot open are not shown.** A manager with no finance permission
+      sees seven sections, not eight greyed out — a menu that lists what you may not do is a menu that
+      invites a support ticket.'
+    error: Could not load the summary. **Every section is still reachable** — this screen is a landing
+      page, and a failed tile must not block navigation.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on a partial picture without knowing it.'
+  layout:
+    template: dashboard
+    regions:
+    - name: sideNav
+      components:
+      - kind: treeNav
+        bindsTo: sections
+        notes: The eight sections. **Persistent — a back office is a place somebody works all day**,
+          and a nav that disappears on every detail screen makes them use the browser back button as
+          navigation.
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: 'Today: takings, admissions, open shifts, items needing attention. **Four, not twelve**
+          — a tile nobody acts on is a tile that trains people to ignore the row.'
+      - kind: cardList
+        bindsTo: sections
+        notes: One card per section with its count of items needing attention. **The count is the point**
+          — a section with nothing pending should look different from one with eleven approvals waiting.
+      - kind: banner
+        notes: Alerts that crossed a threshold, from VenueSettings.alerting. **On-platform and markable
+          as read** (CF-134).
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - BO-101
+    - BO-102
+    - BO-103
+    - BO-104
+    - BO-105
+    - BO-106
+    - BO-107
+    - BO-108
+  implementation:
+    app: venue-management-web
+    route: /home
+    component: apps/venue-management-web/src/routes/home/VenueHomeDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry
+    point to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
+    A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
+    so there was nothing for a home screen to point at; sections were derived from the contract each
+    screen principally calls.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-101
+  name: Orders & Money
+  module: Orders & Money
+  wave: 1
+  purpose: Everything in orders & money, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in orders & money yet.** The action is the first thing to set
+      up, not a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for orders & money. **Said plainly** — an empty section
+      reads as broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 28 screens, each with what needs attention.
+      - kind: searchField
+        label: Search orders & money
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-008
+    - BO-022
+    - BO-023
+    - BO-024
+    - BO-025
+    - BO-026
+    - BO-027
+    - BO-028
+    - BO-029
+    - BO-039
+    - BO-040
+    - BO-041
+    - BO-042
+    - BO-043
+    - BO-047
+    - BO-048
+    - BO-051
+    - BO-059
+    - BO-061
+    - BO-062
+    - BO-065
+    - BO-070
+    - BO-074
+    - BO-075
+    - BO-076
+    - BO-077
+    - BO-089
+    - BO-090
+  implementation:
+    app: venue-management-web
+    route: /orders-money
+    component: apps/venue-management-web/src/routes/home/OrdersMoneyList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **28 screens reach the entry point through here** — before 20 August they
+    reached it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-102
+  name: Sell
+  module: Sell
+  wave: 1
+  purpose: Everything in sell, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in sell yet.** The action is the first thing to set up, not
+      a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for sell. **Said plainly** — an empty section reads as
+      broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 14 screens, each with what needs attention.
+      - kind: searchField
+        label: Search sell
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-007
+    - BO-009
+    - BO-010
+    - BO-011
+    - BO-012
+    - BO-013
+    - BO-014
+    - BO-015
+    - BO-016
+    - BO-017
+    - BO-018
+    - BO-019
+    - BO-037
+    - BO-063
+  implementation:
+    app: venue-management-web
+    route: /sell
+    component: apps/venue-management-web/src/routes/home/SellList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **14 screens reach the entry point through here** — before 20 August they
+    reached it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-103
+  name: Access & Venue
+  module: Access & Venue
+  wave: 1
+  purpose: Everything in access & venue, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in access & venue yet.** The action is the first thing to set
+      up, not a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for access & venue. **Said plainly** — an empty section
+      reads as broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 24 screens, each with what needs attention.
+      - kind: searchField
+        label: Search access & venue
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-001
+    - BO-002
+    - BO-003
+    - BO-004
+    - BO-005
+    - BO-006
+    - BO-030
+    - BO-031
+    - BO-032
+    - BO-033
+    - BO-034
+    - BO-035
+    - BO-038
+    - BO-069
+    - BO-071
+    - BO-072
+    - BO-092
+    - BO-093
+    - BO-094
+    - BO-095
+    - BO-096
+    - BO-097
+    - BO-098
+    - BO-099
+  implementation:
+    app: venue-management-web
+    route: /access-venue
+    component: apps/venue-management-web/src/routes/home/AccessVenueList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **24 screens reach the entry point through here** — before 20 August they
+    reached it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-104
+  name: Food & Beverage
+  module: Food & Beverage
+  wave: 1
+  purpose: Everything in food & beverage, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in food & beverage yet.** The action is the first thing to
+      set up, not a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for food & beverage. **Said plainly** — an empty section
+      reads as broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 4 screens, each with what needs attention.
+      - kind: searchField
+        label: Search food & beverage
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-020
+    - BO-021
+    - BO-045
+    - BO-046
+  implementation:
+    app: venue-management-web
+    route: /food-beverage
+    component: apps/venue-management-web/src/routes/home/FoodBeverageList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **4 screens reach the entry point through here** — before 20 August they reached
+    it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-105
+  name: Stock & Supply
+  module: Stock & Supply
+  wave: 1
+  purpose: Everything in stock & supply, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in stock & supply yet.** The action is the first thing to set
+      up, not a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for stock & supply. **Said plainly** — an empty section
+      reads as broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 9 screens, each with what needs attention.
+      - kind: searchField
+        label: Search stock & supply
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-049
+    - BO-050
+    - BO-052
+    - BO-078
+    - BO-079
+    - BO-080
+    - BO-081
+    - BO-082
+    - BO-083
+  implementation:
+    app: venue-management-web
+    route: /stock-supply
+    component: apps/venue-management-web/src/routes/home/StockSupplyList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **9 screens reach the entry point through here** — before 20 August they reached
+    it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-106
+  name: People & Access Rights
+  module: People & Access Rights
+  wave: 1
+  purpose: Everything in people & access rights, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in people & access rights yet.** The action is the first thing
+      to set up, not a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for people & access rights. **Said plainly** — an empty
+      section reads as broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 11 screens, each with what needs attention.
+      - kind: searchField
+        label: Search people & access rights
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-053
+    - BO-054
+    - BO-055
+    - BO-056
+    - BO-057
+    - BO-066
+    - BO-084
+    - BO-085
+    - BO-086
+    - BO-087
+    - BO-088
+  implementation:
+    app: venue-management-web
+    route: /people-access-rights
+    component: apps/venue-management-web/src/routes/home/PeopleAccessRightsList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **11 screens reach the entry point through here** — before 20 August they
+    reached it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-107
+  name: Guests & Marketing
+  module: Guests & Marketing
+  wave: 1
+  purpose: Everything in guests & marketing, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in guests & marketing yet.** The action is the first thing
+      to set up, not a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for guests & marketing. **Said plainly** — an empty section
+      reads as broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 3 screens, each with what needs attention.
+      - kind: searchField
+        label: Search guests & marketing
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-068
+    - BO-073
+    - BO-091
+  implementation:
+    app: venue-management-web
+    route: /guests-marketing
+    component: apps/venue-management-web/src/routes/home/GuestsMarketingList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **3 screens reach the entry point through here** — before 20 August they reached
+    it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'
+- id: BO-108
+  name: Venue Operations
+  module: Venue Operations
+  wave: 1
+  purpose: Everything in venue operations, and what in it needs attention.
+  density: compact
+  apis:
+  - operationId: getVenueSettings
+    contract: tenancy
+    purpose: What is enabled here
+    trigger: onLoad
+  states:
+    loading: The list, with counts.
+    emptyFirstRun: '**Nothing configured in venue operations yet.** The action is the first thing to
+      set up, not a blank list.'
+    emptyNoResults: Nothing matches the filter.
+    emptyNoAccess: You do not have permission for venue operations. **Said plainly** — an empty section
+      reads as broken.
+    error: Could not load. Venue Home is still reachable.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: screens
+        notes: 6 screens, each with what needs attention.
+      - kind: searchField
+        label: Search venue operations
+  navigation:
+    entryFrom:
+    - BO-100
+    exitTo:
+    - BO-036
+    - BO-044
+    - BO-058
+    - BO-060
+    - BO-064
+    - BO-067
+  implementation:
+    app: venue-management-web
+    route: /venue-operations
+    component: apps/venue-management-web/src/routes/home/VenueOperationsList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: Section landing. **6 screens reach the entry point through here** — before 20 August they reached
+    it through nothing.
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: '**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks
+      the back office and opens it every morning. A principal with more than one venue is asked which
+      before the page renders, rather than shown the first one.'

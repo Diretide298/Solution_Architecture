@@ -166,6 +166,11 @@ screens:
     purpose: Find something by name
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-003
   name: Search Results
   module: Discovery & Browse
@@ -270,6 +275,13 @@ screens:
     purpose: List performances of an event
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: WEB-002
+    - name: productId
+      from: WEB-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-005
   name: Ticket Type Selection
   module: Booking & Selection
@@ -326,6 +338,11 @@ screens:
     purpose: List generated variants
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: productId
+      from: WEB-004
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-006
   name: Date & Session Selection
   module: Booking & Selection
@@ -438,6 +455,12 @@ screens:
     purpose: Seat status for a performance
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
 - id: WEB-008
   name: Add-ons & Upsell
   module: Booking & Selection
@@ -486,6 +509,11 @@ screens:
     purpose: Suggestions for a cart
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-009
   name: Wishlist
   module: Booking & Selection
@@ -538,6 +566,13 @@ screens:
     - WEB-006
     - WEB-007
   density: compact
+  entryState:
+    params:
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-010
   name: Shopping Cart
   module: Cart & Checkout
@@ -624,6 +659,15 @@ screens:
     component: apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx
     status: notStarted
   density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: WEB-008
+    - name: code
+      from: deepLink
+    - name: lineId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-011
   name: Guest Details & Attendee Forms
   module: Cart & Checkout
@@ -716,6 +760,15 @@ screens:
     component: apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
     status: notStarted
   density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-012
   name: Checkout — Payment
   module: Cart & Checkout
@@ -781,6 +834,13 @@ screens:
     component: apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
     status: notStarted
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: WEB-013
   name: Order Confirmation
   module: Cart & Checkout
@@ -838,6 +898,11 @@ screens:
     component: apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
     status: notStarted
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: WEB-012
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-014
   name: Payment Link Landing
   module: Cart & Checkout
@@ -884,6 +949,11 @@ screens:
     - WEB-012
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-015
   name: Virtual Waiting Room
   module: High-Demand Access
@@ -935,6 +1005,11 @@ screens:
     purpose: Wait times across a venue
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-016
   name: Login / Register
   module: Account & Self-Service
@@ -1062,6 +1137,17 @@ screens:
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: challengeId
+      from: deepLink
+    - name: methodId
+      from: deepLink
+    - name: providerId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-017
   name: My Account Dashboard
   module: Account & Self-Service
@@ -1128,6 +1214,15 @@ screens:
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service
@@ -1184,6 +1279,12 @@ screens:
     - WEB-017
     - WEB-019
   density: compact
+  entryState:
+    params:
+    - name: entitlementId
+      from: deepLink
+    coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
+      used, transferred — because *not found* to somebody holding a ticket is the wrong answer.'
 - id: WEB-019
   name: Order History
   module: Account & Self-Service
@@ -1227,6 +1328,13 @@ screens:
     - WEB-018
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: WEB-020
   name: Profile & Preferences
   module: Account & Self-Service
@@ -1288,6 +1396,11 @@ screens:
     - WEB-017
     - WEB-018
   density: compact
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-021
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
@@ -1338,6 +1451,13 @@ screens:
     purpose: Check a gift card balance
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: cardCode
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-022
   name: Membership Plans
   module: Membership, Loyalty & Value
@@ -1384,6 +1504,11 @@ screens:
     purpose: Read a product
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: productId
+      from: WEB-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-023
   name: Membership Management
   module: Membership, Loyalty & Value
@@ -1426,6 +1551,13 @@ screens:
     - WEB-024
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: WEB-024
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
@@ -1491,6 +1623,15 @@ screens:
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-025
   name: Help Centre / FAQ
   module: Engagement & Support
@@ -1640,6 +1781,15 @@ screens:
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-028
   name: Contact & Venue Information
   module: Engagement & Support
@@ -1773,6 +1923,15 @@ screens:
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-014. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: transferId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: WEB-031
   name: My Reservations
   module: Ticketing
@@ -1822,6 +1981,11 @@ screens:
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
+  entryState:
+    params:
+    - name: reservationId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-032
   name: Offers & Promotions
   module: Promotions
@@ -1869,6 +2033,11 @@ screens:
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
+  entryState:
+    params:
+    - name: promotionId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-033
   name: Shop
   module: Retail
@@ -1921,6 +2090,13 @@ screens:
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: outletId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: WEB-034
   name: Lost & Found
   module: Support

@@ -111,6 +111,11 @@ CREATE TABLE IF NOT EXISTS verdict (
   --
   -- The note is not optional. Sending work back without saying why is how it
   -- comes back the same.
+  -- How it was answered when it was closed: built, wired, answered, accepted,
+  -- or approved with nothing to do. The tracker's "Our verdict" column. Kept
+  -- beside done_at rather than replacing it, because "when" and "how" are two
+  -- questions and a report asks them separately.
+  done_response  TEXT NOT NULL DEFAULT '',
   sent_back_at   TEXT,
   sent_back_by   INTEGER REFERENCES account(id),
   sent_back_note TEXT NOT NULL DEFAULT ''
@@ -186,6 +191,10 @@ TAG_OF = {
     "operation": "backend",
     "table": "backend",
     "module": "backend",
+    # A state model is the rules a status may move by, and a schema is a group
+    # of tables. Both are somebody's build before they are anybody's screen.
+    "state": "backend",
+    "schema": "backend",
 }
 
 
@@ -237,6 +246,9 @@ def init() -> None:
             # to an existing table, and the constraint on the fresh schema above
             # is the one that matters for a store made from now on.
             cur.execute("ALTER TABLE verdict ADD COLUMN done_by INTEGER")
+        if "done_response" not in have:
+            cur.execute(
+                "ALTER TABLE verdict ADD COLUMN done_response TEXT NOT NULL DEFAULT ''")
         if "sent_back_at" not in have:
             cur.execute("ALTER TABLE verdict ADD COLUMN sent_back_at TEXT")
             cur.execute("ALTER TABLE verdict ADD COLUMN sent_back_by INTEGER")

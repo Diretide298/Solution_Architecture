@@ -105,11 +105,11 @@
    "operations": 2
   },
   {
-   "contract": "ai",
+   "contract": "games",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "ai",
    "operations": 1
   },
   {
@@ -117,7 +117,7 @@
    "operations": 1
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   }
  ],

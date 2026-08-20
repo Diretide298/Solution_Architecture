@@ -9,6 +9,7 @@ cd "$(dirname "$0")/.."
 
 python3 tools/derive-schema.py
 python3 tools/derive-relationships.py
+python3 tools/derive-schema-roots.py
 python3 tools/derive-frontend.py
 python3 tools/link-screens-contracts.py
 

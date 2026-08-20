@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 75 |
+| Operations with no screen | 73 |
 | Waves | wave2 2 · wave3 6 |
 
 ## Gaps
 
-### 75 operations with no screen here
+### 73 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -32,8 +32,6 @@
 | `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
 | `deleteGuestAccount` | identity | DELETE | Self-service account deletion |
 | `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `grantDelegation` | identity | POST | Let one guest act for another |
-| `listDelegations` | identity | GET | Who may act for this guest, and for whom they may act |
 | `resolvePermissions` | identity | POST | Simulate a principal's effective permissions |
 | `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
 | `setSegregationRules` | identity | PUT | Which permissions may not be held together |
@@ -60,7 +58,9 @@
 | `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
 | `listSegments` | marketing-crm | GET | List segments |
 | `matchLostItem` | marketing-crm | POST | Tie a report to a found item, or hand it back |
-| … | | | 35 more |
+| `previewSegment` | marketing-crm | POST | Estimate segment size and reachability |
+| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
+| … | | | 33 more |
 
 ### 1 modules split across waves
 

@@ -106,6 +106,11 @@ screens:
     - ADM-004
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-002
   name: Platform Dashboard
   module: TODO
@@ -231,6 +236,11 @@ screens:
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
   module: TODO
@@ -311,6 +321,13 @@ screens:
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    - name: rightId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-004
   name: Platform Audit Log
   module: TODO
@@ -480,6 +497,11 @@ screens:
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-006
   name: Tenant Hierarchy Explorer
   module: TODO
@@ -612,6 +634,11 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-007
   name: Module & Feature Entitlement
   module: TODO
@@ -735,6 +762,11 @@ screens:
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-008
   name: Subscription & Plan Management
   module: TODO
@@ -884,6 +916,15 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: agreementId
+      from: deepLink
+    - name: planId
+      from: deepLink
+    - name: tenantId
+      from: ADM-002
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-009
   name: Tenant Billing & Invoicing
   module: TODO
@@ -1005,6 +1046,11 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-010
   name: Usage Metering
   module: TODO
@@ -1125,6 +1171,11 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-011
   name: Licence & Seat Management
   module: TODO
@@ -1246,6 +1297,11 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-012
   name: Tenant Isolation & Resource Pool
   module: TODO
@@ -1373,6 +1429,13 @@ screens:
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    - name: tenantId
+      from: ADM-002
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-013
   name: Tenant Performance Monitor
   module: TODO
@@ -1439,6 +1502,11 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-014
   name: Auto-Scaling Configuration
   module: TODO
@@ -1506,6 +1574,11 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-015
   name: API Rate Limit & Quota Management
   module: TODO
@@ -1628,6 +1701,11 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-016
   name: White-Label Branding Management
   module: TODO
@@ -1829,6 +1907,17 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-017
   name: Domain & Certificate Management
   module: TODO
@@ -2033,6 +2122,17 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-018
   name: Localisation & Language Pack
   module: TODO
@@ -2233,6 +2333,17 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-019
   name: Global Configuration & Defaults
   module: TODO
@@ -2289,6 +2400,11 @@ screens:
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: planId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-020
   name: Platform User Directory
   module: TODO
@@ -2343,6 +2459,11 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: principalId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: ADM-021
   name: Platform Role Management
   module: TODO
@@ -2457,6 +2578,11 @@ screens:
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: releaseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-023
   name: Staging Promotion & Approval
   module: TODO
@@ -2528,6 +2654,11 @@ screens:
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: releaseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-024
   name: Release Notification Composer
   module: TODO
@@ -2735,6 +2866,11 @@ screens:
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: runId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-028
   name: Environment Registry
   module: TODO
@@ -2868,6 +3004,13 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    - name: rolloutId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
   module: TODO
@@ -2935,6 +3078,11 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-031
   name: Security & Compliance Dashboard
   module: TODO
@@ -2990,6 +3138,11 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: dashboardId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-032
   name: WAF & Security Policy View
   module: TODO
@@ -3057,6 +3210,11 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-033
   name: Backup & DR Status
   module: TODO
@@ -3123,6 +3281,11 @@ screens:
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-034
   name: Archival Job Monitor
   module: TODO
@@ -3190,6 +3353,11 @@ screens:
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ADM-035
   name: Support & Escalation Console
   module: TODO
@@ -3337,3 +3505,8 @@ screens:
     a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
     board.**
   density: compact
+  entryState:
+    params:
+    - name: providerId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.

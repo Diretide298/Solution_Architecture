@@ -333,6 +333,11 @@ screens:
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
   density: compact
+  entryState:
+    params:
+    - name: requestId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)

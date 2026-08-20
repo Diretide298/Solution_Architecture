@@ -72,6 +72,7 @@ screens:
     - CMS-003
     - CMS-004
     inferred: true
+    isEntryPoint: true
   wireframe:
     status: drafted
     owner: wireframe board
@@ -80,6 +81,9 @@ screens:
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    **The tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August**
+    — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read
+    as unreachable.
   implementation:
     app: venue-management-web
     route: /white-label/tenant-workspace
@@ -171,6 +175,11 @@ screens:
     purpose: Amend tenant details
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: CMS-002
   name: Brand Kit
   module: White Label
@@ -228,6 +237,11 @@ screens:
     purpose: Confirm an upload and create the asset
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: uploadId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: CMS-003
   name: Typography
   module: White Label
@@ -431,6 +445,17 @@ screens:
     purpose: Validate the working draft
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: CMS-004
   name: Logo & Assets
   module: White Label
@@ -498,6 +523,11 @@ screens:
     purpose: Amend an asset
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: assetId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: CMS-005
   name: Theme Editor
   module: White Label
@@ -750,6 +780,17 @@ screens:
     purpose: Validate the working draft
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: CMS-007
   name: Page Builder
   module: White Label
@@ -905,6 +946,11 @@ screens:
     purpose: Amend a menu
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: menuId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: CMS-010
   name: Media Library
   module: White Label
@@ -992,6 +1038,15 @@ screens:
     purpose: Amend metadata, tags or rights
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: mediaCode
+      from: deepLink
+    - name: mediaId
+      from: deepLink
+    - name: uploadId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: CMS-013
   name: SEO & Metadata
   module: White Label
@@ -1225,6 +1280,11 @@ screens:
     purpose: Restore a previous version
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: CMS-016
   name: Site Settings
   module: White Label
@@ -1390,6 +1450,11 @@ screens:
     purpose: Amend a guest profile
     trigger: onAction
   density: compact
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: CMS-019
   name: User Access
   module: White Label

@@ -67,6 +67,7 @@ screens:
     - SCN-003
     inferred: true
     fromFlows: true
+    isEntryPoint: true
   wireframe:
     status: drafted
     owner: wireframe board
@@ -75,7 +76,9 @@ screens:
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **createCashMovement removed 18 August** — attached by module resemblance,
     not by what this screen does. A screen that does not handle money should not be able to move it
-    (CF-87's class).
+    (CF-87's class). **Sign in.** The session carries the workstation, so the device cannot scan before
+    it knows who is holding it. **Declared 20 August** — `isEntryPoint` existed in the schema and five
+    platforms used none, so every screen in them read as unreachable.
   implementation:
     app: venue-scanner
     route: /access/sign-in
@@ -163,6 +166,13 @@ screens:
     purpose: Suspend a shift so another user can log in
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: SCN-002
   name: Access point & direction
   module: Access
@@ -227,6 +237,11 @@ screens:
     purpose: Update an access point
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: accessPointId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: SCN-003
   name: Ready to scan
   module: Access
@@ -345,6 +360,13 @@ screens:
     purpose: Remove a blacklist entry
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: mediaCode
+      from: deepLink
+    - name: rightId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: SCN-007
   name: Group admission
   module: Access
@@ -595,6 +617,11 @@ screens:
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: rightId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: SCN-013
   name: Offline journal
   module: Access
@@ -871,3 +898,8 @@ screens:
     purpose: Update an access point
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: accessPointId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.

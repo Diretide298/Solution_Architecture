@@ -48,7 +48,7 @@
   "tables": 48,
   "screens": 22,
   "flows": 3,
-  "documents": 9,
+  "documents": 10,
   "openConflicts": 0
  },
  "metrics": {
@@ -193,6 +193,11 @@
   {
    "file": "docs/active/optimisation-plan.md",
    "title": "Optimisation adoption plan",
+   "status": ""
+  },
+  {
+   "file": "docs/active/viewer-update-brief-20aug.md",
+   "title": "Viewer \u2014 what changed in the package on 20 August",
    "status": ""
   },
   {

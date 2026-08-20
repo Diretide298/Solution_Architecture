@@ -4,6 +4,7 @@
 // reads are extras on this layer and arrive after the reader is already drawn —
 // which is exactly where a block like this fails quietly.
 import puppeteer from 'puppeteer-core';
+import { authed } from './_session.mjs';
 const VIEWER = 'http://localhost:4173';
 let pass = 0, fail = 0;
 const check = (n, ok, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ` — ${d}` : ''}`); ok ? pass++ : fail++; };
@@ -54,8 +55,8 @@ const readTrace = (page) => page.evaluate(() => {
   };
 });
 
-const B = await (await fetch(`${VIEWER}/api/backend`)).json();
-const L = await (await fetch(`${VIEWER}/api/lineage`)).json();
+const B = await (await authed(`${VIEWER}/api/backend`)).json();
+const L = await (await authed(`${VIEWER}/api/lineage`)).json();
 
 // ── 1. a schema stored across two tables ─────────────────────────────
 {
@@ -72,7 +73,7 @@ const L = await (await fetch(`${VIEWER}/api/lineage`)).json();
 
 // ── 2. a schema that becomes no table says why ───────────────────────
 {
-  const schemas = await (await fetch(`${VIEWER}/api/index`)).json()
+  const schemas = await (await authed(`${VIEWER}/api/index`)).json()
     .then((idx) => idx.nodes.filter((n) => n.type === 'schema'));
   const stored = new Set((B.tables ?? []).map((t) => t.schemaId).filter(Boolean));
   const orphan = schemas.find((s) => !stored.has(s.id));
@@ -87,7 +88,7 @@ const L = await (await fetch(`${VIEWER}/api/lineage`)).json();
 // ── 3. an operation that resolves to tables ──────────────────────────
 {
   const op = (L.operations ?? []).find((o) => (o.writes?.length ?? 0) > 1 && o.service);
-  const node = await (await fetch(`${VIEWER}/api/index`)).json()
+  const node = await (await authed(`${VIEWER}/api/index`)).json()
     .then((idx) => idx.nodes.find((n) => n.type === 'operation' && n.name === op.name));
   const page = await coldAt(node.id);
   const t = await readTrace(page);
@@ -105,7 +106,15 @@ const L = await (await fetch(`${VIEWER}/api/lineage`)).json();
 // ── 4. an unresolved operation is drawn, not dropped ─────────────────
 {
   const op = (L.operations ?? []).find((o) => o.source === 'unresolved');
-  const node = await (await fetch(`${VIEWER}/api/index`)).json()
+  // The package resolved its last unresolved operation — 932 of 932 — so the
+  // fixture this asserts on no longer exists. Skipped and said out loud rather
+  // than crashed on `op.name`, and rather than passed quietly: if an
+  // unresolved operation ever comes back, this starts running again by itself.
+  if (!op) {
+    console.log('SKIP  an unresolved operation is drawn, not dropped '
+      + '— every operation resolves, so there is nothing in this state');
+  } else {
+  const node = await (await authed(`${VIEWER}/api/index`)).json()
     .then((idx) => idx.nodes.find((n) => n.type === 'operation' && n.name === op.name));
   const page = await coldAt(node.id);
   const t = await readTrace(page);
@@ -114,12 +123,13 @@ const L = await (await fetch(`${VIEWER}/api/lineage`)).json();
   check('and does not claim it touches nothing',
     /not a claim that/.test(t.text));
   await page.close();
+  }
 }
 
 // ── 5. the chip opens the table in the Backend layer ─────────────────
 {
   const op = (L.operations ?? []).find((o) => (o.writes?.length ?? 0) > 0);
-  const node = await (await fetch(`${VIEWER}/api/index`)).json()
+  const node = await (await authed(`${VIEWER}/api/index`)).json()
     .then((idx) => idx.nodes.find((n) => n.type === 'operation' && n.name === op.name));
   const page = await coldAt(node.id);
   await page.evaluate(() => document.querySelector('#reader-trace .lineage-table').click());
@@ -135,7 +145,7 @@ const L = await (await fetch(`${VIEWER}/api/lineage`)).json();
 
 // ── 6. a file node draws no trace block at all ───────────────────────
 {
-  const node = await (await fetch(`${VIEWER}/api/index`)).json()
+  const node = await (await authed(`${VIEWER}/api/index`)).json()
     .then((idx) => idx.nodes.find((n) => n.type === 'file'));
   const page = await coldAt(node.id);
   const t = await readTrace(page);

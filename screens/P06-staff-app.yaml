@@ -67,13 +67,16 @@ screens:
     - EMP-048
     inferred: true
     fromFlows: true
+    isEntryPoint: true
   wireframe:
     status: drafted
     owner: wireframe board
     board: wireframes/P06 Staff App.dc.html#emp-001
     designReference: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+    still to be written. **Sign in.** A shared device between shifts shows nothing until somebody identifies
+    themselves. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used
+    none, so every screen in them read as unreachable.
   implementation:
     app: venue-staff-app
     route: /operations/sign-in
@@ -113,6 +116,11 @@ screens:
     purpose: Revoke every session in scope
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: EMP-002
   name: Select venue & role
   module: Operations
@@ -193,6 +201,11 @@ screens:
     purpose: Revoke every session in scope
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: EMP-003
   name: Home — on duty
   module: Operations
@@ -304,6 +317,13 @@ screens:
     purpose: Investigate, escalate or close an incident
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: incidentId
+      from: deepLink
+    - name: shiftId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-048
   name: Opening checklist
   module: Operations
@@ -453,6 +473,11 @@ screens:
     purpose: Suspend a shift so another user can log in
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: EMP-010
   name: Scan — ready
   module: Operations
@@ -637,6 +662,13 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
 - id: EMP-015
   name: Group scan
   module: Operations
@@ -834,6 +866,11 @@ screens:
     purpose: Report that a workstation applied a bundle
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: version
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-004
   name: Task list
   module: Operations
@@ -939,6 +976,11 @@ screens:
     purpose: Supervisor verification
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: workOrderId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-005
   name: Task detail
   module: Operations
@@ -1046,6 +1088,11 @@ screens:
     purpose: Supervisor verification
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: workOrderId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-006
   name: Raise a task
   module: Operations
@@ -1149,6 +1196,11 @@ screens:
     purpose: Supervisor verification
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: workOrderId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-007
   name: Handover notes
   module: Operations
@@ -1206,6 +1258,11 @@ screens:
     purpose: Who has acknowledged, and who has not
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: announcementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-008
   name: Shift summary
   module: Operations
@@ -1297,6 +1354,11 @@ screens:
     purpose: Suspend a shift so another user can log in
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: EMP-019
   name: AI assistant — home
   module: Operations
@@ -1349,6 +1411,12 @@ screens:
     purpose: Ask
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: EMP-020
   name: AI assistant — answer
   module: Operations
@@ -1403,6 +1471,12 @@ screens:
     purpose: A principal's conversation history
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
 - id: EMP-031
   name: Queue monitor
   module: Operations
@@ -1478,6 +1552,11 @@ screens:
     purpose: Amend queue configuration
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: queueId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-032
   name: Manual wait entry
   module: Operations
@@ -1556,6 +1635,11 @@ screens:
     purpose: Amend queue configuration
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: queueId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-033
   name: Capacity view
   module: Operations
@@ -1619,6 +1703,11 @@ screens:
     purpose: Amend an envelope
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: envelopeId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-034
   name: Walk-up sale
   module: Operations
@@ -1754,6 +1843,16 @@ screens:
     purpose: Void an order
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: productId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error. **A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
 - id: EMP-035
   name: Payment on device
   module: Operations
@@ -1811,6 +1910,11 @@ screens:
     purpose: Capture a previously authorised payment
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: paymentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-036
   name: Issue media
   module: Operations
@@ -1865,6 +1969,13 @@ screens:
     purpose: Read an asset with derivatives and usage
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: mediaCode
+      from: deepLink
+    - name: mediaId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-037
   name: Notifications
   module: Operations
@@ -1920,6 +2031,11 @@ screens:
     purpose: Tell staff something
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: announcementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-039
   name: Announcements
   module: Operations
@@ -1976,6 +2092,11 @@ screens:
     purpose: Tell staff something
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: announcementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-047
   name: Emergency mode
   module: Operations
@@ -2031,6 +2152,11 @@ screens:
     purpose: Tell staff something
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: announcementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-050
   name: Post-incident restore
   module: Operations
@@ -2090,6 +2216,11 @@ screens:
     purpose: Investigate, escalate or close an incident
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: incidentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-021
   name: Roster
   module: Operations
@@ -2145,6 +2276,11 @@ screens:
     purpose: Move or cancel an assignment
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: assignmentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-022
   name: My rota
   module: Operations
@@ -2200,6 +2336,11 @@ screens:
     purpose: Move or cancel an assignment
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: assignmentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-023
   name: Swap request
   module: Operations
@@ -2255,6 +2396,11 @@ screens:
     purpose: Move or cancel an assignment
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: assignmentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-024
   name: Clock in / out
   module: Operations
@@ -2307,6 +2453,11 @@ screens:
     purpose: A supervisor corrects a record
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: recordId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-025
   name: Break management
   module: Operations
@@ -2358,6 +2509,11 @@ screens:
     purpose: Who was here
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: recordId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-026
   name: Incident report
   module: Operations
@@ -2420,6 +2576,11 @@ screens:
     purpose: Investigate, escalate or close an incident
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: incidentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-027
   name: Incident detail
   module: Operations
@@ -2479,6 +2640,11 @@ screens:
     purpose: Report an incident
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: incidentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-028
   name: Lost & found
   module: Operations
@@ -2547,6 +2713,11 @@ screens:
     purpose: Assign, reprioritise or resolve a case
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-029
   name: Guest assistance
   module: Operations
@@ -2635,6 +2806,13 @@ screens:
     purpose: Investigate, escalate or close an incident
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    - name: incidentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-030
   name: Venue map
   module: Operations
@@ -2701,6 +2879,13 @@ screens:
     purpose: The map with live operational state on it
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: mapId
+      from: deepLink
+    - name: venueId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-038
   name: Broadcast to team
   module: Operations
@@ -2756,6 +2941,11 @@ screens:
     purpose: What staff have been told
     trigger: onLoad
   density: comfortable
+  entryState:
+    params:
+    - name: announcementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
 - id: EMP-040
   name: Knowledge base
   module: Operations
@@ -2909,6 +3099,11 @@ screens:
     purpose: Revoke every session in scope
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: EMP-043
   name: Device settings
   module: Operations
@@ -2996,6 +3191,11 @@ screens:
     purpose: Amend a guest profile
     trigger: onAction
   density: comfortable
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: EMP-044
   name: Accessibility
   module: Operations

@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 1 |
-| Operations with no screen | 87 |
+| Operations with no screen | 84 |
 | Waves | wave1 11 · wave2 16 · wave3 10 |
 
 ## Gaps
 
-### 87 operations with no screen here
+### 84 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -48,8 +48,6 @@
 | `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
 | `deleteGuestAccount` | identity | DELETE | Self-service account deletion |
 | `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `grantDelegation` | identity | POST | Let one guest act for another |
-| `listDelegations` | identity | GET | Who may act for this guest, and for whom they may act |
 | `resolvePermissions` | identity | POST | Simulate a principal's effective permissions |
 | `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
 | `setSegregationRules` | identity | PUT | Which permissions may not be held together |
@@ -60,7 +58,9 @@
 | `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
 | `exportReportResult` | reporting | POST | Export a completed result |
 | `getReportExecution` | reporting | GET | Execution status and result |
-| … | | | 47 more |
+| `getReportExport` | reporting | GET | Export status and download link |
+| `getReportResult` | reporting | GET | Paged result rows |
+| … | | | 44 more |
 
 ### 1 modules split across waves
 

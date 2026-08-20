@@ -15,7 +15,7 @@
   "contracts": 11,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 140
+  "operationsWithNoScreen": 138
  },
  "waves": {
   "wave1": 7,
@@ -87,7 +87,7 @@
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "assets",
    "operations": 1
   },
   {
@@ -95,7 +95,7 @@
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -234,12 +234,6 @@
     "contract": "catalogue",
     "verb": "POST",
     "summary": "Pause a membership at the guest's request"
-   },
-   {
-    "operation": "getMyMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's own memberships, benefits and history"
    },
    {
     "operation": "importProductCatalogue",
@@ -462,12 +456,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "issueWalletPass",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Generate an Apple or Google wallet pass"
    },
    {
     "operation": "listAbandonedCarts",

@@ -5,28 +5,25 @@
 | | |
 |---|---|
 | Screens | 63 |
-| Operations | 91 |
+| Operations | 97 |
 | Contracts | 16 |
 | Modules | 4 |
 | Undrawn | 2 |
-| Operations with no screen | 27 |
+| Operations with no screen | 22 |
 | Waves | wave1 20 · wave2 27 · wave3 16 |
 
 ## Gaps
 
-### 27 operations with no screen here
+### 22 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `getMyMemberships` | catalogue | GET | A guest's own memberships, benefits and history |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `joinRestaurantWaitlist` | fnb | POST | Add a party to an outlet's waitlist |
 | `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `grantDelegation` | identity | POST | Let one guest act for another |
-| `listDelegations` | identity | GET | Who may act for this guest, and for whom they may act |
 | `createReferral` | marketing-crm | POST | Issue a referral code |
 | `getMyChallenges` | marketing-crm | GET | Active challenges and how far along I am |
 | `getWaiverStatus` | marketing-crm | GET | Whether this guest may be issued a ticket that requires a waiver |
@@ -35,11 +32,9 @@
 | `redeemLoyaltyPoints` | marketing-crm | POST | Spend points |
 | `respondToInvitation` | marketing-crm | POST | Accept or decline |
 | `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `updateMyProfile` | marketing-crm | PATCH | A guest correcting their own details |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `createResaleListing` | orders | POST | List an entitlement for resale |
-| `issueWalletPass` | orders | POST | Generate an Apple or Google wallet pass |
 | `listPaymentTokens` | orders | GET | A guest's saved payment methods |
 | `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
 | `shareEntitlement` | orders | POST | Let somebody else use this, without giving it away |
@@ -73,7 +68,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `GST-001` | Home – Default | TODO | 1 | 1 | yes |
+| `GST-001` | Home – Default | TODO | 1 | 4 | yes |
 | `GST-002` | Explore Categories | TODO | 1 | 1 | yes |
 | `GST-003` | Attractions List | TODO | 1 | 2 | yes |
 | `GST-004` | Attraction Details | TODO | 1 | 3 | yes |
@@ -84,15 +79,15 @@
 | `GST-009` | Review & Payment | TODO | 1 | 5 | yes |
 | `GST-010` | Booking Confirmation | TODO | 1 | 1 | yes |
 | `GST-011` | Wallet Overview | TODO | 2 | 2 | yes |
-| `GST-012` | My Tickets | TODO | 1 | 1 | yes |
-| `GST-013` | Ticket Details | TODO | 1 | 1 | yes |
+| `GST-012` | My Tickets | TODO | 1 | 3 | yes |
+| `GST-013` | Ticket Details | TODO | 1 | 4 | yes |
 | `GST-014` | Ticket Transfer | TODO | 2 | 2 | yes |
-| `GST-015` | Memberships | TODO | 2 | 2 | yes |
+| `GST-015` | Memberships | TODO | 2 | 5 | yes |
 | `GST-016` | My Reservations | TODO | 2 | 3 | yes |
 | `GST-017` | Reservation Details | TODO | 2 | 2 | yes |
-| `GST-018` | Add to Calendar / Reminders | TODO | 3 | 2 | yes |
-| `GST-019` | Order History (Wallet) | TODO | 2 | 1 | yes |
-| `GST-020` | Saved Items / Wishlist | TODO | 3 | 7 | yes |
+| `GST-018` | Add to Calendar / Reminders | TODO | 3 | 3 | yes |
+| `GST-019` | Order History (Wallet) | TODO | 2 | 2 | yes |
+| `GST-020` | Saved Items / Wishlist | TODO | 3 | 3 | yes |
 | `GST-021` | Interactive Map | TODO | 2 | 4 | yes |
 | `GST-022` | Attraction Wait Times | TODO | 2 | 1 | yes |
 | `GST-023` | Virtual Queue / Join Queue | TODO | 3 | 3 | yes |

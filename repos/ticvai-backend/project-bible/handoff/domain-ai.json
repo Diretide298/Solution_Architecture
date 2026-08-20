@@ -886,6 +886,12 @@
    "mentions": 3
   },
   {
+   "file": "docs/active/viewer-update-brief-20aug.md",
+   "title": "Viewer \u2014 what changed in the package on 20 August",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs/adr/0007-hybrid-repository-topology.md",
    "title": "ADR-0007: Hybrid repository topology",
    "status": "Accepted",
@@ -1092,7 +1098,7 @@
   "tables": 48,
   "screens": 22,
   "flows": 3,
-  "documents": 9,
+  "documents": 10,
   "openConflicts": 0
  }
 }

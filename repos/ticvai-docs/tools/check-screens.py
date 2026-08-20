@@ -26,6 +26,8 @@ Run: python3 tools/check-screens.py
 import sys
 from pathlib import Path
 
+import json
+import re
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +50,9 @@ def load_vocabulary() -> tuple[set[str], set[str]]:
     doc = yaml.safe_load((SCREENS / "_components.yaml").read_text(encoding="utf-8"))
     return ({c["kind"] for c in doc.get("components", [])},
             {r["id"] for r in doc.get("regions", [])})
+
+
+OP_PATHS: dict = {}
 
 
 def load_operation_ids() -> set[str]:
@@ -207,6 +212,27 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
         if s.get("density") not in ("compact", "comfortable", "touchLarge"):
             ERRORS.append(f"{name}: {sid} declares no density — a back-office table and a kiosk "
                           "button grid are not one screen at two widths")
+        # **A screen that needs a parameter must say where it comes from.** 280 screens called an
+        # operation with a path parameter on 20 August and not one route declared it — raised as
+        # *screens start abruptly, and what is already loaded is unstated*. `GST-013 Ticket
+        # Details` called `getEntitlement(entitlementId)` on `/general/ticket-details`, so **the
+        # screen could not know which ticket it was showing.**
+        needed: set = set()
+        for api in (s.get("apis") or []):
+            path = OP_PATHS.get(api.get("operationId"), "")
+            needed |= set(re.findall(r"\{([a-zA-Z]+)\}", path))
+        entry = s.get("entryState") or {}
+        declared = {p.get("name") for p in (entry.get("params") or [])}
+        if missing := sorted(needed - declared):
+            ERRORS.append(f"{name}: {sid} calls operations needing {', '.join(missing)} and its "
+                          "entryState declares none — the screen cannot know what it is showing")
+        # A parameter arriving by deep link means the screen is reachable cold, and every one of
+        # those can be opened three weeks late against something expired.
+        if any(p.get("from") == "deepLink" for p in (entry.get("params") or [])):
+            if not entry.get("coldEntry") or str(entry["coldEntry"]).startswith("TODO"):
+                WARNINGS.append(f"{name}: {sid} can be reached cold by deep link and says nothing "
+                                "about what it shows when the target is gone")
+
         if todo := [k for k, v in states.items() if str(v).startswith("TODO")]:
             WARNINGS.append(f"{name}: {sid} has TODO states — {', '.join(todo)}")
         if (s.get("purpose") or "").startswith("TODO"):
@@ -249,6 +275,67 @@ def load_staff_operations() -> set[str]:
 STAFF_OPS: set[str] = set()
 
 
+def check_reachability(files) -> None:
+    """Every screen must be reachable from its platform's entry point.
+
+    **1,421 navigation edges and 110 screens that cannot be reached** — asked about on 20 August,
+    and nothing had checked it. Flows were counted at 45% while the graph they walk was never
+    verified as a graph.
+
+    `P08` is the case: **`BO-001 Queue Directory` is the declared entry point to a 99-screen back
+    office**, it exits to four queue screens, and 93 screens hang off nothing. The back office has
+    no home screen at all — the entry point was inferred, like 91 of its 99 navigation blocks, and
+    inference picked the lowest-numbered screen.
+
+    **`P14` declares no entry point, so all 8 of its screens are unreachable.**
+
+    A warning rather than an error while `navigation.inferred` is still true across the estate:
+    failing here would fail the package for a gap the screens plan already schedules as Phase 2.
+    """
+    scr: dict = {}
+    by_plat: dict = {}
+    for f in files:
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        code = doc["platform"]["code"]
+        by_plat[code] = set()
+        for s in doc["screens"]:
+            scr[s["id"]] = s
+            by_plat[code].add(s["id"])
+
+    out: dict = {}
+    for sid, s in scr.items():
+        nav = s.get("navigation") or {}
+        for t in (nav.get("exitTo") or []):
+            if t in scr:
+                out.setdefault(sid, set()).add(t)
+        for t in (nav.get("entryFrom") or []):
+            if t in scr:
+                out.setdefault(t, set()).add(sid)
+
+    for code, ids in sorted(by_plat.items()):
+        entries = {i for i in ids
+                   if (scr[i].get("navigation") or {}).get("isEntryPoint")}
+        if not entries:
+            WARNINGS.append(f"{code}: no screen declares isEntryPoint — every one of its "
+                            f"{len(ids)} screens is unreachable")
+            continue
+        seen, frontier = set(entries), list(entries)
+        while frontier:
+            nxt = []
+            for t in frontier:
+                for u in out.get(t, set()) & ids:
+                    if u not in seen:
+                        seen.add(u)
+                        nxt.append(u)
+            frontier = nxt
+        stranded = sorted(ids - seen)
+        if stranded:
+            WARNINGS.append(
+                f"{code}: {len(stranded)} screen(s) cannot be reached from "
+                f"{', '.join(sorted(entries))} — {', '.join(stranded[:5])}"
+                + (" …" if len(stranded) > 5 else ""))
+
+
 def main() -> int:
     global STAFF_OPS
     STAFF_OPS = load_staff_operations()
@@ -259,12 +346,18 @@ def main() -> int:
 
     kinds, regions = load_vocabulary()
     ops = load_operation_ids()
+    lin_path = ROOT / "handoff" / "api-data-lineage.json"
+    if lin_path.exists():
+        for oid, v in json.loads(lin_path.read_text(encoding="utf-8")).items():
+            OP_PATHS[oid] = v.get("path", "")
     all_ids = {s["id"] for f in files for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]}
 
     print(f"checking {len(files)} platform(s)")
     print(f"  {len(kinds)} component kinds, {len(regions)} regions, {len(ops)} operationIds\n")
     if not ops:
         WARNINGS.append("contracts not found alongside — operationId checking skipped")
+
+    check_reachability(files)
 
     total = 0
     for f in files:
