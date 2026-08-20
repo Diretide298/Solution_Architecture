@@ -11,30 +11,38 @@
  * price of the gate; the sign-in page is the one place that says so plainly.
  */
 
-// Where the accounts service is, most specific first:
+// Where the accounts service is.
 //
-//   1. `ticvai-api` in localStorage — what the check harnesses set, and the
-//      only one that survives a page the server did not render.
-//   2. `<meta name="ticvai-api">`, written into the page by server.mjs from
-//      TICVAI_API_PUBLIC, for a deployment on some other pair of names.
-//   3. The constant below on a server, localhost:8787 on a workstation.
+// On a server this constant decides, and nothing overrides it. Not a meta tag,
+// not localStorage: an address that can be talked out of being itself is an
+// address that goes wrong quietly, in one browser, on the day nobody is looking
+// for it. There is one deployment and this is where its accounts service is.
 //
+// No trailing /api — every path below already starts with one, and call() joins
+// them as `${API}${path}`, so a base ending in /api asks for /api/api/....
+const API_DEPLOYED = 'https://atlasapi.ainfinite.ai';
+
+// A workstation is the exception, and only a workstation: there the two halves
+// are on separate ports on this machine and the deployed address is the wrong
+// answer. The overrides live here — `ticvai-api` in localStorage is what the
+// check harnesses set, and the meta tag is there for a second deployment on
+// some other pair of names.
+const workstation = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const API = workstation
+  ? (localStorage.getItem('ticvai-api')
+     ?? document.querySelector('meta[name="ticvai-api"]')?.content?.trim()
+     ?? 'http://localhost:8787')
+  : API_DEPLOYED;
+
 // This is only ever the *accounts* service — auth, invites, verdicts, mentions.
 // The reading server owns /api/index, /api/session, /api/tooltips, /api/domains
 // and the rest of the package, which are same-origin and never come here. A
-// proxy that sends all of /api to the accounts service 404s every one of them.
+// proxy — or a router pattern — that sends those to the accounts service 404s
+// every one of them.
 //
 // Cross-origin in every arrangement: calls carry credentials: 'include' so the
 // session cookie rides along, which is also why the service can never allow "*"
 // and why the cookie needs a domain both names sit under.
-// The deployed address of the accounts service. No trailing /api: every path
-// below already starts with one, and call() joins them as `${API}${path}`.
-const API_DEPLOYED = 'https://atlasapi.ainfinite.ai';
-
-const declared = document.querySelector('meta[name="ticvai-api"]')?.content?.trim();
-const workstation = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-const API = localStorage.getItem('ticvai-api')
-  ?? (declared || (workstation ? 'http://localhost:8787' : API_DEPLOYED));
 
 /** What a *review* can say. Three values, unchanged: this is somebody judging
  *  an artefact, and the vocabulary for answering one lives below. */
