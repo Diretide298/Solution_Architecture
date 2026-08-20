@@ -31,6 +31,35 @@ VIEWER_PORT="${VIEWER_PORT:-4173}"
 API_PORT="${API_PORT:-8787}"
 ADMIN_EMAIL=""
 
+# ── the deployed names ───────────────────────────────────────────────
+#
+# Three settings that only matter once this is on real names behind TLS, and
+# that all three have to agree with each other. They live here rather than being
+# typed into ecosystem.config.cjs because this script *generates* that file: a
+# value added there by hand survives until the next deploy and then vanishes,
+# which is a bug that arrives days later wearing the costume of something else.
+#
+# PUBLIC_ORIGIN   where a browser loads the front end. The accounts service must
+#                 name it to allow a credentialed cross-origin call, and it can
+#                 never be "*" — a browser refuses "*" alongside credentials.
+#
+# COOKIE_DOMAIN   the parent both names sit under, with the leading dot. This is
+#                 what lets one session cookie be seen by the front end and the
+#                 API alike. Without it the cookie is host-only to whichever
+#                 name issued it, the reading server's gate never sees one, and
+#                 signing in bounces straight back to the sign-in door in a loop
+#                 that looks, from the outside, like the page refreshing itself.
+#                 Set it to the shared parent and no higher: a domain cookie is
+#                 sent to every host beneath it.
+#
+# SECURE_COOKIE   1 once there is a certificate. Set it before there is one and
+#                 the cookie is never sent at all.
+#
+# Empty is the workstation default: host-only cookie, no extra origin, no Secure.
+PUBLIC_ORIGIN="${PUBLIC_ORIGIN:-https://atlas.ainfinite.ai}"
+COOKIE_DOMAIN="${COOKIE_DOMAIN:-.ainfinite.ai}"
+SECURE_COOKIE="${SECURE_COOKIE:-1}"
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --admin) ADMIN_EMAIL="${2:-}"; shift 2 ;;

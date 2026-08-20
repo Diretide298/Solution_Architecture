@@ -76,25 +76,71 @@ export function isPublic(pathname) {
 }
 
 export function readCookie(header, name = COOKIE) {
-  if (!header) return null;
+  return readCookies(header, name)[0] ?? null;
+}
+
+/**
+ * Every value sent under one cookie name, in the order the browser sent them.
+ *
+ * There is normally one. There are two for anybody who signed in while the
+ * front end and the accounts service shared an origin and has signed in again
+ * since they stopped: the old cookie is host-only to the front end's name, the
+ * new one is scoped to the parent domain, both are called `ticvai_session`, and
+ * a browser sends both. Cookies carry no attributes on the way back, so the two
+ * are indistinguishable here — the header is `ticvai_session=a; ticvai_session=b`
+ * and nothing in it says which is which.
+ *
+ * Taking the first was the bug. The browser sends the older one first, so the
+ * stale value won every time, the gate called a signed-in reader a stranger and
+ * sent them to the sign-in door, which asked the accounts service — reachable
+ * on the *other* name, where only the good cookie applies — was told yes, and
+ * sent them back. Neither half was wrong on its own.
+ */
+export function readCookies(header, name = COOKIE) {
+  if (!header) return [];
+  const out = [];
   for (const part of header.split(';')) {
     const at = part.indexOf('=');
     if (at < 0) continue;
-    if (part.slice(0, at).trim() === name) return decodeURIComponent(part.slice(at + 1).trim());
+    if (part.slice(0, at).trim() === name) out.push(decodeURIComponent(part.slice(at + 1).trim()));
+  }
+  return out;
+}
+
+/**
+ * Deletes a host-only `ticvai_session` — no Domain attribute, so it matches the
+ * cookie the front end's own name once set and leaves the parent-domain one
+ * alone. Sent when a request arrives holding a token that resolves to nobody,
+ * which is exactly the shape of the stale duplicate above.
+ *
+ * Path and name must match the cookie being deleted or the browser keeps it.
+ */
+const CLEAR_STALE = `${COOKIE}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`;
+
+/**
+ * Resolves the account behind a request, or null.
+ *
+ * Every `ticvai_session` on the request is tried, not just the first, and the
+ * first one that names somebody wins. One dead cookie sitting in front of a
+ * live one is a transitional state with a long tail — it lasts until the reader
+ * clears it, and a reader who cannot get in cannot be told to — so this stops
+ * depending on the order the browser happens to send them in.
+ *
+ * Ordinary requests carry one cookie and cost one call, unchanged.
+ */
+export async function whoIs(req, apiBase) {
+  for (const token of readCookies(req.headers.cookie)) {
+    const account = await resolveToken(token, apiBase);
+    if (account) return account;
   }
   return null;
 }
 
 /**
- * Resolves the account behind a request, or null.
- *
  * `apiBase` is where the accounts service lives — same host in every
  * deployment, so this is a loopback call and not a trip over the network.
  */
-export async function whoIs(req, apiBase) {
-  const token = readCookie(req.headers.cookie);
-  if (!token) return null;
-
+async function resolveToken(token, apiBase) {
   const hit = cache.get(token);
   if (hit && hit.until > Date.now()) return hit.account;
 
@@ -139,12 +185,20 @@ export async function gate(req, res, url, apiBase) {
   const account = await whoIs(req, apiBase);
   if (account) return { answered: false, role: account.role ?? 'reviewer' };
 
+  // A token that names nobody is worth taking off the reader on the way past.
+  // It is either expired, revoked or the stale host-only duplicate described
+  // above, and in every one of those cases the browser is holding something it
+  // will keep presenting forever otherwise. Only sent when there was one to
+  // begin with, so an ordinary signed-out visitor gets no Set-Cookie at all.
+  const stale = readCookies(req.headers.cookie).length > 0;
+  const headers = { 'Cache-Control': 'no-store', ...(stale ? { 'Set-Cookie': CLEAR_STALE } : {}) };
+
   if (url.pathname.startsWith('/api/')) {
-    res.writeHead(401, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+    res.writeHead(401, { ...headers, 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'not signed in' }));
     return { answered: true, role: null };
   }
-  res.writeHead(302, { Location: '/login.html', 'Cache-Control': 'no-store' });
+  res.writeHead(302, { ...headers, Location: '/login.html' });
   res.end();
   return { answered: true, role: null };
 }
