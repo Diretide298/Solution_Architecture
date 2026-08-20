@@ -11,6 +11,7 @@ import {
   hue, markdownBlock,
 } from './core.js';
 import { tip, tipFor } from './tips.js';
+import { apiFetch } from './validation.js';
 // The router. A layer may reach the router; the router may not reach into a
 // layer's internals — it only calls the render function below.
 import { setMode } from './app.js';
@@ -289,7 +290,7 @@ export async function openDoc(file) {
   const source = $('reader-source');
   source.textContent = 'Loading…';
   try {
-    const text = await fetch(`/api/file?path=${encodeURIComponent(file)}`).then((r) => {
+    const text = await apiFetch(`/api/file?path=${encodeURIComponent(file)}`).then((r) => {
       if (!r.ok) throw new Error(String(r.status));
       return r.text();
     });
@@ -850,7 +851,7 @@ export async function renderDecision() {
   prose.textContent = 'Loading…';
   body.append(prose);
   try {
-    const text = await fetch(`/api/file?path=${encodeURIComponent(adr.file)}`).then((r) => {
+    const text = await apiFetch(`/api/file?path=${encodeURIComponent(adr.file)}`).then((r) => {
       if (!r.ok) throw new Error(String(r.status));
       return r.text();
     });

@@ -75,6 +75,28 @@ export const RESPONSES = [
 export const ASKS_FOR_WORK = new Set(['needs-work', 'rejected']);
 export const asksForWork = (verdict) => ASKS_FOR_WORK.has(verdict);
 
+/**
+ * The delivery package, read through the same address as everything else.
+ *
+ * These are the reading server's own routes — /api/index, /api/detail,
+ * /api/tooltips and the ten others that parse the contracts off disk. They are
+ * answered by the node process, not by the accounts service, and they are here
+ * only so that one name in front of a browser means one API: the deployment
+ * puts both behind the API host and sends these thirteen paths on to :4173.
+ *
+ * Two things that a same-origin fetch got for free and this does not:
+ *
+ *   credentials — the reading server gates every one of these on the session
+ *     cookie, and a cross-origin fetch sends no cookie unless asked to.
+ *   the absolute base — a bare '/api/index' would resolve against the page,
+ *     which is the front end, which does not answer it.
+ *
+ * apiUrl() is the same join without the fetch, for the two places that cannot
+ * use one: an EventSource, and an anchor the reader clicks.
+ */
+export const apiUrl = (path) => `${API}${path}`;
+export const apiFetch = (path, init) => fetch(`${API}${path}`, { credentials: 'include', ...init });
+
 /** Cached so every verdict block on a page does not ask again. */
 let session = { signedIn: false, account: null, reachable: true };
 const listeners = new Set();

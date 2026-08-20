@@ -585,7 +585,7 @@ function ensureDetail(file) {
   if (!file || state.detailLoaded.has(file)) return Promise.resolve();
   if (detailInFlight.has(file)) return detailInFlight.get(file);
 
-  const request = fetch(`/pkg/detail?file=${encodeURIComponent(file)}`)
+  const request = auth.apiFetch(`/api/detail?file=${encodeURIComponent(file)}`)
     .then((r) => r.json())
     .catch(() => null)
     .then((detail) => {
@@ -674,14 +674,14 @@ async function loadIndex() {
   // Who this is, and what they may open. First, because it decides which tabs
   // are drawn — and a client asking for a layer they cannot have would be met
   // with a 403 rather than a view.
-  state.session = await fetch('/pkg/session').then((r) => r.json()).catch(() => null);
+  state.session = await auth.apiFetch('/api/session').then((r) => r.json()).catch(() => null);
   if (state.session?.layers && !state.session.layers.includes(state.layer)) {
     state.layer = state.session.layers[0];
   }
 
   // The index is the one part nothing can be drawn without: the tree, the
   // graph and every selection resolve against it.
-  const index = await fetch('/pkg/index').then((r) => r.json());
+  const index = await auth.apiFetch('/api/index').then((r) => r.json());
   state.index = index;
   state.journeys = null;
   state.backend = null;
@@ -690,12 +690,12 @@ async function loadIndex() {
   state.decisions = null;
 
   // Small, and read by every layer's hover text, so it is not worth deferring.
-  state.tooltips = await fetch('/pkg/tooltips').then((r) => r.json()).catch(() => null);
+  state.tooltips = await auth.apiFetch('/api/tooltips').then((r) => r.json()).catch(() => null);
 
   // The domain lenses. Every layer's tree marks its members, so this cannot be
   // a per-layer part — and at 3 KB gzipped it does not want to be. `byArtefact`
   // is already keyed `kind:id`, which is what a tree row asks with.
-  state.domains = await fetch('/pkg/domains').then((r) => r.json()).catch(() => null);
+  state.domains = await auth.apiFetch('/api/domains').then((r) => r.json()).catch(() => null);
   state.lensOf = new Map(Object.entries(state.domains?.byArtefact ?? {}));
   state.lensById = new Map((state.domains?.lenses ?? []).map((l) => [l.key, l]));
   // A contract file is not itself a lens member; its operations are. Rolling
@@ -1818,7 +1818,7 @@ function describeTreeNode(node) {
 
 async function fetchTree(relPath) {
   if (state.treeCache.has(relPath)) return state.treeCache.get(relPath);
-  const res = await fetch(`/pkg/tree?path=${encodeURIComponent(relPath)}`);
+  const res = await auth.apiFetch(`/api/tree?path=${encodeURIComponent(relPath)}`);
   const data = await res.json();
   state.treeCache.set(relPath, data);
   return data;
@@ -2132,7 +2132,7 @@ function renderER({ focus } = {}) {
 
 async function loadJourneys() {
   if (state.journeys) return state.journeys;
-  const res = await fetch('/pkg/journeys');
+  const res = await auth.apiFetch('/api/journeys');
   state.journeys = await res.json();
   return state.journeys;
 }
@@ -6292,7 +6292,7 @@ function markPermissions(text) {
 
 async function fetchFile(relPath) {
   if (state.fileCache.has(relPath)) return state.fileCache.get(relPath);
-  const res = await fetch(`/pkg/file?path=${encodeURIComponent(relPath)}`);
+  const res = await auth.apiFetch(`/api/file?path=${encodeURIComponent(relPath)}`);
   const text = await res.text();
   state.fileCache.set(relPath, text);
   return text;
@@ -6521,7 +6521,7 @@ function markMatch(text, needle) {
 
 // ── live reload ──────────────────────────────────────────────────────
 function connectLiveReload() {
-  const source = new EventSource('/pkg/events');
+  const source = new EventSource(auth.apiUrl('/api/events'), { withCredentials: true });
   const dot = $('live-dot');
 
   // the server process this page was served by

@@ -48,6 +48,21 @@ const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
  * same in all of them. Trailing slash trimmed: validation.js joins it to paths
  * that already start with one.
  */
+/**
+ * Which origins may read the package across an origin boundary.
+ *
+ * The deployed front end, and the two workstation spellings — localhost and
+ * 127.0.0.1 are different origins to a browser, and a check harness that runs
+ * against one while a person reads the other is a confusing afternoon.
+ * TICVAI_ORIGINS adds to it, the same variable and the same spelling the
+ * accounts service uses, so the two halves are configured once.
+ */
+const ALLOWED_ORIGINS = new Set([
+  'https://atlas.ainfinite.ai',
+  'http://localhost:4173', 'http://127.0.0.1:4173',
+  ...(process.env.TICVAI_ORIGINS ?? '').split(',').map((o) => o.trim()).filter(Boolean),
+]);
+
 const API_PUBLIC = (process.env.TICVAI_API_PUBLIC ?? '').trim().replace(/\/+$/, '');
 const API_META = API_PUBLIC
   ? `<meta name="ticvai-api" content="${API_PUBLIC.replace(/"/g, '&quot;')}" />`
@@ -400,17 +415,32 @@ function sendCachedJson(res, req, key, value) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  // /pkg/… is /api/… under another name, and the reason it exists is a proxy
-  // in front of this process that forwards everything matching /api/ to the
-  // accounts service. The thirteen routes below are answered here and exist
-  // nowhere else, so that rule does not redirect them, it deletes them — a 404
-  // carrying FastAPI's `{"detail":"Not Found"}` from a route this file defines.
+  // The deployment gives the browser one API host and sends the thirteen paths
+  // this process owns on to it, so requests for the package now arrive from the
+  // front end's origin rather than from this one. That makes them cross-origin,
+  // and a cross-origin read of a gated route needs three things said out loud:
+  // the origin is allowed, credentials are allowed, and — because these carry a
+  // cookie — the allowed origin is named rather than "*", which a browser
+  // refuses to accept alongside credentials.
   //
-  // A prefix the rule does not match walks past it. Rewritten this early so the
-  // gate and every handler downstream go on seeing /api/ and none of them have
-  // to know: both names work, and the day the proxy rule is corrected nothing
-  // here needs undoing.
-  if (url.pathname.startsWith('/pkg/')) url.pathname = `/api/${url.pathname.slice(5)}`;
+  // Named here rather than reflected back: reflecting whatever arrives is the
+  // same as allowing everyone, and the package is the thing behind the gate.
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Vary', 'Origin');
+  }
+  // The preflight. It never reaches the gate: a browser sends it without the
+  // cookie by definition, so gating it would 401 every request that follows.
+  if (req.method === 'OPTIONS') {
+    res.writeHead(origin && ALLOWED_ORIGINS.has(origin) ? 204 : 403, {
+      'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '600',
+    });
+    return res.end();
+  }
 
   try {
     // --- the accounts service, on this origin -------------------------------

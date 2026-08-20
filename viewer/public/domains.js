@@ -39,6 +39,7 @@
  */
 
 import '/theme.js';   // the saved day/night choice, before anything paints
+import * as auth from '/validation.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -103,7 +104,10 @@ const state = {
 // ── reading ──────────────────────────────────────────────────────────
 
 async function json(path) {
-  const res = await fetch(path);
+  // Every caller passes a /api/… path the reading server owns, and the reading
+  // server is behind the API host now, so this joins the base and carries the
+  // session cookie across the origin.
+  const res = await auth.apiFetch(path);
   if (!res.ok) throw new Error(`${path} answered ${res.status}`);
   return res.json();
 }
@@ -148,7 +152,7 @@ async function loadProse(lens, ctx) {
     (lens.byKind.operation ?? []).map((o) => o.file).filter(Boolean)
   )];
   const parts = await Promise.all(files.map((f) =>
-    json(`/pkg/detail?file=${encodeURIComponent(f)}`).catch(() => ({}))
+    json(`/api/detail?file=${encodeURIComponent(f)}`).catch(() => ({}))
   ));
   for (const part of parts) {
     for (const [key, value] of Object.entries(part)) {
@@ -669,7 +673,7 @@ function renderMembers(lens) {
     for (const doc of lens.docs) {
       const row = el('div', 'member-row member-doc');
       const link = el('a', 'member-id', doc);
-      link.href = `/pkg/file?path=${encodeURIComponent(doc)}`;
+      link.href = `${auth.apiUrl('')}/api/file?path=${encodeURIComponent(doc)}`;
       link.target = '_blank';
       link.rel = 'noopener';
       row.append(link);
@@ -877,11 +881,11 @@ function fail(message) {
 
   try {
     const [domains, index, journeys, lineage, domain] = await Promise.all([
-      json('/pkg/domains'),
-      json('/pkg/index'),
-      json('/pkg/journeys'),
-      json('/pkg/lineage'),
-      json('/pkg/domain'),
+      json('/api/domains'),
+      json('/api/index'),
+      json('/api/journeys'),
+      json('/api/lineage'),
+      json('/api/domain'),
     ]);
 
     state.lenses = (domains.lenses ?? []).filter((l) => l.stats.total > 0);
