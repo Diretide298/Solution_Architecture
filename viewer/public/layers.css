@@ -1981,31 +1981,38 @@ textarea.rt-sendback-note {
   color: #6aa7ff;
 }
 
-/* ── the bell ─────────────────────────────────────────────────────────
+/* ── the bell ────────────────────────────────────────
    Its own control beside the account button. Being named is something
    that happened to you; who you are signed in as is not, and the two
    want different actions behind them. */
-.bell-toggle { position: relative; }
-.icon-bell {
-  font-size: 15px;
-  line-height: 1;
-  opacity: 0.75;
+.bell-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.bell-toggle:hover .icon-bell { opacity: 1; }
-.bell-toggle.has-mentions .icon-bell { opacity: 1; color: #6aa7ff; }
+.icon-bell {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+.bell-toggle.has-mentions { color: var(--accent, #6aa7ff); border-color: var(--accent, #6aa7ff); }
 
+/* Sits on the corner of the button rather than inside it: the count is about
+   the bell, and one drawn within a 26px square leaves no room for the bell. */
 .bell-count {
   position: absolute;
-  top: 1px;
-  right: 0;
-  min-width: 15px;
+  top: -5px;
+  right: -5px;
+  min-width: 14px;
+  height: 14px;
   padding: 0 3px;
   border-radius: 999px;
-  background: #6aa7ff;
-  color: #0d0f14;
-  font-size: 10px;
+  background: var(--accent, #6aa7ff);
+  color: #0b0d12;
+  font-size: 9.5px;
   font-weight: 700;
-  line-height: 15px;
+  line-height: 14px;
   text-align: center;
   box-shadow: 0 0 0 2px var(--bg, #0d0f14);
 }
