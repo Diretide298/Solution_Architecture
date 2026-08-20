@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 35
+  x-ticvai-screen-count: 38
   x-ticvai-tier: spine
   x-ticvai-module: "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth"
   x-ticvai-requirements: 107
@@ -141,6 +141,66 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429': { $ref: '../shared/common.yaml#/components/responses/TooManyRequests' }
 
+  /auth/guest/verify-email:
+    post:
+      operationId: verifyGuestEmail
+      x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
+      summary: Send a verification link, or consume one
+      description: >
+        **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies the
+        address on it — and **a guest account with an unverified email can receive somebody else's
+        tickets**, because a transfer is offered to an address.
+
+        Two modes on one operation: **`send` issues a single-use token; `confirm` consumes it.** One
+        operation because they are one act with two halves, and splitting them invites a `confirm`
+        that works without a `send`.
+
+        **Unverified accounts still buy.** Blocking purchase on verification loses the sale and
+        teaches nobody — what an unverified account cannot do is *receive a transfer* or *reset a
+        password*, which are the two paths that matter.
+      tags: [identity]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest, anonymous]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode]
+              properties:
+                mode: { type: string, enum: [send, confirm] }
+                token:
+                  type: string
+                  nullable: true
+                  description: >
+                    For `confirm`. **Single use and short-lived** — a verification link that works
+                    forever is a verification link in an old inbox.
+      responses:
+        '200':
+          description: Sent, or verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isVerified: { type: boolean }
+                  expiresAt: { type: string, format: date-time, nullable: true }
+        '410':
+          description: >
+            **The token expired or was already used.** Distinct from an invalid one — a guest who
+            clicked an old link should be offered a new one rather than told they are wrong.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /password-policy:
     put:
       operationId: setPasswordPolicy
@@ -265,6 +325,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listDelegations
+      x-ticvai-consumed-by:
+        - "P02 GST-015 Memberships"
       summary: Who may act for this guest, and for whom they may act
       description: >
         CF-132. **Both directions, because a guest is usually in both.** A parent holds authority
@@ -290,6 +352,8 @@ paths:
 
     post:
       operationId: grantDelegation
+      x-ticvai-consumed-by:
+        - "P02 GST-015 Memberships"
       summary: Let one guest act for another
       description: >
         CF-132, CL-05. **A portfolio is delegated authority, not a household table.**

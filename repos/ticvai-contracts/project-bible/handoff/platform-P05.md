@@ -9,19 +9,18 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 3 |
-| Operations with no screen | 23 |
+| Operations with no screen | 20 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-### 23 operations with no screen here
+### 20 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `getMyMemberships` | catalogue | GET | A guest's own memberships, benefits and history |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `joinRestaurantWaitlist` | fnb | POST | Add a party to an outlet's waitlist |
 | `createReferral` | marketing-crm | POST | Issue a referral code |
@@ -32,11 +31,9 @@
 | `redeemLoyaltyPoints` | marketing-crm | POST | Spend points |
 | `respondToInvitation` | marketing-crm | POST | Accept or decline |
 | `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `updateMyProfile` | marketing-crm | PATCH | A guest correcting their own details |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `createResaleListing` | orders | POST | List an entitlement for resale |
-| `issueWalletPass` | orders | POST | Generate an Apple or Google wallet pass |
 | `listPaymentTokens` | orders | GET | A guest's saved payment methods |
 | `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
 | `shareEntitlement` | orders | POST | Let somebody else use this, without giving it away |

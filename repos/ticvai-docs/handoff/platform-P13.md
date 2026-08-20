@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 118 |
+| Operations with no screen | 115 |
 | Waves | wave2 20 |
 
 ## Gaps
 
-### 118 operations with no screen here
+### 115 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -45,8 +45,6 @@
 | `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
 | `deleteGuestAccount` | identity | DELETE | Self-service account deletion |
 | `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `grantDelegation` | identity | POST | Let one guest act for another |
-| `listDelegations` | identity | GET | Who may act for this guest, and for whom they may act |
 | `resolvePermissions` | identity | POST | Simulate a principal's effective permissions |
 | `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
 | `setSegregationRules` | identity | PUT | Which permissions may not be held together |
@@ -60,7 +58,9 @@
 | `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
 | `createReferral` | marketing-crm | POST | Issue a referral code |
 | `createSegment` | marketing-crm | POST | Create a segment |
-| … | | | 78 more |
+| `createUrlRedirect` | marketing-crm | POST | 301, 302 and custom redirects |
+| `getJourneyPerformance` | marketing-crm | GET | Entrants, completions, goals reached |
+| … | | | 75 more |
 
 ## Modules
 

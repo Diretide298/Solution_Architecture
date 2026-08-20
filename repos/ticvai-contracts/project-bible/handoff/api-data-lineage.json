@@ -21908,5 +21908,136 @@
   "audience": [
    "staff"
   ]
+ },
+ "listMyEntitlements": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/guests/me/entitlements",
+  "reads": [
+   "access.entitlement",
+   "catalogue.entitlement_template",
+   "catalogue.product",
+   "identity.grant"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": true,
+  "summary": "Every ticket, pass and membership this guest holds",
+  "source": "hand-mapped",
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ],
+  "audience": [
+   "staff",
+   "guest"
+  ]
+ },
+ "getEntitlement": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/entitlements/{entitlementId}",
+  "reads": [
+   "access.entitlement",
+   "catalogue.entitlement_template",
+   "identity.grant"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": true,
+  "summary": "One entitlement, with what remains on it",
+  "source": "hand-mapped",
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ],
+  "audience": [
+   "staff",
+   "guest"
+  ]
+ },
+ "getEntitlementCredential": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/entitlements/{entitlementId}/credential",
+  "reads": [
+   "access.entitlement"
+  ],
+  "writes": [
+   "access.entitlement"
+  ],
+  "routing": "",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "The thing that gets scanned",
+  "source": "hand-mapped",
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ],
+  "audience": [
+   "staff",
+   "guest"
+  ]
+ },
+ "getEntitlementHistory": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/entitlements/{entitlementId}/history",
+  "reads": [
+   "access.entitlement",
+   "access.scan_event"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "Every scan, freeze, share and reissue against it",
+  "source": "hand-mapped",
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ],
+  "audience": [
+   "staff",
+   "guest"
+  ]
+ },
+ "verifyGuestEmail": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/auth/guest/verify-email",
+  "reads": [
+   "cache:idempotency",
+   "identity.otp_challenge",
+   "pii.subject"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.otp_challenge",
+   "marketing.message_dispatch",
+   "pii.subject"
+  ],
+  "routing": "",
+  "scope": "tenant",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Send a verification link, or consume one",
+  "source": "hand-mapped",
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "audience": [
+   "guest",
+   "anonymous"
+  ]
  }
 }

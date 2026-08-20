@@ -20,6 +20,7 @@ packages:
 - ui
 - api-client
 contracts:
+- access
 - catalogue
 - finance
 - identity

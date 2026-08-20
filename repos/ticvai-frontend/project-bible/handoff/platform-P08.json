@@ -15,7 +15,7 @@
   "contracts": 23,
   "modules": 8,
   "undrawn": 26,
-  "operationsWithNoScreen": 244
+  "operationsWithNoScreen": 240
  },
  "waves": {
   "wave1": 45,
@@ -152,11 +152,11 @@
    "operations": 9
   },
   {
-   "contract": "reporting",
+   "contract": "retail",
    "operations": 8
   },
   {
-   "contract": "retail",
+   "contract": "reporting",
    "operations": 8
   },
   {
@@ -172,11 +172,11 @@
    "operations": 4
   },
   {
-   "contract": "assets",
+   "contract": "seating",
    "operations": 2
   },
   {
-   "contract": "seating",
+   "contract": "assets",
    "operations": 2
   }
  ],
@@ -1220,12 +1220,6 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "getMyMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's own memberships, benefits and history"
-   },
-   {
     "operation": "importProductCatalogue",
     "contract": "catalogue",
     "verb": "POST",
@@ -1544,18 +1538,6 @@
     "summary": "Everything the platform holds about one guest"
    },
    {
-    "operation": "grantDelegation",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Let one guest act for another"
-   },
-   {
-    "operation": "listDelegations",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Who may act for this guest, and for whom they may act"
-   },
-   {
     "operation": "resolvePermissions",
     "contract": "identity",
     "verb": "POST",
@@ -1860,12 +1842,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "issueWalletPass",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Generate an Apple or Google wallet pass"
    },
    {
     "operation": "listAbandonedCarts",

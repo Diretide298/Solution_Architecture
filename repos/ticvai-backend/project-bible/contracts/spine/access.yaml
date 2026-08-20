@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 23
+  x-ticvai-screen-count: 27
   x-ticvai-tier: spine
   x-ticvai-module: "3 — Admission and Access"
   x-ticvai-requirements: 201
@@ -165,6 +165,183 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guests/me/entitlements:
+    get:
+      operationId: listMyEntitlements
+      x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P02 GST-001 Home – Default"
+        - "P02 GST-012 My Tickets"
+      summary: Every ticket, pass and membership this guest holds
+      description: >
+        **Raised in review by Pranay and Deep, independently, on four screens.** `GST-012 My
+        Tickets`, `GST-013 Ticket Details`, `GST-019 Order History` and `WEB-018` each declared one
+        operation — `transferOrderTickets` — so **a guest could give a ticket away and could not
+        read it.**
+
+        `getMediaEntitlements` and `lookupTicket` both exist and are both staff-only. **The read
+        surface a guest needs was never built**, which only became visible once `access.entitlement`
+        existed at all.
+
+        **Grouped by validity, not by purchase date.** A guest opening this at a gate wants what
+        works today at the top; the order they bought things in is the operator's question.
+      tags: [access]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: state
+          in: query
+          schema: { type: string, enum: [usableNow, upcoming, expired, all], default: usableNow }
+        - name: includeShared
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: >
+            **Entitlements shared with this guest by somebody else** (`shareEntitlement`). Shown by
+            default and marked as shared — **a guest who cannot see a pass shared with them will ask
+            for it again.**
+      responses:
+        '200':
+          description: Entitlements
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Entitlement' }
+
+  /entitlements/{entitlementId}:
+    parameters:
+      - name: entitlementId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getEntitlement
+      x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P02 GST-012 My Tickets"
+        - "P02 GST-013 Ticket Details"
+      summary: One entitlement, with what remains on it
+      description: >
+        **Entries used against entries allowed, and the validity after any freeze.** A guest looking
+        at a ten-entry pass wants the number left, and until `access.entitlement` existed nothing
+        counted.
+
+        **A guest may read their own and one shared with them, and nothing else.** The share is
+        one-way: the recipient sees the entitlement and not the owner's other entitlements.
+      tags: [access]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The entitlement
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Entitlement' }
+        '404':
+          description: >
+            **Not found and not permitted return the same response.** A distinct *"exists but not
+            yours"* tells anybody with an id whether it is real.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /entitlements/{entitlementId}/credential:
+    parameters:
+      - name: entitlementId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getEntitlementCredential
+      x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P02 GST-013 Ticket Details"
+      summary: The thing that gets scanned
+      description: >
+        The QR payload, wallet pass reference or wristband serial. **Separated from `getEntitlement`
+        because it is the sensitive half** — a list of a guest's tickets is a convenience, and the
+        credential admits somebody.
+
+        **Rotates without reissuing.** A guest whose phone was stolen gets a new payload against the
+        same entitlement, and the old one stops scanning.
+      tags: [access]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: rotate
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Credential
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mediaCode: { type: string }
+                  payload: { type: string }
+                  expiresAt: { type: string, format: date-time, nullable: true }
+
+  /entitlements/{entitlementId}/history:
+    parameters:
+      - name: entitlementId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getEntitlementHistory
+      x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P02 GST-013 Ticket Details"
+      summary: Every scan, freeze, share and reissue against it
+      description: >
+        **The screen a support agent opens when a guest says it did not work.** Scans with their
+        outcome and deny reason, freezes with their dates, shares, reissues and the chain back
+        through `supersedesEntitlementId`.
+
+        **A guest sees their own history too**, because *"it says I already used it"* is answered by
+        showing them when.
+      tags: [access]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: History, most recent first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    at: { type: string, format: date-time }
+                    kind: { type: string, enum: [issued, scanned, denied, frozen, unfrozen, shared, unshared, reissued, transferred, suspended, reinstated] }
+                    accessPointName: { type: string, nullable: true }
+                    denyReason: { type: string, nullable: true }
+                    byPrincipalName: { type: string, nullable: true }
 
   /face-pass/enrolments:
     post:

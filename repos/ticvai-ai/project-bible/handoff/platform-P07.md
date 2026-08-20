@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 53 |
+| Operations with no screen | 50 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 53 operations with no screen here
+### 50 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -37,8 +37,6 @@
 | `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
 | `deleteGuestAccount` | identity | DELETE | Self-service account deletion |
 | `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `grantDelegation` | identity | POST | Let one guest act for another |
-| `listDelegations` | identity | GET | Who may act for this guest, and for whom they may act |
 | `resolvePermissions` | identity | POST | Simulate a principal's effective permissions |
 | `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
 | `setSegregationRules` | identity | PUT | Which permissions may not be held together |
@@ -51,7 +49,6 @@
 | `createReservation` | orders | POST | Hold without payment |
 | `extendReservation` | orders | POST | Extend a reservation |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
-| `issueWalletPass` | orders | POST | Generate an Apple or Google wallet pass |
 | `listAbandonedCarts` | orders | GET | Carts that lapsed without checking out |
 | `listChargebacks` | orders | GET | Open disputes, by deadline |
 | `listInvitationAllowances` | orders | GET | Who may issue comps, and how many are left |
@@ -60,7 +57,10 @@
 | `openGuestCreditAccount` | orders | POST | A credit limit for an individual booking ahead |
 | `printTicketProof` | orders | POST | Print a sample without selling anything |
 | `pushWalletPassUpdate` | orders | POST | Push a change to every device holding it |
-| … | | | 13 more |
+| `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
+| `reissueEntitlement` | orders | POST | Zero-value reissue of an expired entitlement for a later date |
+| `respondToChargeback` | orders | POST | Submit evidence, or accept the loss |
+| … | | | 10 more |
 
 ## Modules
 

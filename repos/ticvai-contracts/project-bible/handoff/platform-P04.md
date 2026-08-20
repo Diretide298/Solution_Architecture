@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 140 |
+| Operations with no screen | 138 |
 | Waves | wave1 7 · wave2 3 |
 
 ## Gaps
 
-### 140 operations with no screen here
+### 138 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -27,7 +27,6 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `getMyMemberships` | catalogue | GET | A guest's own memberships, benefits and history |
 | `importProductCatalogue` | catalogue | POST | Parse a catalogue file into a preview |
 | `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
 | `leaveWaitlist` | catalogue | DELETE | Stop waiting |
@@ -60,7 +59,8 @@
 | `convertReservation` | orders | POST | Convert a reservation into an order |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `createCart` | orders | POST | Start a cart |
-| … | | | 100 more |
+| `createPaymentLink` | orders | POST | Send a guest a link to pay later |
+| … | | | 98 more |
 
 ### 2 modules split across waves
 

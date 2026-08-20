@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 53
+  "operationsWithNoScreen": 50
  },
  "waves": {
   "wave1": 11
@@ -257,18 +257,6 @@
     "summary": "Everything the platform holds about one guest"
    },
    {
-    "operation": "grantDelegation",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Let one guest act for another"
-   },
-   {
-    "operation": "listDelegations",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Who may act for this guest, and for whom they may act"
-   },
-   {
     "operation": "resolvePermissions",
     "contract": "identity",
     "verb": "POST",
@@ -339,12 +327,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "issueWalletPass",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Generate an Apple or Google wallet pass"
    },
    {
     "operation": "listAbandonedCarts",

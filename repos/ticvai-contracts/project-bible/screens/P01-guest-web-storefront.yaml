@@ -474,15 +474,13 @@ screens:
     - WEB-006
     - WEB-007
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    Add-ons. **`listCatalogueBundles` removed** — Sanket noted the screen shows individual add-ons rather
+    than bundles, and it does. **Rewired on the 20 August review.**
   apis:
   - operationId: addCartLine
     contract: orders
     purpose: Add something
     trigger: onAction
-  - operationId: listCatalogueBundles
-    contract: catalogue
-    purpose: List published bundles
-    trigger: onLoad
   - operationId: getUpsellSuggestions
     contract: promotions
     purpose: Suggestions for a cart
@@ -510,36 +508,21 @@ screens:
   capability: C79
   apis:
   - operationId: getWishlist
-    purpose: Saved items
-    trigger: onLoad
     contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
   - operationId: addToWishlist
+    contract: marketing-crm
     purpose: Save an item
     trigger: onAction
-    contract: marketing-crm
   - operationId: removeFromWishlist
+    contract: marketing-crm
     purpose: Remove a saved item
-    trigger: onAction
-    contract: marketing-crm
-  - operationId: listGuestDevices
-    contract: marketing-crm
-    purpose: A guest's registered devices
-    trigger: onLoad
-  - operationId: recordConsent
-    contract: marketing-crm
-    purpose: Record a consent decision
-    trigger: onAction
-  - operationId: registerGuestDevice
-    contract: marketing-crm
-    purpose: Register a device for push
-    trigger: onAction
-  - operationId: revokeGuestDevice
-    contract: marketing-crm
-    purpose: Revoke a device registration
     trigger: onAction
   notes: Withdrawn products stay in the list marked unavailable. A guest who saved something and finds
     it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations
-    on 17 August, not from a requirement.
+    on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that
+    no device management appears on this screen, and he was right. **Rewired on the 20 August review.**
   implementation:
     app: guest-web
     route: /booking-and-selection/wishlist
@@ -1166,12 +1149,26 @@ screens:
     designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C09
   notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. The read surface Deep
+    asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired
+    on the 20 August review.**
   apis:
-  - operationId: transferOrderTickets
-    contract: orders
-    purpose: Transfer tickets to another guest
-    trigger: onAction
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: Every ticket, pass and membership this guest holds
+    trigger: onLoad
+  - operationId: getEntitlement
+    contract: access
+    purpose: One entitlement, with what remains on it
+    trigger: onLoad
+  - operationId: getEntitlementCredential
+    contract: access
+    purpose: The thing that gets scanned
+    trigger: onLoad
+  - operationId: getEntitlementHistory
+    contract: access
+    purpose: Every scan, freeze, share and reissue against it
+    trigger: onLoad
   implementation:
     app: guest-web
     route: /account-and-self-service/my-tickets
@@ -1252,35 +1249,29 @@ screens:
     designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C36
   notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement.
+    derived from the screen name and its operations on 17 August, not from a requirement. Profile and
+    Preferences. **Wishlist and device operations removed; profile, consent and email verification added.**
+    Deep listed exactly these. **Rewired on the 20 August review.**
   apis:
+  - operationId: getGuestProfile
+    contract: marketing-crm
+    purpose: Read a guest profile
+    trigger: onLoad
+  - operationId: updateMyProfile
+    contract: marketing-crm
+    purpose: A guest correcting their own details
+    trigger: onAction
   - operationId: recordConsent
     contract: marketing-crm
-    purpose: from page inventory
-    trigger: onLoad
-  - operationId: addToWishlist
-    contract: marketing-crm
-    purpose: Save an item
+    purpose: Record a consent decision
     trigger: onAction
-  - operationId: getWishlist
+  - operationId: listConsentPurposes
     contract: marketing-crm
-    purpose: Read a guest's saved items
+    purpose: Configured consent purposes
     trigger: onLoad
-  - operationId: listGuestDevices
-    contract: marketing-crm
-    purpose: A guest's registered devices
-    trigger: onLoad
-  - operationId: registerGuestDevice
-    contract: marketing-crm
-    purpose: Register a device for push
-    trigger: onAction
-  - operationId: removeFromWishlist
-    contract: marketing-crm
-    purpose: Remove a saved item
-    trigger: onAction
-  - operationId: revokeGuestDevice
-    contract: marketing-crm
-    purpose: Revoke a device registration
+  - operationId: verifyGuestEmail
+    contract: identity
+    purpose: Send a verification link, or consume one
     trigger: onAction
   implementation:
     app: guest-web

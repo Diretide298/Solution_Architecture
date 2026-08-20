@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 49
+  x-ticvai-screen-count: 50
   x-ticvai-tier: satellite
   x-ticvai-module: "22 — Marketing & CRM"
   x-ticvai-requirements: 319
@@ -938,6 +938,8 @@ paths:
   /guests/me/profile:
     patch:
       operationId: updateMyProfile
+      x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
       summary: A guest correcting their own details
       description: >
         **`updateGuestProfile` is staff-only, and the three screens calling it are the staff app,
@@ -1599,6 +1601,8 @@ paths:
       operationId: getGuestProfile
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-001 Home – Default"
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
@@ -1745,13 +1749,11 @@ paths:
     post:
       operationId: recordConsent
       x-ticvai-consumed-by:
-        - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
-        - "P02 GST-020 Saved Items / Wishlist"
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
         - "P13 CMS-018 Consent & Legal"
@@ -1840,6 +1842,7 @@ paths:
       operationId: listConsentPurposes
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-065 Newsletter & Preferences"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
@@ -1967,7 +1970,6 @@ paths:
         - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
@@ -2008,7 +2010,6 @@ paths:
         - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
@@ -2070,7 +2071,6 @@ paths:
         - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
@@ -2099,13 +2099,10 @@ paths:
     get:
       operationId: listGuestDevices
       x-ticvai-consumed-by:
-        - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
-        - "P02 GST-020 Saved Items / Wishlist"
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
@@ -2138,13 +2135,10 @@ paths:
     post:
       operationId: registerGuestDevice
       x-ticvai-consumed-by:
-        - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
-        - "P02 GST-020 Saved Items / Wishlist"
       x-ticvai-audience: [guest]
       summary: Register a device for push
       description: >
@@ -2200,13 +2194,10 @@ paths:
     delete:
       operationId: revokeGuestDevice
       x-ticvai-consumed-by:
-        - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Loyalty & Rewards"
         - "P01 WEB-027 Newsletter Subscription"
-        - "P02 GST-020 Saved Items / Wishlist"
       x-ticvai-audience: [guest]
       summary: Revoke a device registration
       description: >

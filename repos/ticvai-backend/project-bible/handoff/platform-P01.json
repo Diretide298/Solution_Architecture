@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 35,
-  "operations": 77,
-  "contracts": 10,
+  "operations": 82,
+  "contracts": 11,
   "modules": 12,
   "undrawn": 6,
-  "operationsWithNoScreen": 26
+  "operationsWithNoScreen": 21
  },
  "waves": {
   "wave1": 20,
@@ -118,7 +118,7 @@
  "contracts": [
   {
    "contract": "identity",
-   "operations": 21
+   "operations": 22
   },
   {
    "contract": "orders",
@@ -126,14 +126,14 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 12
-  },
-  {
-   "contract": "catalogue",
-   "operations": 7
+   "operations": 13
   },
   {
    "contract": "retail",
+   "operations": 6
+  },
+  {
+   "contract": "catalogue",
    "operations": 6
   },
   {
@@ -141,15 +141,19 @@
    "operations": 5
   },
   {
+   "contract": "access",
+   "operations": 4
+  },
+  {
    "contract": "queue",
    "operations": 3
   },
   {
-   "contract": "seating",
+   "contract": "white-label",
    "operations": 2
   },
   {
-   "contract": "white-label",
+   "contract": "seating",
    "operations": 2
   },
   {
@@ -227,7 +231,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/add-ons-and-upsell",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -236,7 +240,7 @@
    "module": "Booking & Selection",
    "wave": 3,
    "route": "/booking-and-selection/wishlist",
-   "operations": 7,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -317,7 +321,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/my-tickets",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -335,7 +339,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/profile-and-preferences",
-   "operations": 7,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -483,12 +487,6 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "getMyMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's own memberships, benefits and history"
-   },
-   {
     "operation": "listGuestMemberships",
     "contract": "catalogue",
     "verb": "GET",
@@ -499,18 +497,6 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Everything the platform holds about one guest"
-   },
-   {
-    "operation": "grantDelegation",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Let one guest act for another"
-   },
-   {
-    "operation": "listDelegations",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Who may act for this guest, and for whom they may act"
    },
    {
     "operation": "createReferral",
@@ -561,12 +547,6 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "updateMyProfile",
-    "contract": "marketing-crm",
-    "verb": "PATCH",
-    "summary": "A guest correcting their own details"
-   },
-   {
     "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -583,12 +563,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "List an entitlement for resale"
-   },
-   {
-    "operation": "issueWalletPass",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Generate an Apple or Google wallet pass"
    },
    {
     "operation": "listPaymentTokens",

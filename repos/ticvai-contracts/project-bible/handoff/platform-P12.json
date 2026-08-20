@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 75
+  "operationsWithNoScreen": 73
  },
  "waves": {
   "wave2": 2,
@@ -41,11 +41,11 @@
    "operations": 16
   },
   {
-   "contract": "reporting",
+   "contract": "identity",
    "operations": 8
   },
   {
-   "contract": "identity",
+   "contract": "reporting",
    "operations": 8
   },
   {
@@ -200,18 +200,6 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Everything the platform holds about one guest"
-   },
-   {
-    "operation": "grantDelegation",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Let one guest act for another"
-   },
-   {
-    "operation": "listDelegations",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Who may act for this guest, and for whom they may act"
    },
    {
     "operation": "resolvePermissions",

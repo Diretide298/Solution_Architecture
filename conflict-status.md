@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**159 conflicts raised — CF-01 to CF-156, plus CF-33a and one screen-level item.**
+**160 conflicts raised — CF-01 to CF-157, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -10,12 +10,12 @@ register.
 |---|---|
 | OPEN — client | **6** |
 | OPEN — Softlabs | **1** |
-| CLOSED | **146** |
+| CLOSED | **147** |
 | WITHDRAWN | **6** |
-| **Total** | **159** |
+| **Total** | **160** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**7 open, 146 closed.**
+**7 open, 147 closed.**
 
 
 ## Open — needs a client decision — 6
@@ -35,7 +35,7 @@ register.
 |---|---|---|
 | **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
 
-## Closed — 146
+## Closed — 147
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -184,6 +184,7 @@ register.
 | **CF-154** | API audit, step 2 of 4 — 292 operations reached nothing, and two contracts had no screen at all. 18 August. Every operation tested for duplication, ve | Chinmay |
 | **CF-155** | Workflow audit, step 3 of 4 — the flows were sound and three contracts had none. 18 August. Every flow tested for structure, step integrity, branch co | Chinmay |
 | **CF-156** | Schema audit, step 4 of 4 — the entitlement table did not exist. 18 August. All 347 tables tested for columns, reachability, relationships, descriptio | Chinmay |
+| **CF-157** | Frontend review, 20 August — 59 verdicts from seven reviewers, and 21 of the 39 needs-work rows were one defect. Operations had been attached to scree | Chinmay |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
 ## Withdrawn or absorbed — 6
@@ -201,7 +202,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-156, no gaps
+- **Numbering:** CF-01 to CF-157, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

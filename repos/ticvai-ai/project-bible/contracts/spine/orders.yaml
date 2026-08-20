@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 45
+  x-ticvai-screen-count: 46
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales"
   x-ticvai-requirements: 343
@@ -389,6 +389,8 @@ paths:
   /wallet-passes:
     post:
       operationId: issueWalletPass
+      x-ticvai-consumed-by:
+        - "P02 GST-018 Add to Calendar / Reminders"
       summary: Generate an Apple or Google wallet pass
       description: >
         BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF is that it
@@ -1458,6 +1460,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-018 Add to Calendar / Reminders"
+        - "P02 GST-019 Order History (Wallet)"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
@@ -1596,6 +1599,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-013 Order Confirmation"
         - "P02 GST-018 Add to Calendar / Reminders"
+        - "P02 GST-019 Order History (Wallet)"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P05 KSK-009 Ticket issued"
@@ -2846,7 +2850,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-013 Order Confirmation"
-        - "P01 WEB-018 My Tickets"
         - "P01 WEB-019 Order History"
         - "P01 WEB-023 Membership Management"
         - "P01 WEB-030 Ticket Transfer"
@@ -2856,7 +2859,6 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
-        - "P02 GST-019 Order History (Wallet)"
         - "P02 GST-045 Ticket Delivery & Sharing"
         - "P02 GST-055 Dynamic QR Ticket"
         - "P05 KSK-009 Ticket issued"

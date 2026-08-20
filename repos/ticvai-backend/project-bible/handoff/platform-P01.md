@@ -5,27 +5,24 @@
 | | |
 |---|---|
 | Screens | 35 |
-| Operations | 77 |
-| Contracts | 10 |
+| Operations | 82 |
+| Contracts | 11 |
 | Modules | 12 |
 | Undrawn | 6 |
-| Operations with no screen | 26 |
+| Operations with no screen | 21 |
 | Waves | wave1 20 · wave2 11 · wave3 4 |
 
 ## Gaps
 
-### 26 operations with no screen here
+### 21 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `getMyMemberships` | catalogue | GET | A guest's own memberships, benefits and history |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `grantDelegation` | identity | POST | Let one guest act for another |
-| `listDelegations` | identity | GET | Who may act for this guest, and for whom they may act |
 | `createReferral` | marketing-crm | POST | Issue a referral code |
 | `getMyChallenges` | marketing-crm | GET | Active challenges and how far along I am |
 | `getWaiverStatus` | marketing-crm | GET | Whether this guest may be issued a ticket that requires a waiver |
@@ -34,11 +31,9 @@
 | `redeemLoyaltyPoints` | marketing-crm | POST | Spend points |
 | `respondToInvitation` | marketing-crm | POST | Accept or decline |
 | `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `updateMyProfile` | marketing-crm | PATCH | A guest correcting their own details |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `createResaleListing` | orders | POST | List an entitlement for resale |
-| `issueWalletPass` | orders | POST | Generate an Apple or Google wallet pass |
 | `listPaymentTokens` | orders | GET | A guest's saved payment methods |
 | `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
 | `shareEntitlement` | orders | POST | Let somebody else use this, without giving it away |
@@ -94,8 +89,8 @@
 | `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 2 | yes |
 | `WEB-006` | Date & Session Selection | Booking & Selection | 1 | 1 | yes |
 | `WEB-007` | Seat Map Selection | Booking & Selection | 2 | 2 | yes |
-| `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 3 | yes |
-| `WEB-009` | Wishlist | Booking & Selection | 3 | 7 | yes |
+| `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 2 | yes |
+| `WEB-009` | Wishlist | Booking & Selection | 3 | 3 | yes |
 | `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 9 | yes |
 | `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 9 | yes |
 | `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 3 | yes |
@@ -104,9 +99,9 @@
 | `WEB-015` | Virtual Waiting Room | High-Demand Access | 2 | 3 | yes |
 | `WEB-016` | Login / Register | Account & Self-Service | 1 | 22 | yes |
 | `WEB-017` | My Account Dashboard | Account & Self-Service | 1 | 7 | yes |
-| `WEB-018` | My Tickets | Account & Self-Service | 1 | 1 | yes |
+| `WEB-018` | My Tickets | Account & Self-Service | 1 | 4 | yes |
 | `WEB-019` | Order History | Account & Self-Service | 1 | 1 | yes |
-| `WEB-020` | Profile & Preferences | Account & Self-Service | 1 | 7 | yes |
+| `WEB-020` | Profile & Preferences | Account & Self-Service | 1 | 5 | yes |
 | `WEB-021` | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 3 | yes |
 | `WEB-022` | Membership Plans | Membership, Loyalty & Value | 2 | 2 | yes |
 | `WEB-023` | Membership Management | Membership, Loyalty & Value | 2 | 1 | yes |

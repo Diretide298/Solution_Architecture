@@ -9,12 +9,12 @@
 | Contracts | 23 |
 | Modules | 8 |
 | Undrawn | 26 |
-| Operations with no screen | 244 |
+| Operations with no screen | 240 |
 | Waves | wave1 45 · wave2 50 · wave3 4 |
 
 ## Gaps
 
-### 244 operations with no screen here
+### 240 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -44,7 +44,6 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `getMyMemberships` | catalogue | GET | A guest's own memberships, benefits and history |
 | `importProductCatalogue` | catalogue | POST | Parse a catalogue file into a preview |
 | `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
 | `leaveWaitlist` | catalogue | DELETE | Stop waiting |
@@ -60,7 +59,8 @@
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getUnifiedReconciliation` | finance | GET | Every money source against the ledger, in one view |
-| … | | | 204 more |
+| `recordDeposit` | finance | POST | Money taken before the sale is complete |
+| … | | | 200 more |
 
 ### 4 modules split across waves
 

@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 3,
-  "operationsWithNoScreen": 23
+  "operationsWithNoScreen": 20
  },
  "waves": {
   "wave2": 17
@@ -62,11 +62,11 @@
    "operations": 2
   },
   {
-   "contract": "promotions",
+   "contract": "ai",
    "operations": 1
   },
   {
-   "contract": "ai",
+   "contract": "promotions",
    "operations": 1
   }
  ],
@@ -234,12 +234,6 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "getMyMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's own memberships, benefits and history"
-   },
-   {
     "operation": "listGuestMemberships",
     "contract": "catalogue",
     "verb": "GET",
@@ -300,12 +294,6 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "updateMyProfile",
-    "contract": "marketing-crm",
-    "verb": "PATCH",
-    "summary": "A guest correcting their own details"
-   },
-   {
     "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -322,12 +310,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "List an entitlement for resale"
-   },
-   {
-    "operation": "issueWalletPass",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Generate an Apple or Google wallet pass"
    },
    {
     "operation": "listPaymentTokens",
