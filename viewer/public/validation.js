@@ -11,27 +11,30 @@
  * price of the gate; the sign-in page is the one place that says so plainly.
  */
 
-// Where the accounts service is, in the three arrangements there are.
-//
-// Most specific first:
+// Where the accounts service is, most specific first:
 //
 //   1. `ticvai-api` in localStorage — what the check harnesses set, and the
 //      only one that survives a page the server did not render.
 //   2. `<meta name="ticvai-api">`, written into the page by server.mjs from
-//      TICVAI_API_PUBLIC. This is the split deployment: the reading server on
-//      one name and this service on another, so the browser calls the second
-//      one directly and the node proxy is not in the path.
-//   3. Neither, and then the host decides. Anything other than localhost is
-//      the one-origin deployment, where the right base is the empty string —
-//      same origin, no CORS, one cookie both halves see. Localhost is a
-//      workstation, the only place the two ports are apart.
+//      TICVAI_API_PUBLIC, for a deployment on some other pair of names.
+//   3. The constant below on a server, localhost:8787 on a workstation.
 //
-// Cross-origin either way: calls carry credentials: 'include' so the session
-// cookie rides along, which is also why the service can never allow "*".
+// This is only ever the *accounts* service — auth, invites, verdicts, mentions.
+// The reading server owns /api/index, /api/session, /api/tooltips, /api/domains
+// and the rest of the package, which are same-origin and never come here. A
+// proxy that sends all of /api to the accounts service 404s every one of them.
+//
+// Cross-origin in every arrangement: calls carry credentials: 'include' so the
+// session cookie rides along, which is also why the service can never allow "*"
+// and why the cookie needs a domain both names sit under.
+// The deployed address of the accounts service. No trailing /api: every path
+// below already starts with one, and call() joins them as `${API}${path}`.
+const API_DEPLOYED = 'https://atlasapi.ainfinite.ai';
+
 const declared = document.querySelector('meta[name="ticvai-api"]')?.content?.trim();
-const sameOrigin = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const workstation = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 const API = localStorage.getItem('ticvai-api')
-  ?? (declared || (sameOrigin ? '' : 'http://localhost:8787'));
+  ?? (declared || (workstation ? 'http://localhost:8787' : API_DEPLOYED));
 
 /** What a *review* can say. Three values, unchanged: this is somebody judging
  *  an artefact, and the vocabulary for answering one lives below. */
