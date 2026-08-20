@@ -400,6 +400,18 @@ function sendCachedJson(res, req, key, value) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
+  // /pkg/… is /api/… under another name, and the reason it exists is a proxy
+  // in front of this process that forwards everything matching /api/ to the
+  // accounts service. The thirteen routes below are answered here and exist
+  // nowhere else, so that rule does not redirect them, it deletes them — a 404
+  // carrying FastAPI's `{"detail":"Not Found"}` from a route this file defines.
+  //
+  // A prefix the rule does not match walks past it. Rewritten this early so the
+  // gate and every handler downstream go on seeing /api/ and none of them have
+  // to know: both names work, and the day the proxy rule is corrected nothing
+  // here needs undoing.
+  if (url.pathname.startsWith('/pkg/')) url.pathname = `/api/${url.pathname.slice(5)}`;
+
   try {
     // --- the accounts service, on this origin -------------------------------
     // Everything the accounts service owns is answered here by forwarding it,

@@ -148,7 +148,7 @@ async function loadProse(lens, ctx) {
     (lens.byKind.operation ?? []).map((o) => o.file).filter(Boolean)
   )];
   const parts = await Promise.all(files.map((f) =>
-    json(`/api/detail?file=${encodeURIComponent(f)}`).catch(() => ({}))
+    json(`/pkg/detail?file=${encodeURIComponent(f)}`).catch(() => ({}))
   ));
   for (const part of parts) {
     for (const [key, value] of Object.entries(part)) {
@@ -669,7 +669,7 @@ function renderMembers(lens) {
     for (const doc of lens.docs) {
       const row = el('div', 'member-row member-doc');
       const link = el('a', 'member-id', doc);
-      link.href = `/api/file?path=${encodeURIComponent(doc)}`;
+      link.href = `/pkg/file?path=${encodeURIComponent(doc)}`;
       link.target = '_blank';
       link.rel = 'noopener';
       row.append(link);
@@ -877,11 +877,11 @@ function fail(message) {
 
   try {
     const [domains, index, journeys, lineage, domain] = await Promise.all([
-      json('/api/domains'),
-      json('/api/index'),
-      json('/api/journeys'),
-      json('/api/lineage'),
-      json('/api/domain'),
+      json('/pkg/domains'),
+      json('/pkg/index'),
+      json('/pkg/journeys'),
+      json('/pkg/lineage'),
+      json('/pkg/domain'),
     ]);
 
     state.lenses = (domains.lenses ?? []).filter((l) => l.stats.total > 0);
