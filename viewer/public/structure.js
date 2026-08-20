@@ -6,7 +6,7 @@
 // it to its header with a count of what is hidden.
 
 import { enableTouch } from './touch.js';
-import { hue } from './core.js';
+import { hue, alpha } from './core.js';
 
 // One table, resolved at draw time — the tokens carry the theme, so the
 // hand-maintained light-theme duplicate this used to keep is gone.
@@ -551,7 +551,7 @@ export class StructureTree {
         const active =
           Boolean(anchorPath) && (touches(link.from.node.path) || touches(link.to.node.path));
         ctx.strokeStyle = active
-          ? (light ? 'rgba(124,58,237,.85)' : 'rgba(167,139,250,.85)')
+          ? alpha(accent, .85)
           : (light ? 'rgba(0,0,0,.14)' : 'rgba(255,255,255,.12)');
         ctx.lineWidth = (active ? 1.8 : 1) * Math.max(0.5, Math.min(1.5, k));
         // dashed when it lands on a container rather than the target itself
@@ -710,8 +710,8 @@ export class StructureTree {
 
         const active = Boolean(anchorPath) && (touches(link.fromNode.path) || touches(link.to.node.path));
         ctx.strokeStyle = active
-          ? (light ? 'rgba(124,58,237,.85)' : 'rgba(167,139,250,.85)')
-          : (light ? 'rgba(124,58,237,.2)' : 'rgba(167,139,250,.18)');
+          ? alpha(accent, .85)
+          : alpha(accent, .2);
         ctx.lineWidth = (active ? 1.8 : 1) * Math.max(0.5, Math.min(1.5, k));
         ctx.setLineDash(link.exact ? [] : [4 * k, 3 * k]);
         const bow = Math.min(180, Math.abs(to.y - from.y) * 0.25 + 50) * Math.min(1.4, k);
@@ -791,9 +791,22 @@ export class StructureTree {
 
       // ▸ / ▾ so it is obvious which blocks open, and which way they are set
       if (node.children.length) {
-        ctx.font = `${Math.max(6, 10 * k)}px ui-sans-serif, system-ui, sans-serif`;
+        // Drawn rather than typed. A canvas has no fallback chain to save it:
+        // where the font lacks U+25B8 this printed a tofu box into the diagram.
+        const r = Math.max(2.5, 3.4 * k);
         ctx.fillStyle = color;
-        ctx.fillText(entry.collapsed ? '▸' : '▾', textLeft, titleY);
+        ctx.beginPath();
+        if (entry.collapsed) {
+          ctx.moveTo(textLeft, titleY - r);
+          ctx.lineTo(textLeft + r, titleY);
+          ctx.lineTo(textLeft, titleY + r);
+        } else {
+          ctx.moveTo(textLeft - r, titleY - r * 0.6);
+          ctx.lineTo(textLeft + r, titleY - r * 0.6);
+          ctx.lineTo(textLeft, titleY + r * 0.7);
+        }
+        ctx.closePath();
+        ctx.fill();
         textLeft += 10 * k;
       }
 

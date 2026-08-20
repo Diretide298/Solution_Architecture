@@ -6393,7 +6393,10 @@ function renderAudit() {
 
   for (const problem of visible.slice(0, 500)) {
     const item = el('div', `audit-item ${problem.severity}`);
-    item.append(el('span', 'audit-icon', problem.severity === 'error' ? '✕' : problem.severity === 'warning' ? '!' : 'i'));
+    // U+00D7 rather than U+2715: the multiplication sign is in Latin-1 and so
+    // is in every font that can render the message beside it. The other two are
+    // ASCII already.
+    item.append(el('span', 'audit-icon', problem.severity === 'error' ? '\u00d7' : problem.severity === 'warning' ? '!' : 'i'));
     const body = el('div', 'audit-body');
     body.append(el('div', 'audit-message', problem.message));
     body.append(el('div', 'audit-where', `${problem.file}${problem.line ? `:${problem.line}` : ''}`));

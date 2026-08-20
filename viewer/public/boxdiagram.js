@@ -9,7 +9,7 @@
 // the initial arrangement. Re-picking the scope restores the tidy layout.
 
 import { enableTouch } from './touch.js';
-import { hue } from './core.js';
+import { hue, alpha } from './core.js';
 
 const HEADER_H = 26;
 const ROW_H = 17;
@@ -534,7 +534,7 @@ export class BoxDiagram {
       ctx.strokeStyle = muted
         ? (light ? 'rgba(0,0,0,.10)' : 'rgba(255,255,255,.09)')
         : active
-          ? (light ? '#6d28d9' : '#c4b5fd')
+          ? accent
           : (light ? 'rgba(0,0,0,.42)' : 'rgba(255,255,255,.46)');
 
       // a child edge is the strongest statement on the diagram — this row
@@ -542,7 +542,7 @@ export class BoxDiagram {
       const weight = edge.kind === 'child' ? 2.4 : 1.5;
       ctx.lineWidth = (active ? 2.8 : muted ? 1 : weight) * Math.min(1.6, Math.max(0.55, k));
       if (active) {
-        ctx.shadowColor = light ? 'rgba(109,40,217,.45)' : 'rgba(196,181,253,.55)';
+        ctx.shadowColor = alpha(accent, .45);
         ctx.shadowBlur = 10;
       }
       // dashed marks a relationship that was inferred rather than declared
@@ -581,11 +581,11 @@ export class BoxDiagram {
           ctx.fillStyle = light ? 'rgba(255,255,255,.92)' : 'rgba(20,20,26,.92)';
           ctx.fillRect(midX - metrics.width / 2 - 4, midY - 8, metrics.width + 8, 16);
           if (active) {
-            ctx.strokeStyle = light ? 'rgba(109,40,217,.5)' : 'rgba(196,181,253,.5)';
+            ctx.strokeStyle = alpha(accent, .5);
             ctx.lineWidth = 1;
             ctx.strokeRect(midX - metrics.width / 2 - 4, midY - 8, metrics.width + 8, 16);
           }
-          ctx.fillStyle = active ? (light ? '#6d28d9' : '#c4b5fd') : faint;
+          ctx.fillStyle = active ? accent : faint;
           ctx.fillText(edge.label, midX, midY);
         }
       }
@@ -624,8 +624,8 @@ export class BoxDiagram {
       ctx.fill();
       if (selected || neighbour) {
         ctx.shadowColor = selected
-          ? (light ? 'rgba(109,40,217,.5)' : 'rgba(167,139,250,.55)')
-          : (light ? 'rgba(109,40,217,.22)' : 'rgba(167,139,250,.25)');
+          ? alpha(accent, .5)
+          : alpha(accent, .22);
         ctx.shadowBlur = selected ? 18 : 9;
         ctx.fill();
         ctx.shadowBlur = 0;
@@ -634,7 +634,7 @@ export class BoxDiagram {
       ctx.strokeStyle = selected
         ? accent
         : neighbour
-          ? (light ? 'rgba(109,40,217,.55)' : 'rgba(167,139,250,.6)')
+          ? alpha(accent, .55)
           : border;
       ctx.stroke();
 

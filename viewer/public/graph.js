@@ -5,7 +5,7 @@
 // cools with an alpha decay and parks itself, then only re-heats on interaction.
 
 import { enableTouch } from './touch.js';
-import { hue } from './core.js';
+import { hue, alpha } from './core.js';
 
 // Which token paints which kind of node. Named rather than spelled out: there
 // used to be a second copy of this table holding the light-theme hexes, kept in
@@ -420,6 +420,7 @@ export class Graph {
     const styles = getComputedStyle(document.documentElement);
     const dim = styles.getPropertyValue('--text-dim').trim() || '#9a9aa6';
     const text = styles.getPropertyValue('--text').trim() || '#dcdde3';
+    const accent = styles.getPropertyValue('--accent').trim() || hue('accent');
     const isLight = document.documentElement.dataset.theme !== 'dark';
 
     ctx.clearRect(0, 0, this.width, this.height);
@@ -458,14 +459,14 @@ export class Graph {
       // line and the head read this instead. Keep the fill out here: inside, it
       // would inherit the shadow an active link sets and bloom.
       const stroke = active
-        ? link.color ?? (isLight ? 'rgba(124,58,237,.75)' : 'rgba(167,139,250,.75)')
+        ? link.color ?? alpha(accent, .75)
         : hasFocus
           ? (isLight ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.035)')
           : link.color ?? (isLight ? 'rgba(0,0,0,.11)' : 'rgba(255,255,255,.09)');
 
       ctx.save();
       if (active && this.directed) {
-        ctx.shadowColor = link.color ?? (isLight ? 'rgba(124,58,237,.6)' : 'rgba(167,139,250,.6)');
+        ctx.shadowColor = link.color ?? alpha(accent, .6);
         ctx.shadowBlur = 10;
       }
       ctx.beginPath();
@@ -512,7 +513,7 @@ export class Graph {
         ctx.beginPath();
         ctx.arc(p.x, p.y, r + 5, 0, Math.PI * 2);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = isLight ? 'rgba(124,58,237,.5)' : 'rgba(167,139,250,.5)';
+        ctx.strokeStyle = alpha(accent, .5);
         ctx.stroke();
       } else if (node === this.hoverNode) {
         ctx.lineWidth = 2;

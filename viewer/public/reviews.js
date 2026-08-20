@@ -562,7 +562,8 @@ function renderRows(rows) {
     const button = el('button', 'rt-sort', col.label);
     button.type = 'button';
     if (state.sort.key === col.key) {
-      button.append(el('span', 'rt-arrow', state.sort.dir < 0 ? '▾' : '▴'));
+      // A CSS triangle rather than U+25BE — a border trick needs no font at all.
+      button.append(el('span', `rt-arrow ${state.sort.dir < 0 ? 'down' : 'up'}`));
     }
     button.onclick = () => {
       // Clicking the sorted column reverses it; clicking another starts that

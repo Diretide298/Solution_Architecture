@@ -1,4 +1,4 @@
-# Handoff: TICVAI AI project planner — viewer UI redesign
+# Handoff: Atlas — viewer UI redesign
 
 ## Overview
 A redesign of the TICVAI viewer — the local browser for the delivery package (contracts, screens,
@@ -6,8 +6,9 @@ flows, state models, migrations). Two files, one design: a **day** theme and a *
 the same layout, content and component set. The nav moved from a vertical rail to a **two-row top
 bar**, and the body dropped to three columns.
 
-Brand: Softlabs Group logo, product name **TICVAI / AI PROJECT PLANNER**, and a
-**Powered by AinfiniteCore** lockup at the foot of the left column.
+Brand: the product is **Atlas — the context layer for AI-assisted development**. The header carries
+the Atlas lockup (mark + wordmark) as a single image; the foot of the left column carries a
+**Powered by AinfiniteCore** lockup with the **Softlabs Group** logo beside it.
 
 ## About the design files
 `designs/` holds two self-contained HTML pages — **design references, not production code**.
@@ -33,9 +34,11 @@ Full viewport height, `min-width:1180px`, `overflow-x:auto`. Desktop-only by int
 1180px the page scrolls horizontally rather than crushing the main column.
 
 **Row 1 — dark chrome bar, 64px.** `padding:0 22px`, `display:flex; align-items:center; gap:20px`.
-- Brand: Softlabs logo (118px wide, `filter:brightness(0) invert(1)`, opacity .92) + a two-line
-  lockup — `TICVAI` 15px/800/-0.02em white over `AI PROJECT PLANNER` 9px/600, letter-spacing .16em,
-  uppercase, 55% white.
+- Brand: the Atlas lockup as one image, `height:46px; width:auto`. Two files, one per theme —
+  `brand/atlas-lockup-day.png` on the day chrome, `brand/atlas-lockup-night.png` on the night
+  chrome. Both are background-keyed to transparent, so they sit on any dark surface. No typeset
+  wordmark and no tagline in the bar: the lockup carries the name, and the tagline lives in the
+  image `alt`.
 - 1px × 26px divider at 13% white.
 - **Layer switch** — a segmented pill tray (`radius:11px`, 4px padding, tray one step darker than
   the bar). Each item `padding:8px 14px; radius:8px; 13px/600` with a mono count at 70% opacity.
@@ -224,8 +227,17 @@ Spacing: 4 / 6 / 8 / 9 / 10 / 11 / 13 / 14 / 15 / 16 / 18 / 19 / 20 / 22 / 24 px
 Scrollbars: 10px, palette-neutral thumb, 3px transparent border, `background-clip:content-box`.
 
 ## Assets
-- `assets/softlabs-logo.webp` — client logo, rendered white via `filter:brightness(0) invert(1)`.
-  A true white SVG/PNG would be crisper; swap when available.
+`assets/brand/` — the Atlas identity.
+- `atlas-lockup-day.png` / `atlas-lockup-night.png` — the header lockups, transparent background.
+  These are the two files the viewer actually loads.
+- `atlas-mark.png` — mark only, transparent, for favicons, avatars and tight spaces.
+- `atlas-logo-light.svg` / `atlas-logo-night.svg` — a redrawn vector lockup (mark as geometry,
+  wordmark as text in Montserrat Light, tagline in Montserrat Medium). Useful when the logo has to
+  scale past raster limits — print, large display. The text is live text referencing Montserrat by
+  name, so outline it before sending anywhere the font is not installed.
+- `atlas-mark-light.svg` / `atlas-mark-night.svg` — the vector mark alone.
+- `assets/softlabs-logo.webp` — partner logo, rendered white via `filter:brightness(0) invert(1)`
+  in the powered-by strip. A true white SVG/PNG would be crisper; swap when available.
 - The AinfiniteCore mark is **CSS, not an asset**: two 14px overlapping bordered circles
   (light teal over deep teal, `margin-left:-5px` on the second).
 - Fonts from Google Fonts. No other imagery; all icon glyphs are CSS shapes, as in the current viewer.

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TICVAI Contract Graph</title>
+    <title>Atlas — TICVAI delivery package</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,10 +12,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%95%B8%EF%B8%8F</text></svg>"
-    />
+    <link rel="icon" href="/brand/atlas-mark.png" />
   </head>
   <body>
     <div id="app" class="app">
@@ -41,12 +38,22 @@
             <span class="icon-menu" aria-hidden="true"></span>
           </button>
 
-          <a class="brand" href="/" aria-label="TICVAI — AI project planner">
-            <img class="brand-logo" src="/softlabs-logo.webp" alt="Softlabs Group" />
-            <span class="brand-lockup">
-              <span class="brand-name">TICVAI</span>
-              <span class="brand-sub">AI Project Planner</span>
-            </span>
+          <!-- One image, not a typeset wordmark — the lockup carries the name and
+               the tagline rides in the alt. Both variants are in the DOM and CSS
+               shows the one this theme wants: the toggle is instant and a swapped
+               src would flash a blank box while the other file decodes. -->
+          <a class="brand" href="/" aria-label="Atlas — the context layer for AI-assisted development">
+            <img
+              class="brand-lockup brand-lockup-day"
+              src="/brand/atlas-lockup-day.png"
+              alt="Atlas — the context layer for AI-assisted development"
+            />
+            <img
+              class="brand-lockup brand-lockup-night"
+              src="/brand/atlas-lockup-night.png"
+              alt=""
+              aria-hidden="true"
+            />
           </a>
 
           <span class="chrome-divider" aria-hidden="true"></span>
@@ -102,7 +109,16 @@
                   title="Your account" aria-haspopup="dialog">
             <span id="account-initials" class="account-initials">·</span>
           </button>
-          <button id="theme-toggle" class="icon-btn" title="Toggle theme" type="button">◐</button>
+          <!-- Drawn, not typed. This was U+25D0, which is an icon only where a
+               font ships it — and on a box with a minimal font set it is a
+               tofu box sitting next to the bell, which made the bell look
+               broken too. -->
+          <button id="theme-toggle" class="icon-btn" title="Toggle theme" type="button">
+            <svg class="icon-theme" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.4" />
+              <path d="M8 2a6 6 0 0 0 0 12Z" fill="currentColor" />
+            </svg>
+          </button>
           </div>
         </div>
 
@@ -144,6 +160,7 @@
             <span class="powered-label">Powered by</span>
             <span class="powered-name">Ainfinite<b>Core</b></span>
           </span>
+          <img class="powered-partner" src="/softlabs-logo.webp" alt="Softlabs Group" />
         </div>
       </aside>
 
@@ -598,8 +615,15 @@
         />
         <div class="palette-results" id="palette-results"></div>
         <div class="palette-foot">
-          <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
-          <span><kbd>↵</kbd> open</span>
+          <span>
+            <kbd><svg class="icon-arrow" viewBox="0 0 10 10" aria-label="up"><path d="M5 8.5V2M5 2 2 5M5 2l3 3" /></svg></kbd
+            ><kbd><svg class="icon-arrow" viewBox="0 0 10 10" aria-label="down"><path d="M5 1.5V8M5 8l3-3M5 8 2 5" /></svg></kbd>
+            navigate
+          </span>
+          <span>
+            <kbd><svg class="icon-arrow" viewBox="0 0 10 10" aria-label="enter"><path d="M8.5 2v3.5h-6M2.5 5.5 5 3M2.5 5.5 5 8" /></svg></kbd>
+            open
+          </span>
           <span><kbd>esc</kbd> close</span>
           <span class="spacer"></span>
           <span id="palette-count"></span>

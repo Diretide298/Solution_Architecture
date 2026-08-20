@@ -437,6 +437,25 @@ export const hue = (token) =>
   getComputedStyle(document.documentElement).getPropertyValue('--' + token).trim() || '#8b8b93';
 
 /**
+ * A token at some transparency, for a canvas.
+ *
+ * `ctx.strokeStyle` takes a CSS colour string but nothing computed, so a
+ * renderer that wants "the accent at 50%" cannot write color-mix() and had to
+ * write the rgba out by hand — which is how four canvases ended up holding a
+ * private copy of a colour the palette had already moved on from. Accepts the
+ * #rgb and #rrggbb the tokens are written in, and passes anything else through
+ * so a token that is already rgba() still works.
+ */
+export function alpha(color, a) {
+  const hex = String(color).trim();
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex);
+  if (!m) return hex;
+  const h = m[1].length === 3 ? m[1].replace(/./g, (c) => c + c) : m[1];
+  const n = parseInt(h, 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+}
+
+/**
  * `inlineMarkdown` plus links, which the prose in these files uses constantly
  * and which were rendering as raw `[ADR-0014](0014-cell-per-region.md)`.
  *
