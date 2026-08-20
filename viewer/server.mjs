@@ -59,7 +59,7 @@ const API_META = API_PUBLIC
  * long-lived stream that must not be forwarded.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|validation|verdicts|mentions|mentionable|health|session)(\/|$)|docs|openapi\.json)/;
 
 /**
  * Hand a request to the accounts service and give its answer back unchanged.
