@@ -52,6 +52,23 @@ app.add_middleware(
 )
 
 SESSION_COOKIE = "ticvai_session"
+
+# Who the session cookie belongs to.
+#
+# Unset on a workstation and in the one-origin deployment: the cookie is
+# host-only, which is the tighter default and all either arrangement needs.
+#
+# It is required the moment the two halves are on different names — the reading
+# server on atlas.example.com and this service on atlasapi.example.com. The
+# browser sends a host-only cookie set by atlasapi back to atlasapi and nowhere
+# else, so the node gate, which reads the same cookie off its own requests to
+# decide who is asking, would never see one and would bounce every page to the
+# sign-in door in a loop. TICVAI_COOKIE_DOMAIN=.example.com is what makes one
+# cookie visible to both names.
+#
+# It must be the shared parent of the two, and no higher: a cookie scoped to a
+# domain is sent to every host under it.
+COOKIE_DOMAIN = os.environ.get("TICVAI_COOKIE_DOMAIN") or None
 # What a *review* can say. Three values: this is somebody judging an artefact.
 VERDICTS = ("approved", "rejected", "needs-work")
 
@@ -345,7 +362,9 @@ def logout(
     if ticvai_session:
         db.write("DELETE FROM session WHERE token_hash = ?",
                  (security.token_hash(ticvai_session),))
-    response.delete_cookie(SESSION_COOKIE, path="/")
+    # Domain and path have to match the ones it was set with, or the browser
+    # keeps the cookie and signing out leaves a live one behind.
+    response.delete_cookie(SESSION_COOKIE, path="/", domain=COOKIE_DOMAIN)
     return {"ok": True}
 
 
@@ -370,7 +389,9 @@ def logout_all(
     # Including the caller's own. Signing out everywhere and staying signed in
     # here would mean the one device you are holding is the one you cannot
     # clear — and that is usually the point of pressing it.
-    response.delete_cookie(SESSION_COOKIE, path="/")
+    # Domain and path have to match the ones it was set with, or the browser
+    # keeps the cookie and signing out leaves a live one behind.
+    response.delete_cookie(SESSION_COOKIE, path="/", domain=COOKIE_DOMAIN)
     return {"ok": True, "dropped": dropped}
 
 
@@ -395,10 +416,14 @@ def _set_session_cookie(response: Response, token: str) -> None:
         httponly=True,   # script cannot read it, so an injection cannot steal it
         samesite="lax",
         path="/",
+        # Host-only unless the two halves are on different names under one
+        # parent, where both have to see it. "lax" survives that: sibling
+        # subdomains are the same *site*, and it is cross-site that lax stops.
+        domain=COOKIE_DOMAIN,
         # The viewer runs over http on a workstation. Setting Secure here would
         # stop the cookie being sent at all. Set TICVAI_SECURE_COOKIE=1 when
         # this is ever served over https.
-        secure=bool(__import__("os").environ.get("TICVAI_SECURE_COOKIE")),
+        secure=bool(os.environ.get("TICVAI_SECURE_COOKIE")),
     )
 
 

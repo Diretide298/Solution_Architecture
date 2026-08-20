@@ -11,16 +11,27 @@
  * price of the gate; the sign-in page is the one place that says so plainly.
  */
 
-// On a workstation the service is on its own port, so calls are cross-origin
-// and the session cookie only rides along with credentials: 'include'.
+// Where the accounts service is, in the three arrangements there are.
 //
-// A deployment puts nginx in front of both processes on one address, so there
-// the right base is the empty string — same origin, no CORS to configure, and
-// one cookie that both halves see. Anything other than localhost is taken to
-// be that, because a workstation is the only place the two ports are apart.
-// `ticvai-api` in localStorage still overrides, which is what the harnesses use.
+// Most specific first:
+//
+//   1. `ticvai-api` in localStorage — what the check harnesses set, and the
+//      only one that survives a page the server did not render.
+//   2. `<meta name="ticvai-api">`, written into the page by server.mjs from
+//      TICVAI_API_PUBLIC. This is the split deployment: the reading server on
+//      one name and this service on another, so the browser calls the second
+//      one directly and the node proxy is not in the path.
+//   3. Neither, and then the host decides. Anything other than localhost is
+//      the one-origin deployment, where the right base is the empty string —
+//      same origin, no CORS, one cookie both halves see. Localhost is a
+//      workstation, the only place the two ports are apart.
+//
+// Cross-origin either way: calls carry credentials: 'include' so the session
+// cookie rides along, which is also why the service can never allow "*".
+const declared = document.querySelector('meta[name="ticvai-api"]')?.content?.trim();
 const sameOrigin = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-const API = localStorage.getItem('ticvai-api') ?? (sameOrigin ? '' : 'http://localhost:8787');
+const API = localStorage.getItem('ticvai-api')
+  ?? (declared || (sameOrigin ? '' : 'http://localhost:8787'));
 
 /** What a *review* can say. Three values, unchanged: this is somebody judging
  *  an artefact, and the vocabulary for answering one lives below. */

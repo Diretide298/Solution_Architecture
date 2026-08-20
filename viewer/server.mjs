@@ -32,6 +32,28 @@ const PUBLIC = path.join(here, 'public');
 const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
 
 /**
+ * Where the *browser* should call the accounts service, when that is not here.
+ *
+ * AUTH_BASE above is this process talking to that one, over loopback, and stays
+ * loopback in every arrangement. This is the separate question of what address
+ * to put in front of a visitor, and it only has an answer in the split
+ * deployment — the reading server on atlas.example.com and the accounts service
+ * on atlasapi.example.com.
+ *
+ * Unset, every page keeps calling this origin and server.mjs proxies onward,
+ * which is what a workstation and the one-origin deployment both want.
+ *
+ * Handed to the client as a meta tag rather than baked into the eight HTML
+ * files, because the address belongs to a deployment and those files are the
+ * same in all of them. Trailing slash trimmed: validation.js joins it to paths
+ * that already start with one.
+ */
+const API_PUBLIC = (process.env.TICVAI_API_PUBLIC ?? '').trim().replace(/\/+$/, '');
+const API_META = API_PUBLIC
+  ? `<meta name="ticvai-api" content="${API_PUBLIC.replace(/"/g, '&quot;')}" />`
+  : '';
+
+/**
  * What the accounts service owns. Deliberately a list rather than "anything
  * under /api": the viewer answers most of /api itself, and /api/events is a
  * long-lived stream that must not be forwarded.
@@ -603,6 +625,19 @@ const server = http.createServer(async (req, res) => {
     if (!info?.isFile()) return send(res, 404, 'not found');
 
     const body = await readFile(file);
+
+    // The one thing a page cannot know for itself: which address the accounts
+    // service answers on. Inserted after <head> rather than before </head> so
+    // it is in place before the module scripts at the foot of the page run,
+    // and only on html — every other file goes out untouched.
+    if (API_META && path.extname(file) === '.html') {
+      return send(
+        res, 200,
+        body.toString('utf8').replace(/<head(\s[^>]*)?>/i, (open) => `${open}\n    ${API_META}`),
+        MIME['.html'], req,
+      );
+    }
+
     // app.js alone is 270 KB of text, and the boards are larger still
     return send(res, 200, body, MIME[path.extname(file)] ?? 'application/octet-stream', req);
   } catch (err) {
