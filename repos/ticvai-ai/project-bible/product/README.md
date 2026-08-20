@@ -1,9 +1,18 @@
-# Product
+# Active
 
-> **Purpose:** Product overview  
+> **Purpose:** What is in flight now  
 > **Owner:** Chinmay  
-> **Status:** Stub
+> **Status:** Living
 
-21 domains, 118 sub-domains, 3,184 requirements. See [modules](modules/) for the
-per-domain pages and [registers/capabilities](../registers/capabilities.md) for the
-164-capability catalogue.
+Current wave, current context, open blockers, this week's gates.
+
+| Page | |
+|---|---|
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

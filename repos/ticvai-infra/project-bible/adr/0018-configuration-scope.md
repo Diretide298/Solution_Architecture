@@ -1,9 +1,9 @@
 # ADR-0018 — Configuration scope
 
-**Status:** Accepted
+**Status:** Accepted · amended 18 August 2026 (CF-138)
 **Date:** 14 August 2026
 **Relates to:** [ADR-0008](0008-money-carries-per-region-scale.md) money scale ·
-[ADR-0011](0011-hierarchy-is-binding.md) hierarchy · [ADR-0006](0006-tiered-guest-app-distribution.md) app distribution
+[ADR-0011](0011-hierarchy-is-binding.md) hierarchy — **amended 18 August to add `outlet`, by this ADR** · [ADR-0006](0006-tiered-guest-app-distribution.md) app distribution
 
 ---
 
@@ -24,15 +24,49 @@ times. It needs a rule.
 
 **Configuration resolves up the scope tree. Nearest ancestor wins. There are three levels.**
 
-    tenant  ─────► region ─────► venue
+    tenant ─────► region ─────► venue ─────► outlet
                                    │
                         assigned, not configured
                                    │
-                    ┌──────────────┴──────────────┐
-                 workstation                   outlet
+                              workstation
 
-**Venue is the floor.** A tenant sets a default, a region overrides it where law or commerce
-requires, a venue overrides it for itself. Nothing below venue configures anything.
+**Venue is the floor for everything except the two domains that trade from a place inside it.**
+A tenant sets a default, a region overrides it where law or commerce requires, a venue overrides
+it for itself, and **an outlet overrides it for F&B and retail.**
+
+### Why outlet is a level and workstation is not
+
+**Amended 18 August.** The original rule put both below the floor, and that conflated two
+different things.
+
+**An outlet is a business. A workstation is a device.** A restaurant has its own menu, its own
+opening hours, its own kitchen and its own prep times; a till has a serial number and whoever is
+standing at it. Forty tills configured individually is forty things that drift — that reasoning
+stands and workstation stays assigned. **It was never an argument about outlets.**
+
+**The package had already modelled it this way.** `platform.outlet` is referenced fourteen times
+and every one is F&B or retail — `fnb.menu`, `fnb.kitchen_station`, `retail.merchandise`,
+**`retail.return_policy`**. A return policy is configuration, it is already outlet-scoped, and
+this ADR had no vocabulary for that.
+
+**And the outlet already carried five configuration values outside the configuration system** —
+`openingHours`, `stockLocationId`, `costCenterId`, `kind`, `zone`. They are configuration on a
+thing the rule said could not configure, which is how the gap announced itself.
+
+### Outlet is a sibling of department, not a child
+
+    venue
+      ├── department ──► subDepartment ──► workstation      organisational
+      └── outlet                                            commercial
+
+**Department could not do this job.** `inventory.requisition.department_id` and
+`platform.workstation.department_id` both resolve to `platform.scope_node`: a department has
+requisitions, rotas and workstations. **Modelling a restaurant as a department would put it in
+the staffing tree and give every rota a restaurant to schedule against.**
+
+**One resolution mechanism, unchanged.** Nearest ancestor still wins. An F&B setting resolves
+outlet → venue → region → tenant. A ticketing setting has no outlet on its path and resolves from
+venue exactly as before — **nothing that works today changes.**
 
 ### Below venue you assign, you do not configure
 
@@ -76,13 +110,13 @@ not stay in step.
 | SSO configuration | A tenant's directory is theirs |
 | Consent purposes and notices | **Consent is a controller-level legal act**, and the controller is the tenant. This is what makes cross-venue entitlements lawful (CF-31) |
 | Licensing and subscription | A commercial contract with the tenant |
-| Loyalty and membership schemes | A membership sold at one venue and honoured at another cannot have per-venue earning rules without the guest holding several balances |
+| Loyalty and membership schemes | A membership sold at one venue and honoured at another cannot have per-venue earning rules without the guest-app holding several balances |
 | Security policy — password, MFA, session, lockout | A venue that can lower its own MFA is a hole in the tenant's posture |
 | Notification templates and sender identity | Brand. **Which events fire is venue** — a venue with no F&B sends no order-ready messages |
 | Report definitions | So figures are comparable. **Scheduling and recipients are venue** |
 | Languages offered | Brand. Date format is regional |
 | B2B contracts, credit limits, net rates | Agreed with the tenant. **Allocation per venue** |
-| Guest profile and segments | One profile per guest per tenant |
+| Guest profile and segments | One profile per guest-app per tenant |
 | Suppliers and purchase approval | One commercial relationship |
 
 ### Venue — everything else
@@ -129,18 +163,33 @@ cannot be per venue without breaking law, store rules or the cross-venue guarant
 underneath. New requirements would arrive without an answer and get one by whoever implemented
 them first.
 
-**Workstation and outlet as configuration levels.** Rejected by the client on 14 August, and
-correctly: forty workstations configured individually is forty things that drift.
+**Workstation as a configuration level.** Rejected by the client on 14 August, and correctly:
+forty workstations configured individually is forty things that drift. **Still rejected.**
+
+**Outlet as a configuration level.** Rejected on 14 August alongside workstation and **reinstated
+on 18 August**, when the client decided F&B and retail configuration belongs at outlet. The two
+were rejected together and should not have been — **the argument that carried the decision was
+about tills, and an outlet is not a till.**
 
 ---
 
 ## Provenance
 
-**Confirmed by the client on 14 August:** workstation and device configuration belongs at venue
-with a master profile; F&B and kitchen configuration belongs at venue.
+**Amended by the client on 18 August:** *"F&B (and, by extension, Retail) configuration will be
+managed at the outlet level rather than the venue level"* — Key Decisions, F&B / Retail /
+Procurement / Inventory workshop. **This supersedes the F&B half of the 14 August confirmation
+and nothing else** (CF-138).
+
+**Confirmed by the client on 14 August, and standing:** workstation and device configuration
+belongs at venue with a master profile.
+
+**Confirmed on 14 August and superseded on 18 August:** F&B and kitchen configuration belongs at
+venue. The 14 August session moved F&B from outlet to venue, and that correction is what produced
+the *venue is the floor* rule — **so the rule was built on the half of the decision that has now
+been reversed.** Workstation is what makes the floor worth having, and workstation has not moved.
 
 **Settled earlier and not reopened here:** currency and money to region (ADR-0008, and Allam's
-three-decimal confirmation), ledger and settlement to region, brand and guest app to tenant
+three-decimal confirmation), ledger and settlement to region, brand and guest-app app to tenant
 (ADR-0006), identity and consent and licensing to tenant.
 
 **Accepted by the client on 14 August:** all twenty categories in

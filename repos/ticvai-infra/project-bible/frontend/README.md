@@ -1,60 +1,58 @@
-# Frontend linkage
+# Frontend manifests
 
-**Screens declare which app implements them. Everything else is derived.**
+**Ten apps, 364 screens.** Generated from `screens/*.yaml` — do not hand-edit.
 
-    ../screens/P*.yaml       the source — each screen carries an `implementation` block
-    web-b2c.yaml             per-app manifest, generated
-    ../tools/link-frontend.py
-    ../tools/check-frontend.py
+Named by **who operates them**, agreed 17 August. `guest-*` is what a visitor touches,
+`venue-*` is what venue staff run, `ticvai-*` is ours. That is the boundary that matters when
+someone asks who supports a screen at 9pm on a Saturday.
 
-## What a screen declares
+| App | Operator | Audience | Form factor | Screens | Offline | Platforms |
+|---|---|---|---|---|---|---|
+| `accreditation-web` | **public** | public | web | 8 | no | P11 |
+| `guest-app` | **guest** | guest | kiosk | 76 | no | P02, P05 |
+| `guest-web` | **guest** | guest | web | 29 | no | P01 |
+| `partner-web` | **partner** | partner | web | 21 | no | P10 |
+| `ticvai-web` | **ticvai** | platformAdmin | web | 36 | no | P09 |
+| `venue-management-web` | **venue** | staff | web | 93 | no | P08, P13 |
+| `venue-pos` | **venue** | staff | posTerminal | 10 | **yes** | P04 |
+| `venue-scanner` | **venue** | staff | handheld | 16 | **yes** | P07 |
+| `venue-staff-app` | **venue** | staff | mobileApp | 50 | **yes** | P06 |
+| `venue-support-web` | **venue** | staff | web | 8 | no | P12 |
+| | | | | **347** | | |
 
-```yaml
-implementation:
-  app: web-b2c
-  route: /discovery-and-browse/home-landing
-  component: apps/web-b2c/src/routes/discovery-and-browse/HomeLandingDashboard.tsx
-  status: notStarted
-```
+## What the naming settles
 
-Route and component path are conventional, derived from the module and screen name. A file
-can be found from a screen id and a screen id from a file, without either side maintaining
-a lookup table.
+**An app is not a platform.** `guest-app` serves both the mobile app and the kiosk, because
+they share a codebase and differ by layout. `venue-management-web` serves the back office and
+the White-Label CMS for the same reason.
 
-## What the app manifest gives you
+**`venue-support-web` is separate from `venue-management-web` deliberately.** A contact-centre
+agent and a venue manager are different people with different shifts, and folding eight
+screens into ninety-three would bury them.
 
-Per app: which platforms it serves, which packages it depends on, **which contracts it
-consumes**, screen count by wave, and every route.
+**`ticvai-web` is the only app we operate.** Everything else is run by a venue, a partner or a
+guest, and that is what the prefix is for.
 
-`contracts` is the useful one. `web-b2c` touches eight — catalogue, identity, marketing-crm,
-orders, promotions, retail, seating, white-label. That is the api-client generation scope for
-that app, and it comes from the screens rather than from someone's memory.
+## Build order
 
-## What the check catches
+Classified in `handoff/build-order.md`, and on each manifest as `buildReadiness`.
 
-| | |
-|---|---|
-| **App does not exist** | 73 screens are assigned to four apps nobody has scaffolded |
-| **Route collision** | Two screens on one route surfaces as "sometimes the wrong page loads" |
-| **Component path off convention** | Breaks the find-one-from-the-other property |
-| **Offline app without offline-core** | An app that queues writes without it does not queue them anywhere |
-
-## The finding
-
-**Six apps exist. Nine platforms need one.**
-
-| App | Screens | |
+| | Apps | Screens |
 |---|---|---|
-| web-b2c | 29 | scaffolded |
-| **platform-admin** | **36** | **not scaffolded** |
-| **partner-portal** | **21** | **not scaffolded** |
-| **support-console** | 8 | **not scaffolded** |
-| **accreditation** | 8 | **not scaffolded** |
+| **Ready to build** | `venue-scanner`, `venue-pos` | **26** |
+| Wave 1 critical, specify first | `venue-staff-app`, `guest-web` | 79 |
+| Wave 1 partial | `venue-management-web`, `guest-app`, `ticvai-web` | 205 |
+| Wave 2 or later | `partner-web`, `accreditation-web`, `venue-support-web` | 37 |
 
-Two of the four were always in the proposal — the partner portal and the platform console.
-They were missed because they have no UI/UX board, and the boards were what the frontend plan
-was built from.
+**The gate is specified, not defined.** Every screen is defined — purpose, route, navigation,
+enough to draw. Specified means it also names its operations and its states, and **the states
+are what a developer builds from**.
 
-The other 203 screens on P02, P04, P06, P07, P08 and P13 have no screen definitions yet, so
-their apps show zero here. That is a gap in the definitions, not in the apps — those six are
-scaffolded and the definitions are the next step.
+Only two apps clear it, and both are offline-mandatory. That is not a coincidence: they were
+specified first because a gate that cannot validate without a network is a queue.
+
+## Status
+
+**All ten scaffolded, none implemented.** `status: notStarted` on every route. Four were
+created on 17 August and had never existed — `ticvai-web`, `partner-web`, `venue-support-web`
+and `accreditation-web` carried 73 screens between them with no folder to put them in.

@@ -1,6 +1,6 @@
 # ADR-0011: The Hierarchy Is Binding
 
-**Status:** Accepted
+**Status:** Accepted · amended 18 August 2026 (CF-138)
 **Date:** 13 August 2026
 **Closes:** CF-34, CF-27
 
@@ -63,3 +63,39 @@ rank-3 document, now confirmed as binding. It drives row-level security, the def
 posture, and permission test vector V05.
 
 Worth recording in a MoM so it has rank-1 authority rather than resting on this ADR.
+
+---
+
+## Amendment — `outlet`, 18 August 2026
+
+**The seven organisational levels are unchanged. An eighth has been added beside them.**
+
+The client decided on 18 August that F&B and retail configuration belongs at outlet level
+(CF-138). Configuration resolves up the scope tree, so an outlet had to be on it — and it was
+not: `platform.outlet` hung off `venue_id` as a business unit with no scope path.
+
+    venue
+      ├── department ──► subDepartment ──► workstation      organisational
+      └── outlet                                            commercial
+
+**`outlet` is a sibling of `department`, not a child.** They answer different questions. A
+department has requisitions, rotas and workstations — `inventory.requisition.department_id` and
+`platform.workstation.department_id` both resolve to `platform.scope_node`. An outlet has a menu,
+stock and opening hours. **Modelling a restaurant as a department would put it in the staffing
+tree and give every rota a restaurant to schedule against.**
+
+**Nothing about the seven changes.** Region still owns currency, scale, time zone and fiscal
+year. Reporting still drills tenant to workstation. **The rights cascade is unaffected** — an
+outlet inherits from its venue like anything else below it.
+
+**Why this is an amendment and not a contradiction.** ADR-0011 was confirmed against a
+client-supplied diagram of the *organisational* hierarchy, and it is still right about that. The
+outlet was always in the package — fourteen tables reference it, all F&B or retail, and
+`Outlet` already carried five configuration values (`openingHours`, `stockLocationId`,
+`costCenterId`, `kind`, `zone`) **outside the configuration system that said it could not
+configure.** The amendment names what was already there.
+
+**What it costs.** `scope_path` is an `ltree` and gains a segment for outlets. 76 tables resolve
+against `platform.scope_node` and none of them changes — an outlet appears on the path only where
+one exists, and no other domain has one.
+

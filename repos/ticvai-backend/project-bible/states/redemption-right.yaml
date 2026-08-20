@@ -1,0 +1,45 @@
+# Cross-cell redemption right — state model
+# Contract: cross-cell.RedemptionRight.status
+# Checked by tools/check-states.py.
+
+entity: Cross-cell redemption right
+contract: cross-cell
+enum: RedemptionRight.status
+enumKind: inline
+enumSchema: RedemptionRight
+enumProperty: status
+owner: cross-cell
+initial:
+- active
+terminal:
+- exhausted
+- revoked
+- expired
+transitions:
+- from: active
+  to: exhausted
+  operation: consumeRedemptionRight
+  trigger: operation
+  guard: Every entry used. **A copy, not the entitlement** — the owning cell still holds the truth
+- from: active
+  to: revoked
+  operation: revokeRedemptionRight
+  trigger: operation
+  guard: The owning cell cancelled or refunded it. **Must reach the other cell before the guest does**
+- from: active
+  to: expired
+  trigger: timer
+  guard: The membership lapsed
+- from: exhausted
+  to: active
+  operation: reconcileRedemptions
+  trigger: operation
+  guard: '**Reconciliation found the owning cell disagrees.** The owning cell wins — a copy that drifts
+    is corrected to the original, never the other way'
+  isReversal: true
+notes: 'A redemption right carries an entitlement reference and **no personal data**, which is what
+  makes cross-border validation lawful under ADR-0009.
+
+
+  The return from `exhausted` is the one that matters: two cells can both believe a single-entry pass
+  was used, and only the owning cell can settle it.'

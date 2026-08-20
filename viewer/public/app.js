@@ -7038,6 +7038,97 @@ function renderAccountPanel() {
   }
 }
 
+/**
+ * How many notes have named you, on the account button and on the link that
+ * leads to them.
+ *
+ * The inbox itself lives on the review page, which is the right home for it —
+ * it needs the note, the artefact and who wrote it, and none of that fits in a
+ * topbar. But an inbox you only find by visiting the page it is on is not a
+ * notification, so the count comes to you: the account button is on every
+ * layer of the viewer and is the one thing always in view.
+ *
+ * Asked once per sign-in rather than polled. A mention arrives when somebody
+ * types it, which is not often enough to be worth a timer, and the count is
+ * re-read whenever the account panel is opened.
+ */
+let mentionCache = [];
+
+async function showMentionCount() {
+  const bell = $('bell-toggle');
+  const link = $('mentions-link');
+  if (!bell) return;
+
+  let payload = null;
+  try {
+    payload = await auth.myMentions();
+  } catch {
+    return;                       // the viewer is not about this
+  }
+  mentionCache = payload.mentions ?? [];
+  const unseen = payload.unseen ?? 0;
+
+  // Shown once there is anything at all, read or unread — a bell that
+  // disappears the moment you read the last note takes the history with it,
+  // and "what did that say again" is a question people ask an hour later.
+  bell.hidden = mentionCache.length === 0;
+  bell.classList.toggle('has-mentions', unseen > 0);
+  bell.title = unseen
+    ? `${unseen} note${unseen === 1 ? '' : 's'} named you`
+    : 'Where you were named';
+
+  const count = $('bell-count');
+  count.textContent = unseen > 9 ? '9+' : String(unseen);
+  count.hidden = unseen === 0;
+
+  if (link) {
+    link.textContent = unseen ? `Review activity - ${unseen} named you` : 'Review activity';
+    link.classList.toggle('auth-button-loud', unseen > 0);
+  }
+}
+
+/** The panel behind the bell. Drawn from what the count already fetched, so
+ *  opening it costs nothing and never shows a spinner over three rows. */
+function renderBellPanel() {
+  const list = $('bell-list');
+  list.innerHTML = '';
+  const unseen = mentionCache.filter((m) => !m.seen_at).length;
+  $('bell-note').textContent = mentionCache.length
+    ? (unseen ? `${unseen} unread of ${mentionCache.length}` : `${mentionCache.length}, all read`)
+    : 'Nobody has named you yet.';
+  $('bell-seen').hidden = unseen === 0;
+
+  for (const m of mentionCache.slice(0, 8)) {
+    const row = el('div', `bell-row${m.seen_at ? '' : ' unread'}`);
+    const head = el('div', 'bell-row-head');
+    head.append(el('span', 'bell-who', m.by || m.by_email));
+    const target = el('button', 'bell-target', m.target_id);
+    target.type = 'button';
+    // Goes to the thing rather than to a list of things, because the reason
+    // somebody was named is always about one artefact.
+    target.onclick = () => {
+      closeBellPanel();
+      location.hash = encodeURIComponent(
+        m.target_kind === 'operation' ? m.target_id : `${m.target_kind}:${m.target_id}`);
+    };
+    head.append(target);
+    row.append(head);
+    row.append(auth.renderNote(m.note));
+    list.append(row);
+  }
+}
+
+function openBellPanel() {
+  renderBellPanel();
+  $('bell-panel').hidden = false;
+  $('bell-toggle').setAttribute('aria-expanded', 'true');
+}
+
+function closeBellPanel() {
+  $('bell-panel').hidden = true;
+  $('bell-toggle').setAttribute('aria-expanded', 'false');
+}
+
 /** The initials in the topbar, and what the button says it is for. */
 function renderAccountButton() {
   const who = auth.account();
@@ -7063,6 +7154,21 @@ function renderAccountButton() {
 }
 
 function bindAccountUI() {
+  $('bell-toggle').onclick = () =>
+    ($('bell-panel').hidden ? openBellPanel() : closeBellPanel());
+  $('bell-panel').onclick = (e) => { if (e.target === $('bell-panel')) closeBellPanel(); };
+  $('bell-seen').onclick = async () => {
+    $('bell-seen').disabled = true;
+    try {
+      await auth.markMentionsSeen();
+      for (const m of mentionCache) m.seen_at = m.seen_at ?? new Date().toISOString();
+      renderBellPanel();
+      showMentionCount();
+    } finally {
+      $('bell-seen').disabled = false;
+    }
+  };
+
   $('account-toggle').onclick = () =>
     ($('account-panel').hidden ? openAccountPanel() : closeAccountPanel());
   $('account-panel').onclick = (e) => { if (e.target === $('account-panel')) closeAccountPanel(); };
@@ -7102,6 +7208,11 @@ function bindAccountUI() {
 
   auth.onAuthChange(() => {
     renderAccountButton();
+    // The bell has to be told on sign-in, not on the first time somebody opens
+    // the account panel. It was hanging off renderAccountPanel, which meant the
+    // one control whose job is to tell you something unprompted only appeared
+    // once you had gone looking — exactly the failure it exists to fix.
+    if (auth.account()) showMentionCount();
     if (!$('account-panel').hidden) renderAccountPanel();
   });
   auth.refreshSession();

@@ -53,7 +53,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
   wireframe:
     status: drafted
@@ -76,9 +76,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  density: compact
 - id: ACC-002
   name: Registration Form
-  module: approvals
+  module: Applicant Journey
   wave: 3
   layout:
     template: form
@@ -88,7 +89,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -119,8 +121,7 @@ screens:
     contract: approvals
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
-  modules:
-  - approvals
+  density: compact
 - id: ACC-003
   name: Application Review & Submit
   module: Applicant Journey
@@ -133,7 +134,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
   wireframe:
     status: drafted
@@ -158,6 +159,7 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: Application Review & Submit — the screen a person opens when they need to deal with application
     review & submit.
+  density: compact
 - id: ACC-004
   name: Application Status Tracking
   module: Applicant Journey
@@ -170,7 +172,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
   wireframe:
     status: drafted
@@ -194,9 +196,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: Find application status tracking for this venue.
+  density: compact
 - id: ACC-005
   name: Accreditation Badge
-  module: approvals
+  module: Applicant Journey
   wave: 3
   layout:
     template: detail
@@ -206,7 +209,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -226,7 +230,7 @@ screens:
     - ACC-001
     - ACC-002
     - ACC-003
-    - SCN-004
+    - SCN-003
     inferred: true
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -237,11 +241,10 @@ screens:
     contract: approvals
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
-  modules:
-  - approvals
+  density: compact
 - id: ACC-006
   name: Reviewer Queue
-  module: queue
+  module: Reviewer (Internal)
   wave: 3
   layout:
     template: list
@@ -251,7 +254,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
   wireframe:
     status: drafted
@@ -280,11 +283,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: Find the right one quickly, and act on it without opening it.
-  modules:
-  - queue
+  density: compact
 - id: ACC-007
   name: Reviewer Application Detail
-  module: approvals
+  module: Reviewer (Internal)
   wave: 3
   layout:
     template: detail
@@ -294,7 +296,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -329,8 +332,7 @@ screens:
     contract: approvals
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
-  modules:
-  - approvals
+  density: compact
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)
@@ -343,7 +345,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
   wireframe:
     status: drafted
@@ -367,3 +369,4 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   purpose: Get a guest into the app, fast, on a device that may be shared.
+  density: compact

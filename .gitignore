@@ -8,3 +8,8 @@ backend/target/
 backend/node_modules/
 arabic-embed-eval/.venv/
 arabic-embed-eval/results/raw/
+
+# Build artefacts of the viewer, made for a deploy. Not source, and a drop
+# overwrites this file so the same rules live in .git/info/exclude too.
+viewer.zip
+*.zip

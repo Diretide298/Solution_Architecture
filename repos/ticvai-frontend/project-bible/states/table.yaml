@@ -1,0 +1,73 @@
+# Table — state model
+# Contract: fnb.TableStatus
+# Checked by tools/check-states.py.
+
+entity: Table
+contract: fnb
+enum: TableStatus
+enumKind: named
+enumSchema: TableStatus
+owner: fnb
+initial:
+- free
+terminal:
+- outOfService
+transitions:
+- from: free
+  to: seated
+  operation: claimTableSession
+  trigger: operation
+  guard: A party sat down
+- from: seated
+  to: ordered
+  operation: createFnbOrder
+  trigger: cascade
+  guard: First order placed
+- from: ordered
+  to: billRequested
+  operation: getGuestBill
+  trigger: operation
+  guard: Bill asked for
+- from: billRequested
+  to: needsClearing
+  operation: createPayment
+  trigger: cascade
+  guard: Paid and the party left
+- from: needsClearing
+  to: free
+  operation: clearTable
+  trigger: operation
+  guard: Cleared and reset
+- from: free
+  to: reserved
+  operation: createReservation
+  trigger: cascade
+  guard: Held for a booking
+- from: reserved
+  to: seated
+  operation: claimTableSession
+  trigger: operation
+  guard: The booking arrived
+- from: reserved
+  to: free
+  trigger: timer
+  guard: '**No-show past the hold window.** A table held all evening for someone who never came is a
+    table that earned nothing'
+- from: free
+  to: outOfService
+  operation: clearTable
+  trigger: operation
+  guard: Damaged, or the section is closed
+- from: outOfService
+  to: free
+  operation: clearTable
+  trigger: operation
+  guard: Back in service
+  isReversal: true
+- from: seated
+  to: free
+  operation: clearTable
+  trigger: operation
+  guard: Party left without ordering
+notes: '`needsClearing` exists so a paid table is not immediately sellable. Seating a new party at an
+  uncleared table is the complaint that follows from collapsing this state into `free`.'

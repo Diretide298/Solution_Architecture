@@ -1,0 +1,92 @@
+# Entitlement — state model
+# Contract: orders.EntitlementStatus
+# Checked by tools/check-states.py.
+
+entity: Entitlement
+contract: orders
+enum: EntitlementStatus
+enumKind: named
+enumSchema: EntitlementStatus
+owner: orders
+initial:
+- issued
+terminal:
+- fullyConsumed
+- expired
+- cancelled
+- surrendered
+transitions:
+- from: issued
+  to: partiallyConsumed
+  operation: validateAccess
+  trigger: operation
+  guard: '**A multi-entry pass used once.** The distinction exists because a partly-used pass refunds
+    differently from an untouched one'
+- from: partiallyConsumed
+  to: fullyConsumed
+  operation: validateAccess
+  trigger: operation
+  guard: Every entry taken
+- from: issued
+  to: fullyConsumed
+  operation: validateAccess
+  trigger: operation
+  guard: A single-entry ticket scanned
+- from: issued
+  to: expired
+  trigger: timer
+  guard: '**The performance happened, or the validity window closed.** Distinct from cancelled — nobody
+    did anything wrong'
+- from: partiallyConsumed
+  to: expired
+  trigger: timer
+  guard: Lapsed with entries remaining. **Whether that refunds is a policy question, not a technical
+    one**
+- from: issued
+  to: cancelled
+  operation: createRefund
+  trigger: operation
+  guard: '**Cancelled only on refund confirmation**, never on request — cancelling first and failing
+    at the gateway leaves a guest with no ticket and no money'
+- from: issued
+  to: cancelled
+  operation: cancelPerformance
+  trigger: operation
+  guard: The performance was cancelled and every holder is made whole (F09)
+- from: issued
+  to: surrendered
+  operation: transferOrderTickets
+  trigger: operation
+  guard: '**Given to somebody else.** The entitlement moves rather than being voided — one ticket, one
+    holder'
+- from: partiallyConsumed
+  to: cancelled
+  operation: createRefund
+  trigger: operation
+  guard: Refunded with entries already taken. The consumed entries stand
+- from: issued
+  to: issued
+  operation: suspendEntitlement
+  trigger: operation
+  guard: '**Suspended is a flag, not a state.** A suspended pass is still issued and can be reinstated
+    without reissuing'
+notes: '**`expired` and `cancelled` are not interchangeable.** One is time passing and the other is
+  a decision, and only the second has money attached.
+
+
+  **`surrendered` exists so a transfer is not a void.** Voiding and reissuing produces two records where
+  the truth is one ticket that changed hands.
+
+
+  **Cancellation follows the refund, never precedes it** — the order the refund state model settles.
+
+
+  **Merged with `states/entitlement.yaml` on 18 August.** That file modelled `access.TicketStatus`,
+  which is **an object, not an enum** — a scan-response payload carrying `isValid`, `entriesUsed` and
+  `isInsideVenue`, computed at scan time from the entitlement and the scan history. Six states were
+  being checked against nothing, and `check-states` had warned about it since 17 August as its one standing
+  exception.
+
+
+  **The name is the trap.** `TicketStatus` reads like a lifecycle and is a validation result. The lifecycle
+  is `orders.EntitlementStatus`, which is this file.'

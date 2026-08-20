@@ -330,7 +330,7 @@ and a source of divergence from server truth.
 |---|---|---|
 | 1 | Should `ORDER_REFUND_APPROVE` carry a **threshold value** on the grant, or is the threshold a separate configuration? 2.12.3 implies a value; the grant model has no amount field | Chinmay |
 | 2 | Is `REPORT_VIEW_OWN` the only self-scoped permission, or is self-scoping a general modifier? | Chinmay |
-| 3 | Do accreditation credential holders resolve through this model, or a separate one? They are non-user humans holding scannable access | Chinmay |
+| 3 | Do accreditation-web credential holders resolve through this model, or a separate one? They are non-user humans holding scannable access | Chinmay |
 | 4 | Does a Tenant-level grant span cells once **CF-31** is answered? Currently R8 says no | **Qossai — depends on CF-31** |
 
 Question 4 is the only one that could change a normative rule. Everything else is

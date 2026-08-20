@@ -6,8 +6,8 @@ platform:
   code: P09
   audience: platformAdmin
   formFactor: web
-  shortName: Admin Web
-  name: Admin Web — Platform Console
+  shortName: TICVAI Web
+  name: TICVAI Web — Platform Console
   surface: platformAdmin
   runtime: reactWeb
   offlineCapable: false
@@ -17,8 +17,8 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 36
-  app: platform-admin
+  screenCount: 37
+  app: ticvai-web
   appStatus: not scaffolded
   packages:
   - design-tokens
@@ -33,11 +33,13 @@ platform:
     deviceOwnership: platform staff device
     networkAssumption: corporate network, IP-restricted
     releaseCadence: weekly
+  wireframeBoard: wireframes/P09 Admin Web.dc.html
+  operator: ticvai
 screens:
 - id: ADM-001
   name: Platform Login / MFA
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 1
   layout:
     template: list
@@ -47,30 +49,67 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Checking the session
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Sign-in failed. Wrong credentials read differently from an unreachable directory
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-001
   capability: C35
   apis:
   - operationId: login
     contract: identity
     purpose: from page inventory
     trigger: onLoad
+  - operationId: forceLogout
+    contract: identity
+    purpose: Supervisor termination of an abandoned session
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: listActiveSessions
+    contract: identity
+    purpose: List active sessions
+    trigger: onLoad
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: revokeAllSessions
+    contract: identity
+    purpose: Revoke every session in scope
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/platform-login-mfa
-    component: apps/platform-admin/src/routes/general/PlatformLoginMfaList.tsx
+    component: apps/ticvai-web/src/routes/general/PlatformLoginMfaList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-002
+    - ADM-003
+    - ADM-004
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-002
   name: Platform Dashboard
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
     template: dashboard
@@ -80,36 +119,122 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Tiles skeleton; tenant count first
+    emptyFirstRun: No tenants yet — a new installation, not an error
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Each tile fails independently. **One dead cell must not blank the console that manages it**
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-002
   capability: C95
   apis:
   - operationId: listTenants
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/platform-dashboard
-    component: apps/platform-admin/src/routes/general/PlatformDashboard.tsx
+    component: apps/ticvai-web/src/routes/general/PlatformDashboard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
     exitTo:
     - ADM-001
+    - ADM-003
+    - ADM-004
     - ADM-005
     - ADM-006
     - ADM-007
     - ADM-008
     - ADM-012
     inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
     template: dashboard
@@ -119,30 +244,77 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Cells report in parallel; slow ones are shown as pending rather than held for
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**A cell that does not answer is the finding, not an error.** It is rendered unreachable
+      with its last-known state and the age of it'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-003
   capability: C95
   apis:
   - operationId: getCellHealth
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  - operationId: propagateRedemptionRight
+    contract: cross-cell
+    purpose: Propagate a right from the issuing cell to a consuming cell
+    trigger: onAction
+  - operationId: getRedemptionRight
+    contract: cross-cell
+    purpose: Read a redemption right
+    trigger: onLoad
+  - operationId: reconcileRedemptions
+    contract: cross-cell
+    purpose: Report consumption back to the issuing cell
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/cross-tenant-health-dashboard
-    component: apps/platform-admin/src/routes/general/CrossTenantHealthDashboard.tsx
+    component: apps/ticvai-web/src/routes/general/CrossTenantHealthDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-004
+    - SCN-003
+    fromFlows: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-004
   name: Platform Audit Log
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find platform audit log for this venue.
   wave: 2
   layout:
     template: list
@@ -152,27 +324,42 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Paged from the analytical replica
+    emptyFirstRun: No events for this filter
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Log unavailable. **The console says so rather than showing an empty log** — an empty audit
+      trail and a broken one look identical and mean opposite things
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-004
   capability: C97
   openQuestions:
   - No contract — Control Plane audit not specified
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/platform-audit-log
-    component: apps/platform-admin/src/routes/general/PlatformAuditLogList.tsx
+    component: apps/ticvai-web/src/routes/general/PlatformAuditLogList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listAiInteractions
+    contract: ai
+    purpose: Every prompt, response and action
+    trigger: onLoad
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-005
   name: Tenant Directory
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
     template: list
@@ -182,30 +369,121 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: List skeleton
+    emptyFirstRun: No tenants match
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-005
   capability: C95
   apis:
   - operationId: listTenants
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/tenant-directory
-    component: apps/platform-admin/src/routes/general/TenantDirectoryList.tsx
+    component: apps/ticvai-web/src/routes/general/TenantDirectoryList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-012
+    fromFlows: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-006
   name: Tenant Hierarchy Explorer
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See tenant hierarchy explorer for this venue.
   wave: 1
   layout:
     template: list
@@ -215,25 +493,129 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Tree loads lazily below region
+    emptyFirstRun: A tenant with one venue — shown flat rather than as a tree of one
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Partial. Branches that failed are marked, not hidden
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-006
   capability: C20
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/tenant-hierarchy-explorer
-    component: apps/platform-admin/src/routes/general/TenantHierarchyExplorerList.tsx
+    component: apps/ticvai-web/src/routes/general/TenantHierarchyExplorerList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-007
+    fromFlows: true
+  apis:
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
+  - operationId: listScopeNodes
+    contract: tenancy
+    purpose: List scope nodes visible to the session
+    trigger: onLoad
+  - operationId: createScopeNode
+    contract: tenancy
+    purpose: Create a scope node
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-007
   name: Module & Feature Entitlement
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See module & feature entitlement for this venue.
   wave: 1
   layout:
     template: detail
@@ -242,30 +624,121 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Entitlements resolve against the plan
+    emptyFirstRun: All modules enabled — the maximum plan
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not resolve. **Editing is blocked**, because saving against an unknown current state
+      overwrites what nobody read
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-007
   capability: C75
   apis:
   - operationId: getTenantLicences
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/module-and-feature-entitlement
-    component: apps/platform-admin/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
+    component: apps/ticvai-web/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - BO-074
+    fromFlows: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-008
   name: Subscription & Plan Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find subscription & plan management for this venue.
   wave: 1
   layout:
     template: form
@@ -275,11 +748,13 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Plans and the current subscription
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Save failed. The subscription is unchanged and says so
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-008
   capability: C74
   apis:
   - operationId: listPlans
@@ -290,19 +765,129 @@ screens:
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createPlan
+    contract: subscription
+    purpose: Create a subscription plan
+    trigger: onAction
+  - operationId: createPlanVersion
+    contract: subscription
+    purpose: Publish a new version of a plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getPlan
+    contract: subscription
+    purpose: Read a plan
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
+  - operationId: listPartnerAgreements
+    contract: subscription
+    purpose: Commercial agreements with B2B partners
+    trigger: onLoad
+  - operationId: createPartnerAgreement
+    contract: subscription
+    purpose: Agree commercial terms with a partner
+    trigger: onAction
+  - operationId: updatePartnerAgreement
+    contract: subscription
+    purpose: Amend, suspend or terminate
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/subscription-and-plan-management
-    component: apps/platform-admin/src/routes/general/SubscriptionAndPlanManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/SubscriptionAndPlanManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-009
   name: Tenant Billing & Invoicing
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find tenant billing & invoicing for this venue.
   wave: 2
   layout:
     template: detail
@@ -311,30 +896,119 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Invoices, newest first
+    emptyFirstRun: No invoices — a tenant inside its first period
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: 'Billing unavailable. **Read-only failure**: no invoice may be issued from a screen that
+      cannot list them'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-009
   capability: C74
   apis:
   - operationId: listSubscriptionInvoices
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/tenant-billing-and-invoicing
-    component: apps/platform-admin/src/routes/general/TenantBillingAndInvoicingDetail.tsx
+    component: apps/ticvai-web/src/routes/general/TenantBillingAndInvoicingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-010
   name: Usage Metering
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See usage metering for this venue.
   wave: 2
   layout:
     template: detail
@@ -343,30 +1017,118 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Metering aggregates from the analytical replica
+    emptyFirstRun: No usage in the period
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Metering unavailable. Shows the last complete period rather than nothing
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-010
   capability: C74
   apis:
   - operationId: getUsageMetering
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/usage-metering
-    component: apps/platform-admin/src/routes/general/UsageMeteringDetail.tsx
+    component: apps/ticvai-web/src/routes/general/UsageMeteringDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-011
   name: Licence & Seat Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See licence & seat management for this venue.
   wave: 2
   layout:
     template: form
@@ -376,30 +1138,118 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Licences and consumption
+    emptyFirstRun: No seats allocated
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-011
   capability: C75
   apis:
   - operationId: getEntitlementUsage
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/licence-and-seat-management
-    component: apps/platform-admin/src/routes/general/LicenceAndSeatManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/LicenceAndSeatManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-012
   name: Tenant Isolation & Resource Pool
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Work with tenant isolation & resource pool for this venue.
   wave: 1
   layout:
     template: detail
@@ -408,30 +1258,125 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Cell and pool state
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Provisioning is disabled while the current state is unknown.** A second cell provisioned
+      because the first was invisible is the expensive mistake'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-012
   capability: C96
   apis:
   - operationId: provisionCell
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/tenant-isolation-and-resource-pool
-    component: apps/platform-admin/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
+    component: apps/ticvai-web/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-006
+    fromFlows: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-013
   name: Tenant Performance Monitor
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See tenant performance monitor for this venue.
   wave: 2
   layout:
     template: dashboard
@@ -441,30 +1386,63 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Metrics stream in; the shape renders first
+    emptyFirstRun: No traffic in the window — for a tenant before go-live this is correct
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Metrics unavailable. The cell may be healthy and unobserved, and the screen distinguishes
+      the two
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-013
   capability: C96
   apis:
   - operationId: getCellHealth
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/tenant-performance-monitor
-    component: apps/platform-admin/src/routes/general/TenantPerformanceMonitorDashboard.tsx
+    component: apps/ticvai-web/src/routes/general/TenantPerformanceMonitorDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-014
   name: Auto-Scaling Configuration
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Change how auto-scaling behaves here, and see which level the current value came from.
   wave: 3
   layout:
     template: form
@@ -474,27 +1452,64 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Current sizing and headroom
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not read capacity. Scaling changes are blocked
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-014
   capability: C96
   openQuestions:
   - No contract — infrastructure, Terraform not API
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/auto-scaling-configuration
-    component: apps/platform-admin/src/routes/general/AutoScalingConfigurationForm.tsx
+    component: apps/ticvai-web/src/routes/general/AutoScalingConfigurationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-015
   name: API Rate Limit & Quota Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See api rate limit & quota management for this venue.
   wave: 3
   layout:
     template: form
@@ -504,26 +1519,119 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Limits per plan
+    emptyFirstRun: No custom limits — the plan default applies
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-015
   openQuestions:
   - Blocked — Developer & API workshop
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/api-rate-limit-and-quota-management
-    component: apps/platform-admin/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-016
   name: White-Label Branding Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See white-label branding management for this venue.
   wave: 2
   layout:
     template: form
@@ -533,30 +1641,198 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Tenant config and its published version
+    emptyFirstRun: Never published — draft only
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. **Publishing is blocked**
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-016
   capability: C57
   apis:
   - operationId: getTenantConfig
     contract: white-label
     purpose: from page inventory
     trigger: onLoad
+  - operationId: createBanner
+    contract: white-label
+    purpose: Create a banner
+    trigger: onAction
+  - operationId: createContentPage
+    contract: white-label
+    purpose: Create a content page
+    trigger: onAction
+  - operationId: createPreview
+    contract: white-label
+    purpose: Generate a preview link
+    trigger: onAction
+  - operationId: createPromoBlock
+    contract: white-label
+    purpose: Create a promotional block
+    trigger: onAction
+  - operationId: deleteBanner
+    contract: white-label
+    purpose: Delete a banner
+    trigger: onAction
+  - operationId: deleteContentPage
+    contract: white-label
+    purpose: Delete a content page
+    trigger: onAction
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: getAppIcons
+    contract: white-label
+    purpose: Read app icon set
+    trigger: onLoad
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: getFeatureToggles
+    contract: white-label
+    purpose: Read tenant feature toggles
+    trigger: onLoad
+  - operationId: getFonts
+    contract: white-label
+    purpose: Read font configuration
+    trigger: onLoad
+  - operationId: getHomepageLayout
+    contract: white-label
+    purpose: Read homepage layout
+    trigger: onLoad
+  - operationId: getModuleEnablement
+    contract: white-label
+    purpose: Read module enablement
+    trigger: onLoad
+  - operationId: getNavigation
+    contract: white-label
+    purpose: Read navigation
+    trigger: onLoad
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: listBanners
+    contract: white-label
+    purpose: List banners
+    trigger: onLoad
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: listContentPages
+    contract: white-label
+    purpose: List custom content pages
+    trigger: onLoad
+  - operationId: listFaqs
+    contract: white-label
+    purpose: List FAQs
+    trigger: onLoad
+  - operationId: listPolicies
+    contract: white-label
+    purpose: List legal policies
+    trigger: onLoad
+  - operationId: listPromoBlocks
+    contract: white-label
+    purpose: List promotional blocks
+    trigger: onLoad
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
+  - operationId: setAppIcons
+    contract: white-label
+    purpose: Set app icons
+    trigger: onAction
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: setFaqs
+    contract: white-label
+    purpose: Set FAQ categories and entries
+    trigger: onAction
+  - operationId: setFeatureToggles
+    contract: white-label
+    purpose: Set feature toggles
+    trigger: onAction
+  - operationId: setFonts
+    contract: white-label
+    purpose: Set fonts
+    trigger: onAction
+  - operationId: setHeader
+    contract: white-label
+    purpose: Configure the header
+    trigger: onAction
+  - operationId: setHomepageLayout
+    contract: white-label
+    purpose: Set homepage section order
+    trigger: onAction
+  - operationId: setLanguages
+    contract: white-label
+    purpose: Set enabled languages and default
+    trigger: onAction
+  - operationId: setMaintenanceMode
+    contract: white-label
+    purpose: Enable or clear maintenance mode
+    trigger: onAction
+  - operationId: setModuleEnablement
+    contract: white-label
+    purpose: Enable or disable modules
+    trigger: onAction
+  - operationId: setNavigation
+    contract: white-label
+    purpose: Set main and overflow navigation
+    trigger: onAction
+  - operationId: setPolicy
+    contract: white-label
+    purpose: Publish a policy version
+    trigger: onAction
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
+  - operationId: updateBanner
+    contract: white-label
+    purpose: Amend or activate a banner
+    trigger: onAction
+  - operationId: updateContentPage
+    contract: white-label
+    purpose: Amend a content page
+    trigger: onAction
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/white-label-branding-management
-    component: apps/platform-admin/src/routes/general/WhiteLabelBrandingManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-017
   name: Domain & Certificate Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See domain & certificate management for this venue.
   wave: 2
   layout:
     template: form
@@ -566,27 +1842,201 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Domains and certificate expiry
+    emptyFirstRun: No custom domain — the tenant is on a subpath
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Certificate status unknown. **An expiring certificate nobody can see is an outage with a
+      date on it**
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-017
   capability: C96
   openQuestions:
   - No contract — not specified
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/domain-and-certificate-management
-    component: apps/platform-admin/src/routes/general/DomainAndCertificateManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
+  - operationId: createBanner
+    contract: white-label
+    purpose: Create a banner
+    trigger: onAction
+  - operationId: createContentPage
+    contract: white-label
+    purpose: Create a content page
+    trigger: onAction
+  - operationId: createPreview
+    contract: white-label
+    purpose: Generate a preview link
+    trigger: onAction
+  - operationId: createPromoBlock
+    contract: white-label
+    purpose: Create a promotional block
+    trigger: onAction
+  - operationId: deleteBanner
+    contract: white-label
+    purpose: Delete a banner
+    trigger: onAction
+  - operationId: deleteContentPage
+    contract: white-label
+    purpose: Delete a content page
+    trigger: onAction
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: getAppIcons
+    contract: white-label
+    purpose: Read app icon set
+    trigger: onLoad
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: getFeatureToggles
+    contract: white-label
+    purpose: Read tenant feature toggles
+    trigger: onLoad
+  - operationId: getFonts
+    contract: white-label
+    purpose: Read font configuration
+    trigger: onLoad
+  - operationId: getHomepageLayout
+    contract: white-label
+    purpose: Read homepage layout
+    trigger: onLoad
+  - operationId: getModuleEnablement
+    contract: white-label
+    purpose: Read module enablement
+    trigger: onLoad
+  - operationId: getNavigation
+    contract: white-label
+    purpose: Read navigation
+    trigger: onLoad
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: listBanners
+    contract: white-label
+    purpose: List banners
+    trigger: onLoad
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: listContentPages
+    contract: white-label
+    purpose: List custom content pages
+    trigger: onLoad
+  - operationId: listFaqs
+    contract: white-label
+    purpose: List FAQs
+    trigger: onLoad
+  - operationId: listPolicies
+    contract: white-label
+    purpose: List legal policies
+    trigger: onLoad
+  - operationId: listPromoBlocks
+    contract: white-label
+    purpose: List promotional blocks
+    trigger: onLoad
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
+  - operationId: setAppIcons
+    contract: white-label
+    purpose: Set app icons
+    trigger: onAction
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: setFaqs
+    contract: white-label
+    purpose: Set FAQ categories and entries
+    trigger: onAction
+  - operationId: setFeatureToggles
+    contract: white-label
+    purpose: Set feature toggles
+    trigger: onAction
+  - operationId: setFonts
+    contract: white-label
+    purpose: Set fonts
+    trigger: onAction
+  - operationId: setHeader
+    contract: white-label
+    purpose: Configure the header
+    trigger: onAction
+  - operationId: setHomepageLayout
+    contract: white-label
+    purpose: Set homepage section order
+    trigger: onAction
+  - operationId: setLanguages
+    contract: white-label
+    purpose: Set enabled languages and default
+    trigger: onAction
+  - operationId: setMaintenanceMode
+    contract: white-label
+    purpose: Enable or clear maintenance mode
+    trigger: onAction
+  - operationId: setModuleEnablement
+    contract: white-label
+    purpose: Enable or disable modules
+    trigger: onAction
+  - operationId: setNavigation
+    contract: white-label
+    purpose: Set main and overflow navigation
+    trigger: onAction
+  - operationId: setPolicy
+    contract: white-label
+    purpose: Publish a policy version
+    trigger: onAction
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
+  - operationId: updateBanner
+    contract: white-label
+    purpose: Amend or activate a banner
+    trigger: onAction
+  - operationId: updateContentPage
+    contract: white-label
+    purpose: Amend a content page
+    trigger: onAction
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-018
   name: Localisation & Language Pack
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Configure localisation & language pack for this venue.
   wave: 2
   layout:
     template: detail
@@ -595,30 +2045,198 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Language packs and completeness
+    emptyFirstRun: One language
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-018
   capability: C57
   apis:
   - operationId: setLanguages
     contract: white-label
     purpose: from page inventory
     trigger: onLoad
+  - operationId: createBanner
+    contract: white-label
+    purpose: Create a banner
+    trigger: onAction
+  - operationId: createContentPage
+    contract: white-label
+    purpose: Create a content page
+    trigger: onAction
+  - operationId: createPreview
+    contract: white-label
+    purpose: Generate a preview link
+    trigger: onAction
+  - operationId: createPromoBlock
+    contract: white-label
+    purpose: Create a promotional block
+    trigger: onAction
+  - operationId: deleteBanner
+    contract: white-label
+    purpose: Delete a banner
+    trigger: onAction
+  - operationId: deleteContentPage
+    contract: white-label
+    purpose: Delete a content page
+    trigger: onAction
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: getAppIcons
+    contract: white-label
+    purpose: Read app icon set
+    trigger: onLoad
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: getFeatureToggles
+    contract: white-label
+    purpose: Read tenant feature toggles
+    trigger: onLoad
+  - operationId: getFonts
+    contract: white-label
+    purpose: Read font configuration
+    trigger: onLoad
+  - operationId: getHomepageLayout
+    contract: white-label
+    purpose: Read homepage layout
+    trigger: onLoad
+  - operationId: getModuleEnablement
+    contract: white-label
+    purpose: Read module enablement
+    trigger: onLoad
+  - operationId: getNavigation
+    contract: white-label
+    purpose: Read navigation
+    trigger: onLoad
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: listBanners
+    contract: white-label
+    purpose: List banners
+    trigger: onLoad
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: listContentPages
+    contract: white-label
+    purpose: List custom content pages
+    trigger: onLoad
+  - operationId: listFaqs
+    contract: white-label
+    purpose: List FAQs
+    trigger: onLoad
+  - operationId: listPolicies
+    contract: white-label
+    purpose: List legal policies
+    trigger: onLoad
+  - operationId: listPromoBlocks
+    contract: white-label
+    purpose: List promotional blocks
+    trigger: onLoad
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
+  - operationId: setAppIcons
+    contract: white-label
+    purpose: Set app icons
+    trigger: onAction
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: setFaqs
+    contract: white-label
+    purpose: Set FAQ categories and entries
+    trigger: onAction
+  - operationId: setFeatureToggles
+    contract: white-label
+    purpose: Set feature toggles
+    trigger: onAction
+  - operationId: setFonts
+    contract: white-label
+    purpose: Set fonts
+    trigger: onAction
+  - operationId: setHeader
+    contract: white-label
+    purpose: Configure the header
+    trigger: onAction
+  - operationId: setHomepageLayout
+    contract: white-label
+    purpose: Set homepage section order
+    trigger: onAction
+  - operationId: setMaintenanceMode
+    contract: white-label
+    purpose: Enable or clear maintenance mode
+    trigger: onAction
+  - operationId: setModuleEnablement
+    contract: white-label
+    purpose: Enable or disable modules
+    trigger: onAction
+  - operationId: setNavigation
+    contract: white-label
+    purpose: Set main and overflow navigation
+    trigger: onAction
+  - operationId: setPolicy
+    contract: white-label
+    purpose: Publish a policy version
+    trigger: onAction
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
+  - operationId: updateBanner
+    contract: white-label
+    purpose: Amend or activate a banner
+    trigger: onAction
+  - operationId: updateContentPage
+    contract: white-label
+    purpose: Amend a content page
+    trigger: onAction
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/localisation-and-language-pack
-    component: apps/platform-admin/src/routes/general/LocalisationAndLanguagePackDetail.tsx
+    component: apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-019
   name: Global Configuration & Defaults
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Change how global behaves here, and see which level the current value came from.
   wave: 2
   layout:
     template: form
@@ -628,27 +2246,53 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Defaults resolved at platform level
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. **Editing blocked** — a default saved over an unread one propagates to every
+      tenant
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-019
   capability: C95
   openQuestions:
   - No contract — platform defaults not specified
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/global-configuration-and-defaults
-    component: apps/platform-admin/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
+    component: apps/ticvai-web/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listPlans
+    contract: subscription
+    purpose: List subscription plans
+    trigger: onLoad
+  - operationId: createPlan
+    contract: subscription
+    purpose: Create a subscription plan
+    trigger: onAction
+  - operationId: createPlanVersion
+    contract: subscription
+    purpose: Publish a new version of a plan
+    trigger: onAction
+  - operationId: getPlan
+    contract: subscription
+    purpose: Read a plan
+    trigger: onLoad
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-020
   name: Platform User Directory
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
     template: list
@@ -658,30 +2302,51 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Principals, paged
+    emptyFirstRun: No users match
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-020
   capability: C56
   apis:
   - operationId: listPrincipals
     contract: identity
     purpose: from page inventory
     trigger: onLoad
+  - operationId: createPrincipal
+    contract: identity
+    purpose: Create a principal
+    trigger: onAction
+  - operationId: getPrincipal
+    contract: identity
+    purpose: Read a principal
+    trigger: onLoad
+  - operationId: updatePrincipal
+    contract: identity
+    purpose: Update or deactivate a principal
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/platform-user-directory
-    component: apps/platform-admin/src/routes/general/PlatformUserDirectoryList.tsx
+    component: apps/ticvai-web/src/routes/general/PlatformUserDirectoryList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-021
   name: Platform Role Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find platform role management for this venue.
   wave: 1
   layout:
     template: form
@@ -691,11 +2356,13 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Roles and their permission sets
+    emptyFirstRun: No custom roles — the platform defaults apply
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Role editing is blocked
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-021
   capability: C56
   apis:
   - operationId: listRoles
@@ -707,18 +2374,24 @@ screens:
     purpose: from page inventory
     trigger: onLoad
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/platform-role-management
-    component: apps/platform-admin/src/routes/general/PlatformRoleManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/PlatformRoleManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-022
   name: Release & Version Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find release & version management for this venue.
   wave: 2
   layout:
     template: form
@@ -728,18 +2401,20 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Releases, newest first
+    emptyFirstRun: No releases — before the first build
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-022
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/release-and-version-management
-    component: apps/platform-admin/src/routes/general/ReleaseAndVersionManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/ReleaseAndVersionManagementForm.tsx
     status: notStarted
   apis:
   - operationId: listReleases
@@ -754,17 +2429,38 @@ screens:
     contract: platform-ops
     purpose: Which gates pass and which block
     trigger: onLoad
+  - operationId: createRelease
+    contract: platform-ops
+    purpose: Cut a release
+    trigger: onAction
+  - operationId: promoteRelease
+    contract: platform-ops
+    purpose: Promote a release to the next environment
+    trigger: onAction
+  - operationId: rejectRelease
+    contract: platform-ops
+    purpose: Reject a release back a stage
+    trigger: onAction
+  - operationId: withdrawRelease
+    contract: platform-ops
+    purpose: Withdraw a release
+    trigger: onAction
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-027
     flowDerived: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-023
   name: Staging Promotion & Approval
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Work with staging promotion & approval for this venue.
   wave: 2
   layout:
     template: wizard
@@ -774,18 +2470,21 @@ screens:
       - kind: detailPanel
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Readiness checks run in parallel and each reports separately
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**A readiness check that cannot run is a failed check, not a passed one.** Promotion is
+      blocked'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-023
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/staging-promotion-and-approval
-    component: apps/platform-admin/src/routes/general/StagingPromotionAndApprovalWizard.tsx
+    component: apps/ticvai-web/src/routes/general/StagingPromotionAndApprovalWizard.tsx
     status: notStarted
   apis:
   - operationId: promoteRelease
@@ -796,18 +2495,43 @@ screens:
     contract: platform-ops
     purpose: Checked before the request is offered
     trigger: onLoad
+  - operationId: createRelease
+    contract: platform-ops
+    purpose: Cut a release
+    trigger: onAction
+  - operationId: getRelease
+    contract: platform-ops
+    purpose: Read a release with its rollout state
+    trigger: onLoad
+  - operationId: listReleases
+    contract: platform-ops
+    purpose: List releases
+    trigger: onLoad
+  - operationId: rejectRelease
+    contract: platform-ops
+    purpose: Reject a release back a stage
+    trigger: onAction
+  - operationId: withdrawRelease
+    contract: platform-ops
+    purpose: Withdraw a release
+    trigger: onAction
   navigation:
     entryFrom:
     - ADM-002
     - ADM-027
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-029
     flowDerived: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-024
   name: Release Notification Composer
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Push live release notification composer for this venue.
   wave: 3
   layout:
     template: form
@@ -817,32 +2541,44 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Composer with the release notes prefilled
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Send failed. The draft is kept
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-024
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/release-notification-composer
-    component: apps/platform-admin/src/routes/general/ReleaseNotificationComposerForm.tsx
+    component: apps/ticvai-web/src/routes/general/ReleaseNotificationComposerForm.tsx
     status: notStarted
   apis:
   - operationId: publishSupportNotice
     contract: platform-ops
     purpose: Compose and publish a notice
     trigger: onLoad
+  - operationId: listSupportNotices
+    contract: platform-ops
+    purpose: End-of-support notices
+    trigger: onLoad
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-025
   name: Tenant Upgrade Scheduler
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find tenant upgrade scheduler for this venue.
   wave: 2
   layout:
     template: form
@@ -852,18 +2588,20 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Scheduled upgrades by window
+    emptyFirstRun: Nothing scheduled
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Scheduling is blocked
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-025
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/tenant-upgrade-scheduler
-    component: apps/platform-admin/src/routes/general/TenantUpgradeSchedulerForm.tsx
+    component: apps/ticvai-web/src/routes/general/TenantUpgradeSchedulerForm.tsx
     status: notStarted
   apis:
   - operationId: listUpgradeSchedules
@@ -878,10 +2616,16 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-026
   name: End-of-Support Notice Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Answer a question without needing a person.
   wave: 3
   layout:
     template: form
@@ -891,32 +2635,44 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Notices and their affected versions
+    emptyFirstRun: No notices
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-026
   capability: C96
   openQuestions:
   - No contract — new scope, 30 Jul
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/end-of-support-notice-management
-    component: apps/platform-admin/src/routes/general/EndOfSupportNoticeManagementForm.tsx
+    component: apps/ticvai-web/src/routes/general/EndOfSupportNoticeManagementForm.tsx
     status: notStarted
   apis:
   - operationId: listSupportNotices
     contract: platform-ops
     purpose: End-of-support notices
     trigger: onLoad
+  - operationId: publishSupportNotice
+    contract: platform-ops
+    purpose: Publish an end-of-support notice
+    trigger: onAction
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-027
   name: Database Migration Console
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find database migration console for this venue.
   wave: 1
   layout:
     template: detail
@@ -925,18 +2681,21 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Migration plan and per-cell state
+    emptyFirstRun: No migrations pending — every cell is at the current schema
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Partial state is the normal case mid-rollout.** Cells that could not be reached are listed
+      as unknown rather than assumed current'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-027
   capability: C96
   openQuestions:
   - No contract — the unowned orchestrator
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/database-migration-console
-    component: apps/platform-admin/src/routes/general/DatabaseMigrationConsoleDetail.tsx
+    component: apps/ticvai-web/src/routes/general/DatabaseMigrationConsoleDetail.tsx
     status: notStarted
   apis:
   - operationId: listMigrations
@@ -955,18 +2714,31 @@ screens:
     contract: platform-ops
     purpose: Schema and application version per cell
     trigger: onLoad
+  - operationId: getMigrationRun
+    contract: platform-ops
+    purpose: Migration run progress per cell
+    trigger: onLoad
+  - operationId: rollbackMigrationRun
+    contract: platform-ops
+    purpose: Roll a migration run back
+    trigger: onAction
   navigation:
     entryFrom:
     - ADM-002
     - ADM-022
     inferred: true
     exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
     - ADM-023
     flowDerived: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-028
   name: Environment Registry
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find environment registry for this venue.
   wave: 2
   layout:
     template: detail
@@ -975,18 +2747,20 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Environments and their cells
+    emptyFirstRun: No environments registered
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-028
   capability: C96
   openQuestions:
   - No contract — not specified
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/environment-registry
-    component: apps/platform-admin/src/routes/general/EnvironmentRegistryDetail.tsx
+    component: apps/ticvai-web/src/routes/general/EnvironmentRegistryDetail.tsx
     status: notStarted
   apis:
   - operationId: listEnvironments
@@ -1001,10 +2775,16 @@ screens:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-029
   name: Deployment Monitor
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find deployment monitor for this venue.
   wave: 2
   layout:
     template: dashboard
@@ -1014,11 +2794,14 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Rollouts and jobs, live
+    emptyFirstRun: Nothing deploying
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**A rollout whose state cannot be read is paused, not continued.** Continuing blind is how
+      a bad release reaches every cell'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-029
   capability: C96
   apis:
   - operationId: listCellJobs
@@ -1041,20 +2824,54 @@ screens:
     contract: platform-ops
     purpose: Revert, where every migration is reversible
     trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: startRollout
+    contract: platform-ops
+    purpose: Start or continue a rollout
+    trigger: onAction
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/deployment-monitor
-    component: apps/platform-admin/src/routes/general/DeploymentMonitorDashboard.tsx
+    component: apps/ticvai-web/src/routes/general/DeploymentMonitorDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     - ADM-023
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See infrastructure sizing & scaling policy for this venue.
   wave: 3
   layout:
     template: form
@@ -1064,27 +2881,64 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Cells and their headroom
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not read. Sizing changes are blocked
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-030
   capability: C96
   openQuestions:
   - No contract — Terraform
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/infrastructure-sizing-and-scaling-policy
-    component: apps/platform-admin/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
+    component: apps/ticvai-web/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-031
   name: Security & Compliance Dashboard
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
     template: dashboard
@@ -1094,27 +2948,52 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Compliance dashboards
+    emptyFirstRun: No findings — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. **An unreadable compliance dashboard is not a clean one**
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-031
   capability: C97
   openQuestions:
   - No contract — not specified
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/security-and-compliance-dashboard
-    component: apps/platform-admin/src/routes/general/SecurityAndComplianceDashboard.tsx
+    component: apps/ticvai-web/src/routes/general/SecurityAndComplianceDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listDashboards
+    contract: reporting
+    purpose: List dashboards
+    trigger: onLoad
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: createDashboard
+    contract: reporting
+    purpose: Create a dashboard
+    trigger: onAction
+  - operationId: updateDashboard
+    contract: reporting
+    purpose: Update a dashboard
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-032
   name: WAF & Security Policy View
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See waf & security policy view for this venue.
   wave: 3
   layout:
     template: form
@@ -1124,27 +3003,64 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Policy and cell health
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-032
   capability: C96
   openQuestions:
   - No contract — infrastructure
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/waf-and-security-policy-view
-    component: apps/platform-admin/src/routes/general/WafAndSecurityPolicyViewForm.tsx
+    component: apps/ticvai-web/src/routes/general/WafAndSecurityPolicyViewForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-033
   name: Backup & DR Status
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: See backup & dr status for this venue.
   wave: 2
   layout:
     template: dashboard
@@ -1154,30 +3070,63 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Backup and DR state per cell
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Backup status unknown is the alarm.** A cell whose last backup cannot be confirmed is
+      shown as at risk, not as fine'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-033
   capability: C96
   apis:
   - operationId: getCellHealth
     contract: subscription
     purpose: from page inventory
     trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/backup-and-dr-status
-    component: apps/platform-admin/src/routes/general/BackupAndDrStatusDashboard.tsx
+    component: apps/ticvai-web/src/routes/general/BackupAndDrStatusDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-034
   name: Archival Job Monitor
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find archival job monitor for this venue.
   wave: 3
   layout:
     template: dashboard
@@ -1187,27 +3136,64 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Archival jobs
+    emptyFirstRun: No jobs
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-034
   capability: C96
   openQuestions:
   - No contract — retention not specified
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/archival-job-monitor
-    component: apps/platform-admin/src/routes/general/ArchivalJobMonitorDashboard.tsx
+    component: apps/ticvai-web/src/routes/general/ArchivalJobMonitorDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-035
   name: Support & Escalation Console
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Answer a question without needing a person.
   wave: 3
   layout:
     template: detail
@@ -1216,26 +3202,43 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Open escalations
+    emptyFirstRun: Nothing open
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-035
   openQuestions:
   - No contract — overlaps P12
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/support-and-escalation-console
-    component: apps/platform-admin/src/routes/general/SupportAndEscalationConsoleDetail.tsx
+    component: apps/ticvai-web/src/routes/general/SupportAndEscalationConsoleDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listSupportNotices
+    contract: platform-ops
+    purpose: End-of-support notices
+    trigger: onLoad
+  - operationId: publishSupportNotice
+    contract: platform-ops
+    purpose: Publish an end-of-support notice
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: ADM-036
   name: Platform Notification Broadcast
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Push live platform notification broadcast for this venue.
   wave: 3
   layout:
     template: form
@@ -1245,20 +3248,92 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Composer, with the audience resolved
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Send failed. **Nothing partially sent** — the broadcast is atomic or it is not sent
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P09 Admin Web.dc.html#adm-036
   capability: C96
   openQuestions:
   - No contract — not specified
   implementation:
-    app: platform-admin
+    app: ticvai-web
     route: /general/platform-notification-broadcast
-    component: apps/platform-admin/src/routes/general/PlatformNotificationBroadcastForm.tsx
+    component: apps/ticvai-web/src/routes/general/PlatformNotificationBroadcastForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - ADM-002
     inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: publishSupportNotice
+    contract: platform-ops
+    purpose: Publish an end-of-support notice
+    trigger: onAction
+  - operationId: listSupportNotices
+    contract: platform-ops
+    purpose: End-of-support notices
+    trigger: onLoad
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+- id: ADM-037
+  name: AI Provider & Credentials
+  module: AI
+  purpose: Configure which model a tenant uses, hold the key, and prove it works before anyone relies
+    on it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  apis:
+  - operationId: listAiProviders
+    contract: ai
+    purpose: Configured providers and their order
+    trigger: onLoad
+  - operationId: setAiProvider
+    contract: ai
+    purpose: Configure a provider
+    trigger: onAction
+  - operationId: setAiCredential
+    contract: ai
+    purpose: Store or rotate a provider key
+    trigger: onAction
+  - operationId: testAiProvider
+    contract: ai
+    purpose: Check the key works before anyone relies on it
+    trigger: onAction
+  states:
+    loading: Providers by scope, with the level each resolves from
+    emptyFirstRun: No provider configured — **the assistant is off, not broken**, and the screen says
+      which
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Could not load. Saving is blocked.** A provider saved over an unread one can point a tenant
+      at a model in the wrong jurisdiction'
+  navigation:
+    exitTo:
+    - ADM-001
+    inferred: true
+  implementation:
+    app: ticvai-web
+    route: /ai/providers
+    component: apps/ticvai-web/src/routes/AiProviderCredentials.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    owner: to be drawn
+    board: wireframes/P09 Admin Web.dc.html#adm-001
+    designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
+  notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
+    a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
+    board.**
+  density: compact

@@ -38,7 +38,7 @@ platform:
 screens:
 - id: ADM-001
   name: Platform Login / MFA
-  module: identity
+  module: TODO
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 1
   layout:
@@ -50,7 +50,9 @@ screens:
       - kind: dataTable
   states:
     loading: Checking the session
-    empty: —
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Sign-in failed. Wrong credentials read differently from an unreachable directory
   wireframe:
     status: drafted
@@ -103,11 +105,10 @@ screens:
     - ADM-003
     - ADM-004
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
+  density: compact
 - id: ADM-002
   name: Platform Dashboard
-  module: subscription
+  module: TODO
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -119,7 +120,8 @@ screens:
       - kind: chart
   states:
     loading: Tiles skeleton; tenant count first
-    empty: No tenants yet — a new installation, not an error
+    emptyFirstRun: No tenants yet — a new installation, not an error
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Each tile fails independently. **One dead cell must not blank the console that manages it**
   wireframe:
     status: drafted
@@ -228,12 +230,10 @@ screens:
     - ADM-012
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
-  module: subscription
+  module: TODO
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -245,7 +245,8 @@ screens:
       - kind: chart
   states:
     loading: Cells report in parallel; slow ones are shown as pending rather than held for
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**A cell that does not answer is the finding, not an error.** It is rendered unreachable
       with its last-known state and the age of it'
   wireframe:
@@ -306,15 +307,13 @@ screens:
     - ADM-001
     - ADM-002
     - ADM-004
-    - SCN-004
+    - SCN-003
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - cross-cell
+  density: compact
 - id: ADM-004
   name: Platform Audit Log
-  module: ai
+  module: TODO
   purpose: Find platform audit log for this venue.
   wave: 2
   layout:
@@ -326,7 +325,9 @@ screens:
       - kind: dataTable
   states:
     loading: Paged from the analytical replica
-    empty: No events for this filter
+    emptyFirstRun: No events for this filter
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Log unavailable. **The console says so rather than showing an empty log** — an empty audit
       trail and a broken one look identical and mean opposite things
   wireframe:
@@ -354,11 +355,10 @@ screens:
     purpose: Every prompt, response and action
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - ai
+  density: compact
 - id: ADM-005
   name: Tenant Directory
-  module: subscription
+  module: TODO
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -370,7 +370,9 @@ screens:
       - kind: dataTable
   states:
     loading: List skeleton
-    empty: No tenants match
+    emptyFirstRun: No tenants match
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -477,12 +479,10 @@ screens:
     - ADM-012
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-006
   name: Tenant Hierarchy Explorer
-  module: subscription
+  module: TODO
   purpose: See tenant hierarchy explorer for this venue.
   wave: 1
   layout:
@@ -494,7 +494,9 @@ screens:
       - kind: dataTable
   states:
     loading: Tree loads lazily below region
-    empty: A tenant with one venue — shown flat rather than as a tree of one
+    emptyFirstRun: A tenant with one venue — shown flat rather than as a tree of one
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Partial. Branches that failed are marked, not hidden
   wireframe:
     status: drafted
@@ -609,13 +611,10 @@ screens:
     purpose: Create a scope node
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
-  - tenancy
+  density: compact
 - id: ADM-007
   name: Module & Feature Entitlement
-  module: subscription
+  module: TODO
   purpose: See module & feature entitlement for this venue.
   wave: 1
   layout:
@@ -626,7 +625,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Entitlements resolve against the plan
-    empty: All modules enabled — the maximum plan
+    emptyFirstRun: All modules enabled — the maximum plan
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not resolve. **Editing is blocked**, because saving against an unknown current state
       overwrites what nobody read
   wireframe:
@@ -734,12 +734,10 @@ screens:
     - BO-074
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-008
   name: Subscription & Plan Management
-  module: subscription
+  module: TODO
   purpose: Find subscription & plan management for this venue.
   wave: 1
   layout:
@@ -751,7 +749,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Plans and the current subscription
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Save failed. The subscription is unchanged and says so
   wireframe:
     status: drafted
@@ -884,12 +883,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-009
   name: Tenant Billing & Invoicing
-  module: subscription
+  module: TODO
   purpose: Find tenant billing & invoicing for this venue.
   wave: 2
   layout:
@@ -900,7 +897,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Invoices, newest first
-    empty: No invoices — a tenant inside its first period
+    emptyFirstRun: No invoices — a tenant inside its first period
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: 'Billing unavailable. **Read-only failure**: no invoice may be issued from a screen that
       cannot list them'
   wireframe:
@@ -1006,12 +1004,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-010
   name: Usage Metering
-  module: subscription
+  module: TODO
   purpose: See usage metering for this venue.
   wave: 2
   layout:
@@ -1022,7 +1018,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Metering aggregates from the analytical replica
-    empty: No usage in the period
+    emptyFirstRun: No usage in the period
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Metering unavailable. Shows the last complete period rather than nothing
   wireframe:
     status: drafted
@@ -1127,12 +1124,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-011
   name: Licence & Seat Management
-  module: subscription
+  module: TODO
   purpose: See licence & seat management for this venue.
   wave: 2
   layout:
@@ -1144,7 +1139,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Licences and consumption
-    empty: No seats allocated
+    emptyFirstRun: No seats allocated
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -1249,12 +1245,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-012
   name: Tenant Isolation & Resource Pool
-  module: subscription
+  module: TODO
   purpose: Work with tenant isolation & resource pool for this venue.
   wave: 1
   layout:
@@ -1265,7 +1259,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Cell and pool state
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Provisioning is disabled while the current state is unknown.** A second cell provisioned
       because the first was invisible is the expensive mistake'
   wireframe:
@@ -1377,12 +1372,10 @@ screens:
     - ADM-006
     fromFlows: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-013
   name: Tenant Performance Monitor
-  module: subscription
+  module: TODO
   purpose: See tenant performance monitor for this venue.
   wave: 2
   layout:
@@ -1394,7 +1387,8 @@ screens:
       - kind: chart
   states:
     loading: Metrics stream in; the shape renders first
-    empty: No traffic in the window — for a tenant before go-live this is correct
+    emptyFirstRun: No traffic in the window — for a tenant before go-live this is correct
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Metrics unavailable. The cell may be healthy and unobserved, and the screen distinguishes
       the two
   wireframe:
@@ -1444,11 +1438,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
+  density: compact
 - id: ADM-014
   name: Auto-Scaling Configuration
-  module: subscription
+  module: TODO
   purpose: Change how auto-scaling behaves here, and see which level the current value came from.
   wave: 3
   layout:
@@ -1460,7 +1453,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Current sizing and headroom
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not read capacity. Scaling changes are blocked
   wireframe:
     status: drafted
@@ -1511,11 +1505,10 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
+  density: compact
 - id: ADM-015
   name: API Rate Limit & Quota Management
-  module: subscription
+  module: TODO
   purpose: See api rate limit & quota management for this venue.
   wave: 3
   layout:
@@ -1527,7 +1520,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Limits per plan
-    empty: No custom limits — the plan default applies
+    emptyFirstRun: No custom limits — the plan default applies
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -1633,12 +1627,10 @@ screens:
     purpose: Amend tenant details
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - identity
+  density: compact
 - id: ADM-016
   name: White-Label Branding Management
-  module: white-label
+  module: TODO
   purpose: See white-label branding management for this venue.
   wave: 2
   layout:
@@ -1650,7 +1642,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Tenant config and its published version
-    empty: Never published — draft only
+    emptyFirstRun: Never published — draft only
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Publishing is blocked**
   wireframe:
     status: drafted
@@ -1835,11 +1828,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - white-label
+  density: compact
 - id: ADM-017
   name: Domain & Certificate Management
-  module: white-label
+  module: TODO
   purpose: See domain & certificate management for this venue.
   wave: 2
   layout:
@@ -1851,7 +1843,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Domains and certificate expiry
-    empty: No custom domain — the tenant is on a subpath
+    emptyFirstRun: No custom domain — the tenant is on a subpath
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Certificate status unknown. **An expiring certificate nobody can see is an outage with a
       date on it**
   wireframe:
@@ -2039,11 +2032,10 @@ screens:
     purpose: Validate the working draft
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - white-label
+  density: compact
 - id: ADM-018
   name: Localisation & Language Pack
-  module: white-label
+  module: TODO
   purpose: Configure localisation & language pack for this venue.
   wave: 2
   layout:
@@ -2054,7 +2046,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Language packs and completeness
-    empty: One language
+    emptyFirstRun: One language
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -2239,11 +2232,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - white-label
+  density: compact
 - id: ADM-019
   name: Global Configuration & Defaults
-  module: subscription
+  module: TODO
   purpose: Change how global behaves here, and see which level the current value came from.
   wave: 2
   layout:
@@ -2255,7 +2247,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Defaults resolved at platform level
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Editing blocked** — a default saved over an unread one propagates to every
       tenant
   wireframe:
@@ -2295,11 +2288,10 @@ screens:
     purpose: Read a plan
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
+  density: compact
 - id: ADM-020
   name: Platform User Directory
-  module: identity
+  module: TODO
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -2311,7 +2303,9 @@ screens:
       - kind: dataTable
   states:
     loading: Principals, paged
-    empty: No users match
+    emptyFirstRun: No users match
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -2348,11 +2342,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
+  density: compact
 - id: ADM-021
   name: Platform Role Management
-  module: identity
+  module: TODO
   purpose: Find platform role management for this venue.
   wave: 1
   layout:
@@ -2364,7 +2357,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Roles and their permission sets
-    empty: No custom roles — the platform defaults apply
+    emptyFirstRun: No custom roles — the platform defaults apply
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Role editing is blocked
   wireframe:
     status: drafted
@@ -2393,11 +2387,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
+  density: compact
 - id: ADM-022
   name: Release & Version Management
-  module: platform-ops
+  module: TODO
   purpose: Find release & version management for this venue.
   wave: 2
   layout:
@@ -2409,7 +2402,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Releases, newest first
-    empty: No releases — before the first build
+    emptyFirstRun: No releases — before the first build
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -2462,11 +2456,10 @@ screens:
     - ADM-027
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-023
   name: Staging Promotion & Approval
-  module: platform-ops
+  module: TODO
   purpose: Work with staging promotion & approval for this venue.
   wave: 2
   layout:
@@ -2478,7 +2471,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Readiness checks run in parallel and each reports separately
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**A readiness check that cannot run is a failed check, not a passed one.** Promotion is
       blocked'
   wireframe:
@@ -2533,11 +2527,10 @@ screens:
     - ADM-029
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-024
   name: Release Notification Composer
-  module: platform-ops
+  module: TODO
   purpose: Push live release notification composer for this venue.
   wave: 3
   layout:
@@ -2549,7 +2542,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Composer with the release notes prefilled
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Send failed. The draft is kept
   wireframe:
     status: drafted
@@ -2580,11 +2574,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-025
   name: Tenant Upgrade Scheduler
-  module: platform-ops
+  module: TODO
   purpose: Find tenant upgrade scheduler for this venue.
   wave: 2
   layout:
@@ -2596,7 +2589,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Scheduled upgrades by window
-    empty: Nothing scheduled
+    emptyFirstRun: Nothing scheduled
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Scheduling is blocked
   wireframe:
     status: drafted
@@ -2627,11 +2621,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-026
   name: End-of-Support Notice Management
-  module: platform-ops
+  module: TODO
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -2643,7 +2636,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Notices and their affected versions
-    empty: No notices
+    emptyFirstRun: No notices
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -2674,11 +2668,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-027
   name: Database Migration Console
-  module: platform-ops
+  module: TODO
   purpose: Find database migration console for this venue.
   wave: 1
   layout:
@@ -2689,7 +2682,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Migration plan and per-cell state
-    empty: No migrations pending — every cell is at the current schema
+    emptyFirstRun: No migrations pending — every cell is at the current schema
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Partial state is the normal case mid-rollout.** Cells that could not be reached are listed
       as unknown rather than assumed current'
   wireframe:
@@ -2740,11 +2734,10 @@ screens:
     - ADM-023
     flowDerived: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-028
   name: Environment Registry
-  module: platform-ops
+  module: TODO
   purpose: Find environment registry for this venue.
   wave: 2
   layout:
@@ -2755,7 +2748,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Environments and their cells
-    empty: No environments registered
+    emptyFirstRun: No environments registered
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -2786,11 +2780,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-029
   name: Deployment Monitor
-  module: subscription
+  module: TODO
   purpose: Find deployment monitor for this venue.
   wave: 2
   layout:
@@ -2802,7 +2795,8 @@ screens:
       - kind: chart
   states:
     loading: Rollouts and jobs, live
-    empty: Nothing deploying
+    emptyFirstRun: Nothing deploying
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**A rollout whose state cannot be read is paused, not continued.** Continuing blind is how
       a bad release reaches every cell'
   wireframe:
@@ -2873,12 +2867,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
-  - platform-ops
+  density: compact
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
-  module: subscription
+  module: TODO
   purpose: See infrastructure sizing & scaling policy for this venue.
   wave: 3
   layout:
@@ -2890,7 +2882,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Cells and their headroom
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not read. Sizing changes are blocked
   wireframe:
     status: drafted
@@ -2941,11 +2934,10 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
+  density: compact
 - id: ADM-031
   name: Security & Compliance Dashboard
-  module: reporting
+  module: TODO
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
@@ -2957,7 +2949,8 @@ screens:
       - kind: chart
   states:
     loading: Compliance dashboards
-    empty: No findings — reported as a result, not an empty screen
+    emptyFirstRun: No findings — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **An unreadable compliance dashboard is not a clean one**
   wireframe:
     status: drafted
@@ -2996,11 +2989,10 @@ screens:
     purpose: Update a dashboard
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - reporting
+  density: compact
 - id: ADM-032
   name: WAF & Security Policy View
-  module: subscription
+  module: TODO
   purpose: See waf & security policy view for this venue.
   wave: 3
   layout:
@@ -3012,7 +3004,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Policy and cell health
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -3063,11 +3056,10 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
+  density: compact
 - id: ADM-033
   name: Backup & DR Status
-  module: subscription
+  module: TODO
   purpose: See backup & dr status for this venue.
   wave: 2
   layout:
@@ -3079,7 +3071,8 @@ screens:
       - kind: chart
   states:
     loading: Backup and DR state per cell
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Backup status unknown is the alarm.** A cell whose last backup cannot be confirmed is
       shown as at risk, not as fine'
   wireframe:
@@ -3129,11 +3122,10 @@ screens:
     - ADM-002
     - ADM-003
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
+  density: compact
 - id: ADM-034
   name: Archival Job Monitor
-  module: subscription
+  module: TODO
   purpose: Find archival job monitor for this venue.
   wave: 3
   layout:
@@ -3145,7 +3137,8 @@ screens:
       - kind: chart
   states:
     loading: Archival jobs
-    empty: No jobs
+    emptyFirstRun: No jobs
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -3196,11 +3189,10 @@ screens:
     purpose: Change a cell's tier
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - subscription
+  density: compact
 - id: ADM-035
   name: Support & Escalation Console
-  module: platform-ops
+  module: TODO
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -3211,7 +3203,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Open escalations
-    empty: Nothing open
+    emptyFirstRun: Nothing open
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -3241,11 +3234,10 @@ screens:
     purpose: Publish an end-of-support notice
     trigger: onAction
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-036
   name: Platform Notification Broadcast
-  module: platform-ops
+  module: TODO
   purpose: Push live platform notification broadcast for this venue.
   wave: 3
   layout:
@@ -3257,7 +3249,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Composer, with the audience resolved
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Send failed. **Nothing partially sent** — the broadcast is atomic or it is not sent
   wireframe:
     status: drafted
@@ -3288,11 +3281,10 @@ screens:
     purpose: End-of-support notices
     trigger: onLoad
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - platform-ops
+  density: compact
 - id: ADM-037
   name: AI Provider & Credentials
-  module: ai
+  module: AI
   purpose: Configure which model a tenant uses, hold the key, and prove it works before anyone relies
     on it.
   capability: C00
@@ -3322,7 +3314,9 @@ screens:
     trigger: onAction
   states:
     loading: Providers by scope, with the level each resolves from
-    empty: No provider configured — **the assistant is off, not broken**, and the screen says which
+    emptyFirstRun: No provider configured — **the assistant is off, not broken**, and the screen says
+      which
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked.** A provider saved over an unread one can point a tenant
       at a model in the wrong jurisdiction'
   navigation:
@@ -3342,5 +3336,4 @@ screens:
   notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
     a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
     board.**
-  modules:
-  - ai
+  density: compact

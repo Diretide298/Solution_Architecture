@@ -15,6 +15,7 @@ binding it fails with Errno 10013.
 from __future__ import annotations
 
 import os
+import re
 from typing import List, Optional
 
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Response, Request
@@ -126,6 +127,7 @@ class VerdictOut(BaseModel):
     target_id: str
     layer: str = ""
     tag: str = ""
+    audience: str = "internal"
     verdict: str
     note: str
     by: str
@@ -134,10 +136,19 @@ class VerdictOut(BaseModel):
     # Null until somebody marks it complete. Both fields or neither.
     done_at: Optional[str] = None
     done_by_name: Optional[str] = None
+    # Set when an admin did not accept the completion. Whether the row counts
+    # as done is decided by which of the two timestamps is later.
+    sent_back_at: Optional[str] = None
+    sent_back_by_name: Optional[str] = None
+    sent_back_note: str = ""
 
 
 class DoneIn(BaseModel):
     done: bool = True
+
+
+class SendBackIn(BaseModel):
+    note: str = ""
 
 
 # ── who is asking ────────────────────────────────────────────────────
@@ -173,16 +184,44 @@ def require_admin(account: dict = Depends(require_account)) -> dict:
 
 
 def require_writer(account: dict = Depends(require_account)) -> dict:
-    """Anyone who may record a decision — admin or reviewer, never a client.
+    """Anyone who may act on the team's behalf — admin or reviewer, never a
+    client.
 
-    A client is read-only, and this is where that is true. Hiding the verdict
-    form in the browser is presentation; a hidden form is still a POST away for
-    anyone who opens devtools. The rule has to be here or it is not a rule.
+    This is what a client still may not do: change the shape of the review
+    itself. Closing an item, and anything else that says work has happened, is
+    the team's own record of its own queue. Recording a verdict is no longer on
+    this list — see require_voice — but everything else that writes still is.
+
+    Hiding a control in the browser is presentation; a hidden button is still a
+    POST away for anyone who opens devtools. The rule has to be here or it is
+    not a rule.
     """
     if account["role"] not in security.WRITERS:
         raise HTTPException(
-            403, "A client account can read the package but cannot record a verdict.")
+            403, "A client account can read the package but cannot do that.")
     return account
+
+
+def require_voice(account: dict = Depends(require_account)) -> dict:
+    """Anyone who may say what they think of an artefact — everybody, client
+    included.
+
+    A client reviewing what was built for them is the point of showing it to
+    them, and a reader who can find a fault and has no way to say so will say
+    it somewhere nobody is reading. What keeps that safe is not refusing the
+    write but separating it: see `audience_of`.
+    """
+    return account
+
+
+def audience_of(account: dict) -> str:
+    """Which review a verdict belongs to, from who is writing it.
+
+    Derived here and never accepted from the request. A caller who could name
+    their own audience could file a client's approval as the team's, which is
+    the only thing about this that would actually matter.
+    """
+    return "client" if account["role"] == "client" else "internal"
 
 
 # ── accounts ─────────────────────────────────────────────────────────
@@ -539,10 +578,85 @@ def redeem(body: Redemption, response: Response, request: Request):
     return {"ok": True, "email": invite["email"], "role": invite["role"]}
 
 
+# ── mentions ────────────────────────────────────────────
+
+# @ followed by the local part of an address, or a whole address. The local
+# part is the handle because `email_folded` is unique, so it identifies exactly
+# one person and needs no second namespace that could drift out of step with
+# the roster. Names are not matched: two people called Chris is normal, and a
+# notification that goes to the wrong Chris is worse than one that does not go.
+MENTION = re.compile(r"@([A-Za-z0-9._%+-]+(?:@[A-Za-z0-9.-]+\.[A-Za-z]{2,})?)")
+
+
+def mentioned_in(note: str) -> list:
+    """The accounts a note names, as ids. Unknown handles are ignored rather
+    than refused: a note is prose, and an address in it that happens not to be
+    an account is a sentence, not a mistake to reject a verdict over."""
+    handles = {h.lower() for h in MENTION.findall(note or "")}
+    if not handles:
+        return []
+    rows = db.all_rows("SELECT id, email_folded FROM account WHERE active = 1")
+    hit = []
+    for row in rows:
+        folded = row["email_folded"]
+        if folded in handles or folded.split("@")[0] in handles:
+            hit.append(row["id"])
+    return hit
+
+
+@app.get("/api/mentions")
+def mentions(account: dict = Depends(require_account)):
+    """Every time somebody named you, newest first.
+
+    Carries the note and the artefact rather than an id to go and fetch,
+    because a notification that requires a second request to become legible is
+    one that gets rendered as "you have 3 notifications" and never read.
+    """
+    rows = db.all_rows(
+        """SELECT m.id, m.created_at AS at, m.seen_at,
+                  v.id AS verdict_id, v.target_kind, v.target_id, v.verdict,
+                  v.note, v.audience,
+                  a.name AS by, a.email AS by_email
+             FROM mention m
+             JOIN verdict v ON v.id = m.verdict_id
+             JOIN account a ON a.id = v.account_id
+            WHERE m.account_id = ?
+            ORDER BY m.id DESC
+            LIMIT 200""",
+        (account["id"],),
+    )
+    items = [dict(r) for r in rows]
+    return {"mentions": items, "unseen": sum(1 for i in items if not i["seen_at"])}
+
+
+@app.post("/api/mentions/seen")
+def mentions_seen(account: dict = Depends(require_account)):
+    """Mark everything addressed to you as read. All of it, rather than one at
+    a time: the list is short and the gesture people actually make is closing
+    the panel, not ticking rows."""
+    db.write(
+        "UPDATE mention SET seen_at = ? WHERE account_id = ? AND seen_at IS NULL",
+        (security.stamp(), account["id"]),
+    )
+    return {"ok": True, "unseen": 0}
+
+
+@app.get("/api/mentionable")
+def mentionable(account: dict = Depends(require_account)):
+    """Who can be named, for the picker. Active accounts only — offering
+    somebody who has been disabled invites a note addressed to nobody."""
+    rows = db.all_rows(
+        "SELECT id, name, email, role FROM account WHERE active = 1 ORDER BY name, email"
+    )
+    return {"people": [
+        {**dict(r), "handle": r["email"].split("@")[0].lower()} for r in rows
+    ]}
+
+
 # ── verdicts ─────────────────────────────────────────────────────────
 
 @app.post("/api/validation")
-def record(body: VerdictIn, account: dict = Depends(require_writer)):
+def record(body: VerdictIn, account: dict = Depends(require_voice)):
     if body.verdict not in VERDICTS:
         raise HTTPException(400, f"A verdict is one of {', '.join(VERDICTS)}.")
     if body.target_kind not in TARGET_KINDS:
@@ -559,62 +673,109 @@ def record(body: VerdictIn, account: dict = Depends(require_writer)):
     if tag and tag not in TAGS:
         raise HTTPException(400, f"A tag is one of {', '.join(TAGS)}.")
 
+    audience = audience_of(account)
     row_id = db.write(
         """INSERT INTO verdict
-             (target_kind, target_id, layer, tag, verdict, note, account_id, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+             (target_kind, target_id, layer, tag, audience, verdict, note,
+              account_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
-            body.target_kind, body.target_id.strip(), layer, tag, body.verdict,
-            body.note.strip(), account["id"], security.stamp(),
+            body.target_kind, body.target_id.strip(), layer, tag, audience,
+            body.verdict, body.note.strip(), account["id"], security.stamp(),
         ),
     )
-    return {"id": row_id, "ok": True}
+    # Who the note names. Written as rows now rather than parsed on every read:
+    # the note is prose, people get renamed, and a mention that stopped
+    # resolving later would be a notification that silently never arrives.
+    #
+    # Naming yourself is dropped. It is usually a sentence about your own
+    # address rather than a note to yourself, and either way a notification
+    # about something you just typed is noise.
+    named = [i for i in mentioned_in(body.note) if i != account["id"]]
+    for who in named:
+        db.write(
+            "INSERT INTO mention (verdict_id, account_id, created_at) VALUES (?, ?, ?)",
+            (row_id, who, security.stamp()),
+        )
+
+    return {"id": row_id, "ok": True, "audience": audience, "mentioned": len(named)}
 
 
 @app.get("/api/validation/{target_kind}/{target_id:path}")
 def history(target_kind: str, target_id: str):
-    """Every verdict on one artefact, newest first. The newest is the current
-    one; the rest are how it got there, which is the part worth keeping."""
+    """Every verdict on one artefact, newest first, and the current one for
+    each audience.
+
+    `current` stays the team's, because everything that already reads this key
+    means the team's — and a field that quietly changed meaning the first time
+    a client reviewed something would be worse than a new one. The client's own
+    standing verdict is `client_current`, and the history holds both, marked.
+    """
     rows = db.all_rows(
-        """SELECT v.id, v.target_kind, v.target_id, v.layer, v.tag, v.verdict, v.note,
+        """SELECT v.id, v.target_kind, v.target_id, v.layer, v.tag, v.audience,
+                  v.verdict, v.note,
                   v.created_at AS at, a.name AS by, a.email AS by_email,
-                  v.done_at, d.name AS done_by_name
+                  v.done_at, d.name AS done_by_name,
+                  v.sent_back_at, v.sent_back_note, k.name AS sent_back_by_name
              FROM verdict v
              JOIN account a ON a.id = v.account_id
              LEFT JOIN account d ON d.id = v.done_by
+             LEFT JOIN account k ON k.id = v.sent_back_by
             WHERE v.target_kind = ? AND v.target_id = ?
             ORDER BY v.id DESC""",
         (target_kind, target_id),
     )
     items = [VerdictOut(**dict(r)) for r in rows]
-    return {"current": items[0] if items else None, "history": items}
+    newest = lambda who: next((i for i in items if i.audience == who), None)
+    return {
+        "current": newest("internal"),
+        "client_current": newest("client"),
+        "history": items,
+    }
 
 
 @app.get("/api/validation")
-def summary(target_kind: Optional[str] = None):
+def summary(target_kind: Optional[str] = None, audience: str = "internal"):
     """The current verdict on everything judged so far — one row per artefact,
     which is what a sign-off report is made of."""
+    # One row per artefact *per audience*. Grouping by the artefact alone was
+    # right while only the team could write: it is the newest row that stands,
+    # and there was only ever one review. With a client reviewing too, that
+    # query would hand back whichever of the two happened to be typed last and
+    # call it the verdict — a client's approval standing in for the team's on
+    # something the team had rejected. Two rows, and the caller says which it
+    # wants.
     sql = """
-        SELECT v.target_kind, v.target_id, v.layer, v.tag, v.verdict, v.note,
+        SELECT v.target_kind, v.target_id, v.layer, v.tag, v.audience, v.verdict, v.note,
                v.created_at AS at, a.name AS by, a.email AS by_email, v.id,
-               v.done_at, d.name AS done_by_name
+               v.done_at, d.name AS done_by_name,
+               v.sent_back_at, v.sent_back_note, k.name AS sent_back_by_name
           FROM verdict v
           JOIN account a ON a.id = v.account_id
           LEFT JOIN account d ON d.id = v.done_by
-         WHERE v.id IN (SELECT MAX(id) FROM verdict GROUP BY target_kind, target_id)
+          LEFT JOIN account k ON k.id = v.sent_back_by
+         WHERE v.id IN (
+                 SELECT MAX(id) FROM verdict GROUP BY target_kind, target_id, audience)
     """
-    args: tuple = ()
+    args: list = []
     if target_kind:
         sql += " AND v.target_kind = ?"
-        args = (target_kind,)
+        args.append(target_kind)
+    # "all" is spelled out rather than being what an empty value happens to
+    # mean, so a caller that forgets the parameter gets the team's review —
+    # which is what every existing caller meant by asking at all.
+    if audience != "all":
+        sql += " AND v.audience = ?"
+        args.append(audience)
     sql += " ORDER BY v.target_kind, v.target_id"
 
-    rows = db.all_rows(sql, args)
+    rows = db.all_rows(sql, tuple(args))
     counts: dict = {}
     for r in rows:
         counts.setdefault(r["target_kind"], {}).setdefault(r["verdict"], 0)
         counts[r["target_kind"]][r["verdict"]] += 1
-    return {"counts": counts, "items": [VerdictOut(**dict(r)) for r in rows]}
+    return {"audience": audience, "counts": counts,
+            "items": [VerdictOut(**dict(r)) for r in rows]}
 
 
 @app.get("/api/verdicts")
@@ -631,13 +792,16 @@ def verdicts(account: dict = Depends(require_account)):
     Signed in only. Who reviewed what, and how fast, is not public.
     """
     rows = db.all_rows(
-        """SELECT v.id, v.target_kind, v.target_id, v.layer, v.tag, v.verdict, v.note,
+        """SELECT v.id, v.target_kind, v.target_id, v.layer, v.tag, v.audience,
+                  v.verdict, v.note,
                   v.created_at AS at, v.account_id,
                   a.name AS by, a.email AS by_email, a.role AS by_role, a.active AS by_active,
-                  v.done_at, v.done_by, d.name AS done_by_name
+                  v.done_at, v.done_by, d.name AS done_by_name,
+                  v.sent_back_at, v.sent_back_note, k.name AS sent_back_by_name
              FROM verdict v
              JOIN account a ON a.id = v.account_id
              LEFT JOIN account d ON d.id = v.done_by
+             LEFT JOIN account k ON k.id = v.sent_back_by
             ORDER BY v.id DESC"""
     )
     people = db.all_rows(
@@ -687,6 +851,84 @@ def mark_done(verdict_id: int, body: DoneIn, account: dict = Depends(require_wri
         (verdict_id,),
     )
     return {"id": verdict_id, "done_at": fresh["done_at"], "done_by_name": fresh["done_by_name"]}
+
+
+@app.post("/api/verdicts/{verdict_id}/send-back")
+def send_back(verdict_id: int, body: SendBackIn, account: dict = Depends(require_admin)):
+    """Reject a completion, with a reason. Admin only.
+
+    Somebody marked an item done; this says it is not. It is the other half of
+    marking done, and without it the only answer to work that was not really
+    finished is to reopen it silently — which tells whoever did it nothing, and
+    so tends to produce the same thing again.
+
+    **The note is required.** Everywhere else in this store a reason is
+    encouraged and optional, because a verdict with no reason is still a
+    verdict. This one is different: it is addressed to a specific person about
+    a specific piece of work, and it is the only field that tells them what to
+    do next.
+
+    Admin only, unlike marking done, which anyone who can review may do. Anyone
+    can say a thing is finished; deciding it is not is a call about somebody
+    else's work, and that is narrower.
+
+    Nothing is cleared. `done_at` stays where it was and this is written beside
+    it, so the row keeps both the claim and the answer to it, and which one
+    stands is whichever is later.
+    """
+    note = body.note.strip()
+    if not note:
+        raise HTTPException(400, "Say why it is being sent back — that is the whole of it.")
+
+    row = db.one("SELECT id, done_at FROM verdict WHERE id = ?", (verdict_id,))
+    if not row:
+        raise HTTPException(404, "No such verdict.")
+    if not row["done_at"]:
+        raise HTTPException(
+            400, "That has not been marked done, so there is no completion to reject.")
+
+    db.write(
+        "UPDATE verdict SET sent_back_at = ?, sent_back_by = ?, sent_back_note = ? WHERE id = ?",
+        (security.stamp(), account["id"], note, verdict_id),
+    )
+    fresh = db.one(
+        """SELECT v.sent_back_at, v.sent_back_note, k.name AS sent_back_by_name
+             FROM verdict v LEFT JOIN account k ON k.id = v.sent_back_by
+            WHERE v.id = ?""",
+        (verdict_id,),
+    )
+    return {"id": verdict_id, **dict(fresh)}
+
+
+@app.delete("/api/verdicts/{verdict_id}")
+def discard(verdict_id: int, account: dict = Depends(require_account)):
+    """Discard your own verdict.
+
+    Verdicts are otherwise append-only, and that is deliberate: a row is a
+    thing somebody said at a time, and rewriting it would lose the fact that
+    they once thought otherwise. Changing your mind is a second row, not an
+    edit of the first.
+
+    This is the one exception, and it is narrow on purpose. It is not for
+    withdrawing an opinion — that is what a later verdict is for — it is for a
+    row that should never have existed: a mis-click, a test, a note typed into
+    the wrong artefact. Those are not disagreements worth keeping, and leaving
+    them in makes the register harder to read than the history is worth.
+
+    **Your own only, and no exception for an admin.** An admin can disable an
+    account and can read everything, and still cannot delete what somebody else
+    said — because the moment that is possible, a register of who signed off on
+    what stops being evidence of anything. A junk row from somebody who has
+    left stays, and that is the cheaper of the two problems.
+    """
+    row = db.one("SELECT id, account_id FROM verdict WHERE id = ?", (verdict_id,))
+    if not row:
+        raise HTTPException(404, "No such verdict.")
+    if row["account_id"] != account["id"]:
+        raise HTTPException(403, "You can only discard a verdict you recorded yourself.")
+
+    db.write("DELETE FROM verdict WHERE id = ?", (verdict_id,))
+    return {"id": verdict_id, "discarded": True}
 
 
 @app.get("/api/health")

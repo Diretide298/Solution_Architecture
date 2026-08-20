@@ -1,0 +1,76 @@
+# Registered device — state model
+# Contract: tenancy.RegisteredDevice.status
+# Checked by tools/check-states.py.
+
+entity: Registered device
+contract: tenancy
+enum: RegisteredDevice.status
+enumKind: inline
+enumSchema: RegisteredDevice
+enumProperty: status
+owner: tenancy
+initial:
+- offline
+terminal: []
+transitions:
+- from: offline
+  to: online
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: Reported in
+- from: online
+  to: offline
+  trigger: timer
+  guard: '**No heartbeat within the window.** Not an error — a scanner in a locker overnight is offline
+    and fine'
+- from: online
+  to: error
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: The device reported a fault itself
+- from: online
+  to: consumableLow
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: '**Paper, ribbon, battery.** A wristband printer that runs out at 10am on a Saturday closes
+    a gate'
+- from: consumableLow
+  to: online
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: Replenished
+  isReversal: true
+- from: error
+  to: online
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: Cleared
+  isReversal: true
+- from: online
+  to: needsAttention
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: Working but degraded — a failing scanner head
+- from: needsAttention
+  to: online
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: Serviced
+  isReversal: true
+- from: offline
+  to: unknown
+  trigger: timer
+  guard: '**Silent long enough that offline is no longer the explanation.** Lost, stolen, or decommissioned
+    without telling anyone'
+- from: unknown
+  to: online
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: Reappeared
+  isReversal: true
+notes: '**No terminal state, which is deliberate.** A device is never finished — it is somewhere, in
+  some condition, and the model has to represent "we have not heard from it in three weeks" without
+  deciding what that means.
+
+
+  `consumableLow` is the state that prevents an outage rather than reporting one.'

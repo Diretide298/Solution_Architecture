@@ -1,0 +1,75 @@
+# Asset — state model
+# Contract: maintenance.AssetStatus
+# Checked by tools/check-states.py.
+
+entity: Asset
+contract: maintenance
+enum: AssetStatus
+enumKind: named
+enumSchema: AssetStatus
+owner: maintenance
+initial:
+- inService
+terminal:
+- disposed
+transitions:
+- from: inService
+  to: outOfService
+  operation: updateAsset
+  trigger: operation
+  guard: Taken out of service
+- from: outOfService
+  to: underMaintenance
+  operation: updateWorkOrder
+  trigger: cascade
+  guard: Work started
+- from: inService
+  to: underMaintenance
+  operation: updateWorkOrder
+  trigger: cascade
+  guard: Planned maintenance on a running asset
+- from: underMaintenance
+  to: awaitingParts
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Blocked on supply. Distinct from paused — one is a person, the other is a purchase order
+- from: awaitingParts
+  to: underMaintenance
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Part received
+- from: underMaintenance
+  to: inService
+  operation: verifyWorkOrder
+  trigger: operation
+  guard: '**Verified by someone other than the person who did the work.** Safety-critical assets cannot
+    return without it'
+  requiresApproval: true
+  emits:
+  - maintenance.assetReturnedToService
+- from: outOfService
+  to: inService
+  operation: updateAsset
+  trigger: operation
+  guard: Returned without work — a false alarm
+  isReversal: true
+- from: inService
+  to: retired
+  operation: updateAsset
+  trigger: operation
+  guard: End of life, still on site
+  requiresApproval: true
+- from: outOfService
+  to: retired
+  operation: updateAsset
+  trigger: operation
+  guard: End of life
+  requiresApproval: true
+- from: retired
+  to: disposed
+  operation: updateAsset
+  trigger: operation
+  guard: Removed from the estate
+  requiresApproval: true
+notes: '`retired` and `disposed` are separate because a retired asset is still physically present and
+  still a hazard. The register must be able to say "it is here and it does not work".'

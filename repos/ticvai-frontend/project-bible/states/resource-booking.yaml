@@ -1,0 +1,65 @@
+# Resource booking — state model
+# Contract: resources.ResourceBooking.status
+
+entity: Resource booking
+contract: resources
+enum: ResourceBooking.status
+enumKind: inline
+enumSchema: ResourceBooking
+enumProperty: status
+owner: resources
+initial:
+- reserved
+terminal:
+- returned
+- cancelled
+- noShow
+transitions:
+- from: reserved
+  to: checkedOut
+  operation: checkOutResource
+  trigger: operation
+  guard: Handed over, with a deposit held and the condition recorded. **The condition note taken on
+    the way out is the only defence against a dispute on the way back**
+- from: checkedOut
+  to: returned
+  operation: checkInResource
+  trigger: operation
+  guard: Back, and the deposit released or partly captured
+- from: checkedOut
+  to: overdue
+  trigger: timer
+  guard: Past `dueBackAt`. **Not a failure state** — a guest running late is the normal case, and the
+    deposit is already held
+- from: overdue
+  to: returned
+  operation: checkInResource
+  trigger: operation
+  guard: Back late. The deposit settles the same way
+  isReversal: true
+- from: overdue
+  to: returned
+  operation: checkInResource
+  trigger: operation
+  guard: Recorded as not returned. **The capture is the whole deposit and the resource is retired, not
+    freed** — a stroller nobody brought back must not appear as available
+- from: reserved
+  to: cancelled
+  operation: bookResource
+  trigger: operation
+  guard: Cancelled before handover, releasing the window
+- from: reserved
+  to: noShow
+  trigger: timer
+  guard: Nobody collected it. **Distinct from cancelled** because the window was held and lost, which
+    is what utilisation reporting needs to see
+notes: '**A booking outlives its order**, which is why this could not live in `orders`: an order completes
+  and a rental is still out.
+
+
+  **`overdue` is not a failure.** The deposit is held, the guest is late, and the state exists so an
+  operator can see what is out rather than to punish anybody.
+
+
+  **`noShow` and `cancelled` are separated for reporting**: both free the resource and only one wasted
+  the window.'

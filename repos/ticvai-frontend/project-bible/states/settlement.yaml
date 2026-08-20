@@ -5,6 +5,8 @@
 entity: Settlement
 contract: finance
 enum: SettlementStatus
+enumKind: named
+enumSchema: SettlementStatus
 owner: ledger
 initial:
 - ingesting

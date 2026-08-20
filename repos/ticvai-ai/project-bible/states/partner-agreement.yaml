@@ -1,0 +1,70 @@
+# Partner agreement — state model
+# Contract: subscription.PartnerAgreementStatus
+# Checked by tools/check-states.py.
+
+entity: Partner agreement
+contract: subscription
+enum: PartnerAgreementStatus
+enumKind: named
+enumSchema: PartnerAgreementStatus
+owner: subscription
+initial:
+- pendingApproval
+terminal:
+- expired
+- terminated
+transitions:
+- from: pendingApproval
+  to: active
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: '**Approved.** A commercial agreement is not a configuration change — it routes through approvals
+    (CF-59a)'
+- from: pendingApproval
+  to: terminated
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Refused before it began
+- from: active
+  to: expiringSoon
+  trigger: timer
+  guard: '**Computed, not set.** An agreement nobody renews lapses silently and a partner keeps selling
+    on terms that no longer exist'
+- from: expiringSoon
+  to: active
+  operation: updatePartnerAgreement
+  trigger: operation
+  guard: Renewed. **An amendment creates a version rather than editing in place** — a settlement six
+    months old must be readable against the terms of that day
+  isReversal: true
+- from: expiringSoon
+  to: expired
+  trigger: timer
+  guard: Lapsed. **Outstanding settlements survive** — the agreement ends, the money owed does not
+- from: active
+  to: suspended
+  operation: updatePartnerAgreement
+  trigger: operation
+  guard: Halted without terminating. A payment dispute, or a compliance question
+- from: suspended
+  to: active
+  operation: updatePartnerAgreement
+  trigger: operation
+  guard: Resolved
+  isReversal: true
+- from: active
+  to: terminated
+  operation: updatePartnerAgreement
+  trigger: operation
+  guard: Ended by either party
+- from: suspended
+  to: terminated
+  operation: updatePartnerAgreement
+  trigger: operation
+  guard: Suspended and then ended
+notes: '**`expiringSoon` is computed.** A partner whose agreement lapses without warning keeps selling
+  on terms that no longer exist, and the first anyone knows is a settlement nobody can price.
+
+
+  **Terminating does not settle.** Obligations outlive the agreement that created them, which is why
+  `InterEntityObligation` has its own lifecycle.'

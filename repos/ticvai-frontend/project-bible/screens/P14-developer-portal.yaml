@@ -1,0 +1,543 @@
+# P14 — Developer Portal
+#
+# **The surface `public-api` needed and did not have.** 22 operations were contracted on 18 August
+# and 21 of them reached no screen — the audit's largest single gap in one contract.
+#
+# 13.1.1 to 13.1.5 ask for an interactive documentation portal. ADR-0024 makes the contract the
+# deliverable and the 28 OpenAPI files *are* the schema documentation, so **this platform renders
+# artefacts that already exist** rather than generating new ones.
+#
+# Audience is `partner` throughout, not `staff`. A developer is not an employee, and every screen
+# here is one somebody outside Softlabs will judge the platform by.
+#
+# Validated against _schema.yaml; component kinds from _components.yaml.
+
+platform:
+  code: P14
+  formFactor: web
+  surface: partner
+  runtime: reactWeb
+  themes: [light, dark]
+  directions: [ltr]
+  app: developer-portal-web
+  appStatus: not scaffolded
+  operator: partner
+  deployment:
+    target: browser
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: developer device, unmanaged
+    networkAssumption: public internet
+    releaseCadence: >
+      Monthly, and the API it documents moves on a twelve-month deprecation cycle (ADR-0026).
+      **The portal may change weekly; the contract it describes may not.**
+  name: Developer Portal
+  shortName: Developer
+  audience: partner
+  offlineCapable: false
+  screenCount: 8
+  notes: >
+    **Two audiences on one platform and the split matters.** A developer manages their own
+    organisation, clients, sandboxes and subscriptions. A Softlabs administrator sets quotas,
+    certifies integrations and configures licensing — `DEVELOPER_ADMIN`, and those screens are
+    never shown to a developer.
+
+    **Nothing here is offline-capable.** A developer portal is used at a desk.
+
+screens:
+  - id: DEV-001
+    name: API Reference
+    module: Developer & API
+    wave: 2
+    purpose: Read the contract, and call it without leaving the page.
+    density: compact
+    apis:
+      - operationId: listApiVersions
+        contract: public-api
+        purpose: Which versions exist and which is current
+        trigger: onLoad
+    states:
+      loading: The operation list; the current version renders first.
+      emptyFirstRun: >
+        **Never empty in practice** — the contracts are the documentation and they ship with the
+        platform. An empty reference means the artefacts did not load, which is an error rather
+        than a first run.
+      emptyNoResults: >
+        No operation matches this search. **Search covers the summary and the description**, not
+        just the operationId, because a developer looking for *"how do I refund"* does not know it
+        is called `createRefund`.
+      error: >
+        Could not load the reference. **Names which contract failed** — 28 files load
+        independently and one missing does not mean the API is down.
+    layout:
+      template: split
+      regions:
+        - name: sideNav
+          components:
+            - kind: searchField
+              label: Search operations
+            - kind: treeNav
+              bindsTo: contracts
+              notes: >
+                Grouped by contract, not by tag. **A developer thinks in domains** — ticketing,
+                access, F&B — and the contracts already are the domains.
+        - name: contentBody
+          components:
+            - kind: detailPanel
+              bindsTo: operation
+              notes: >
+                Request, response, scopes and error codes. **The error codes are what a developer
+                comes back for**, and they are the section most documentation buries.
+            - kind: codeBlock
+              notes: >
+                A working example per language. **Copy-paste that runs** — an example with a
+                placeholder token teaches nothing about auth, which is where integrations fail.
+            - kind: primaryButton
+              label: Try it
+              notes: >
+                Runs against the sandbox, never production. **The environment is stated on the
+                button**, because a try-it that quietly hits production is how somebody refunds a
+                real order while reading the docs.
+    navigation:
+      exitTo: [DEV-002, DEV-004]
+    implementation:
+      app: developer-portal-web
+      route: /developer/reference
+      component: apps/developer-portal-web/src/routes/developer/ApiReference.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope
+      rather than a contract gap — the twelve domain-13 rows left open after the contract landed
+      are all this screen and its siblings.
+
+  - id: DEV-002
+    name: Register & Organisation
+    module: Developer & API
+    wave: 2
+    purpose: Sign up as an organisation, and manage who at it may do what.
+    density: compact
+    apis:
+      - operationId: registerDeveloper
+        contract: public-api
+        purpose: Register
+        trigger: onAction
+      - operationId: setDeveloperMembers
+        contract: public-api
+        purpose: Manage members
+        trigger: onAction
+    states:
+      loading: The organisation and its members.
+      emptyFirstRun: >
+        **You are the first member and you are the owner.** An integration outlives the engineer
+        who built it, so this is an organisation rather than a personal account — and the invite
+        action is the point of the state.
+      emptyNoResults: No member matches.
+      emptyNoAccess: >
+        **You are a member and not an owner.** Stated plainly rather than shown as an empty list,
+        because a developer who sees no colleagues assumes the page is broken.
+      error: Could not load. Your credentials are unaffected.
+    layout:
+      template: form
+      regions:
+        - name: contentBody
+          components:
+            - kind: textField
+              label: Organisation name
+            - kind: textField
+              label: Contact email
+            - kind: dataTable
+              bindsTo: members
+              notes: Role per member — owner, admin, developer, read-only.
+            - kind: primaryButton
+              label: Invite
+    navigation:
+      entryFrom: [DEV-001]
+      exitTo: [DEV-003]
+    implementation:
+      app: developer-portal-web
+      route: /developer/organisation
+      component: apps/developer-portal-web/src/routes/developer/OrganisationForm.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining
+      every integrator's staff list is Softlabs doing their HR.
+
+  - id: DEV-003
+    name: Clients & Credentials
+    module: Developer & API
+    wave: 2
+    purpose: Create a client, choose its scopes, and rotate its secret without an outage.
+    density: compact
+    apis:
+      - operationId: listApiClients
+        contract: public-api
+        purpose: Clients with their environment and scopes
+        trigger: onLoad
+      - operationId: createApiClient
+        contract: public-api
+        purpose: Create one
+        trigger: onAction
+      - operationId: rotateApiCredential
+        contract: public-api
+        purpose: New secret with an overlap
+        trigger: onAction
+      - operationId: revokeApiCredential
+        contract: public-api
+        purpose: Revoke now
+        trigger: onAction
+    states:
+      loading: Clients, sandbox first.
+      emptyFirstRun: >
+        **No clients yet. Create a sandbox one** — the action says sandbox because a first client
+        should never be a production client, and defaulting the other way is how a first API call
+        hits a live venue.
+      emptyNoResults: No client matches this environment or scope.
+      emptyNoAccess: You are a read-only member. Credentials are hidden, not absent.
+      error: Could not load clients. Existing credentials keep working.
+    layout:
+      template: list
+      regions:
+        - name: contentBody
+          components:
+            - kind: dataTable
+              bindsTo: ApiClient[]
+              notes: >
+                Environment is a column and not a badge. **A sandbox key and a production key that
+                look alike is how somebody uses the wrong one**, and the difference must survive a
+                glance.
+            - kind: primaryButton
+              label: Create client
+            - kind: banner
+              notes: >
+                **The secret is shown once.** The banner says so before it is generated, not after
+                — a system that can show you a secret later is a system that stores one.
+    navigation:
+      entryFrom: [DEV-002]
+      exitTo: [DEV-004, DEV-005]
+    implementation:
+      app: developer-portal-web
+      route: /developer/clients
+      component: apps/developer-portal-web/src/routes/developer/ClientList.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own.
+      **Rotation carries an overlap window and revocation does not**: one is hygiene, the other is
+      what you reach for when a secret has leaked, and a grace period defeats it.
+
+  - id: DEV-004
+    name: Sandbox
+    module: Developer & API
+    wave: 2
+    purpose: Test against synthetic data, and reset to a known state.
+    density: compact
+    apis:
+      - operationId: listSandboxes
+        contract: public-api
+        purpose: Sandboxes and their expiry
+        trigger: onLoad
+      - operationId: createSandbox
+        contract: public-api
+        purpose: Provision one
+        trigger: onAction
+      - operationId: resetSandbox
+        contract: public-api
+        purpose: Back to clean
+        trigger: onAction
+    states:
+      loading: Sandboxes with their data profile.
+      emptyFirstRun: >
+        **No sandbox yet. Provisioning takes a few minutes and the data is generated, not
+        copied** — no production data is ever cloned or masked into it, which is the decision the
+        whole environment rests on.
+      emptyNoResults: No sandbox matches.
+      emptyNoAccess: You do not have DEVELOPER_MANAGE.
+      error: Could not load. A running sandbox is unaffected.
+      partial: >
+        Provisioning. **The credentials exist before the data does**, so a developer can start
+        wiring auth while the dataset generates.
+    layout:
+      template: list
+      regions:
+        - name: contentBody
+          components:
+            - kind: cardList
+              bindsTo: Sandbox[]
+              notes: Venue kind, record counts, expiry.
+            - kind: primaryButton
+              label: Provision sandbox
+            - kind: secondaryButton
+              label: Reset
+              notes: >
+                Confirms by naming what goes. **"Reset — 5,000 guests and 12 months of orders will
+                be regenerated"** rather than "are you sure", because a developer mid-test needs to
+                know what they are about to lose.
+            - kind: banner
+              notes: >
+                **Expiry, counted in days.** A sandbox that vanishes with no warning is a
+                developer who thinks the platform broke.
+    navigation:
+      entryFrom: [DEV-001, DEV-003]
+      exitTo: [DEV-005]
+    implementation:
+      app: developer-portal-web
+      route: /developer/sandbox
+      component: apps/developer-portal-web/src/routes/developer/SandboxList.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      Decisions D2 and D3. **One shared sandbox, synthetic data only** — which removes the PDPL
+      and DESC exposure entirely. Tenant-specific validation runs on per-customer staging.
+
+  - id: DEV-005
+    name: Webhooks
+    module: Developer & API
+    wave: 2
+    purpose: Subscribe to events, see every delivery, and replay what was missed.
+    density: compact
+    apis:
+      - operationId: listWebhookSubscriptions
+        contract: public-api
+        purpose: Subscriptions
+        trigger: onLoad
+      - operationId: createWebhookSubscription
+        contract: public-api
+        purpose: Subscribe
+        trigger: onAction
+      - operationId: listWebhookDeliveries
+        contract: public-api
+        purpose: The delivery log
+        trigger: onAction
+      - operationId: replayEvents
+        contract: public-api
+        purpose: Re-deliver from a point in time
+        trigger: onAction
+    states:
+      loading: Subscriptions; failing ones first.
+      emptyFirstRun: >
+        **No subscriptions. Twenty-nine business events are available** — and the state names a
+        few, because a developer who does not know what exists cannot subscribe to it.
+      emptyNoResults: No delivery matches this window or status.
+      emptyNoAccess: You do not have DEVELOPER_VIEW.
+      error: Could not load. Deliveries continue regardless of this screen.
+      partial: >
+        Some subscriptions loaded and the delivery log did not. **Said plainly** — a webhook screen
+        showing subscriptions and a blank log looks like nothing has ever been sent.
+    layout:
+      template: split
+      regions:
+        - name: sideNav
+          components:
+            - kind: cardList
+              bindsTo: WebhookSubscription[]
+              notes: >
+                Failing subscriptions sort first and carry the consecutive-failure count. **A
+                developer is told before it is disabled, not after.**
+        - name: contentBody
+          components:
+            - kind: dataTable
+              bindsTo: WebhookDelivery[]
+              notes: >
+                Status, attempts, response code and an excerpt of the receiver's own error.
+                **The excerpt is what makes the log useful** — a 500 with their own message in it
+                answers the question without a support conversation.
+            - kind: secondaryButton
+              label: Replay from…
+              notes: >
+                Bounded by retention, and the replay is marked in the payload. **A consumer that
+                cannot tell a replay from a live event will double-count.**
+    navigation:
+      entryFrom: [DEV-003, DEV-004]
+      exitTo: [DEV-006]
+    implementation:
+      app: developer-portal-web
+      route: /developer/webhooks
+      component: apps/developer-portal-web/src/routes/developer/WebhookList.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      13.1.26 to 13.1.30, 13.3.17 to 13.3.23. **The 29 events already existed and nothing outside
+      could receive one.**
+
+  - id: DEV-006
+    name: Usage & Limits
+    module: Developer & API
+    wave: 2
+    purpose: See whether the integration is healthy, and whose fault it is when it is not.
+    density: compact
+    apis:
+      - operationId: getApiUsage
+        contract: public-api
+        purpose: Calls, errors, latency
+        trigger: onLoad
+    states:
+      loading: Call volume; the current window renders first.
+      emptyFirstRun: >
+        **No calls yet.** The state links to the reference rather than sitting blank — a developer
+        who has registered and not called anything is a developer who needs a first request.
+      emptyNoResults: No calls in this window.
+      emptyNoAccess: You do not have DEVELOPER_VIEW.
+      error: Could not load usage. Your quota is unaffected.
+    layout:
+      template: dashboard
+      regions:
+        - name: contentBody
+          components:
+            - kind: metricTile
+              notes: Calls, success rate, p95 latency, quota headroom.
+            - kind: chart
+              bindsTo: ApiUsageSummary
+              notes: >
+                **Client errors and server errors on separate series.** A 4xx is the integrator's
+                problem and a 5xx is ours, and one combined error rate lets both sides blame the
+                other.
+            - kind: dataTable
+              bindsTo: byOperation
+              notes: Per operation, sorted by error rate rather than by volume.
+    navigation:
+      entryFrom: [DEV-005]
+      exitTo: [DEV-001]
+    implementation:
+      app: developer-portal-web
+      route: /developer/usage
+      component: apps/developer-portal-web/src/routes/developer/UsageDashboard.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      13.1.16 to 13.1.20 and 13.1.41 to 13.1.45. **One screen for five requirements, because they
+      are one question asked five ways.**
+
+  - id: DEV-007
+    name: Marketplace Listing
+    module: Developer & API
+    wave: 3
+    purpose: Submit an integration for certification, and see where it is in review.
+    density: compact
+    apis:
+      - operationId: listIntegrationListings
+        contract: public-api
+        purpose: Published integrations
+        trigger: onLoad
+      - operationId: submitIntegrationListing
+        contract: public-api
+        purpose: Submit for review
+        trigger: onAction
+    states:
+      loading: Listings with their certification status.
+      emptyFirstRun: >
+        **Nothing submitted. Certification gates the listing, not API access** — the state says so,
+        because a developer who thinks they need certifying to make a call will not make one.
+      emptyNoResults: No listing matches this category or status.
+      emptyNoAccess: You do not have DEVELOPER_MANAGE.
+      error: Could not load listings.
+    layout:
+      template: list
+      regions:
+        - name: contentBody
+          components:
+            - kind: cardList
+              bindsTo: IntegrationListing[]
+            - kind: primaryButton
+              label: Submit for certification
+            - kind: banner
+              notes: >
+                **Certification expires, and the date is shown.** An integration certified against
+                v1 and still listed after v3 is Softlabs vouching for something nobody has looked
+                at in two years.
+    navigation:
+      entryFrom: [DEV-006]
+    implementation:
+      app: developer-portal-web
+      route: /developer/marketplace
+      component: apps/developer-portal-web/src/routes/developer/ListingList.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      13.1.49 and 13.1.50, decision D1. **A listing, not an installation** — the integration runs
+      on the developer's own infrastructure, and third-party code does not execute inside TICVAI.
+
+  - id: DEV-008
+    name: Programme Administration
+    module: Developer & API
+    wave: 2
+    purpose: Set quotas, certify integrations and configure licensing.
+    density: compact
+    permission: DEVELOPER_ADMIN
+    apis:
+      - operationId: setApiQuota
+        contract: public-api
+        purpose: Rate limits per client
+        trigger: onAction
+      - operationId: certifyIntegration
+        contract: public-api
+        purpose: Certify, reject or revoke
+        trigger: onAction
+      - operationId: setApiLicensing
+        contract: public-api
+        purpose: Which modules a tenant licenses
+        trigger: onAction
+      - operationId: deprecateApiVersion
+        contract: public-api
+        purpose: Announce a sunset
+        trigger: onAction
+    states:
+      loading: Pending certifications first.
+      emptyFirstRun: Nothing awaiting review.
+      emptyNoResults: No client or listing matches.
+      emptyNoAccess: >
+        **This is a Softlabs screen and you are a developer.** Said plainly — a blank
+        administration page shown to a partner is worse than a refusal, because they will file a
+        support ticket about it.
+      error: Could not load.
+    layout:
+      template: split
+      regions:
+        - name: sideNav
+          components:
+            - kind: treeNav
+              notes: Quotas · Certification queue · Licensing · Versions.
+        - name: contentBody
+          components:
+            - kind: dataTable
+            - kind: primaryButton
+              label: Approve
+            - kind: secondaryButton
+              label: Reject
+              notes: Requires a reason the developer can act on, never a bare rejection.
+            - kind: banner
+              notes: >
+                **Deprecating a version names how many clients call it and which operations they
+                use.** A generic "v1 is retiring" to somebody using three of two hundred endpoints
+                is a message they will ignore.
+    navigation:
+      entryFrom: [DEV-001]
+    implementation:
+      app: developer-portal-web
+      route: /developer/admin
+      component: apps/developer-portal-web/src/routes/developer/ProgrammeAdmin.tsx
+      status: notStarted
+    wireframe:
+      status: notStarted
+      board: null
+    notes: >
+      **`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the
+      commercial model configuration rather than code — this is the surface, and the rates
+      themselves remain CF-135c.

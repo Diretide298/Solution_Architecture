@@ -1,0 +1,39 @@
+# Channel listing — state model
+# Contract: subscription.ChannelListing.status
+
+entity: Channel listing
+contract: subscription
+enum: ChannelListing.status
+enumKind: inline
+enumSchema: ChannelListing
+enumProperty: status
+owner: subscription
+initial:
+- draft
+terminal:
+- delisted
+transitions:
+- from: draft
+  to: live
+  trigger: operation
+  guard: Published to the OTA with its allocation
+- from: live
+  to: paused
+  trigger: operation
+  guard: '**Stops new sales and honours what sold.** An OTA cache still holds the last push, which is
+    why the allocation matters'
+- from: paused
+  to: live
+  trigger: operation
+  guard: Resumed
+  isReversal: true
+- from: live
+  to: delisted
+  trigger: operation
+  guard: Removed
+- from: paused
+  to: delisted
+  trigger: operation
+  guard: Removed while paused
+notes: '**Pausing does not reach the OTA instantly.** They pull and cache, so the gap between pushes
+  is a window where a paused listing still sells — which is what `allocationUnits` bounds.'

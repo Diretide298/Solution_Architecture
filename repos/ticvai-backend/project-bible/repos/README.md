@@ -1,20 +1,18 @@
-# Repos
+# Active
 
-> **Purpose:** Rules specific to each code repository  
+> **Purpose:** What is in flight now  
 > **Owner:** Chinmay  
 > **Status:** Living
 
-Each repository mounts this whole knowledge base at `project-bible/` as a git submodule.
-Its `CLAUDE.md` points here for the runtime-specific rules.
+Current wave, current context, open blockers, this week's gates.
 
-| Repo | Page | Runtime |
-|---|---|---|
-| `ticvai-contracts` | [contracts](contracts.md) | OpenAPI, event schemas, codegen |
-| `ticvai-backend` | [backend](backend.md) | .NET 8 |
-| `ticvai-frontend` | [frontend](frontend.md) | TypeScript, React, React Native |
-| `ticvai-ai` | [ai](ai.md) | Python 3.12, FastAPI |
-| `ticvai-infra` | [infra](infra.md) | Terraform, Kubernetes |
-| `ticvai-docs` | [docs](docs.md) | This repository |
+| Page | |
+|---|---|
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
 
-Shared rules — glossary, nomenclature, gotchas, git conventions, LLM conventions, decisions —
-are not duplicated here. They live once, in their own sections.
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

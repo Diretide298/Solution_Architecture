@@ -5,6 +5,8 @@
 entity: Coupon code
 contract: promotions
 enum: CouponStatus
+enumKind: named
+enumSchema: CouponStatus
 owner: promotions
 initial:
 - issued

@@ -1,7 +1,7 @@
 # Deployment models
 
 **Four. One is the default; the others exist because a client asked or a law requires it.**
-Full reasoning in [ADR-0017](../adr/0017-deployment-models.md).
+Full reasoning in [ADR-0017](../docs/adr/0017-deployment-models.md).
 
 | | Where | Isolation | Operated by | When |
 |---|---|---|---|---|

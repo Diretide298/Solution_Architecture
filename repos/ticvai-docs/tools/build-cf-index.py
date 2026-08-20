@@ -19,8 +19,13 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# Ships in two layouts: inside ticvai-docs, and flat in the delivery package where the
+# register sits under docs/. A generator that cannot run where it ships is one nobody runs.
 REGISTER = ROOT / "registers/conflicts.md"
 INDEX = ROOT / "registers/conflict-status.md"
+if not REGISTER.exists():
+    REGISTER = ROOT / "docs/registers/conflicts.md"
+    INDEX = ROOT / "conflict-status.md"
 
 STATE = {
     "Open — needs a client decision": "OPEN — client",
@@ -36,7 +41,7 @@ OWNER = re.compile(r"Chinmay|Dinesh|Qossai|Allam|Finance|Chitrangi|counsel|Contr
 def parse() -> list[dict]:
     section = None
     rows = []
-    for line in REGISTER.read_text().split("\n"):
+    for line in REGISTER.read_text(encoding="utf-8").split("\n"):
         if line.startswith("## "):
             section = line[3:].strip()
         elif line.startswith("### "):
@@ -66,6 +71,15 @@ def main() -> int:
     if unknown:
         print(f"unrecognised section(s): {unknown}", file=sys.stderr)
         return 1
+
+    # A row whose text says it is closed while it sits in an open section. This drifted twice:
+    # new items were inserted at the top of the open table and completed ones were never moved,
+    # so on 17 August eleven closed conflicts were still filed as open.
+    RESOLVED = re.compile(r"\*\*Closed \d|Closed \d+ \w+\.|\*\*Closed\b|Recovered —|Added —", re.I)
+    for r in rows:
+        if r["section"].startswith("Open") and RESOLVED.search(" | ".join(r["cells"])):
+            print(f"  WARN  {r['id']} reads as resolved but sits under '{r['section']}'",
+                  file=sys.stderr)
 
     numbered = [r for r in rows if r["id"].startswith("CF-")]
     ids = sorted({int(re.sub(r"\D", "", r["id"])) for r in numbered})
@@ -107,7 +121,7 @@ def main() -> int:
             "- **Counts** are generated from the rows, so this file and the register's summary",
             "  cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.\n"]
 
-    INDEX.write_text("\n".join(out) + "\n")
+    INDEX.write_text("\n".join(out) + "\n", encoding="utf-8")
     print(f"{INDEX.name}: {len(rows)} conflicts")
     for k in ORDER:
         print(f"  {counts.get(k, 0):>3}  {STATE[k]}")

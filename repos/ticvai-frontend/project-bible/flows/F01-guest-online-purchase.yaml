@@ -8,158 +8,175 @@
 id: F01
 name: Guest buys a ticket online
 actor: guest
-capability: C02
 wave: 1
 frequency: constant
 criticality: revenue
-
 platforms:
-  - P01 Guest Web Storefront
-offlineBehaviour: >
-  Cannot start. The storefront is a web surface with no local bundle — availability and
-  pricing are read live, and selling from a cached catalogue to an anonymous browser would
-  oversell within minutes. This is the deliberate opposite of the POS position (ADR-0013),
-  and the difference is that a POS has a known workstation, a shift and a lease; a browser
-  has none of those.
+- P01 Guest Web Storefront
+offlineBehaviour: 'Cannot start. The storefront is a web surface with no local bundle — availability
+  and pricing are read live, and selling from a cached catalogue to an anonymous browser would oversell
+  within minutes. This is the deliberate opposite of the POS position (ADR-0013), and the difference
+  is that a POS has a known workstation, a shift and a lease; a browser has none of those.
 
+  '
 trigger:
-  description: >
-    A guest arrives wanting to visit. Most arrive on a product page from a search engine or
-    a campaign link rather than the homepage, so the flow must work from any entry point.
+  description: 'A guest arrives wanting to visit. Most arrive on a product page from a search engine
+    or a campaign link rather than the homepage, so the flow must work from any entry point.
+
+    '
   entryScreen: WEB-001
   entryPoints:
-    - Organic search to a product page
-    - Campaign link with a promotion code
-    - QR code in venue or on print
-    - Direct to the homepage
-
+  - Organic search to a product page
+  - Campaign link with a promotion code
+  - QR code in venue or on print
+  - Direct to the homepage
 steps:
-  - step: 1
-    screen: WEB-001
-    action: Lands and orients
-    operations: [getTenantConfig, getTenantAppStatus, listProducts]
-    outcome: Sees what is on, in the tenant's branding
+- step: 1
+  screen: WEB-001
+  action: Lands and orients
+  operations:
+  - getTenantConfig
+  - getTenantAppStatus
+  - listProducts
+  outcome: Sees what is on, in the tenant's branding
+- step: 2
+  screen: WEB-004
+  action: Opens a product and decides
+  operations:
+  - getProduct
+  - listPerformances
+  outcome: Understands what is included and roughly when it is available
+- step: 3
+  screen: WEB-005
+  action: Chooses ticket types and quantities
+  operations:
+  - listProductVariants
+  - evaluatePromotions
+  outcome: Sees a running total that already reflects any applicable promotion
+- step: 4
+  screen: WEB-006
+  action: Picks a date and session
+  operations:
+  - getAvailability
+  outcome: Holds nothing yet. Availability is read live, never cached
+  duration: Availability must return in under 400ms or guests reload and double-book
+- step: 5
+  screen: WEB-010
+  action: Reviews the cart and may enter a promotion code
+  operations:
+  - evaluatePromotions
+  - getCouponCode
+  outcome: Final price, with any rejected code explained rather than silently ignored
+- step: 6
+  screen: WEB-011
+  action: Enters contact details and answers consent
+  operations:
+  - getGuestProfile
+  - listConsentPurposes
+  outcome: 'Marketing consent unticked by default. Transactional consent presented as required for service,
+    not as a choice dressed up as one
 
-  - step: 2
-    screen: WEB-004
-    action: Opens a product and decides
-    operations: [getProduct, listPerformances]
-    outcome: Understands what is included and roughly when it is available
+    '
+- step: 7
+  screen: WEB-012
+  action: Pays
+  operations:
+  - createOrder
+  - createPayment
+  outcome: 'Order created before payment, so an unknown payment outcome has an order to attach to. This
+    ordering is the whole reason recovery is possible
 
-  - step: 3
-    screen: WEB-005
-    action: Chooses ticket types and quantities
-    operations: [listProductVariants, evaluatePromotions]
-    outcome: Sees a running total that already reflects any applicable promotion
-
-  - step: 4
-    screen: WEB-006
-    action: Picks a date and session
-    operations: [getAvailability]
-    outcome: Holds nothing yet. Availability is read live, never cached
-    duration: Availability must return in under 400ms or guests reload and double-book
-
-  - step: 5
-    screen: WEB-010
-    action: Reviews the cart and may enter a promotion code
-    operations: [evaluatePromotions, getCouponCode]
-    outcome: Final price, with any rejected code explained rather than silently ignored
-
-  - step: 6
-    screen: WEB-011
-    action: Enters contact details and answers consent
-    operations: [getGuestProfile, listConsentPurposes]
-    outcome: >
-      Marketing consent unticked by default. Transactional consent presented as required for
-      service, not as a choice dressed up as one
-
-  - step: 7
-    screen: WEB-012
-    action: Pays
-    operations: [createOrder, createPayment]
-    outcome: >
-      Order created before payment, so an unknown payment outcome has an order to attach to.
-      This ordering is the whole reason recovery is possible
-    duration: The guest is watching. Anything past 8 seconds reads as failure
-
-  - step: 8
-    screen: WEB-013
-    action: Receives confirmation and tickets
-    operations: [getOrder, reprintOrder]
-    outcome: Order number visible immediately, tickets delivered by the chosen channel
-
+    '
+  duration: The guest is watching. Anything past 8 seconds reads as failure
+- step: 8
+  screen: WEB-013
+  action: Receives confirmation and tickets
+  operations:
+  - getOrder
+  - reprintOrder
+  outcome: Order number visible immediately, tickets delivered by the chosen channel
 branches:
-  - at: 4
-    condition: The session sells out between loading the page and selecting it
-    behaviour: >
-      Selection is refused with the next available session offered. Availability is read live
-      precisely so this is caught here rather than at payment.
-    severity: recoverable
-    resolvedBy: WEB-006
+- at: 4
+  condition: The session sells out between loading the page and selecting it
+  behaviour: 'Selection is refused with the next available session offered. Availability is read live
+    precisely so this is caught here rather than at payment.
 
-  - at: 4
-    condition: The session shows sold out online while counter allocation remains
-    behaviour: >
-      Correct behaviour, not a defect. Availability is per channel under channel allocation —
-      web has exhausted its share. Worth stating because it will be raised as a bug.
-    severity: recoverable
+    '
+  severity: recoverable
+  resolvedBy: WEB-006
+- at: 4
+  condition: The session shows sold out online while counter allocation remains
+  behaviour: 'Correct behaviour, not a defect. Availability is per channel under channel allocation
+    — web has exhausted its share. Worth stating because it will be raised as a bug.
 
-  - at: 5
-    condition: A promotion code does not apply
-    behaviour: >
-      The rejection names the condition that failed — expired, already used, wrong channel,
-      membership required. "Invalid code" is what makes a guest call the venue.
-    severity: recoverable
-    resolvedBy: WEB-010
+    '
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 5
+  condition: A promotion code does not apply
+  behaviour: 'The rejection names the condition that failed — expired, already used, wrong channel,
+    membership required. "Invalid code" is what makes a guest call the venue.
 
-  - at: 7
-    condition: Payment declined
-    behaviour: >
-      Retry reuses the same idempotency key. The order persists in an unpaid state rather than
-      being torn down, so a second attempt does not rebuild the cart.
-    severity: recoverable
-    resolvedBy: WEB-012
+    '
+  severity: recoverable
+  resolvedBy: WEB-010
+- at: 7
+  condition: Payment declined
+  behaviour: 'Retry reuses the same idempotency key. The order persists in an unpaid state rather than
+    being torn down, so a second attempt does not rebuild the cart.
 
-  - at: 7
-    condition: >
-      Payment taken but no response received. The card is charged and the platform does not
-      know it.
-    behaviour: >
-      **The failure to build for.** The screen offers inquiry, never a retry — a retry
-      double-charges and the guest is the one who discovers it. A background reconciler
-      resolves any inquiry the guest abandons.
-    severity: requiresStaff
-    resolvedBy: inquirePaymentStatus
+    '
+  severity: recoverable
+  resolvedBy: WEB-012
+- at: 7
+  condition: 'Payment taken but no response received. The card is charged and the platform does not
+    know it.
 
-  - at: 8
-    condition: Payment succeeded but confirmation fails to load
-    behaviour: >
-      Shows the order number and a support route. Never implies the purchase failed — a guest
-      told their payment did not work will pay twice.
-    severity: recoverable
-    resolvedBy: WEB-013
+    '
+  behaviour: '**The failure to build for.** The screen offers inquiry, never a retry — a retry double-charges
+    and the guest is the one who discovers it. A background reconciler resolves any inquiry the guest
+    abandons.
 
-  - at: 6
-    condition: The guest abandons at the details form
-    behaviour: >
-      Nothing is held, so nothing needs releasing. The abandoned cart is a marketing trigger
-      only where consent already exists — an abandonment is not itself consent to be emailed.
-    severity: abandonsFlow
+    '
+  severity: requiresStaff
+  resolvedBy: inquirePaymentStatus
+- at: 8
+  condition: Payment succeeded but confirmation fails to load
+  behaviour: 'Shows the order number and a support route. Never implies the purchase failed — a guest
+    told their payment did not work will pay twice.
 
+    '
+  severity: recoverable
+  resolvedBy: WEB-013
+- at: 6
+  condition: The guest abandons at the details form
+  behaviour: 'Nothing is held, so nothing needs releasing. The abandoned cart is a marketing trigger
+    only where consent already exists — an abandonment is not itself consent to be emailed.
+
+    '
+  severity: abandonsFlow
+  resolvedBy: guest
 exitStates:
-  - state: completed
-    description: Order paid, entitlements issued, tickets delivered
-  - state: abandoned
-    description: >
-      Guest left before payment. No capacity was held on an unseated flow, so nothing to
-      reclaim
-  - state: deferred
-    description: >
-      Payment outcome unknown, inquiry pending. Resolves within minutes by reconciler or by
-      the guest returning to the order
+- state: completed
+  description: Order paid, entitlements issued, tickets delivered
+- state: abandoned
+  description: 'Guest left before payment. No capacity was held on an unseated flow, so nothing to reclaim
 
+    '
+- state: deferred
+  description: 'Payment outcome unknown, inquiry pending. Resolves within minutes by reconciler or by
+    the guest returning to the order
+
+    '
 openQuestions:
-  - >
-    Sandbox credentials for Stripe and Network International are outstanding. Steps 7 and the
-    unknown-outcome branch cannot be tested without them, and that branch is the one most
-    worth testing.
+- 'Sandbox credentials for Stripe and Network International are outstanding. Steps 7 and the unknown-outcome
+  branch cannot be tested without them, and that branch is the one most worth testing.
+
+  '
+primaryContract: catalogue
+contracts:
+- catalogue
+- orders
+- promotions
+- white-label
+- marketing-crm

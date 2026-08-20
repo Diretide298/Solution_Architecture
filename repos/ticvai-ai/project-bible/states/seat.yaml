@@ -5,12 +5,13 @@
 entity: Seat
 contract: seating
 enum: SeatStatus
+enumKind: named
+enumSchema: SeatStatus
 owner: seating
 initial:
 - available
 terminal:
 - unavailable
-offlineReachable: []
 transitions:
 - from: available
   to: held
@@ -80,3 +81,4 @@ notes: 'No terminal state for the seat itself except removal. A seat outlives ev
   `unavailable` was in the enum with nothing reaching it. Settled 14 August as **permanent removal**
   — a refit, a structural change — and therefore terminal. `blocked` is a seat held back and expected
   to return; `unavailable` is one that will not.'
+offlineReachable: []

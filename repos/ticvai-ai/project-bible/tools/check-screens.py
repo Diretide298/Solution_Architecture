@@ -30,16 +30,22 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
-CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+# The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
+# outside the package, so every validator passed for whoever had that repo checked out and read
+# nothing for anyone working from the zip — which is the worst failure a checker can have, because
+# it is silent and it looks like success.
+CONTRACTS = ROOT / "contracts"
 if not CONTRACTS.exists():
-    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+    CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+if not CONTRACTS.exists():
+    CONTRACTS = ROOT / "contracts"
 
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
 
 
 def load_vocabulary() -> tuple[set[str], set[str]]:
-    doc = yaml.safe_load((SCREENS / "_components.yaml").read_text())
+    doc = yaml.safe_load((SCREENS / "_components.yaml").read_text(encoding="utf-8"))
     return ({c["kind"] for c in doc.get("components", [])},
             {r["id"] for r in doc.get("regions", [])})
 
@@ -50,7 +56,7 @@ def load_operation_ids() -> set[str]:
         return ops
     for f in CONTRACTS.rglob("*.yaml"):
         try:
-            doc = yaml.safe_load(f.read_text())
+            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         except Exception:
             continue
         for item in (doc.get("paths") or {}).values():
@@ -75,7 +81,42 @@ RUNTIME_FOR = {"web": {"reactWeb"}, "mobileApp": {"reactNative"},
 OFFLINE_REQUIRED = {"posTerminal", "handheld"}
 
 
+SHORTNAMES: dict[str, str] = {}
+
+# A guest or public surface may only call operations a guest can call. Enforced because a
+# sibling-attachment pass on 17 August put 659 staff operations onto guest screens — including
+# `applyManualDiscount` and `exchangeOrderLines` on a guest's own ticket list — and every other
+# checker passed, because each operation existed and resolved to a table.
+# P11 Accreditation is `public`, not `guest`. An external reviewer signs in from outside the
+# organisation and holds a real permission — treating that surface as a guest surface is what
+# produced `decideApprovalRequest` marked `x-ticvai-guest-callable` on 17 August, which reads as
+# a guest approving their own refund. Public and guest are different audiences and the platform
+# declares which it is.
+GUEST_PLATFORMS = {"P01", "P02", "P05"}
+
+
+def check_guest_operations(name: str, code: str, screen: dict, staff_ops: set[str]) -> None:
+    if code not in GUEST_PLATFORMS:
+        return
+    for a in (screen.get("apis") or []):
+        if (oid := a.get("operationId")) in staff_ops:
+            ERRORS.append(f"{name}: {screen['id']} is a guest surface and declares '{oid}', "
+                          "which carries a staff permission")
+
+
 def check_platform(name: str, p: dict) -> None:
+    """Also enforces that a shortName identifies exactly one platform.
+
+    Three platforms were called "Staff Web" until 17 August — P08 back office, P12 support and
+    P13 the CMS. A name that identifies three things identifies none, and it is the kind of
+    collision that survives because each file is individually correct.
+    """
+    if sn := p.get("shortName"):
+        if sn in SHORTNAMES and SHORTNAMES[sn] != p.get("code"):
+            ERRORS.append(f"{name}: shortName '{sn}' is already used by "
+                          f"{SHORTNAMES[sn]} — a name identifying two platforms identifies none")
+        SHORTNAMES[sn] = p.get("code")
+
     for k in ("code", "audience", "formFactor", "shortName", "name"):
         if k not in p:
             ERRORS.append(f"{name}: platform is missing '{k}'")
@@ -105,12 +146,13 @@ def check_platform(name: str, p: dict) -> None:
 
 def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids: set[str]) -> None:
     name = path.name
-    doc = yaml.safe_load(path.read_text())
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
     check_platform(name, doc["platform"])
     offline_capable = doc["platform"].get("offlineCapable", False)
 
     seen: set[str] = set()
     for s in doc["screens"]:
+        check_guest_operations(name, doc["platform"]["code"], s, STAFF_OPS)
         sid = s["id"]
         if sid in seen:
             ERRORS.append(f"{name}: duplicate screen id {sid}")
@@ -130,13 +172,42 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
             elif ops and oid not in ops:
                 ERRORS.append(f"{name}: {sid} references unknown operationId '{oid}'")
 
+        # **`empty` became three states on 18 August.** One field held "nothing exists yet",
+        # "your filter matched nothing" and "you may not see this", and they are three different
+        # screens with three different actions. The permission case is the one that mattered —
+        # **an empty list where the truth is a permission is a lie a person will act on.**
         states = s.get("states") or {}
-        for required in ("loading", "empty", "error"):
+        for required in ("loading", "emptyFirstRun", "error"):
             if required not in states:
                 ERRORS.append(f"{name}: {sid} is missing the '{required}' state")
+        if "empty" in states:
+            ERRORS.append(f"{name}: {sid} still declares 'empty' — split it into emptyFirstRun, "
+                          "emptyNoResults and emptyNoAccess")
+        # A screen that filters must say what no-results looks like. A list with a search box and
+        # one empty state tells a person their data is gone when their filter is just narrow.
+        # Named \, not \ — the parameter is the vocabulary, and shadowing it
+        # here made every component on every screen after the first read as unknown. 218 false
+        # failures from one variable name.
+        screen_kinds = {c.get("kind")
+                        for region in (s.get("layout") or {}).get("regions", [])
+                        for c in region.get("components", [])}
+        if screen_kinds & {"dataTable", "cardList", "searchField", "timeline"} and "emptyNoResults" not in states:
+            WARNINGS.append(f"{name}: {sid} lists or filters and declares no emptyNoResults")
         if offline_capable and "offline" not in states:
             ERRORS.append(f"{name}: {sid} is offline-capable but declares no offline state")
-        if todo := [k for k, v in states.items() if v == "TODO"]:
+        # **Density follows formFactor, not the platform number.** Assigned by platform code on
+        # 18 August, which put the handheld scanner on `compact` — a gate device held in one hand
+        # while the other takes a ticket is not a desktop, and `formFactor` said so all along.
+        want = {"web": "compact", "posTerminal": "touchLarge", "kiosk": "touchLarge",
+                "mobileApp": "comfortable", "handheld": "comfortable",
+                "wearable": "comfortable"}.get(doc["platform"].get("formFactor"))
+        if want and s.get("density") != want:
+            ERRORS.append(f"{name}: {sid} is density '{s.get('density')}' on a "
+                          f"{doc['platform']['formFactor']} platform — expected '{want}'")
+        if s.get("density") not in ("compact", "comfortable", "touchLarge"):
+            ERRORS.append(f"{name}: {sid} declares no density — a back-office table and a kiosk "
+                          "button grid are not one screen at two widths")
+        if todo := [k for k, v in states.items() if str(v).startswith("TODO")]:
             WARNINGS.append(f"{name}: {sid} has TODO states — {', '.join(todo)}")
         if (s.get("purpose") or "").startswith("TODO"):
             WARNINGS.append(f"{name}: {sid} has no purpose written")
@@ -153,7 +224,34 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
         ERRORS.append(f"{name}: screenCount says {declared}, file has {len(doc['screens'])}")
 
 
+def load_staff_operations() -> set[str]:
+    """Operations carrying a staff permission. A guest surface may declare none of them."""
+    out: set[str] = set()
+    for tier in ("spine", "satellite"):
+        d = CONTRACTS / tier
+        if not d.exists():
+            continue
+        for f in d.glob("*.yaml"):
+            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+            for item in (doc.get("paths") or {}).values():
+                if not isinstance(item, dict):
+                    continue
+                for verb, op in item.items():
+                    if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict):
+                        # `x-ticvai-guest-callable` marks an operation a guest performs on
+                        # their own data — createOrder, createPayment, acquireLease. The
+                        # permission is for staff doing it on a guest's behalf at a till.
+                        if op.get("x-ticvai-permission") and not "guest" in (op.get("x-ticvai-audience") or []):
+                            out.add(op["operationId"])
+    return out
+
+
+STAFF_OPS: set[str] = set()
+
+
 def main() -> int:
+    global STAFF_OPS
+    STAFF_OPS = load_staff_operations()
     files = sorted(SCREENS.glob("P*.yaml"))
     if not files:
         print("no platform files found", file=sys.stderr)
@@ -161,7 +259,7 @@ def main() -> int:
 
     kinds, regions = load_vocabulary()
     ops = load_operation_ids()
-    all_ids = {s["id"] for f in files for s in yaml.safe_load(f.read_text())["screens"]}
+    all_ids = {s["id"] for f in files for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]}
 
     print(f"checking {len(files)} platform(s)")
     print(f"  {len(kinds)} component kinds, {len(regions)} regions, {len(ops)} operationIds\n")
@@ -170,7 +268,7 @@ def main() -> int:
 
     total = 0
     for f in files:
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         total += len(doc["screens"])
         check(f, kinds, regions, ops, all_ids)
         print(f"  {doc['platform']['code']}  {doc['platform']['name']:30} {len(doc['screens']):>3} screens")

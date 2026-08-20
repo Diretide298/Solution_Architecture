@@ -41,7 +41,7 @@ def main() -> int:
     unscaffolded: dict[str, int] = defaultdict(int)
 
     for f in sorted(SCREENS.glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         plat = doc["platform"]
         app = plat.get("app")
         if not app:

@@ -1,0 +1,168 @@
+# F26 — A venue maps its site
+#
+# **The `venue-map` contract had no flow.** Thirteen operations across two contracts, three
+# back-office screens, and no end-to-end story — so the handover between the deterministic
+# extraction and the AI proposal was described twice and joined nowhere.
+#
+# The flow that shows why extraction and labelling are separate operations: **a mis-parsed layer
+# and a bad suggestion look identical to an operator if one step does both.**
+
+$schema: ./_schema.yaml
+id: F26
+name: A venue maps its site
+actor: venueManager
+capability: Venue mapping and wayfinding
+wave: 2
+frequency: rare
+criticality: operational
+primaryContract: venue-map
+contracts: [venue-map, ai, assets, platform-ops]
+platforms: [P08, P02]
+
+trigger:
+  description: >
+    A venue is opening, or has rebuilt an area. Somebody has a drawing and needs guests to be able
+    to find a toilet.
+  entryScreen: BO-092
+
+offlineBehaviour: >
+  **The authoring side cannot go offline and the guest side must.** Import, labelling and publish
+  are back-office acts at a desk. **The published map, its points and its graph ship in the offline
+  package** — a guest standing in the middle of a park with no signal is the guest who most needs
+  directions.
+
+steps:
+  - step: 1
+    screen: BO-092
+    action: The manager creates a map.
+    operations: [createVenueMap]
+    outcome: A draft, with the kind and floor level set. Nothing is live.
+
+  - step: 2
+    screen: BO-093
+    action: The plan is uploaded and read.
+    operations: [importVenueGeometry]
+    outcome: >
+      Shapes extracted, **deterministically**. Every layer name reported back, decoded, mapped or
+      not — and **a file that yields nothing says `nothingFound` rather than reporting success**,
+      which is the defect CF-122 found in the seat importer.
+
+  - step: 3
+    screen: BO-093
+    action: The assistant proposes what each shape is; the operator accepts, edits or rejects.
+    operations: [proposeVenueLabels, acceptVenueLabelProposals]
+    outcome: >
+      Points created from accepted proposals. **Low-confidence proposals are shown, not filtered** —
+      the shape the assistant is unsure about is the one most worth a human looking at.
+
+  - step: 4
+    screen: BO-094
+    action: The operator places what the drawing did not carry and links each point to what it is.
+    operations: [setVenuePoint]
+    outcome: >
+      A restaurant point carries its outlet id, a ride its product id, a gate its access point.
+      **Tapping a restaurant on the map should open its menu, and that only works if the map knows
+      which outlet it is.**
+
+  - step: 5
+    screen: BO-094
+    action: The graph is validated before anybody publishes.
+    operations: [validateVenueMapGraph]
+    outcome: >
+      Unreachable points, dead-end paths, orphan components — and **points reachable only by
+      steps**, which is the finding nothing in the drawing makes visible.
+    duration: under 5s
+
+  - step: 6
+    screen: BO-094
+    action: The manager publishes.
+    operations: [publishVenueMap]
+    outcome: >
+      A new version. **The previous one stays readable** so a guest mid-route on version 3 finishes
+      on version 3.
+
+  - step: 7
+    screen: GST-021
+    action: A guest opens the map and is routed.
+    operations: [getVenueMap, getVenueMapGraph]
+    outcome: >
+      The whole map in one call, cached, and the graph small enough to route over on the device.
+      **The platform guarantees the graph and the client walks it** — a phone with it cached routes
+      with no signal.
+
+branches:
+  - at: 1
+    condition: The plan is a scan or a photograph with no vector geometry.
+    behaviour: >
+      `rasterOnly` is a **warning, not an error**. The manifest still gives seats and the image
+      still works as a map; only automatic geometry is lost. **Refusing a venue that sent everything
+      it had is the wrong answer.**
+
+      Where there is nothing to subtract, `ai.proposeWalkways` sees the paths instead — and it
+      **refuses to run where vector geometry exists**, because running a model where subtraction is
+      available is how a worse answer gets preferred for arriving in a nicer format.
+    severity: recoverable
+
+  - at: 1
+    condition: No layer matched any role.
+    behaviour: >
+      `noLayersMatched`, separated from `nothingFound` deliberately. **It almost always means a role
+      needed a second entry or a name needed decoding**, not that the file is wrong — and
+      `layersFound` lists every decoded name so an operator maps a role by reading rather than
+      guessing.
+    severity: recoverable
+    resolvedBy: importVenueGeometry
+
+  - at: 3
+    condition: The assistant proposes a fire exit as an ordinary exit.
+    behaviour: >
+      The operator rejects it and places it correctly. **A map that cannot tell them apart routes a
+      normal departure through a fire door**, which is why `emergencyExit` is a separate kind and
+      why proposals are accepted one at a time rather than in bulk.
+    severity: requiresStaff
+
+  - at: 5
+    condition: A point is reachable only by steps.
+    behaviour: >
+      Listed separately from unreachable points. **The map works perfectly until a wheelchair user
+      opens it**, and nothing in the drawing makes it visible — which is the whole reason this
+      check runs before publication rather than after.
+    severity: requiresStaff
+    resolvedBy: validateVenueMapGraph
+
+  - at: 6
+    condition: A point links to an outlet that has closed.
+    behaviour: >
+      Publish is refused and **the response names which point**. A restaurant point pointing
+      nowhere is worse than no point, because a guest walks there.
+    severity: recoverable
+    resolvedBy: publishVenueMap
+
+  - at: 7
+    condition: A path closes after the guest cached the graph.
+    behaviour: >
+      `setPathClosure` bumps the graph version, and the client holding an older version knows its
+      route may cross something closed. **A guest holding an offline route across a path that closed
+      this morning gets told, rather than walking into a barrier.**
+    severity: recoverable
+    resolvedBy: setPathClosure
+
+exitStates:
+  - state: published
+    description: The map is live, the graph is connected, and guests can route on it.
+  - state: publishedNotNavigable
+    description: >
+      Published with points and no paths. **A legitimate outcome** — the map shows a guest where
+      things are and cannot tell them how to get there, which is better than no map and should be
+      visible rather than silent.
+  - state: draft
+    description: Imported and never published. The current map keeps serving.
+
+notes: >
+  **Steps 1 and 2 are separate operations in separate contracts and that is the load-bearing
+  decision.** Extraction is deterministic and lives in `venue-map`; labelling calls a model and
+  lives in `ai`, because ADR-0020 says only the AI contract writes AI tables — a boundary that
+  caught this contract twice on the day it was drafted.
+
+  **Two failure modes kept apart.** A mis-parsed layer and a bad suggestion look identical if one
+  step does both, and the operator is left able to say only that the map is wrong.

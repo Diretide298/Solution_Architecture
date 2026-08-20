@@ -43,7 +43,7 @@ use of live data, not a forecast, so it does not depend on operating history.
 ### CF-37 — FX. **Partially closed.**
 
 **Settled — foreign currency tender.** All transactions store the **base currency of the
-region**. A guest paying USD 100 has the dirham equivalent stored at the configured rate.
+region**. A guest-app paying USD 100 has the dirham equivalent stored at the configured rate.
 Change and refunds are **always in base currency** — never in the tendered currency. A separate
 foreign-currency report shows what each cashier took in which currency.
 
@@ -129,12 +129,12 @@ profile, purchase.
 ### POS branding — TICVAI, not white-label
 
 Staff-facing surfaces carry **TICVAI branding**: POS, tablets. *"If the application is used by
-the venue employee, then it's supposed to be TICVAI branding."*
+the venue venue-staff-app, then it's supposed to be TICVAI branding."*
 
 **The kiosk is the exception** — guest-facing, so white-label with the client's logo and
 colours, styled like the website rather than like the POS.
 
-*"Powered by TICVAI"* appears everywhere including guest surfaces.
+*"Powered by TICVAI"* appears everywhere including guest-app surfaces.
 
 This contradicts nothing already built, but the White Label Builder currently offers branding
 per tenant with no notion of which surfaces it may reach. It needs a surface scope.
@@ -168,7 +168,7 @@ covers it; worth recording because it was previously assumed out of scope.
 ### One cart, one receipt, one QR
 
 A single cart spans tickets, F&B and retail. **One receipt** on site — *"we don't need multiple
-receipts."* One unified guest id, one QR that admits, opens a locker and redeems a meal.
+receipts."* One unified guest-app id, one QR that admits, opens a locker and redeems a meal.
 
 **Entitlements can be appended to an existing ticket.** Buying a locker after arrival: scan the
 existing QR, the locker attaches to it, no second QR. This is a real gap — the contract issues

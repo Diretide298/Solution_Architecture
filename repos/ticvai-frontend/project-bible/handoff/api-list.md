@@ -19,16 +19,16 @@ One third of the build handoff. See [page-inventory](page-inventory.md) and [sch
 | ✅ | POST | `/auth/refresh` | — | ✗ | all |
 | ✅ | POST | `/auth/logout` | — | ✓ | all |
 | ✅ | GET | `/auth/session` | — | ✓ | all |
-| ✅ | POST | `/auth/sessions/{id}/force-logout` | `SESSION_FORCE_LOGOUT` | ✗ | pos, backoffice |
-| 🟡 | POST | `/auth/guest` | — | ✗ | guest, webb2c |
-| 🟡 | POST | `/auth/guest/otp` | — | ✗ | guest, webb2c |
-| 🟡 | POST | `/auth/guest/social` | — | ✗ | guest, webb2c |
-| 🟡 | GET/POST | `/principals` | `USER_MANAGE` | ✗ | backoffice |
-| 🟡 | GET/PATCH | `/principals/{id}` | `USER_MANAGE` | ✗ | backoffice |
-| 🟡 | GET/POST | `/roles` | `ROLE_MANAGE` | ✗ | backoffice |
-| 🟡 | GET/POST/DELETE | `/grants` | `PERMISSION_GRANT` | ✗ | backoffice |
-| 🟡 | POST | `/permissions/resolve` | `PERMISSION_VIEW` | ✗ | backoffice |
-| 🟡 | GET/PUT | `/password-policy` | `USER_MANAGE` | ✗ | backoffice |
+| ✅ | POST | `/auth/sessions/{id}/force-logout` | `SESSION_FORCE_LOGOUT` | ✗ | venue-pos, venue-management-web |
+| 🟡 | POST | `/auth/guest-app` | — | ✗ | guest-app, webb2c |
+| 🟡 | POST | `/auth/guest-app/otp` | — | ✗ | guest-app, webb2c |
+| 🟡 | POST | `/auth/guest-app/social` | — | ✗ | guest-app, webb2c |
+| 🟡 | GET/POST | `/principals` | `USER_MANAGE` | ✗ | venue-management-web |
+| 🟡 | GET/PATCH | `/principals/{id}` | `USER_MANAGE` | ✗ | venue-management-web |
+| 🟡 | GET/POST | `/roles` | `ROLE_MANAGE` | ✗ | venue-management-web |
+| 🟡 | GET/POST/DELETE | `/grants` | `PERMISSION_GRANT` | ✗ | venue-management-web |
+| 🟡 | POST | `/permissions/resolve` | `PERMISSION_VIEW` | ✗ | venue-management-web |
+| 🟡 | GET/PUT | `/password-policy` | `USER_MANAGE` | ✗ | venue-management-web |
 
 **6 published · ~20 total**
 
@@ -38,13 +38,13 @@ One third of the build handoff. See [page-inventory](page-inventory.md) and [sch
 
 | Status | Method | Path | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| ✅ | GET/POST | `/scope-nodes` | `SCOPE_VIEW` / `SCOPE_MANAGE` | ✗ | backoffice |
-| ✅ | GET/PATCH | `/scope-nodes/{id}` | `SCOPE_VIEW` / `SCOPE_MANAGE` | ✗ | backoffice |
+| ✅ | GET/POST | `/scope-nodes` | `SCOPE_VIEW` / `SCOPE_MANAGE` | ✗ | venue-management-web |
+| ✅ | GET/PATCH | `/scope-nodes/{id}` | `SCOPE_VIEW` / `SCOPE_MANAGE` | ✗ | venue-management-web |
 | ✅ | GET/PUT | `/regions/{id}/settings` | `SCOPE_VIEW` / `REGION_CONFIGURE` | ✓ read | all |
-| ✅ | GET | `/workstations` | `SCOPE_VIEW` | ✗ | backoffice |
-| ✅ | GET/PUT | `/workstations/{id}` | `SCOPE_VIEW` / `WORKSTATION_CONFIGURE` | ✓ read | pos, scanner |
-| 🟡 | GET/POST | `/sale-boards` | `WORKSTATION_CONFIGURE` | ✓ read | backoffice, pos |
-| 🟡 | GET/POST | `/devices` | `DEVICE_CONFIGURE` | ✗ | backoffice |
+| ✅ | GET | `/workstations` | `SCOPE_VIEW` | ✗ | venue-management-web |
+| ✅ | GET/PUT | `/workstations/{id}` | `SCOPE_VIEW` / `WORKSTATION_CONFIGURE` | ✓ read | venue-pos, venue-scanner |
+| 🟡 | GET/POST | `/sale-boards` | `WORKSTATION_CONFIGURE` | ✓ read | venue-management-web, venue-pos |
+| 🟡 | GET/POST | `/devices` | `DEVICE_CONFIGURE` | ✗ | venue-management-web |
 
 **9 published · ~12 total**
 
@@ -54,14 +54,14 @@ One third of the build handoff. See [page-inventory](page-inventory.md) and [sch
 
 | Status | Method | Path | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| ✅ | GET/POST | `/shifts` | `REPORT_VIEW_WORKSTATION` / `SHIFT_OPEN` | ✓ | pos |
-| ✅ | GET | `/shifts/current` | `SHIFT_OPEN` | ✓ | pos |
-| ✅ | GET | `/shifts/{id}` | `REPORT_VIEW_WORKSTATION` | ✓ | pos, backoffice |
-| ✅ | POST | `/shifts/{id}/suspend` | `SHIFT_SUSPEND` | ✓ | pos |
-| ✅ | POST | `/shifts/{id}/resume` | `SHIFT_OPEN` | ✓ | pos |
-| ✅ | POST | `/shifts/{id}/close` | `SHIFT_CLOSE` | ✓ | pos |
-| ✅ | POST | `/shifts/{id}/accept-variance` | `OVERSHORT_ACCEPT` | ✗ | pos |
-| ✅ | GET/POST | `/shifts/{id}/cash-movements` | `CASH_LIFT` | ✓ | pos |
+| ✅ | GET/POST | `/shifts` | `REPORT_VIEW_WORKSTATION` / `SHIFT_OPEN` | ✓ | venue-pos |
+| ✅ | GET | `/shifts/current` | `SHIFT_OPEN` | ✓ | venue-pos |
+| ✅ | GET | `/shifts/{id}` | `REPORT_VIEW_WORKSTATION` | ✓ | venue-pos, venue-management-web |
+| ✅ | POST | `/shifts/{id}/suspend` | `SHIFT_SUSPEND` | ✓ | venue-pos |
+| ✅ | POST | `/shifts/{id}/resume` | `SHIFT_OPEN` | ✓ | venue-pos |
+| ✅ | POST | `/shifts/{id}/close` | `SHIFT_CLOSE` | ✓ | venue-pos |
+| ✅ | POST | `/shifts/{id}/accept-variance` | `OVERSHORT_ACCEPT` | ✗ | venue-pos |
+| ✅ | GET/POST | `/shifts/{id}/cash-movements` | `CASH_LIFT` | ✓ | venue-pos |
 
 **10 published — context complete**
 
@@ -71,15 +71,15 @@ One third of the build handoff. See [page-inventory](page-inventory.md) and [sch
 
 | Status | Method | Path | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| ✅ | POST | `/access/validate` | `ACCESS_VALIDATE` | ✓ | scanner, pos |
-| ✅ | POST | `/access/override` | `ACCESS_OVERRIDE` | ✓ | scanner |
-| ✅ | GET | `/access/lookup` | `TICKET_LOOKUP` | ✓ | scanner, employee |
-| ✅ | GET/POST | `/access/scans` | `ACCESS_VALIDATE` | ✗ | scanner |
-| ✅ | GET | `/access/offline-package` | `ACCESS_VALIDATE` | ✗ | scanner, edge |
-| ✅ | PUT | `/access-points/{id}/mode` | `TURNSTILE_MODE_SET` | ✓ | scanner |
-| 🟡 | GET/POST | `/access-points` | `ACCESS_POINT_CONFIGURE` | ✗ | backoffice |
-| 🟡 | GET/POST | `/admission-profiles` | `ACCESS_POINT_CONFIGURE` | ✗ | backoffice |
-| 🟡 | GET/POST/DELETE | `/blacklist` | `ACCESS_POINT_CONFIGURE` | ✗ | backoffice |
+| ✅ | POST | `/access/validate` | `ACCESS_VALIDATE` | ✓ | venue-scanner, venue-pos |
+| ✅ | POST | `/access/override` | `ACCESS_OVERRIDE` | ✓ | venue-scanner |
+| ✅ | GET | `/access/lookup` | `TICKET_LOOKUP` | ✓ | venue-scanner, venue-staff-app |
+| ✅ | GET/POST | `/access/scans` | `ACCESS_VALIDATE` | ✗ | venue-scanner |
+| ✅ | GET | `/access/offline-package` | `ACCESS_VALIDATE` | ✗ | venue-scanner, edge |
+| ✅ | PUT | `/access-points/{id}/mode` | `TURNSTILE_MODE_SET` | ✓ | venue-scanner |
+| 🟡 | GET/POST | `/access-points` | `ACCESS_POINT_CONFIGURE` | ✗ | venue-management-web |
+| 🟡 | GET/POST | `/admission-profiles` | `ACCESS_POINT_CONFIGURE` | ✗ | venue-management-web |
+| 🟡 | GET/POST/DELETE | `/blacklist` | `ACCESS_POINT_CONFIGURE` | ✗ | venue-management-web |
 
 **7 published · ~20 total**
 
@@ -128,7 +128,7 @@ One third of the build handoff. See [page-inventory](page-inventory.md) and [sch
 | POST | `/orders/{id}/exchanges` | `ORDER_EXCHANGE` | ✗ | |
 | POST | `/orders/{id}/reprints` | `ORDER_REPRINT` | ✓ | |
 | POST | `/refunds/bulk` | `ORDER_REFUND_BULK` | ✗ | Event or date level |
-| POST | `/refund-requests` | — *(guest)* | ✗ | A34 → ops queue |
+| POST | `/refund-requests` | — *(guest-app)* | ✗ | A34 → ops queue |
 | GET/POST | `/payments` | — | ✓ cash | |
 | POST | `/payments/{id}/inquiry` | — | ✗ | **Status recovery. 12 Aug §12** |
 | POST | `/payments/{id}/capture` | — | ✗ | |
@@ -191,7 +191,7 @@ Filterable by site, operating area, channel, workstation, user.
 
 | Context | Published | Total | Status |
 |---|---|---|---|
-| **Identity & AuthZ** | **38** | ~38 | **Complete.** Staff auth, guest auth, SSO, MFA, sessions, principals, roles, grants |
+| **Identity & AuthZ** | **38** | ~38 | **Complete.** Staff auth, guest-app auth, SSO, MFA, sessions, principals, roles, grants |
 | **Tenancy & Org** | **15** | ~15 | **Complete.** Scope tree, regions, workstations, sale boards, devices |
 | Shift & Till | **10** | 10 | **Complete** |
 | **Access Control** | **19** | ~19 | **Complete.** Validation, override, group, offline package, access points, geofence |

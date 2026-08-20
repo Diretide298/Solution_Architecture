@@ -5,6 +5,8 @@
 entity: Fiscal period
 contract: finance
 enum: PeriodStatus
+enumKind: named
+enumSchema: PeriodStatus
 owner: ledger
 initial:
 - open

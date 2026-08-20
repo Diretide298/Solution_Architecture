@@ -10,8 +10,8 @@ platform:
   code: P04
   audience: staff
   formFactor: posTerminal
-  shortName: Staff POS
-  name: Staff POS — Terminal and Tablet
+  shortName: Venue POS
+  name: Venue POS — Terminal and Tablet
   surface: staffFacing
   runtime: reactNativeTablet
   offlineCapable: true
@@ -22,7 +22,7 @@ platform:
   - ltr
   - rtl
   screenCount: 10
-  app: pos
+  app: venue-pos
   appStatus: scaffolded
   packages:
   - design-tokens
@@ -38,6 +38,15 @@ platform:
     deviceOwnership: venue-owned, staffed
     networkAssumption: venue LAN with expected outages
     releaseCadence: monthly, never during trading
+  wireframeBoard: wireframes/P04 Staff POS.dc.html
+  designReferences:
+  - path: sources/designs/Park_POS_dc.html
+    note: Delivered client mockup. Six of the ten screens exist in it, and it is the source of the design
+      tokens the boards use.
+  - path: sources/designs/Park_POS_v1_dc.html
+    note: Delivered client mockup. Six of the ten screens exist in it, and it is the source of the design
+      tokens the boards use.
+  operator: venue
 screens:
 - id: POS-001
   name: Begin Shift
@@ -71,13 +80,16 @@ screens:
         label: Review & confirm
   states:
     loading: Denominations from region settings
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Open failed. Counts are kept on screen
     offline: Opens locally and syncs. A gate that cannot open a till because the network is down is
       a gate that does not sell
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-001
+    designReference: sources/designs/Park_POS_dc.html
   permission: SHIFT_OPEN
   apis:
   - operationId: openShift
@@ -88,18 +100,65 @@ screens:
     contract: shift
     purpose: Whether a shift is already open here
     trigger: onLoad
+  - operationId: acceptShiftVariance
+    contract: shift
+    purpose: Accept an over/short beyond the threshold
+    trigger: onAction
+  - operationId: approveShiftOpen
+    contract: shift
+    purpose: Approve a shift opening outside tolerance
+    trigger: onAction
+  - operationId: closeShift
+    contract: shift
+    purpose: Blind close-out
+    trigger: onAction
+  - operationId: createCashMovement
+    contract: shift
+    purpose: Record a cash lift or add
+    trigger: onAction
+  - operationId: getShift
+    contract: shift
+    purpose: Read a shift
+    trigger: onLoad
+  - operationId: listCashMovements
+    contract: shift
+    purpose: Lifts, adds and the opening float
+    trigger: onLoad
+  - operationId: listShifts
+    contract: shift
+    purpose: List shifts
+    trigger: onLoad
+  - operationId: recordNoSale
+    contract: shift
+    purpose: Open the drawer without a sale
+    trigger: onAction
+  - operationId: reopenShift
+    contract: shift
+    purpose: Reopen a shift closed in error
+    trigger: onAction
+  - operationId: resumeShift
+    contract: shift
+    purpose: Resume a suspended shift
+    trigger: onAction
+  - operationId: suspendShift
+    contract: shift
+    purpose: Suspend a shift so another user can log in
+    trigger: onAction
   notes: 'Design: Park_POS_dc.html. The mockup warns "you will not be able to edit the float amount
     after the shift has started" — that is correct and deliberate. An editable opening float makes close-out
     variance meaningless.'
   implementation:
-    app: pos
+    app: venue-pos
     route: /shift/begin-shift
-    component: apps/pos/src/routes/shift/BeginShiftWizard.tsx
+    component: apps/venue-pos/src/routes/shift/BeginShiftWizard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
     exitTo:
     - POS-002
+    - POS-007
+    - POS-009
+  density: touchLarge
 - id: POS-002
   name: Sell — Ticket Catalogue
   module: Sell
@@ -148,13 +207,17 @@ screens:
         label: Clear cart
   states:
     loading: Tiles from the local bundle. Instant — this screen must not wait on a network
-    empty: No products in this category
+    emptyFirstRun: No products in this category
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Bundle stale or missing. The terminal refuses to sell rather than selling at an unknown price
     offline: Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal
       does not know whether it has a network.
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-002
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: listProducts
@@ -173,23 +236,178 @@ screens:
     contract: orders
     purpose: Cashier discount with a reason
     trigger: onAction
+  - operationId: analysePromotionConflicts
+    contract: promotions
+    purpose: Analyse stacking against live promotions
+    trigger: onLoad
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
+  - operationId: createProduct
+    contract: catalogue
+    purpose: Create a product
+    trigger: onAction
+  - operationId: createPromotion
+    contract: promotions
+    purpose: Create a promotion
+    trigger: onAction
+  - operationId: createRefund
+    contract: orders
+    purpose: Refund an order, wholly or in part
+    trigger: onAction
+  - operationId: endPromotion
+    contract: promotions
+    purpose: End a promotion early
+    trigger: onAction
+  - operationId: exchangeOrderLines
+    contract: orders
+    purpose: Exchange lines for different products or dates
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: getOrderStatement
+    contract: orders
+    purpose: Full financial history of an order
+    trigger: onLoad
+  - operationId: getProduct
+    contract: catalogue
+    purpose: Read a product
+    trigger: onLoad
+  - operationId: getPromotion
+    contract: promotions
+    purpose: Read a promotion
+    trigger: onLoad
+  - operationId: getPromotionUsage
+    contract: promotions
+    purpose: Redemption count and discount given
+    trigger: onLoad
+  - operationId: listAlternativeCodes
+    contract: catalogue
+    purpose: External identifiers for a product
+    trigger: onLoad
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: List refunds against an order
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: List generated variants
+    trigger: onLoad
+  - operationId: listPromotions
+    contract: promotions
+    purpose: List promotions
+    trigger: onLoad
+  - operationId: modifyOrder
+    contract: orders
+    purpose: Add or remove lines on an existing order
+    trigger: onAction
+  - operationId: pausePromotion
+    contract: promotions
+    purpose: Pause a live promotion
+    trigger: onAction
+  - operationId: publishPromotion
+    contract: promotions
+    purpose: Publish a promotion
+    trigger: onAction
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
+  - operationId: rescheduleOrder
+    contract: orders
+    purpose: Move an order to another performance
+    trigger: onAction
+  - operationId: resolveProductByCode
+    contract: catalogue
+    purpose: Resolve a partner code to a product
+    trigger: onLoad
+  - operationId: resumeOrder
+    contract: orders
+    purpose: Bring a parked sale back to a till
+    trigger: onAction
+  - operationId: setAlternativeCodes
+    contract: catalogue
+    purpose: Set external identifiers
+    trigger: onAction
+  - operationId: setProductAttributes
+    contract: catalogue
+    purpose: Set the attribute axes for a product
+    trigger: onAction
+  - operationId: transitionProductLifecycle
+    contract: catalogue
+    purpose: Move a product through its lifecycle
+    trigger: onAction
+  - operationId: unschedulePromotion
+    contract: promotions
+    purpose: Pull a scheduled promotion before it starts
+    trigger: onAction
+  - operationId: updateProduct
+    contract: catalogue
+    purpose: Update a product
+    trigger: onAction
+  - operationId: updatePromotion
+    contract: promotions
+    purpose: Amend a promotion
+    trigger: onAction
+  - operationId: voidOrder
+    contract: orders
+    purpose: Void an order
+    trigger: onAction
+  - operationId: evaluateApprovalRequirement
+    contract: approvals
+    purpose: Does this need approval, and from whom
+    trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Take a payment against an order
+    trigger: onAction
+  - operationId: listMerchandise
+    contract: retail
+    purpose: List merchandise
+    trigger: onLoad
+  - operationId: lookupMerchandise
+    contract: retail
+    purpose: Price and stock check by barcode
+    trigger: onLoad
+  - operationId: issueGameCard
+    contract: games
+    purpose: Issue or activate a game card
+    trigger: onAction
+  - operationId: loadGameCredits
+    contract: games
+    purpose: Load credits onto a card
+    trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Ticket Catalogue / Product Selection". The mockup exposes Hold
-    Order and Discount as first-class buttons — neither existed as an operation until 14 August.'
+    Order and Discount as first-class buttons — neither existed as an operation until 14 August. Where
+    a foreign note is offered, the tender currency and rate are recorded on the payment. **The sale
+    is still booked in base currency** — 2.9.1: the sale finalises in local currency.'
   implementation:
-    app: pos
+    app: venue-pos
     route: /sell/sell-ticket-catalogue
-    component: apps/pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - POS-001
     - POS-006
     exitTo:
+    - BO-084
+    - GST-026
+    - POS-001
     - POS-003
     - POS-004
     - POS-005
     - POS-006
     - POS-010
+    fromFlows: true
+  density: touchLarge
 - id: POS-003
   name: Sell — Timed Entry
   module: Sell
@@ -219,13 +437,17 @@ screens:
         label: Add to cart
   states:
     loading: Slot skeleton
-    empty: No sessions on this date, with the next available offered
+    emptyFirstRun: No sessions on this date, with the next available offered
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Availability unavailable. Selection blocked — overselling is worse than waiting
     offline: '**Availability is never served from the bundle.** A lease is acquired against the server;
       without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)'
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-003
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: getAvailability
@@ -240,19 +462,75 @@ screens:
     contract: catalogue
     purpose: Ticket types
     trigger: onLoad
+  - operationId: createProduct
+    contract: catalogue
+    purpose: Create a product
+    trigger: onAction
+  - operationId: forceReleaseLease
+    contract: catalogue
+    purpose: Reclaim a stranded lease
+    trigger: onAction
+  - operationId: getProduct
+    contract: catalogue
+    purpose: Read a product
+    trigger: onLoad
+  - operationId: listAlternativeCodes
+    contract: catalogue
+    purpose: External identifiers for a product
+    trigger: onLoad
+  - operationId: listLeases
+    contract: catalogue
+    purpose: List leases
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  - operationId: releaseLease
+    contract: catalogue
+    purpose: Return unsold units
+    trigger: onAction
+  - operationId: renewLease
+    contract: catalogue
+    purpose: Extend a lease TTL
+    trigger: onAction
+  - operationId: resolveProductByCode
+    contract: catalogue
+    purpose: Resolve a partner code to a product
+    trigger: onLoad
+  - operationId: setAlternativeCodes
+    contract: catalogue
+    purpose: Set external identifiers
+    trigger: onAction
+  - operationId: setProductAttributes
+    contract: catalogue
+    purpose: Set the attribute axes for a product
+    trigger: onAction
+  - operationId: transitionProductLifecycle
+    contract: catalogue
+    purpose: Move a product through its lifecycle
+    trigger: onAction
+  - operationId: updateProduct
+    contract: catalogue
+    purpose: Update a product
+    trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Aquarium Entry" timed entry. The demand indicator is a presentation
     of remaining capacity, not a separate field.'
   implementation:
-    app: pos
+    app: venue-pos
     route: /sell/sell-timed-entry
-    component: apps/pos/src/routes/sell/SellTimedEntryForm.tsx
+    component: apps/venue-pos/src/routes/sell/SellTimedEntryForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-004
     - POS-005
+    - POS-006
+  density: touchLarge
 - id: POS-004
   name: Sell — Seat Map
   module: Sell
@@ -281,13 +559,16 @@ screens:
         label: Add seats to cart
   states:
     loading: Map skeleton at the venue aspect ratio
-    empty: No seats in the selected category
+    emptyFirstRun: No seats in the selected category
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Map unavailable, with best-available offered instead
     offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
       seat is unrecoverable'
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-004
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: getSeatAvailability
@@ -302,19 +583,61 @@ screens:
     contract: seating
     purpose: Extend during payment
     trigger: onAction
+  - operationId: cancelPerformance
+    contract: catalogue
+    purpose: Cancel a performance
+    trigger: onAction
+  - operationId: getPerformance
+    contract: catalogue
+    purpose: Read a performance
+    trigger: onLoad
+  - operationId: getSeatHold
+    contract: seating
+    purpose: Read a hold
+    trigger: onLoad
+  - operationId: recommendSeats
+    contract: seating
+    purpose: Recommend seats for a party
+    trigger: onAction
+  - operationId: releaseSeatHold
+    contract: seating
+    purpose: Release a hold
+    trigger: onAction
+  - operationId: updatePerformance
+    contract: catalogue
+    purpose: Amend a performance
+    trigger: onAction
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Take a payment against an order
+    trigger: onAction
+  - operationId: evaluateApprovalRequirement
+    contract: approvals
+    purpose: Does this need approval, and from whom
+    trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Reserved Seating / Seat Map". Booking fee is a separate line —
-    it is a fee, not part of the seat price, and reporting separates them.'
+    it is a fee, not part of the seat price, and reporting separates them. Foreign tender: **cash in
+    a currency the venue accepts, converted at the rate on the payment** (4.6.11). Change is given in
+    base currency only, so the till holds one float and one count per currency it takes in.'
   implementation:
-    app: pos
+    app: venue-pos
     route: /sell/sell-seat-map
-    component: apps/pos/src/routes/sell/SellSeatMapCanvas.tsx
+    component: apps/venue-pos/src/routes/sell/SellSeatMapCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-003
     - POS-005
+    - POS-006
+  density: touchLarge
 - id: POS-005
   name: Payment
   module: Payment
@@ -356,13 +679,16 @@ screens:
         label: Cancel order
   states:
     loading: Button disabled while processing. Double submission impossible
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Declined, with the reason. Retry reuses the same idempotency key
     offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
       never saw is a sale that vanishes at settlement
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-005
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_CREATE
   apis:
   - operationId: createPayment
@@ -381,12 +707,39 @@ screens:
     contract: retail
     purpose: Reprint
     trigger: onAction
+  - operationId: capturePayment
+    contract: orders
+    purpose: Capture a previously authorised payment
+    trigger: onAction
+  - operationId: createRetailSale
+    contract: retail
+    purpose: Sell merchandise
+    trigger: onAction
+  - operationId: getRetailSale
+    contract: retail
+    purpose: Read a retail sale
+    trigger: onLoad
+  - operationId: listRetailSales
+    contract: retail
+    purpose: List retail sales
+    trigger: onLoad
+  - operationId: lookupRetailSale
+    contract: retail
+    purpose: Find a sale from a receipt
+    trigger: onLoad
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
-    until 14 August. A tip posts to a liability, not to sales.'
+    until 14 August. A tip posts to a liability, not to sales. **The one surface that takes foreign
+    cash** (4.6.11). Records `tenderCurrency`, `tenderAmount` and the `fxRate` applied, and **gives
+    change in base currency only** — a till giving change in five currencies needs five floats and the
+    variance becomes unattributable.'
   implementation:
-    app: pos
+    app: venue-pos
     route: /payment/payment
-    component: apps/pos/src/routes/payment/PaymentForm.tsx
+    component: apps/venue-pos/src/routes/payment/PaymentForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -394,7 +747,11 @@ screens:
     - POS-003
     - POS-004
     exitTo:
+    - BO-048
+    - POS-001
     - POS-002
+    fromFlows: true
+  density: touchLarge
 - id: POS-006
   name: Held Orders
   module: Sell
@@ -417,13 +774,17 @@ screens:
         label: Resume
   states:
     loading: List skeleton
-    empty: Nothing held
+    emptyFirstRun: Nothing held
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: List unavailable. A held order can still be resumed by its number
     offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
       till's sale needs the server
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-006
+    designReference: sources/designs/Park_POS_dc.html
   permission: ORDER_MODIFY
   apis:
   - operationId: listOrders
@@ -434,18 +795,70 @@ screens:
     contract: orders
     purpose: Bring it back, reporting anything that moved
     trigger: onAction
+  - operationId: applyManualDiscount
+    contract: orders
+    purpose: Apply a discount a cashier chose
+    trigger: onAction
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
+  - operationId: createRefund
+    contract: orders
+    purpose: Refund an order, wholly or in part
+    trigger: onAction
+  - operationId: exchangeOrderLines
+    contract: orders
+    purpose: Exchange lines for different products or dates
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: getOrderStatement
+    contract: orders
+    purpose: Full financial history of an order
+    trigger: onLoad
+  - operationId: holdOrder
+    contract: orders
+    purpose: Park a sale and free the till
+    trigger: onAction
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: List refunds against an order
+    trigger: onLoad
+  - operationId: modifyOrder
+    contract: orders
+    purpose: Add or remove lines on an existing order
+    trigger: onAction
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
+  - operationId: rescheduleOrder
+    contract: orders
+    purpose: Move an order to another performance
+    trigger: onAction
+  - operationId: voidOrder
+    contract: orders
+    purpose: Void an order
+    trigger: onAction
   notes: Implied by the Hold Order button in the design and absent from it. A hold with no way to find
     it again is a lost sale.
   implementation:
-    app: pos
+    app: venue-pos
     route: /sell/held-orders
-    component: apps/pos/src/routes/sell/HeldOrdersList.tsx
+    component: apps/venue-pos/src/routes/sell/HeldOrdersList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-003
+    - POS-004
+  density: touchLarge
 - id: POS-007
   name: Close Shift
   module: Shift
@@ -472,13 +885,17 @@ screens:
         label: Submit count
   states:
     loading: Denominations
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Close failed. The count is preserved
     offline: Cannot close. Closing requires the server total, and a locally computed variance is not
       a variance
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-007
+    designReference: sources/designs/Park_POS_dc.html
   permission: SHIFT_CLOSE
   apis:
   - operationId: closeShift
@@ -493,16 +910,60 @@ screens:
     contract: shift
     purpose: Drawer opened without a sale
     trigger: onAction
+  - operationId: approveShiftOpen
+    contract: shift
+    purpose: Approve a shift opening outside tolerance
+    trigger: onAction
+  - operationId: createCashMovement
+    contract: shift
+    purpose: Record a cash lift or add
+    trigger: onAction
+  - operationId: getCurrentShift
+    contract: shift
+    purpose: The open or suspended shift on the session's workstation
+    trigger: onLoad
+  - operationId: getShift
+    contract: shift
+    purpose: Read a shift
+    trigger: onLoad
+  - operationId: listCashMovements
+    contract: shift
+    purpose: Lifts, adds and the opening float
+    trigger: onLoad
+  - operationId: listShifts
+    contract: shift
+    purpose: List shifts
+    trigger: onLoad
+  - operationId: openShift
+    contract: shift
+    purpose: Open a shift
+    trigger: onAction
+  - operationId: reopenShift
+    contract: shift
+    purpose: Reopen a shift closed in error
+    trigger: onAction
+  - operationId: resumeShift
+    contract: shift
+    purpose: Resume a suspended shift
+    trigger: onAction
+  - operationId: suspendShift
+    contract: shift
+    purpose: Suspend a shift so another user can log in
+    trigger: onAction
   notes: The blind count is the whole control. Not in the mockup, which shows only Begin Shift.
   implementation:
-    app: pos
+    app: venue-pos
     route: /shift/close-shift
-    component: apps/pos/src/routes/shift/CloseShiftWizard.tsx
+    component: apps/venue-pos/src/routes/shift/CloseShiftWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - POS-002
-    exitTo: []
+    exitTo:
+    - POS-001
+    - POS-009
+    inferred: true
+  density: touchLarge
 - id: POS-008
   name: Reports
   module: Reports
@@ -528,31 +989,69 @@ screens:
         label: Export
   states:
     loading: Tile skeletons
-    empty: No sales yet today
+    emptyFirstRun: No sales yet today
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Reporting unavailable. Selling is unaffected
     offline: '**Not available.** Reporting reads the analytical replica (ADR-0016) and a terminal-local
       figure would disagree with the back office'
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-008
+    designReference: sources/designs/Park_POS_dc.html
   permission: REPORT_VIEW
   apis:
   - operationId: runReport
     contract: reporting
     purpose: Terminal day view
     trigger: onLoad
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Natural-language reporting query
+    trigger: onAction
+  - operationId: createReport
+    contract: reporting
+    purpose: Create a custom report definition
+    trigger: onAction
+  - operationId: deleteReport
+    contract: reporting
+    purpose: Retire a report definition
+    trigger: onAction
+  - operationId: getFinancialReport
+    contract: finance
+    purpose: P&L, balance sheet or cash flow
+    trigger: onLoad
+  - operationId: getReport
+    contract: reporting
+    purpose: Read a report definition
+    trigger: onLoad
+  - operationId: listReports
+    contract: reporting
+    purpose: List available report definitions
+    trigger: onLoad
+  - operationId: saveNaturalLanguageQuery
+    contract: reporting
+    purpose: Save a natural-language answer as a report definition
+    trigger: onAction
+  - operationId: updateReport
+    contract: reporting
+    purpose: Publish a new version of a definition
+    trigger: onAction
   notes: 'Design: Park_POS_dc.html reports view. Read routing is analytical — never the primary, under
     any load.'
   implementation:
-    app: pos
+    app: venue-pos
     route: /reports/reports
-    component: apps/pos/src/routes/reports/ReportsDashboard.tsx
+    component: apps/venue-pos/src/routes/reports/ReportsDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+  density: touchLarge
 - id: POS-009
   name: Staff Roster
   module: Shift
@@ -572,28 +1071,83 @@ screens:
         label: Export roster
   states:
     loading: Table skeleton
-    empty: Nobody on duty
+    emptyFirstRun: Nobody on duty
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Roster unavailable
     offline: Last known roster, with its age shown
   wireframe:
     status: approved
-    owner: design — Park_POS_dc.html
+    owner: client mockup
+    board: wireframes/P04 Staff POS.dc.html#pos-009
+    designReference: sources/designs/Park_POS_dc.html
   permission: SHIFT_CLOSE_OTHER
   apis:
   - operationId: listShifts
     contract: shift
     purpose: Open shifts at this venue
     trigger: onLoad
+  - operationId: acceptShiftVariance
+    contract: shift
+    purpose: Accept an over/short beyond the threshold
+    trigger: onAction
+  - operationId: approveShiftOpen
+    contract: shift
+    purpose: Approve a shift opening outside tolerance
+    trigger: onAction
+  - operationId: closeShift
+    contract: shift
+    purpose: Blind close-out
+    trigger: onAction
+  - operationId: getCurrentShift
+    contract: shift
+    purpose: The open or suspended shift on the session's workstation
+    trigger: onLoad
+  - operationId: getShift
+    contract: shift
+    purpose: Read a shift
+    trigger: onLoad
+  - operationId: listCashMovements
+    contract: shift
+    purpose: Lifts, adds and the opening float
+    trigger: onLoad
+  - operationId: openShift
+    contract: shift
+    purpose: Open a shift
+    trigger: onAction
+  - operationId: recordNoSale
+    contract: shift
+    purpose: Open the drawer without a sale
+    trigger: onAction
+  - operationId: reopenShift
+    contract: shift
+    purpose: Reopen a shift closed in error
+    trigger: onAction
+  - operationId: resumeShift
+    contract: shift
+    purpose: Resume a suspended shift
+    trigger: onAction
+  - operationId: suspendShift
+    contract: shift
+    purpose: Suspend a shift so another user can log in
+    trigger: onAction
   implementation:
-    app: pos
+    app: venue-pos
     route: /shift/staff-roster
-    component: apps/pos/src/routes/shift/StaffRosterList.tsx
+    component: apps/venue-pos/src/routes/shift/StaffRosterList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - POS-002
     exitTo:
+    - POS-001
     - POS-002
+    - POS-007
+  notes: Close counts each foreign currency separately (`foreignHoldings`). **A variance collapsed into
+    a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
+    removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
+    does not handle money should not be able to move it (CF-87's class).
+  density: touchLarge
 - id: POS-010
   name: Add to Existing Ticket
   module: Sell
@@ -610,6 +1164,10 @@ screens:
     contract: orders
     purpose: Attach the new purchase to the same media
     trigger: onAction
+  - operationId: getMediaAsset
+    contract: assets
+    purpose: Read an asset with derivatives and usage
+    trigger: onLoad
   layout:
     template: detail
     regions:
@@ -631,7 +1189,8 @@ screens:
         label: Add and pay
   states:
     loading: Media lookup. Reads the primary — a stale entitlement set is a wrong one
-    empty: Media recognised and carries nothing. Unusual, and worth showing rather than hiding
+    emptyFirstRun: Media recognised and carries nothing. Unusual, and worth showing rather than hiding
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Media not recognised at this venue
     offline: '**Not available.** The entitlement set must be read live; appending to a stale picture
       double-sells a locker'
@@ -639,13 +1198,22 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
-    - POS-005
+    - POS-001
     - POS-002
+    - POS-003
+    - POS-004
+    - POS-005
   implementation:
-    app: pos
+    app: venue-pos
     route: /sell/add-to-existing-ticket
-    component: apps/pos/src/routes/sell/AddToExistingTicketDetail.tsx
+    component: apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx
     status: notStarted
   wireframe:
-    status: notStarted
-  notes: CF-58, from the 14 August MoM. Not in the delivered mockups.
+    status: drafted
+    board: wireframes/P04 Staff POS.dc.html#pos-010
+    designReference: sources/designs/Park_POS_dc.html
+  notes: 'CF-58, from the 14 August MoM. Not in the delivered mockups. **9 assets operations removed
+    18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item
+    to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same
+    shape as CF-87, one level up: that attached sibling operations, this attached a whole contract.'
+  density: touchLarge

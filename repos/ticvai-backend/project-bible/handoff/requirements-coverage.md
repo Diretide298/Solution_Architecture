@@ -21,7 +21,7 @@ that have never been counted** (CF-60).
 | Retail POS | 78 | `retail` | 26 | Covered |
 | Device Management | 60 | — | — | **Workshop.** No contract |
 | Subscription & Licensing Management | 59 | `subscription` | 34 | Covered |
-| Accreditation & Credential Management | 58 | — | — | **Workshop.** Wave 1 scanner depends on it |
+| Accreditation & Credential Management | 58 | — | — | **Workshop.** Wave 1 venue-scanner depends on it |
 | Maintenance & Safety Management | 50 | `maintenance` | 28 | Covered |
 | Employee Mobile App & AI Assistant | 50 | — | — | A surface. Maps to screens; P06 has none written (CF-59) |
 | Games & F&B Integration | 25 | `games` | 13 | Covered |
@@ -34,7 +34,7 @@ that have never been counted** (CF-60).
 |---|---|---|
 | Developer & API Management | 94 | Workshop |
 | Device Management | 60 | Workshop |
-| Accreditation & Credential Management | 58 | Workshop. **Wave 1 scanner depends on it** |
+| Accreditation & Credential Management | 58 | Workshop. **Wave 1 venue-scanner depends on it** |
 | Approval Workflows & Governance | 80 | Cross-cutting, owned by nothing |
 | Employee Mobile App & AI Assistant | 50 | A surface, not a module |
 

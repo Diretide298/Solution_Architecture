@@ -13,7 +13,7 @@ Offline is not a feature. It is a layer every write path passes through.
 |---|---|---|
 | POS thick client | **Full** | Installable, local SQLite |
 | Mobile / Flying POS | **Full, mandatory** | Roaming, may be off-site |
-| Dedicated scanner app | **Full, mandatory** | Native. Explicitly not web |
+| Dedicated venue-scanner app | **Full, mandatory** | Native. Explicitly not web |
 | Employee app | Partial | Validity lookup, not full scanning |
 | Kiosk | Full | Unattended |
 | Guest app | Partial | Cached tickets |
@@ -70,4 +70,4 @@ A ticket sold at the front gate, scanned 20 metres later, must not be refused by
 
 ## Testing
 
-Not provable on a bench. Requires a **pilot venue** and deliberate WAN severing mid-transaction. See [delivery/environments](../delivery/environments.md).
+Not provable on a bench. Requires a **pilot venue** and deliberate WAN severing mid-transaction. See delivery/environments.

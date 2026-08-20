@@ -62,6 +62,17 @@
           >
             <span class="icon-links" aria-hidden="true"></span>
           </button>
+          <!-- Notes that named you. Its own control rather than a mark on the
+               account button: being mentioned is a thing that happened to you,
+               not a fact about who you are signed in as, and the two want
+               different actions. Hidden until there is an account to address. -->
+          <button id="bell-toggle" class="icon-btn bell-toggle" type="button"
+                  title="Where you were named" aria-haspopup="dialog"
+                  aria-expanded="false" aria-controls="bell-panel" hidden>
+            <span class="icon-bell" aria-hidden="true">⊕</span>
+            <span id="bell-count" class="bell-count" hidden></span>
+          </button>
+
           <!-- Who you are signed in as, and the way out. -->
           <button id="account-toggle" class="icon-btn account-toggle" type="button"
                   title="Your account" aria-haspopup="dialog">
@@ -386,6 +397,26 @@
     <!-- ── account ───────────────────────────────────────────────────
          Signing in, and — for an admin — inviting the people who will be
          recording verdicts alongside you. -->
+    <!-- ── where you were named ────────────────────────────────────
+         The notes that named you, read here rather than only on the review
+         page. It carries the note itself: a panel that says "3 notifications"
+         and makes you go somewhere else to find out what for is one people
+         stop opening. -->
+    <div class="palette-backdrop" id="bell-panel" hidden>
+      <div class="account-dialog bell-dialog" role="dialog" aria-modal="true"
+           aria-labelledby="bell-title">
+        <h2 class="account-title" id="bell-title">Where you were named</h2>
+        <p class="auth-note auth-fine" id="bell-note"></p>
+        <div id="bell-list" class="bell-list"></div>
+        <button class="auth-button auth-button-quiet" id="bell-seen" type="button" hidden>
+          Mark all read
+        </button>
+        <a class="auth-button auth-button-quiet" href="/reviews.html">
+          All review activity
+        </a>
+      </div>
+    </div>
+
     <div class="palette-backdrop" id="account-panel" hidden>
       <div class="account-dialog" role="dialog" aria-modal="true" aria-labelledby="account-title">
         <h2 class="account-title" id="account-title">Sign in</h2>
@@ -424,7 +455,7 @@
             what is left.
           </p>
           <a class="auth-button" href="/validation.html">What has been signed off</a>
-          <a class="auth-button auth-button-quiet" href="/reviews.html">Review activity</a>
+          <a class="auth-button auth-button-quiet" id="mentions-link" href="/reviews.html">Review activity</a>
           <!-- The rollups. Neither is a view of one layer, which is why neither
                is a tab: a module and a domain both cut across all five. -->
           <a class="auth-button auth-button-quiet" href="/domains.html">Domain lenses</a>

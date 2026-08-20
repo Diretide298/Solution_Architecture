@@ -50,6 +50,11 @@ const LAYERS = {
 // implies. Two values, because the question is whose queue it is in.
 const TAGS = { frontend: 'Frontend', backend: 'Backend' };
 
+// Whose review a row belongs to. The team's and the client's are two reviews of
+// the same package, and mixing them would make "12 approved" a number nobody
+// could act on — it would not say approved by whom.
+const AUDIENCES = { internal: 'The team', client: 'Client' };
+
 const DAY = 86400000;
 const when = (iso) => new Date(iso);
 const fmt = (d) => d.toLocaleString(undefined,
@@ -78,7 +83,10 @@ const median = (xs) => {
 const state = {
   all: [],
   accounts: [],
-  filter: { kind: '', layer: '', tag: '', done: '', verdict: '', person: '', window: '', text: '' },
+  filter: {
+    kind: '', layer: '', tag: '', done: '', verdict: '',
+    audience: '', person: '', window: '', text: '',
+  },
   // Newest first, which is what a log is. Every column is sortable because the
   // question changes: "what happened today" wants time, "what is still open"
   // wants status, and "what did Asha say about the POS" wants the artefact.
@@ -95,10 +103,13 @@ function filtered() {
     if (f.kind && v.target_kind !== f.kind) return false;
     if (f.layer && (v.layer || '') !== f.layer) return false;
     if (f.tag && (v.tag || '') !== f.tag) return false;
-    // "Open" is the absence of a completion date, not a flag — so a row that
-    // was marked done and then reopened reads as open again with no third state.
-    if (f.done === 'done' && !v.done_at) return false;
-    if (f.done === 'open' && v.done_at) return false;
+    if (f.audience && (v.audience || 'internal') !== f.audience) return false;
+    // Settled rather than "has a date": work that was marked done and sent
+    // back is open again, and a filter that disagreed with the badge beside it
+    // would be the kind of wrong nobody reports because they assume they
+    // misread it.
+    if (f.done === 'done' && !auth.isSettled(v)) return false;
+    if (f.done === 'open' && auth.isSettled(v)) return false;
     if (f.verdict && v.verdict !== f.verdict) return false;
     if (f.person && String(v.account_id) !== f.person) return false;
     if (cutoff && when(v.at).getTime() < cutoff) return false;
@@ -141,7 +152,7 @@ function renderHeadline(rows) {
   // asked for work — a rejection or a needs-work — because an approval is not
   // a thing anybody has to come back and close.
   const asked = rows.filter((v) => v.verdict !== 'approved');
-  const openWork = asked.filter((v) => !v.done_at).length;
+  const openWork = asked.filter((v) => !auth.isSettled(v)).length;
   box.append(stat(openWork, 'still open',
     !asked.length ? 'nothing has been sent back'
       : openWork ? `of ${asked.length} that asked for work`
@@ -400,6 +411,74 @@ function renderPeople(rows) {
   for (const n of notes) host.append(el('p', 'pane-note warn-note', n));
 }
 
+// ── where you were named ───────────────────────────────
+
+/**
+ * The notes that named you, unread first.
+ *
+ * Shown above everything else on the page because it is the only part of it
+ * addressed to one person. Read rows stay for a while rather than vanishing on
+ * sight — the thing people do with a notification is read it, get interrupted,
+ * and come back for it, and a list that empties itself on the first glance is
+ * one they stop trusting.
+ */
+async function renderMentions() {
+  let payload = null;
+  try {
+    payload = await auth.myMentions();
+  } catch {
+    return;                       // the page is still worth having without it
+  }
+  const items = payload?.mentions ?? [];
+  if (!items.length) return;
+
+  const panel = $('mentions-panel');
+  const box = $('mentions');
+  panel.hidden = false;
+  box.innerHTML = '';
+  $('mentions-note').textContent = payload.unseen
+    ? `${payload.unseen} unread of ${items.length}`
+    : `${items.length}, all read`;
+  $('mentions-seen').hidden = !payload.unseen;
+
+  for (const m of items.slice(0, 12)) {
+    const row = el('div', `mention-row${m.seen_at ? '' : ' unread'}`);
+    if (!m.seen_at) row.append(el('span', 'mention-dot'));
+
+    const who = el('span', 'mention-by', m.by || m.by_email);
+    const what = el('span', 'mention-what');
+    what.append(el('span', `verdict-chip ${m.verdict}`, LABEL[m.verdict] ?? m.verdict));
+    const target = el('a', 'rt-artefact-link', m.target_id);
+    target.href = `/#${encodeURIComponent(
+      m.target_kind === 'operation' ? m.target_id : `${m.target_kind}:${m.target_id}`)}`;
+    what.append(target);
+
+    const line = el('div', 'mention-line');
+    line.append(who, what, el('span', 'rt-when-text', fmt(when(m.at))));
+    row.append(line);
+    // The note itself, with the handles picked out — without it the row says
+    // somebody wanted you and not what for, which is a notification that costs
+    // a click to become information.
+    row.append(auth.renderNote(m.note));
+    box.append(row);
+  }
+
+  $('mentions-seen').onclick = async () => {
+    $('mentions-seen').disabled = true;
+    try {
+      await auth.markMentionsSeen();
+      for (const row of box.querySelectorAll('.mention-row.unread')) {
+        row.classList.remove('unread');
+        row.querySelector('.mention-dot')?.remove();
+      }
+      $('mentions-note').textContent = `${items.length}, all read`;
+      $('mentions-seen').hidden = true;
+    } finally {
+      $('mentions-seen').disabled = false;
+    }
+  };
+}
+
 // ── the list ─────────────────────────────────────────────────────────
 
 // The columns, in the order they get read: when it happened, what was said,
@@ -411,6 +490,11 @@ const COLUMNS = [
     draw: (v) => el('span', 'rt-when-text', fmt(when(v.at))) },
   { key: 'verdict', label: 'Verdict', cls: 'rt-verdict', get: (v) => v.verdict,
     draw: (v) => el('span', `verdict-chip ${v.verdict}`, LABEL[v.verdict] ?? v.verdict) },
+  { key: 'audience', label: 'Review', cls: 'rt-audience',
+    get: (v) => v.audience ?? 'internal',
+    draw: (v) => ((v.audience ?? 'internal') === 'client'
+      ? el('span', 'rt-audience-chip client', 'Client')
+      : el('span', 'rt-none', 'team')) },
   { key: 'tag', label: 'Lands on', cls: 'rt-tag', get: (v) => v.tag ?? '',
     draw: (v) => (v.tag
       ? el('span', `verdict-tag-chip ${v.tag}`, TAGS[v.tag] ?? v.tag)
@@ -426,7 +510,7 @@ const COLUMNS = [
     } },
   { key: 'note', label: 'Why', cls: 'rt-note', get: (v) => v.note ?? '',
     draw: (v) => (v.note
-      ? el('span', 'rt-note-text', v.note)
+      ? auth.renderNote(v.note)
       : el('span', 'rt-none', 'no reason given')) },
   { key: 'by', label: 'Reviewer', cls: 'rt-who', get: (v) => v.by || v.by_email,
     draw: (v) => el('span', 'rt-who-text', v.by || v.by_email) },
@@ -507,7 +591,7 @@ function renderRows(rows) {
 }
 
 function tableRow(v) {
-  const row = el('tr', `review-row${v.done_at ? ' done' : ''}`);
+  const row = el('tr', `review-row${auth.isSettled(v) ? ' done' : ''}`);
   for (const col of COLUMNS) {
     const cell = el('td', col.cls);
     cell.append(col.draw(v));
@@ -534,10 +618,21 @@ function doneCell(v) {
   const stamp = el('span', 'rt-done-stamp');
   const paint = () => {
     stamp.innerHTML = '';
-    if (v.done_at) {
+    if (auth.isSettled(v)) {
       stamp.append(el('span', 'rt-done-chip', 'Done'));
       stamp.append(el('span', 'rt-done-by',
         `${v.done_by_name ? `${v.done_by_name} · ` : ''}${fmt(when(v.done_at))}`));
+    } else if (v.sent_back_at) {
+      // Open again, but not the same as never having been finished — somebody
+      // did the work and it was not accepted, and the reason is the only part
+      // of this row that says what to do next, so it is shown rather than
+      // hidden behind a hover.
+      stamp.append(el('span', 'rt-sentback-chip', 'Sent back'));
+      stamp.append(el('span', 'rt-done-by',
+        `${v.sent_back_by_name ? `${v.sent_back_by_name} · ` : ''}${fmt(when(v.sent_back_at))}`));
+      if (v.sent_back_note) {
+        stamp.append(el('span', 'rt-sentback-note', v.sent_back_note));
+      }
     } else if (v.verdict === 'approved') {
       stamp.append(el('span', 'rt-none', '—'));
     } else {
@@ -547,23 +642,30 @@ function doneCell(v) {
   paint();
   cell.append(stamp);
 
-  if (!mayWrite) return cell;
-  // An approval is not a thing anybody has to go and do, so there is nothing to
-  // close. Offering the button on one invites a tick that means nothing and
-  // makes the open count answer a different question than it says it does.
-  if (v.verdict === 'approved') return cell;
+  // Two separate rules, and only the first is about closing. Discarding is
+  // always offered on your own row — a client's mis-click is as much a mis-click
+  // as anybody's, and an approval typed into the wrong artefact is the most
+  // likely row to want gone.
+  //
+  // An approval is not a thing anybody has to go and *do*, so there is nothing
+  // to close: a tick on one would mean nothing and would make the open count
+  // answer a different question than it says it does.
+  if (!mayWrite || v.verdict === 'approved') {
+    cell.append(discardButton(v));
+    return cell;
+  }
 
-  const button = el('button', 'chip rt-done-button', v.done_at ? 'Reopen' : 'Mark done');
+  const button = el('button', 'chip rt-done-button', auth.isSettled(v) ? 'Reopen' : 'Mark done');
   button.type = 'button';
   button.onclick = async () => {
     button.disabled = true;
-    const want = !v.done_at;
+    const want = !auth.isSettled(v);
     try {
       const result = await auth.markVerdictDone(v.id, want);
       v.done_at = result.done_at;
       v.done_by_name = result.done_by_name;
-      button.textContent = v.done_at ? 'Reopen' : 'Mark done';
-      button.closest('tr')?.classList.toggle('done', Boolean(v.done_at));
+      button.textContent = auth.isSettled(v) ? 'Reopen' : 'Mark done';
+      button.closest('tr')?.classList.toggle('done', auth.isSettled(v));
       paint();
       // The headline counts open work, so it has to hear about this. The rows
       // are left alone deliberately: redrawing the table here would throw away
@@ -577,7 +679,131 @@ function doneCell(v) {
     }
   };
   cell.append(button);
+  cell.append(sendBackControl(v, paint));
+  cell.append(discardButton(v));
   return cell;
+}
+
+/**
+ * Reject a completion, with a reason. Admin only.
+ *
+ * The other half of Mark done. Without it the only answer to work that was not
+ * really finished is to reopen it silently, which tells whoever did it nothing
+ * and so tends to produce the same thing again.
+ *
+ * The note is not optional and the control is built around that: pressing
+ * "Send back" opens a field rather than doing anything, and the confirm stays
+ * disabled until something has been typed. There is no path through this that
+ * sends work back without saying why.
+ */
+function sendBackControl(v, repaint) {
+  const me = auth.account();
+  // Only on a row that is actually claiming to be finished — there is nothing
+  // to reject on one nobody has marked done.
+  if (me?.role !== 'admin' || !auth.isSettled(v)) return el('span');
+
+  const wrap = el('span', 'rt-sendback');
+  const open = el('button', 'chip rt-sendback-open', 'Send back');
+  open.type = 'button';
+  open.title = 'Reject this as not finished, and say why.';
+  wrap.append(open);
+
+  open.onclick = () => {
+    open.remove();
+    const form = el('span', 'rt-sendback-form');
+    const note = document.createElement('textarea');
+    note.className = 'rt-sendback-note';
+    note.rows = 2;
+    note.placeholder = 'What is still wrong? This is what they will read.';
+
+    const send = el('button', 'chip rt-sendback-send', 'Send back');
+    send.type = 'button';
+    send.disabled = true;
+    const cancel = el('button', 'chip rt-sendback-cancel', 'Cancel');
+    cancel.type = 'button';
+
+    note.oninput = () => { send.disabled = !note.value.trim(); };
+    cancel.onclick = () => { form.replaceWith(open); };
+
+    send.onclick = async () => {
+      send.disabled = true;
+      try {
+        const result = await auth.sendBackVerdict(v.id, note.value.trim());
+        v.sent_back_at = result.sent_back_at;
+        v.sent_back_by_name = result.sent_back_by_name;
+        v.sent_back_note = result.sent_back_note;
+        form.remove();
+        repaint();
+        // It is open work again, so the count above has to hear about it, and
+        // the row loses the dimming that said it was finished.
+        renderHeadline(filtered());
+        redraw();
+      } catch (error) {
+        $('error').textContent = error.message;
+        $('error').hidden = false;
+        send.disabled = false;
+      }
+    };
+
+    form.append(note, send, cancel);
+    wrap.append(form);
+    note.focus();
+  };
+  return wrap;
+}
+
+/**
+ * Discard one of your own rows.
+ *
+ * Two presses, not one. Everything else on this page is reversible — a verdict
+ * is answered by a later verdict, a closed item can be reopened — and this is
+ * the only control that destroys something. It asks once, and gives up asking
+ * after four seconds so a half-pressed button cannot sit there waiting to be
+ * completed by a stray click much later.
+ *
+ * Shown only on your own rows, because the server refuses anybody else's and a
+ * button that exists to be told no is worse than no button.
+ */
+function discardButton(v) {
+  const me = auth.account();
+  if (!me || v.account_id !== me.id) return el('span');
+
+  let armed = null;
+  const button = el('button', 'chip rt-discard', 'Discard');
+  button.type = 'button';
+  button.title = 'Remove this row. Only you can, and only this one.';
+
+  const disarm = () => {
+    clearTimeout(armed);
+    armed = null;
+    button.textContent = 'Discard';
+    button.classList.remove('armed');
+  };
+
+  button.onclick = async () => {
+    if (!armed) {
+      button.textContent = 'Discard?';
+      button.classList.add('armed');
+      armed = setTimeout(disarm, 4000);
+      return;
+    }
+    clearTimeout(armed);
+    button.disabled = true;
+    button.textContent = 'Discarding…';
+    try {
+      await auth.discardVerdict(v.id);
+      // Gone from the store, so gone from the page — including the counts and
+      // the pace chart above, which would otherwise still be describing it.
+      state.all = state.all.filter((row) => row.id !== v.id);
+      redraw();
+    } catch (error) {
+      $('error').textContent = error.message;
+      $('error').hidden = false;
+      button.disabled = false;
+      disarm();
+    }
+  };
+  return button;
 }
 
 // ── controls ─────────────────────────────────────────────────────────
@@ -606,6 +832,13 @@ function renderControls() {
   if (used.size > 1) {
     segment($('f-layer'),
       [['', 'All layers'], ...Object.entries(LAYERS).filter(([k]) => used.has(k))], 'layer');
+  }
+  // Only offered once a client has actually reviewed something — until then it
+  // is a filter with one populated side, which says a distinction is being made
+  // that is not yet being made.
+  if (state.all.some((v) => v.audience === 'client')) {
+    segment($('f-audience'),
+      [['', 'Both reviews'], ...Object.entries(AUDIENCES)], 'audience');
   }
   segment($('f-tag'), [['', 'Both sides'], ...Object.entries(TAGS)], 'tag');
   segment($('f-done'), [['', 'Open and done'], ['open', 'Open'], ['done', 'Done']], 'done');
@@ -663,13 +896,17 @@ function exportCsv(rows) {
   };
   const ordered = [...rows].sort((a, b) => when(a.at) - when(b.at));
   const body = [
-    ['when', 'date', 'layer', 'lands on', 'kind', 'artefact', 'verdict',
-     'reviewer', 'email', 'status', 'done on', 'done by', 'note'].join(','),
+    ['when', 'date', 'review', 'layer', 'lands on', 'kind', 'artefact', 'verdict',
+     'reviewer', 'email', 'status', 'done on', 'done by', 'sent back because',
+     'note'].join(','),
     ...ordered.map((v) => [
-      v.at, day(v.at), LAYERS[v.layer] ?? v.layer ?? '', TAGS[v.tag] ?? v.tag ?? '',
+      v.at, day(v.at), AUDIENCES[v.audience ?? 'internal'] ?? v.audience,
+      LAYERS[v.layer] ?? v.layer ?? '', TAGS[v.tag] ?? v.tag ?? '',
       KINDS[v.target_kind] ?? v.target_kind, v.target_id,
       LABEL[v.verdict] ?? v.verdict, v.by, v.by_email,
-      v.done_at ? 'Done' : 'Open', v.done_at ? day(v.done_at) : '', v.done_by_name ?? '',
+      auth.isSettled(v) ? 'Done' : v.sent_back_at ? 'Sent back' : 'Open',
+      v.done_at ? day(v.done_at) : '', v.done_by_name ?? '',
+      v.sent_back_note ?? '',
       v.note,
     ].map(esc).join(',')),
   ].join('\r\n');
@@ -694,13 +931,14 @@ function redraw() {
   renderPeople(rows);
   renderRows(rows);
   const LOOKUP = {
-    kind: KINDS, layer: LAYERS, tag: TAGS,
+    kind: KINDS, layer: LAYERS, tag: TAGS, audience: AUDIENCES,
     done: { open: 'Open', done: 'Done' },
   };
-  for (const host of [$('f-kind'), $('f-layer'), $('f-tag'), $('f-done'), $('f-verdict')]) {
+  for (const host of [$('f-kind'), $('f-layer'), $('f-audience'), $('f-tag'),
+    $('f-done'), $('f-verdict')]) {
     if (!host) continue;
     const key = {
-      'f-kind': 'kind', 'f-layer': 'layer', 'f-tag': 'tag',
+      'f-kind': 'kind', 'f-layer': 'layer', 'f-audience': 'audience', 'f-tag': 'tag',
       'f-done': 'done', 'f-verdict': 'verdict',
     }[host.id];
     for (const b of host.querySelectorAll('button')) {
@@ -727,4 +965,5 @@ function redraw() {
   }
   renderControls();
   redraw();
+  renderMentions();
 })();

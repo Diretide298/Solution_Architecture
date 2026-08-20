@@ -20,7 +20,7 @@ Without it, *"the tenant is slow"* is unactionable — and with cells, *"which c
 | Logging | Structured, never concatenated | Same dimensions. **Never PII** |
 | Aggregation | Central, cross-cell | Cell as a first-class dimension |
 
-Central aggregation is a control-plane function. Metrics and traces are operational telemetry, not personal data — but see [compliance/data-residency](../compliance/data-residency.md): logs must be PII-free **by construction**, not by filtering, if they leave the jurisdiction.
+Central aggregation is a control-plane function. Metrics and traces are operational telemetry, not personal data — but see compliance/data-residency: logs must be PII-free **by construction**, not by filtering, if they leave the jurisdiction.
 
 ## Per-venue attribution
 

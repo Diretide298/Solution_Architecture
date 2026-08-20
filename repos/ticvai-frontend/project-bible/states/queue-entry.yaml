@@ -5,6 +5,8 @@
 entity: Queue entry
 contract: queue
 enum: QueueEntryStatus
+enumKind: named
+enumSchema: QueueEntryStatus
 owner: queue
 initial:
 - waiting
@@ -51,3 +53,10 @@ transitions:
   trigger: operation
   guard: Returned to the queue — called in error, or the guest asked for more time
   isReversal: true
+notes: 'A guest in a virtual queue. **`called` expires rather than restoring their place** — unlike
+  a waitlist, where being asleep is not declining, a called queue place lapses because the ride is running
+  and the next party is waiting.
+
+
+  `abandoned` and `expired` are distinct: one is a guest leaving, one is the queue closing under them,
+  and only the second deserves an apology.'

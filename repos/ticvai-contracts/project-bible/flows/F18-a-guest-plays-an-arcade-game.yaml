@@ -1,0 +1,94 @@
+# F18 — A guest plays an arcade game
+#
+# The `games` contract had no flow. Written mainly to surface the two open questions,
+# which are both about money on a card nobody can trace.
+#
+# Validated by tools/check-flows.py.
+
+id: F18
+name: A guest plays an arcade game
+actor: guest
+wave: 3
+frequency: constant
+criticality: convenience
+platforms:
+- P02 Guest App
+- P04 Venue POS
+- P08 Venue Management
+offlineBehaviour: '**The play is offline by necessity** — a game machine reader cannot wait for a network.
+  Credits are on the card and the play journals.'
+trigger:
+  description: A guest taps a game card on a machine and plays.
+  entryScreen: GST-026
+  entryPoints:
+  - Buying a card
+  - Topping up
+  - Tapping a machine
+steps:
+- step: 1
+  screen: POS-002
+  action: Buys or tops up a card
+  operations:
+  - issueGameCard
+  - loadGameCredits
+  outcome: Credits loaded
+- step: 2
+  screen: GST-026
+  action: Checks the balance in the app
+  operations:
+  - getGameCard
+  outcome: What is on the card
+- step: 3
+  screen: BO-069
+  action: Machine records the play
+  operations:
+  - recordGamePlay
+  - syncGamePlays
+  outcome: '**Offline, journalled, synced later**'
+- step: 4
+  screen: BO-069
+  action: Machine goes out of service
+  operations:
+  - listGames
+  - updateGame
+  outcome: The asset cascade closes it
+branches:
+- at: 3
+  condition: The card has no credits
+  behaviour: Refused at the machine. **Offline, so the machine must know the balance** — which means
+    the balance is on the card as well as the server, and they will disagree.
+  severity: recoverable
+  resolvedBy: Guest
+- at: 3
+  condition: The card balance and the server disagree after sync
+  behaviour: '**The card wins for plays already taken** — the guest played, and reversing it is not
+    possible. The difference is a reconciliation item.'
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 4
+  condition: The machine fails mid-play
+  behaviour: A credit was taken and no play happened. **Refund or replay is a policy nobody has stated**,
+    and it happens often enough to matter.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+- at: 2
+  condition: Guest loses the card
+  behaviour: Credits are on the card. **A lost card is lost money unless it is linked to a guest**,
+    which is the argument for requiring a profile.
+  severity: requiresStaff
+  resolvedBy: Guest services
+exitStates:
+- state: completed
+  description: Played, credit consumed
+- state: deferred
+  description: Journalled offline, pending sync
+- state: escalated
+  description: Disputed play
+openQuestions:
+- What happens when a machine fails mid-play. Refund, replay, or nothing — and it is frequent enough
+  that not deciding is a decision.
+- Whether a game card must be linked to a guest profile. Unlinked is simpler and means a lost card is
+  lost money.
+primaryContract: games
+contracts:
+- games

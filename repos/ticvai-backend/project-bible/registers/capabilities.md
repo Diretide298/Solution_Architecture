@@ -137,7 +137,7 @@ Whole domain previously unmapped.
 
 | ID | Capability | Context | Refs | Wave |
 |---|---|---|---|---|
-| C56 | **Guest authentication** — social login, UAE Pass, OTP, biometric, guest checkout, account linking, MFA, session management. **83 requirements — the single largest sub-domain gap** | Identity & AuthZ | 19.2 | 1 |
+| C56 | **Guest authentication** — social login, UAE Pass, OTP, biometric, guest-app checkout, account linking, MFA, session management. **83 requirements — the single largest sub-domain gap** | Identity & AuthZ | 19.2 | 1 |
 | C57 | **White-label branding configuration** — theme, colours, fonts, logos, banners; upload validation with pixel and font limits; publish to config API | Guest App & Branding | 19.1; 10 Aug §31 | 1 |
 | C58 | **Guest profile & relationships** — profile data, household and family links, dependants, guardians, merge duplicates, bulk anonymise | Guest Engagement | 5.3, 22.2 | 2 |
 | C92 | **Guest app publishing pipeline** — per-tenant build, signing under tenant store accounts, review status, version per tenant per platform | Control Plane | 12 Aug §5 `MOM` | 2 |
@@ -158,7 +158,7 @@ Whole domain previously unmapped.
 | C66 | **SEO & content management** — CMS, metadata, sitemaps, search, dynamic pages, audit | Guest Engagement | 22.10, 22.11 | 3 |
 | C82 | **Virtual queue** — join, position, wait times, redirect, throttling, reservations for rides and experiences | Virtual Queue | 5.6 | 2 |
 | C83 | **Loyalty programme administration** — earn rules, tiers, expiry, statements | Guest Engagement | 5.4 | 3 |
-| C93 | **Omnichannel inbox** — unified conversation history across WhatsApp, web chat, app chat, Messenger, Instagram, email, SMS; unified guest identification; agent workspace | Guest Engagement | 22.8 | 2 |
+| C93 | **Omnichannel inbox** — unified conversation history across WhatsApp, web chat, app chat, Messenger, Instagram, email, SMS; unified guest-app identification; agent workspace | Guest Engagement | 22.8 | 2 |
 
 ### 3.8 Back of House — C11–C18, C24, C30–C31, C78, C94
 
@@ -170,8 +170,8 @@ Whole domain previously unmapped.
 | C14 | **Procurement** — requisition → dept approval → PO with quotation compare → GRN → issue; three-way matching; par-level auto-draft | Inventory | 15.3, 17.6 | 3 |
 | C15 | **Approvals** — approve / reject / return / RFI; trail; **delegation, out-of-office rerouting, parallel, consensus** | *(cross-cutting)* | 11.1, 18.6 | 1 |
 | C16 | **Roster & attendance** — shift view, clock in/out, leave, break with replacement scheduling | Resource Mgmt | 18.9, 1.2 | 2 |
-| C17 | **Guest assistance** — venue info, announcements, attraction status, supervisor contacts | *(employee app)* | 18.9 | 2 |
-| C18 | **Lost & found** — staff log, desk match, guest claim, tracking | Guest Engagement | 10 Aug §4.6 `MOM` | 2 |
+| C17 | **Guest assistance** — venue info, announcements, attraction status, supervisor contacts | *(venue-staff-app app)* | 18.9 | 2 |
+| C18 | **Lost & found** — staff log, desk match, guest-app claim, tracking | Guest Engagement | 10 Aug §4.6 `MOM` | 2 |
 | C24 | **Offline overlay** — auto-detect, visible indicator, cash-only, capacity products blocked, venue-offline alert | *(cross-cutting)* | 2.3.1; 31 Jul §11 | 1 |
 | C30 | **Accreditation issuance** — application → review → approval → credential → access assignment → expiry → revocation, for staff, contractors, vendors, media, VIPs, government | Accreditation | 12.1 | 3 |
 | C31 | **Device lifecycle** — register, enrol, provision, remote configure, monitor, maintain, firmware, security, retire | Device Mgmt | 16.1–16.9 | 3 |
@@ -216,7 +216,7 @@ Surfaced by the client UI/UX boards, 13 August.
 | C109 | **Employee recognition** — kudos, categories, recipients | Employee App | `DESIGN` — **no requirement, no MoM** | 3 |
 
 **C105 and C106 are Wave 1** because the White Label Builder is how a tenant configures the
-guest app, and no tenant can go live without it. C108 and C109 are not scope until they
+guest-app app, and no tenant can go live without it. C108 and C109 are not scope until they
 appear in the matrix or a MoM.
 
 ### 3.10 AI — AI-01 → AI-67
@@ -287,7 +287,7 @@ Everything else waits on these.
 | ID | Capability | Why Wave 1 |
 |---|---|---|
 | C95 | Tenant & cell provisioning | Every cell and migration depends on it. Longest lead time, unowned since 30 Jul |
-| C56 | Guest authentication | 83 reqs; every guest flow starts here |
+| C56 | Guest authentication | 83 reqs; every guest-app flow starts here |
 | C36 | Password & credential policy | Identity spine |
 | C20 | Configuration | Nothing is sellable until products exist |
 | C84 | Event & performance management | Capacity and scheduling substrate |
@@ -320,6 +320,6 @@ Everything else waits on these.
 |---|---|
 | **C35 staff authentication modes is `REF`** — RFID/card login materially affects POS and gate throughput but has no matrix requirement. Confirm or drop | Qossai |
 | **C80 ticket resale marketplace (19 reqs) has zero MoM coverage** — never discussed in any session | Chinmay |
-| **C56 guest authentication is 83 requirements** — the largest single sub-domain, and the only MoM coverage is a passing mention of auth options on 03 Aug | Chinmay |
+| **C56 guest-app authentication is 83 requirements** — the largest single sub-domain, and the only MoM coverage is a passing mention of auth options on 03 Aug | Chinmay |
 | **C44 revenue recognition rules** — Allam directed cross-checking the reference manuals for rules beyond the matrix (12 Aug §8). Narrow documented exception to the source-of-truth hierarchy | Chinmay — ongoing |
 | Four domains still unworkshopped — Accreditation (58), Device Mgmt (60), Developer/API (94), Rentals (15) | Chinmay — schedule |

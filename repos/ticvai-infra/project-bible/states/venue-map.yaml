@@ -1,0 +1,50 @@
+# Venue map — state model
+# Contract: venue-map.VenueMap.status
+
+entity: Venue map
+contract: venue-map
+enum: VenueMap.status
+enumKind: inline
+enumSchema: VenueMap
+enumProperty: status
+owner: venue-map
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: published
+  operation: publishVenueMap
+  trigger: operation
+  guard: '**Refuses on an unresolved proposal or a broken link.** A restaurant point pointing at a closed
+    outlet is worse than no point, because a guest walks there'
+- from: published
+  to: draft
+  operation: createVenueMap
+  trigger: operation
+  guard: A new draft opens from the published version. **The published one keeps serving** — the whole
+    reason publishing is separate from saving
+  isReversal: true
+- from: published
+  to: published
+  operation: publishVenueMap
+  trigger: operation
+  guard: Republished. **Creates a version rather than replacing one**, so a guest mid-route on version
+    3 finishes on version 3
+- from: published
+  to: archived
+  operation: createVenueMap
+  trigger: operation
+  guard: Superseded by another map, or the area closed
+- from: draft
+  to: archived
+  operation: createVenueMap
+  trigger: operation
+  guard: Abandoned before it was ever published
+notes: '**A map is published, not saved.** Editing a live map under a guest standing in front of it
+  is how a wayfinding route ends at a wall.
+
+
+  **`draft` and `published` coexist** — the draft is worked on for weeks while the published version
+  keeps serving, which is why this is a status on a versioned object rather than an edit lock.'

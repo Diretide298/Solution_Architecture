@@ -1,7 +1,14 @@
 # ADR-0001: Cell architecture — one tenant per jurisdiction
 
-**Status:** Accepted — split rule **superseded by [ADR-0014](0014-cell-per-region.md)**;
-isolation claim **amended 14 August 2026**  
+**Status:** Superseded by [ADR-0014](0014-cell-per-region.md) and [ADR-0017](0017-deployment-models.md)  
+**Retired:** 17 August 2026. **Decision section removed 18 August (CF-97).** **Kept for its Context and Alternatives, which are history rather than
+decision.** Its Decision — *Cell = Tenant × Jurisdiction* — is replaced by ADR-0014's *Cell =
+Tenant × Region*, and two of its Consequences are broken by the shared cell, as the section below
+records.
+
+**Do not cite the Decision section of this ADR.** It read as live to a careful reader on
+17 August because the status line led with "Accepted", and reasoning from it produced a
+cross-tenant isolation defect in ADR-0021 (CF-97).  
 **Date:** 12 August 2026
 
 ## Context
@@ -50,9 +57,15 @@ costs and buys little:
 **Recommendation: split within a jurisdiction only when load or a client requirement forces
 it.** Not as a default posture.
 
-## Decision
+## Decision — removed
 
-**Cell = Tenant × Jurisdiction.** One isolated deployment — own cloud environment, cluster and database — per tenant per jurisdiction. Placement is a **Region** attribute: `shared` | `dedicated:{cloud}:{region}` | `client_hosted:{endpoint}`. A tenant may be mixed across regions.
+**Removed entirely on 18 August, not struck through.**
+
+It said *Cell = Tenant × Jurisdiction*. ADR-0014 replaced it with *Cell = Tenant × Region* and ADR-0017 replaced the isolation model, and **a superseded decision left on the page is a decision somebody reads.** That is not a hypothetical: reasoning from this section produced a cross-tenant isolation defect in ADR-0021 (CF-97), by a careful reader, six days after it was superseded.
+
+**Marking it superseded was not enough. Striking it through would not have been either.**
+
+**Read [ADR-0014](0014-cell-per-region.md) and [ADR-0017](0017-deployment-models.md).**
 
 ## Consequences
 

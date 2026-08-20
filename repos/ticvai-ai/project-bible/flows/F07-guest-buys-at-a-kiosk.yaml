@@ -1,0 +1,132 @@
+# F07 — Guest buys at a kiosk
+#
+# An unattended terminal. Every failure that a cashier would absorb has to be handled
+# on screen, and the two that matter are an unknown payment and a dead printer.
+#
+# Validated by tools/check-flows.py.
+
+id: F07
+name: Guest buys at a kiosk
+actor: guest
+wave: 2
+frequency: constant
+criticality: revenue
+platforms:
+- P05 Guest Kiosk
+offlineBehaviour: Not offline-capable. A kiosk is unattended — an unattended terminal selling from a
+  stale catalogue oversells with nobody watching, and there is no cashier to notice. It refuses rather
+  than guesses, and KSK-014 is the screen that says so.
+trigger:
+  description: A guest at the entrance chooses to buy from a machine rather than queue for a counter.
+    Nobody is standing beside them, which changes every failure.
+  entryScreen: KSK-001
+  entryPoints:
+  - Attract loop times out to idle
+  - Guest touches the screen
+  - Redirected from a full counter queue
+steps:
+- step: 1
+  screen: KSK-001
+  action: Touches the attract loop
+  operations: []
+  outcome: Wakes to language selection **Calls nothing** — the attract loop is idle video until somebody
+    touches it.
+- step: 2
+  screen: KSK-002
+  action: Chooses a language
+  operations:
+  - getTenantConfig
+  outcome: Everything after this is in their language, including receipts
+- step: 3
+  screen: KSK-003
+  action: Chooses buy or collect
+  operations:
+  - listProducts
+  outcome: Two paths diverge here
+- step: 4
+  screen: KSK-004
+  action: Chooses tickets and quantities
+  operations:
+  - listProductVariants
+  - getAvailability
+  outcome: Sees live availability, never cached
+- step: 5
+  screen: KSK-005
+  action: Chooses a session
+  operations:
+  - getAvailability
+  - acquireLease
+  outcome: Capacity is leased before payment
+- step: 6
+  screen: KSK-006
+  action: Reviews the order
+  operations:
+  - evaluatePromotions
+  outcome: Last chance to change anything
+- step: 7
+  screen: KSK-007
+  action: Pays at the terminal
+  operations:
+  - createPayment
+  outcome: Card only — a kiosk takes no cash
+- step: 8
+  screen: KSK-009
+  action: Takes the printed ticket
+  operations:
+  - getOrder
+  outcome: Paper, because a guest at a kiosk may have no phone battery
+branches:
+- at: 7
+  condition: Payment outcome unknown
+  behaviour: KSK-008. **The important one.** A card charged with no response, at an unattended machine.
+    The kiosk must inquire rather than retry, and must not print until it knows.
+  severity: requiresStaff
+  resolvedBy: Automatic inquiry, then KSK-013 call staff
+- at: 7
+  condition: Payment declined
+  behaviour: Returns to KSK-007 with the reason. The lease is held for the remaining window rather than
+    released immediately — a guest fumbling for a second card should not lose their session.
+  severity: recoverable
+  resolvedBy: Guest
+- at: 8
+  condition: Printer out of paper or jammed
+  behaviour: KSK-010. **The order is paid and the ticket exists** — it is emailed and shown as a QR
+    on screen, and the kiosk marks itself degraded rather than dead.
+  severity: recoverable
+  resolvedBy: Automatic, then staff
+- at: 5
+  condition: Session sells out while the guest is choosing
+  behaviour: KSK-005 refreshes and says so. Refusing at payment would be worse.
+  severity: recoverable
+  resolvedBy: Guest
+- at: 4
+  condition: Guest abandons mid-flow
+  behaviour: Times out to KSK-001 after a stated interval and releases the lease. A kiosk holding capacity
+    for someone who walked away is a kiosk selling less.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 1
+  condition: Kiosk cannot reach the server
+  behaviour: KSK-014 out of service. It does not attempt a cached sale.
+  severity: abandonsFlow
+  resolvedBy: Staff
+- at: 3
+  condition: Guest chose collect rather than buy
+  behaviour: KSK-011 and KSK-012. A different flow with a reference lookup and no payment.
+  severity: recoverable
+  resolvedBy: Guest
+exitStates:
+- state: completed
+  description: Ticket printed and the guest admitted to the queue
+- state: deferred
+  description: Paid, ticket delivered by email after a print failure
+- state: abandoned
+  description: Timed out, lease released
+- state: escalated
+  description: Staff called to an unresolved payment
+primaryContract: catalogue
+contracts:
+- catalogue
+- orders
+- white-label
+- promotions

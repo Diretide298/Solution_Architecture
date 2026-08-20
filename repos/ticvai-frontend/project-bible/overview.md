@@ -117,7 +117,7 @@ transactions or federation if venues were separate databases:
 - Multi-venue passes with revenue split by percentage or fixed amount per venue (12 Aug §16)
 - Memberships and annual passes valid across venues (matrix 2.14.x)
 - Wallet balances spendable at any venue (matrix 6.1.x, 10.2.x)
-- Consistent guest identity across channels — the stated reason for 3.3.3 (10 Aug)
+- Consistent guest-app identity across channels — the stated reason for 3.3.3 (10 Aug)
 - Consolidated brand and legal-entity reporting (12 Aug §14)
 
 List partitioning delivers the same physical separation, partition pruning, and independent
@@ -132,7 +132,7 @@ default topology.
 
 | # | Position | Basis |
 |---|---|---|
-| 3.35.1 | **Entitlements, wallets, memberships and guest identity cross jurisdictions.** Home-cell ownership with delegated redemption | Client decision · [ADR-0010](adr/0010-cross-jurisdiction-entitlements.md) |
+| 3.35.1 | **Entitlements, wallets, memberships and guest-app identity cross jurisdictions.** Home-cell ownership with delegated redemption | Client decision · [ADR-0010](adr/0010-cross-jurisdiction-entitlements.md) |
 | 3.35.2 | **Only a pseudonymous `guestLinkId` crosses a border.** No PII, ever | Derived |
 | 3.35.3 | Cross-cell linkage requires **explicit recorded consent** — the PDPL Article 23 basis | Derived |
 | 3.35.4 | **Orders never span cells.** The selling cell owns the order; redemption rights propagate | Derived |
@@ -150,7 +150,7 @@ default topology.
 | 3.36.3 | **Contended inventory uses leases**, not replication — TTL, automatic return, refusal on exhaustion | Derived |
 | 3.36.4 | Seated inventory stays **blocked offline** | Ratified |
 | 3.36.5 | Transactions written to a local journal and **committed before the cashier is acknowledged** | Derived |
-| 3.36.6 | **Server re-prices every line on ingest.** Local price is the guest answer; the server is authoritative for the ledger | Derived |
+| 3.36.6 | **Server re-prices every line on ingest.** Local price is the guest-app answer; the server is authoritative for the ledger | Derived |
 | 3.36.7 | Three deployment profiles — **terminal-local, venue edge, thin** — one codebase | Derived |
 | 3.36.8 | Venue edge node for mid and large venues. Turns WAN-down-LAN-up into a fully working venue | Derived |
 

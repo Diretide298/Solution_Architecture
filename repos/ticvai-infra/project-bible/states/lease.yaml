@@ -5,6 +5,8 @@
 entity: Inventory lease
 contract: catalogue
 enum: LeaseStatus
+enumKind: named
+enumSchema: LeaseStatus
 owner: catalogue
 initial:
 - active
@@ -12,8 +14,6 @@ terminal:
 - expired
 - released
 - forceReleased
-offlineReachable:
-- active
 transitions:
 - from: active
   to: released
@@ -34,3 +34,5 @@ transitions:
   requiresApproval: true
 notes: '`forceReleased` is deliberately distinct from `released`. One is a terminal reporting; the other
   is a human overriding a terminal that cannot report, and the reconciliation afterwards is different.'
+offlineReachable:
+- active

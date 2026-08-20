@@ -1,4 +1,4 @@
-# ADR-0006: Tiered guest app distribution
+# ADR-0006: Tiered guest-app app distribution
 
 **Status:** Accepted  
 **Date:** 12 August 2026
@@ -26,6 +26,6 @@ CF-13. Whether to publish one universal TICVAI app or per-tenant branded apps, a
 
 | Rejected | Why |
 |---|---|
-| Universal app only | Cannot bind to one cell; a guest selecting venues in two jurisdictions holds cross-border session state |
+| Universal app only | Cannot bind to one cell; a guest-app selecting venues in two jurisdictions holds cross-border session state |
 | Branded apps, self-published | Version fragmentation, signing key custody, toolchain burden |
 | TICVAI publishes all branded apps under its own account | Guideline 4.2.6 rejection |

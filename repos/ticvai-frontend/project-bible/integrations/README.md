@@ -1,22 +1,18 @@
-# Integrations
+# Active
 
-> **Purpose:** Third-party and hardware  
+> **Purpose:** What is in flight now  
 > **Owner:** Chinmay  
-> **Status:** Stub
+> **Status:** Living
 
-194 requirements depend on external systems; 998 on hardware or on-location infrastructure.
+Current wave, current context, open blockers, this week's gates.
 
-**Standard pattern (10 Aug):** TICVAI exposes an inbound API; the client's chosen
-third-party feeds into it. Direct integration with a named vendor is bespoke work, quoted
-separately.
-
-**Exception:** payment gateways require full end-to-end integration including recovery
-paths, not just the happy path.
-
-| Page | Covers |
+| Page | |
 |---|---|
-| [hardware-lab](hardware-lab.md) | Devices, drivers, simulators |
-| [payment](payment.md) | Gateways, terminals, status-inquiry recovery |
-| [identity-providers](identity-providers.md) | UAE Pass, SSO, MFA |
-| [venue-systems](venue-systems.md) | Turnstiles, queue feeds, KDS, lockers, signage |
-| [distribution](distribution.md) | OTAs, resellers, channel management |
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

@@ -63,7 +63,8 @@ ls -l /srv/ticvai/backups/
 ## Inviting a client
 
 A client is somebody outside the company: they read everything except the
-decisions, and record nothing.
+decisions, and they can sign off on what they read — into their own review,
+kept apart from the team's.
 
 ```
 sudo -u ticvai env TICVAI_DB=/srv/ticvai/viewer/api/ticvai.db \
@@ -90,13 +91,21 @@ Not hidden in the browser. `/api/decisions` answers 403, and so does
 matters, because an ADR is a `.md` file and blocking only the endpoint would
 leave every decision readable one path at a time.
 
+**Their review is their own.** A client can record a verdict on anything they
+can see, and it is filed under its own audience — taken from the role on their
+session, never from the request, so it cannot be sent in as the team's. The
+sign-off summary answers with the team's review unless asked for
+`?audience=client`, which means a client approving something the team rejected
+changes nothing about where the team stands. Closing an item stays the team's:
+it is a record of the team's own queue.
+
 Prove it rather than believe it:
 
 ```
 node viewer/checks/client-check.mjs
 ```
 
-32 checks. It creates a client, asks the server the questions a curious
+38 checks. It creates a client, asks the server the questions a curious
 reader would ask from devtools, and removes the account afterwards.
 
 ## This address has no certificate

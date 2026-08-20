@@ -1,0 +1,63 @@
+# Integration listing — state model
+# Contract: public-api.IntegrationListing.status
+
+entity: Integration listing
+contract: public-api
+enum: IntegrationListing.status
+enumKind: inline
+enumSchema: IntegrationListing
+enumProperty: status
+owner: public-api
+initial:
+- draft
+terminal:
+- delisted
+transitions:
+- from: draft
+  to: submitted
+  operation: submitIntegrationListing
+  trigger: operation
+  guard: Sent for review
+- from: submitted
+  to: inReview
+  operation: certifyIntegration
+  trigger: operation
+  guard: Being assessed
+- from: inReview
+  to: certified
+  operation: certifyIntegration
+  trigger: operation
+  guard: '**Approved, with an expiry.** Certification against v1 still listed after v3 is TICVAI vouching
+    for something it has not looked at in two years'
+- from: inReview
+  to: rejected
+  operation: certifyIntegration
+  trigger: operation
+  guard: Not approved, with reasons the developer can act on
+- from: rejected
+  to: submitted
+  operation: submitIntegrationListing
+  trigger: operation
+  guard: Resubmitted after changes
+  isReversal: true
+- from: certified
+  to: revoked
+  operation: certifyIntegration
+  trigger: operation
+  guard: '**Withdrawn after certification** — a breaking change on the integrator side, or a security
+    finding'
+- from: certified
+  to: delisted
+  trigger: timer
+  guard: Certification expired and was not renewed
+- from: revoked
+  to: delisted
+  operation: certifyIntegration
+  trigger: operation
+  guard: Removed from the marketplace
+notes: '**Certification gates the listing, not API access.** A developer may call the API uncertified;
+  they may not appear in the marketplace uncertified, **because a listing is TICVAI vouching for something.**
+
+
+  **The integration runs on the developer own infrastructure** — this record describes and points at
+  it, and third-party code does not execute inside TICVAI.'

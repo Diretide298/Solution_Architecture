@@ -1,20 +1,18 @@
-# Setup
+# Active
 
-> **Purpose:** Section index  
+> **Purpose:** What is in flight now  
 > **Owner:** Chinmay  
-> **Status:** Stub
+> **Status:** Living
 
-Everything a new engineer needs, in reading order.
+Current wave, current context, open blockers, this week's gates.
 
-| Page | Read when |
+| Page | |
 |---|---|
-| [quickstart](quickstart.md) | Day one |
-| [naming-and-style](naming-and-style.md) | Before writing anything |
-| [git-and-mrs](git-and-mrs.md) | Before the first commit |
-| [quality-gates](quality-gates.md) | Before the first MR |
-| [api-conventions](api-conventions.md) | Before touching a contract |
-| [backend-patterns](backend-patterns.md) / [frontend-patterns](frontend-patterns.md) / [data-and-storage](data-and-storage.md) | Per stream |
-| [config-and-secrets](config-and-secrets.md) | Before touching config |
-| [dependencies](dependencies.md) | Before adding a package |
-| [llm-conventions](llm-conventions.md) | Before committing AI-assisted code |
-| [adding-things](adding-things.md) | When adding anything structural |
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

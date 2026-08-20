@@ -152,6 +152,136 @@ export const recordVerdict = (kind, id, verdict, note, layer, tag) =>
 export const markVerdictDone = (id, done = true) =>
   call(`/api/verdicts/${id}/done`, { method: 'POST', body: { done } });
 
+/** Reject a completion, with a reason. Admin only, and the note is required —
+ *  it is the only thing that tells whoever did the work what to do next. */
+export const sendBackVerdict = (id, note) =>
+  call(`/api/verdicts/${id}/send-back`, { method: 'POST', body: { note } });
+
+/** Whether a row counts as finished right now.
+ *
+ *  Both stamps are kept, so this is a comparison rather than a flag: marked
+ *  done, sent back, marked done again. Exported because the reviews page and
+ *  the verdict block have to agree — two readings of the same two dates would
+ *  differ exactly once and nobody would know which was right. */
+export function isSettled(v) {
+  if (!v?.done_at) return false;
+  if (!v.sent_back_at) return true;
+  return new Date(v.done_at) > new Date(v.sent_back_at);
+}
+
+// ── naming somebody in a note ────────────────────────────
+
+export const mentionable = () => call('/api/mentionable');
+export const myMentions = () => call('/api/mentions');
+export const markMentionsSeen = () => call('/api/mentions/seen', { method: 'POST' });
+
+/** The roster, fetched once per page rather than per verdict block. There are
+ *  a few dozen accounts and 374 screens, and a block per screen each asking
+ *  for the same list is the sort of thing that only shows up in production. */
+let roster = null;
+async function people() {
+  if (!roster) roster = mentionable().then((r) => r.people ?? []).catch(() => []);
+  return roster;
+}
+
+/**
+ * Turn a textarea into one that can name somebody.
+ *
+ * Typing `@` opens a list; the arrows move through it, Enter or Tab picks, Esc
+ * closes. What gets inserted is the handle — the local part of the address —
+ * because that is what the server matches on, and it is unique by construction
+ * where a display name is not. Two people called Chris is normal, and a
+ * notification that reaches the wrong Chris is worse than one that does not go.
+ */
+export function attachMentions(textarea, host) {
+  const menu = el('div', 'mention-menu');
+  menu.hidden = true;
+  host.append(menu);
+
+  let matches = [];
+  let active = 0;
+  let at = -1;                       // where the @ that opened this sits
+
+  const close = () => {
+    menu.hidden = true;
+    matches = [];
+    at = -1;
+  };
+
+  const draw = () => {
+    menu.innerHTML = '';
+    if (!matches.length) return close();
+    matches.forEach((person, i) => {
+      const row = el('button', `mention-option${i === active ? ' active' : ''}`);
+      row.type = 'button';
+      row.append(el('span', 'mention-handle', `@${person.handle}`));
+      row.append(el('span', 'mention-name', person.name || person.email));
+      if (person.role === 'client') row.append(el('span', 'mention-role', 'client'));
+      // mousedown, not click: click lands after the textarea has already lost
+      // focus, and the caret position we are about to write into is gone by then.
+      row.onmousedown = (e) => { e.preventDefault(); pick(i); };
+      menu.append(row);
+    });
+    menu.hidden = false;
+  };
+
+  const pick = (i) => {
+    const person = matches[i];
+    if (!person) return;
+    const before = textarea.value.slice(0, at);
+    const after = textarea.value.slice(textarea.selectionStart);
+    const inserted = `@${person.handle} `;
+    textarea.value = before + inserted + after;
+    const caret = before.length + inserted.length;
+    textarea.setSelectionRange(caret, caret);
+    close();
+    textarea.focus();
+  };
+
+  textarea.addEventListener('input', async () => {
+    const upto = textarea.value.slice(0, textarea.selectionStart);
+    // The @ must start a word, or every address typed into a note opens a menu.
+    const open = /(?:^|\s)@([A-Za-z0-9._-]*)$/.exec(upto);
+    if (!open) return close();
+    at = textarea.selectionStart - open[1].length - 1;
+    const needle = open[1].toLowerCase();
+    const all = await people();
+    matches = all
+      .filter((p) => p.handle.includes(needle)
+        || (p.name ?? '').toLowerCase().includes(needle))
+      .slice(0, 6);
+    active = 0;
+    draw();
+  });
+
+  textarea.addEventListener('keydown', (e) => {
+    if (menu.hidden) return;
+    if (e.key === 'ArrowDown') { active = (active + 1) % matches.length; draw(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { active = (active - 1 + matches.length) % matches.length; draw(); e.preventDefault(); }
+    else if (e.key === 'Enter' || e.key === 'Tab') { pick(active); e.preventDefault(); }
+    else if (e.key === 'Escape') { close(); e.preventDefault(); }
+  });
+
+  textarea.addEventListener('blur', () => setTimeout(close, 120));
+}
+
+/** A note with the handles in it turned into something that reads as a name.
+ *  Text nodes throughout — a note is somebody's prose and never markup. */
+export function renderNote(text) {
+  const box = el('span', 'note-text');
+  const parts = String(text ?? '').split(/(@[A-Za-z0-9._%+-]+)/g);
+  for (const part of parts) {
+    if (/^@/.test(part)) box.append(el('span', 'note-mention', part));
+    else box.append(document.createTextNode(part));
+  }
+  return box;
+}
+
+/** Discard a verdict you recorded yourself. The server refuses anybody else's,
+ *  admin included — see the endpoint for why. */
+export const discardVerdict = (id) =>
+  call(`/api/verdicts/${id}`, { method: 'DELETE' });
+
 /** Which side of the house a kind lands on before anybody says otherwise.
  *  Mirrors TAG_OF in db.py; the server defaults the same way if this is wrong,
  *  so the two disagreeing costs a wrong pre-selection and never a wrong row. */
@@ -160,8 +290,14 @@ const TAG_OF = {
   screen: 'frontend', board: 'frontend',
   operation: 'backend', table: 'backend', platform: 'frontend',
 };
-export const validationSummary = (kind) =>
-  call(`/api/validation${kind ? `?target_kind=${encodeURIComponent(kind)}` : ''}`);
+// audience: 'internal' (the team, and the default every existing caller means),
+// 'client', or 'all'.
+export const validationSummary = (kind, audience = 'internal') => {
+  const q = new URLSearchParams();
+  if (kind) q.set('target_kind', kind);
+  if (audience) q.set('audience', audience);
+  return call(`/api/validation${q.toString() ? `?${q}` : ''}`);
+};
 
 /** Every verdict ever recorded, plus the roster. The summary throws away the
  *  disagreement, the revisions and the pace; this keeps them. */
@@ -183,6 +319,53 @@ const WHEN = (iso) => {
   return then.toLocaleString(undefined,
     { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
+
+/**
+ * Discard your own verdict, from wherever it is being shown.
+ *
+ * Matched on the address rather than an id because that is what the payload
+ * carries, and one account is one address by construction — `email_folded` is
+ * unique, so Asha@ and asha@ cannot be two people.
+ *
+ * Two presses. Everything else here is reversible: a verdict is answered by a
+ * later verdict, a closed item reopens. This is the only control that removes
+ * something, so it asks, and stops asking after four seconds rather than
+ * sitting armed for a stray click later.
+ */
+function discardControl(item, after) {
+  const mine = session.signedIn
+    && session.account?.email?.toLowerCase() === (item.by_email ?? '').toLowerCase();
+  if (!mine) return el('span');
+
+  let armed = null;
+  const button = el('button', 'verdict-discard', 'Discard this');
+  button.type = 'button';
+  const disarm = () => {
+    clearTimeout(armed);
+    armed = null;
+    button.textContent = 'Discard this';
+    button.classList.remove('armed');
+  };
+  button.onclick = async () => {
+    if (!armed) {
+      button.textContent = 'Discard — sure?';
+      button.classList.add('armed');
+      armed = setTimeout(disarm, 4000);
+      return;
+    }
+    clearTimeout(armed);
+    button.disabled = true;
+    try {
+      await discardVerdict(item.id);
+      after();
+    } catch (error) {
+      button.disabled = false;
+      disarm();
+      button.textContent = error.message;
+    }
+  };
+  return button;
+}
 
 /**
  * A verdict control for one artefact. Renders immediately with what it knows
@@ -223,8 +406,9 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
       return;
     }
 
-    // what it stands at now
+    // what it stands at now — the team's, and the client's beside it
     const current = state?.current ?? null;
+    const fromClient = state?.client_current ?? null;
     const status = el('div', 'verdict-current');
     if (current) {
       status.append(el('span', `verdict-chip ${current.verdict}`, verdictLabel(current.verdict)));
@@ -238,15 +422,41 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
         status.append(el('span', 'verdict-done-chip',
           `Done${current.done_by_name ? ` · ${current.done_by_name}` : ''} · ${WHEN(current.done_at)}`));
       }
-      if (current.note) status.append(el('p', 'verdict-note', current.note));
+      if (current.note) status.append(el('p', 'verdict-note', renderNote(current.note)));
+      status.append(discardControl(current, load));
     } else {
       status.append(el('span', 'verdict-chip none', 'Not reviewed'));
-      status.append(el('span', 'verdict-by', 'Nobody has recorded a verdict on this yet.'));
+      status.append(el('span', 'verdict-by',
+        fromClient ? 'Nobody on the team has recorded a verdict on this yet.'
+          : 'Nobody has recorded a verdict on this yet.'));
     }
     statusBox.append(status);
 
-    // how it got there — only worth showing once there is a "there"
-    const past = (state?.history ?? []).slice(1);
+    // Drawn only once a client has actually said something. An empty "client:
+    // not reviewed" on every artefact in the package would be a second row of
+    // nothing on 374 screens, and would read as an outstanding step rather
+    // than an absent one.
+    if (fromClient) {
+      const theirs = el('div', 'verdict-current verdict-client-track');
+      theirs.append(el('span', 'verdict-track-label', 'Client'));
+      theirs.append(el('span', `verdict-chip ${fromClient.verdict}`,
+        verdictLabel(fromClient.verdict)));
+      theirs.append(el('span', 'verdict-by',
+        `${fromClient.by || fromClient.by_email} · ${WHEN(fromClient.at)}`));
+      if (fromClient.note) theirs.append(el('p', 'verdict-note', renderNote(fromClient.note)));
+      theirs.append(discardControl(fromClient, load));
+      statusBox.append(theirs);
+    }
+
+    // How it got there — only worth showing once there is a "there".
+    //
+    // By id rather than by position. Slicing the first row off assumed the
+    // newest row was the one drawn above it, which stopped being true the
+    // moment a second audience could write: a client verdict recorded last
+    // would be sliced away as "already shown" while the team's current one
+    // appeared twice.
+    const standing = new Set([current?.id, fromClient?.id].filter((x) => x != null));
+    const past = (state?.history ?? []).filter((item) => !standing.has(item.id));
     if (past.length) {
       const list = el('div', 'verdict-history');
       list.append(el('div', 'verdict-history-head', `${past.length} earlier`));
@@ -254,9 +464,10 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
         const row = el('div', 'verdict-history-row');
         row.append(el('span', `verdict-dot ${item.verdict}`));
         row.append(el('span', 'verdict-history-what', verdictLabel(item.verdict)));
-        row.append(el('span', 'verdict-history-who', `${item.by || item.by_email}`));
+        row.append(el('span', 'verdict-history-who',
+          `${item.by || item.by_email}${item.audience === 'client' ? ' · client' : ''}`));
         row.append(el('span', 'verdict-history-when', WHEN(item.at)));
-        if (item.note) row.append(el('span', 'verdict-history-note', item.note));
+        if (item.note) row.append(el('span', 'verdict-history-note', renderNote(item.note)));
         list.append(row);
       }
       statusBox.append(list);
@@ -283,17 +494,18 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
       return;
     }
 
-    // A client reads and records nothing. Saying so is the point: an absent
-    // form reads as a page that failed to load, and a client who thinks the
-    // viewer is broken will say so to somebody other than us. The server
-    // refuses the write in any case — this is the explanation, not the rule.
-    if (session.account?.role === 'client') {
-      formBox.append(el('p', 'pane-note',
-        'Signed in as a client — you can read this package and record nothing.'));
-      return;
-    }
+    // A client records a verdict like anybody else. What differs is where it
+    // lands: the server files it under its own audience from the role on the
+    // session, so it stands beside the team's review rather than on top of it.
+    // Saying so here is worth a line — somebody signing off on their own
+    // project should know their approval is being kept as theirs.
+    const asClient = session.account?.role === 'client';
 
     const form = el('div', 'verdict-form');
+    if (asClient) {
+      form.append(el('p', 'pane-note verdict-as-client',
+        'Recorded as the client review, kept separately from the team’s.'));
+    }
 
     // Which side has to act on it. Pre-selected from the kind and changeable,
     // because the default is right most of the time and wrong exactly when it
@@ -301,6 +513,9 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
     // and fixed in the backend, and only the person looking at it knows which.
     let tag = TAG_OF[kind] ?? 'backend';
     const tagRow = el('div', 'verdict-tag-row');
+    // Which side has to act is the team's triage, not the client's — they are
+    // not the ones holding either queue. The server defaults it from the kind.
+    if (asClient) tagRow.hidden = true;
     tagRow.append(el('span', 'verdict-tag-label', 'Lands on'));
     const tagButtons = el('div', 'verdict-tag-buttons');
     const paintTags = () => {
@@ -325,8 +540,12 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
     const note = document.createElement('textarea');
     note.className = 'verdict-note-input';
     note.rows = 2;
-    note.placeholder = 'Why? A verdict with no reason gets rediscovered the hard way.';
-    form.append(note);
+    note.placeholder =
+      'Why? A verdict with no reason gets rediscovered the hard way. Type @ to name somebody.';
+    const noteWrap = el('div', 'verdict-note-wrap');
+    noteWrap.append(note);
+    attachMentions(note, noteWrap);
+    form.append(noteWrap);
 
     // Pick, then submit — rather than one click recording a verdict outright.
     //

@@ -1,0 +1,148 @@
+seq,wave,matrix_domain_id,domain,sub_id,subdomain,rows,xlsx_first,xlsx_last,contracts,flags
+111,0,19,Guest Mobile App & Branding,19.2,Authentication & Login,83,2599,2681,white-label|identity,
+110,0,19,Guest Mobile App & Branding,19.1,Branding & White-Label Configuration,24,2575,2598,white-label|identity,
+1,1,1,Ticketing Catalogue,1.1,Ticket Types,122,2,123,catalogue,
+53,1,5,F&B & Guest Management,5.12,Revenue Recognition,120,1379,1498,finance|queue|fnb,
+48,1,5,F&B & Guest Management,5.7,Accounting,99,1252,1350,finance|queue|fnb,
+2,1,1,Ticketing Catalogue,1.2,Resource Management,84,124,207,catalogue,
+24,1,3,Admission and Access,3.2,Access Control System,77,667,743,access,
+12,1,2,Ticketing Sales,2.6,Call Center Sales,67,354,420,orders|shift,
+13,1,2,Ticketing Sales,2.7,Pricing,55,421,475,orders|shift,
+3,1,1,Ticketing Catalogue,1.3,Event Management,52,208,259,catalogue,
+25,1,3,Admission and Access,3.3,Access Control System,48,744,791,access,
+47,1,5,F&B & Guest Management,5.6,Virtual Queue,46,1206,1251,finance|queue|fnb,REF_COLLISION
+19,1,2,Ticketing Sales,2.13,Front Gate Sales,45,559,603,orders|shift,
+28,1,3,Admission and Access,3.6,Promotions,39,807,845,access,
+18,1,2,Ticketing Sales,2.12,Order Management,36,523,558,orders|shift,
+41,1,5,F&B & Guest Management,5.3,Profile Management,35,1103,1137,finance|queue|fnb,
+7,1,2,Ticketing Sales,2.1,Sales Channels,33,314,346,orders|shift,
+42,1,5,F&B & Guest Management,5.4,Loyalty,31,1138,1168,finance|queue|fnb,DUP_SUBDOMAIN_ID
+4,1,1,Ticketing Catalogue,1.4,Product Lifecycle,30,260,289,catalogue,
+46,1,5,F&B & Guest Management,5.5,Portfolio & Entitlement Management,30,1176,1205,finance|queue|fnb,DUP_SUBDOMAIN_ID;REF_COLLISION
+20,1,2,Ticketing Sales,2.14,Membership,23,604,626,orders|shift,
+6,1,1,Ticketing Catalogue,1.6,Ticket Resale Marketplace,19,295,313,catalogue,
+15,1,2,Ticketing Sales,2.9,Ticket Upgrades,19,488,506,orders|shift,
+22,1,2,Ticketing Sales,2.16,Ticket Media,17,640,656,orders|shift,
+21,1,2,Ticketing Sales,2.15,Digital Waiver Management,13,627,639,orders|shift,
+27,1,3,Admission and Access,3.5,Bundles,13,794,806,access,
+14,1,2,Ticketing Sales,2.8,Pricing,12,476,487,orders|shift,
+29,1,3,Admission and Access,3.7,Upsell and cross-sell,12,846,857,access,
+39,1,5,F&B & Guest Management,5.1,Payment Methods,12,1087,1098,finance|queue|fnb,
+17,1,2,Ticketing Sales,2.11,Ticket Upgrades,11,512,522,orders|shift,
+23,1,3,Admission and Access,3.1,Ticket Media,10,657,666,access,
+50,1,5,F&B & Guest Management,5.9,Shift opening and closing,10,1360,1369,finance|queue|fnb,
+49,1,5,F&B & Guest Management,5.8,Cash Handling,9,1351,1359,finance|queue|fnb,
+52,1,5,F&B & Guest Management,5.11,Double-Entry Financial Ledger,6,1373,1378,finance|queue|fnb,
+5,1,1,Ticketing Catalogue,1.5,Sales Channels,5,290,294,catalogue,
+16,1,2,Ticketing Sales,2.10,Digital Waiver Management,5,507,511,orders|shift,
+40,1,5,F&B & Guest Management,5.2,Wallet,4,1099,1102,finance|queue|fnb,
+45,1,5,F&B & Guest Management,5.5,Portfolio Management,4,1172,1175,finance|queue|fnb,DUP_SUBDOMAIN_ID;REF_COLLISION
+11,1,2,Ticketing Sales,2.5,B2B Sales,3,351,353,orders|shift,THIN
+51,1,5,F&B & Guest Management,5.10,Receipt,3,1370,1372,finance|queue|fnb,THIN
+8,1,2,Ticketing Sales,2.2,Ticketing POS and Kiosks,2,347,348,orders|shift,THIN
+26,1,3,Admission and Access,3.4,Parking Integration,2,792,793,access,THIN
+43,1,5,F&B & Guest Management,5.4,Unified Platform,2,1169,1170,finance|queue|fnb,DUP_SUBDOMAIN_ID;THIN
+9,1,2,Ticketing Sales,2.3,Flying POS,1,349,349,orders|shift,THIN
+10,1,2,Ticketing Sales,2.4,B2B Sales,1,350,350,orders|shift,THIN
+74,2,11,Approval Workflows & Governance,11.1,Accounting,80,2085,2164,approvals,
+32,2,4,Bundles and Promotions,4.3,Wallet,38,908,945,promotions,
+35,2,4,Bundles and Promotions,4.6,F&B POS - Core Ordering,37,1008,1044,promotions,
+34,2,4,Bundles and Promotions,4.5,F&B and Retail Offers and Promotions,33,975,1007,promotions,
+33,2,4,Bundles and Promotions,4.4,Upsell and cross-sell,29,946,974,promotions,
+30,2,4,Bundles and Promotions,4.1,Bundles,25,858,882,promotions,
+31,2,4,Bundles and Promotions,4.2,Promotions,25,883,907,promotions,
+124,2,21,Seat Management & Venue Mapping,21.5,Seat Selection & Assignment,24,2782,2805,seating,
+37,2,4,Bundles and Promotions,4.8,F&B POS - Menu Management,19,1051,1069,promotions,
+38,2,4,Bundles and Promotions,4.9,Table Reservation,17,1070,1086,promotions,
+121,2,21,Seat Management & Venue Mapping,21.2,Seat Map Import,17,2750,2766,seating,
+120,2,21,Seat Management & Venue Mapping,21.1,Seat Map Builder,9,2741,2749,seating,
+123,2,21,Seat Management & Venue Mapping,21.4,Seat Tracking & Holds,8,2774,2781,seating,
+125,2,21,Seat Management & Venue Mapping,21.6,Seat Holds & Blocks,8,2806,2813,seating,
+122,2,21,Seat Management & Venue Mapping,21.3,Layout & Templates,7,2767,2773,seating,
+129,2,21,Seat Management & Venue Mapping,21.10,Seat Recommendations,7,2829,2835,seating,
+36,2,4,Bundles and Promotions,4.7,F&B POS - Modifiers,6,1045,1050,promotions,
+126,2,21,Seat Management & Venue Mapping,21.7,Seating Rules & Buffer,6,2814,2819,seating,
+131,2,21,Seat Management & Venue Mapping,21.12,Seat Reporting & Analytics,6,2841,2846,seating,
+132,2,21,Seat Management & Venue Mapping,21.13,Seat Platform & API,6,2847,2852,seating,
+128,2,21,Seat Management & Venue Mapping,21.9,Group Reservations & Blocks,5,2824,2828,seating,
+130,2,21,Seat Management & Venue Mapping,21.11,Seat Revenue Management & Forecasting,5,2836,2840,seating,
+127,2,21,Seat Management & Venue Mapping,21.8,Accessible Seating,4,2820,2823,seating,
+54,3,6,Retail POS,6.1,Wallet,78,1499,1576,retail,
+55,3,7,F&B POS,7.1,Retail POS,62,1577,1638,fnb,
+58,3,7,F&B POS,7.4,Table Reservation,52,1651,1702,fnb,
+79,3,15,Inventory Management,15.1,Inventory Management,38,2317,2354,inventory,
+80,3,15,Inventory Management,15.2,Warehouse Management,22,2355,2376,inventory,
+81,3,15,Inventory Management,15.3,Procurement,18,2377,2394,inventory,
+60,3,7,F&B POS,7.6,Inventory Management Integration,15,1713,1727,fnb,
+83,3,15,Inventory Management,15.5,Enterprise Features,11,2404,2414,inventory,
+57,3,7,F&B POS,7.3,F&B POS - Menu Management,10,1641,1650,fnb,
+59,3,7,F&B POS,7.5,Kitchen Display,10,1703,1712,fnb,
+82,3,15,Inventory Management,15.4,Inventory Planning,9,2395,2403,inventory,
+56,3,7,F&B POS,7.2,F&B POS - Modifiers,2,1639,1640,fnb,THIN
+73,4,10,Games & F&B Integration,10.2,Game & Ride Payment & Redemption,20,2065,2084,games,
+147,4,23,Digital Asset Management,23.1,Digital Asset Management,15,3172,3186,assets,
+115,4,20,Subscription & Licensing Management,20.4,Module Marketplace & Management,10,2703,2712,subscription,
+113,4,20,Subscription & Licensing Management,20.2,Subscription Management,8,2688,2695,subscription,
+116,4,20,Subscription & Licensing Management,20.5,License Enforcement & Renewal,8,2713,2720,subscription,
+117,4,20,Subscription & Licensing Management,20.6,Usage & Quota Monitoring,8,2721,2728,subscription,
+101,4,18,Employee Mobile App & AI Assistant,18.2,Work Order Management,7,2530,2536,workforce,
+114,4,20,Subscription & Licensing Management,20.3,Licensing Models,7,2696,2702,subscription,
+118,4,20,Subscription & Licensing Management,20.7,Billing & Payment,7,2729,2735,subscription,
+103,4,18,Employee Mobile App & AI Assistant,18.4,Safety & Incident Reporting,6,2542,2547,workforce,
+112,4,20,Subscription & Licensing Management,20.1,Self-Service Onboarding,6,2682,2687,subscription,
+72,4,10,Games & F&B Integration,10.1,Kitchen Display & Inventory Sync,5,2060,2064,games,
+100,4,18,Employee Mobile App & AI Assistant,18.1,Mobile App Core (iOS & Android),5,2525,2529,workforce,
+102,4,18,Employee Mobile App & AI Assistant,18.3,Asset Scanning & Lookup,5,2537,2541,workforce,
+104,4,18,Employee Mobile App & AI Assistant,18.5,Media Capture & Notes,5,2548,2552,workforce,
+108,4,18,Employee Mobile App & AI Assistant,18.9,Attendance & Communications,5,2565,2569,workforce,
+109,4,18,Employee Mobile App & AI Assistant,18.10,AI Assistant & Voice Interface,5,2570,2574,workforce,
+119,4,20,Subscription & Licensing Management,20.8,Customer Support & Helpdesk,5,2736,2740,subscription,
+105,4,18,Employee Mobile App & AI Assistant,18.6,Approvals & Notifications,4,2553,2556,workforce,
+106,4,18,Employee Mobile App & AI Assistant,18.7,Inventory & Stock Management,4,2557,2560,workforce,
+107,4,18,Employee Mobile App & AI Assistant,18.8,Ticket & Membership Scanning,4,2561,2564,workforce,
+63,5,8,Unified Operations Dashboard,8.2,Demand Forecasting,58,1741,1798,reporting|ai,
+64,5,8,Unified Operations Dashboard,8.3,Fraud Detection,54,1799,1852,reporting|ai,DUP_SUBDOMAIN_ID
+67,5,8,Unified Operations Dashboard,8.5,Dynamic Pricing,46,1920,1965,reporting|ai,
+66,5,8,Unified Operations Dashboard,8.4,AI Engine,38,1882,1919,reporting|ai,
+68,5,8,Unified Operations Dashboard,8.6,Recommendation Engine,36,1966,2001,reporting|ai,
+69,5,8,Unified Operations Dashboard,8.7,BI & Reporting,34,2002,2035,reporting|ai,
+135,5,22,Marketing & CRM,22.3,Case Management & SLA,32,2901,2932,marketing-crm,REF_COLLISION
+142,5,22,Marketing & CRM,22.10,Marketing,30,3065,3094,marketing-crm,
+65,5,8,Unified Operations Dashboard,8.3,AI Governance,29,1853,1881,reporting|ai,DUP_SUBDOMAIN_ID
+134,5,22,Marketing & CRM,22.2,Guest Profiles & Data Management,28,2873,2900,marketing-crm,
+140,5,22,Marketing & CRM,22.8,Omnichannel Communications & AI Chatbot,26,3014,3039,marketing-crm,
+141,5,22,Marketing & CRM,22.9,Notifications & Messaging,25,3040,3064,marketing-crm,
+146,5,22,Marketing & CRM,22.14,Audience Segmentation,25,3147,3171,marketing-crm,
+139,5,22,Marketing & CRM,22.7,Surveys & Feedback,21,2993,3013,marketing-crm,
+133,5,22,Marketing & CRM,22.1,Campaign Management,20,2853,2872,marketing-crm,
+136,5,22,Marketing & CRM,22.4,Newsletter & Email Marketing,20,2933,2952,marketing-crm,
+137,5,22,Marketing & CRM,22.5,Reviews & Ratings,20,2953,2972,marketing-crm,
+138,5,22,Marketing & CRM,22.6,Gamification & Loyalty,20,2973,2992,marketing-crm,
+144,5,22,Marketing & CRM,22.12,Digital Waivers & Signature Management,20,3107,3126,marketing-crm,
+145,5,22,Marketing & CRM,22.13,Consent Management,20,3127,3146,marketing-crm,
+70,5,8,Unified Operations Dashboard,8.8,AI Configuration Assistant,14,2036,2049,reporting|ai,
+143,5,22,Marketing & CRM,22.11,SEO Management & Optimization,12,3095,3106,marketing-crm,
+71,5,8,Unified Operations Dashboard,8.9,Operations Command Center,10,2050,2059,reporting|ai,
+62,5,8,Unified Operations Dashboard,8.1,AI Governance & Explainability,7,1734,1740,reporting|ai,DUP_SUBDOMAIN_ID;REF_COLLISION
+61,5,8,Unified Operations Dashboard,8.1,AI Configuration Assistant,6,1728,1733,reporting|ai,DUP_SUBDOMAIN_ID;REF_COLLISION
+75,9,12,Accreditation & Credential Management,12.1,Reporting  and Dashboards,58,2165,2222,—,NO_CONTRACT
+76,9,13,Developer & API Management,13.1,Reporting  and Dashboards,50,2223,2272,—,NO_CONTRACT
+78,9,13,Developer & API Management,13.3,API Business Coverage,24,2293,2316,—,NO_CONTRACT
+77,9,13,Developer & API Management,13.2,Sandbox,20,2273,2292,—,NO_CONTRACT
+91,9,16,Device Management,16.8,Device Integrations,10,2455,2464,—,NO_CONTRACT
+92,9,16,Device Management,16.9,Enterprise Features,10,2465,2474,—,NO_CONTRACT
+97,9,17,Maintenance & Safety Management,17.5,Safety & Compliance,10,2505,2514,maintenance,
+93,9,17,Maintenance & Safety Management,17.1,Asset Management,8,2475,2482,maintenance,
+96,9,17,Maintenance & Safety Management,17.4,Work Order Management,8,2497,2504,maintenance,
+94,9,17,Maintenance & Safety Management,17.2,Preventive Maintenance Planning,7,2483,2489,maintenance,
+95,9,17,Maintenance & Safety Management,17.3,Corrective Maintenance & Incident,7,2490,2496,maintenance,
+84,9,16,Device Management,16.1,Device Registration,6,2415,2420,—,NO_CONTRACT
+85,9,16,Device Management,16.2,Device Inventory,6,2421,2426,—,NO_CONTRACT
+87,9,16,Device Management,16.4,Device Monitoring,6,2432,2437,—,NO_CONTRACT
+88,9,16,Device Management,16.5,Device Maintenance,6,2438,2443,—,NO_CONTRACT
+90,9,16,Device Management,16.7,Security,6,2449,2454,—,NO_CONTRACT
+86,9,16,Device Management,16.3,Device Configuration,5,2427,2431,—,NO_CONTRACT
+89,9,16,Device Management,16.6,Firmware & Software Management,5,2444,2448,—,NO_CONTRACT
+98,9,17,Maintenance & Safety Management,17.6,Spare Parts & Procurement,5,2515,2519,maintenance,
+99,9,17,Maintenance & Safety Management,17.7,Maintenance Reporting & Analytics,5,2520,2524,maintenance,
+44,9,5,Payment,5.4,Unified Platform,1,1171,1171,—,NO_CONTRACT;DUP_SUBDOMAIN_ID;THIN;ORPHAN

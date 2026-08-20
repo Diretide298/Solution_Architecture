@@ -1,0 +1,45 @@
+# Referral — state model
+# Contract: marketing-crm.Referral.status
+
+entity: Referral
+contract: marketing-crm
+enum: Referral.status
+enumKind: inline
+enumSchema: Referral
+enumProperty: status
+owner: marketing-crm
+initial:
+- issued
+terminal:
+- rewarded
+- expired
+- void
+transitions:
+- from: issued
+  to: registered
+  trigger: operation
+  guard: The referee signed up. **No reward yet** — paying on registration pays for accounts rather
+    than guests
+- from: registered
+  to: qualified
+  trigger: operation
+  guard: '**The qualifying act happened** — a first purchase, a first visit, a membership. This is what
+    the reward is for'
+- from: qualified
+  to: rewarded
+  trigger: operation
+  guard: Both sides paid
+- from: issued
+  to: expired
+  trigger: timer
+  guard: Nobody used the code
+- from: registered
+  to: expired
+  trigger: timer
+  guard: Registered and never qualified
+- from: registered
+  to: void
+  trigger: operation
+  guard: '**Fraud** — the same person on both sides, or a ring of accounts referring each other'
+notes: '**Three states before the reward, and that is the point.** A referral programme that pays on
+  sign-up funds fake accounts, which is why `qualified` exists between `registered` and `rewarded`.'

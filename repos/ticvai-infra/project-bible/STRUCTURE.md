@@ -1,3 +1,5 @@
+**New session? Read `docs/RESUME.md` first.**
+
 # Documentation Structure
 
 ## Placement rule
@@ -22,7 +24,7 @@ there does not.
     sources/                    CLIENT DOCUMENTS — read-only, authoritative
       mom/                      7 MoMs. Rank 1 — scope + binding
       requirements/             the 3,184-requirement matrix. Rank 2 — scope
-      designs/                  design vision, guest app, employee app. Rank 3
+      designs/                  design vision, guest-app app, venue-staff-app app. Rank 3
       diagrams/                 multi-tenant hierarchy. Rank 3
 
                                 Reference-system manuals are rank 4 and are
@@ -119,7 +121,7 @@ Three reasons:
    silently overwritten.
 2. **Adjacent to the analysis.** A register that cites requirement 2.12.3 sits two
    directories from the file containing it.
-3. **Authority is explicit.** The [sources README](sources/README.md) states the rank of
+3. **Authority is explicit.** The sources README states the rank of
    each folder. On a drive, everything looks equally authoritative — which is exactly how
    reference-system material leaks into scope.
 

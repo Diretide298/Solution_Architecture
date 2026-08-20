@@ -1,18 +1,18 @@
-# Runbooks
+# Active
 
-> **Purpose:** Operational procedures  
-> **Owner:** Dinesh  
-> **Status:** Stub
+> **Purpose:** What is in flight now  
+> **Owner:** Chinmay  
+> **Status:** Living
 
-| Runbook | When |
+Current wave, current context, open blockers, this week's gates.
+
+| Page | |
 |---|---|
-| [restore-drill](restore-drill.md) | Monthly. An untested backup is not a backup |
-| [cell-provisioning](cell-provisioning.md) — **not written** | New tenant or new jurisdiction |
-| [migration-rollout](migration-rollout.md) | Every schema change, canary first |
-| [venue-offline](venue-offline.md) | Site loses WAN |
-| [incident](incident.md) — **not written** | Severity, comms, postmortem |
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
 
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
 
-> **Two runbooks are listed and do not exist** — cell provisioning and incident
-> response. Listing a runbook that has not been written is worse than omitting it:
-> someone reaches for it during an incident and finds nothing.
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

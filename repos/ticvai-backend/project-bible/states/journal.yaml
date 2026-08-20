@@ -5,6 +5,8 @@
 entity: Journal entry
 contract: finance
 enum: JournalStatus
+enumKind: named
+enumSchema: JournalStatus
 owner: ledger
 initial:
 - draft

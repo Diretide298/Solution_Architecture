@@ -1,0 +1,61 @@
+# Kitchen ticket — state model
+# Contract: fnb.KitchenTicketStatus
+# Checked by tools/check-states.py.
+
+entity: Kitchen ticket
+contract: fnb
+enum: KitchenTicketStatus
+enumKind: named
+enumSchema: KitchenTicketStatus
+owner: fnb
+initial:
+- received
+terminal:
+- served
+- cancelled
+transitions:
+- from: received
+  to: preparing
+  operation: setKitchenTicketStatus
+  trigger: operation
+  guard: A station picked it up
+- from: preparing
+  to: ready
+  operation: setKitchenTicketStatus
+  trigger: operation
+  guard: Plated
+  emits:
+  - fnb.orderReady
+- from: ready
+  to: served
+  operation: recordOrderHandover
+  trigger: operation
+  guard: Handed over
+- from: ready
+  to: recalled
+  operation: setKitchenTicketStatus
+  trigger: operation
+  guard: '**Called back before it left.** Wrong item, wrong table, or it sat too long under the pass'
+  isReversal: true
+- from: recalled
+  to: preparing
+  operation: setKitchenTicketStatus
+  trigger: operation
+  guard: Remade
+- from: received
+  to: cancelled
+  operation: cancelFnbOrder
+  trigger: cascade
+  guard: Order cancelled before preparation
+- from: preparing
+  to: cancelled
+  operation: cancelFnbOrder
+  trigger: cascade
+  guard: Cancelled mid-preparation. Waste is recorded separately
+  requiresApproval: true
+notes: '`recalled` is distinct from `cancelled`. One is food coming back to be fixed; the other is food
+  nobody is paying for, and only the second raises a waste movement.'
+offlineReachable:
+- received
+- preparing
+- ready

@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 14 August 2026
-**Consolidates:** the cell-kind material in [ADR-0001](0001-cell-architecture-one-tenant-per-jurisdiction.md)
+**Consolidates:** the cell-kind material in [ADR-0001](0001-cell-architecture-one-tenant-per-jurisdiction.md), **whose split rule is superseded by ADR-0014**
 and [ADR-0014](0014-cell-per-region.md), both of which have been amended twice. This ADR is
 the operative statement; those two remain the record of how it got here.
 
@@ -47,7 +47,7 @@ The trigger is residency: a venue whose jurisdiction requires its data to stay t
 latency, not capacity — capacity is answered by launching another cluster in the same region
 (ADR-0016), which is cheaper and does not multiply the compliance surface.
 
-This inverts what ADR-0001 assumed. It read the multi-jurisdiction case as the normal one and
+This inverts what ADR-0001 (retired — see ADR-0014 and ADR-0017) assumed. It read the multi-jurisdiction case as the normal one and
 sized the architecture for it. In practice the UAE installation covers the pipeline, and a
 second region is a project with its own timeline, its own DESC-equivalent conversation and its
 own cost. The machinery to do it exists and stays unused until something needs it.

@@ -58,10 +58,10 @@
 ## Scope change — 13 August
 
 The client UI/UX boards were read after this sprint was drafted. **The page inventory went
-from 99 to 203 screens.** Two Sprint 1 effects:
+from 99 to 364 screens.** Two Sprint 1 effects:
 
 - **F5 and F6 gain RTL and dark theme.** A full Arabic mirror is not a translation layer,
-  and the employee app is dark by default. +4 days across the two.
+  and the venue-staff-app app is dark by default. +4 days across the two.
 - **White Label Builder is a new Wave 1 context** — 20 screens, C105 and C106. Not in this
   sprint, but it enters the contract queue ahead of some satellites.
 

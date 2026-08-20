@@ -27,10 +27,11 @@ payload:
   type: timestamp
 consumers:
 - context: marketing
-  purpose: Push the guest a notification
+  purpose: Push the guest a notification. **The guest never learns their food is ready.** No recovery
+    path and no second chance — the food goes cold while they wait for a notification that is not coming
   idempotencyKey: orderId
-  onFailure: retry
-  isCritical: false
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: reporting
   purpose: Preparation time
   idempotencyKey: orderId

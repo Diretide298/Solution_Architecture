@@ -188,3 +188,27 @@ Recorded here so the manuals do not need re-reading:
 4. If it changes a settled position, raise a CF item in
    [registers/conflicts](../docs/registers/conflicts.md) — a new document does not silently
    supersede a decision.
+
+## What arrived on 18 August, and what it changed
+
+**Five client documents had never entered this package**, and the requirement walk had verified
+the matrix against the contracts without ever checking the other direction. They are now filed.
+
+| | Was missing | What it settled |
+|---|---|---|
+| `rfp/` | **The RFP itself** | Evaluation criteria — **AI at 15%, naming the four capabilities CF-73 parked.** CF-139 |
+| `planning/` | **The delivery plan** | 23 epics, 7,552 person-days, and priorities that contradict the dependency order. CF-140 |
+| `planning/` | Task tracker from workshops | Workshop actions, not yet swept |
+| `mom/` | 14 August MoM | Referenced 29 times in the package and never filed |
+| `mom/` | **18 August MoM** | Ten backlog entries settled, one ADR contradicted. CF-138 |
+| `requirements/` | Seating manifest and amphitheatre plan | The CF-17 sample, used on 18 August and never filed |
+
+**The lesson is the filing, not the reading.** The 14 August minute was cited twenty-nine times
+across the package by people who had read it, and it was never put where the next person would
+find it. A source consulted and not filed is a source the package cannot be checked against.
+
+**The 18 August workshop is the sharpest instance of why this matters.** It records a client
+decision that F&B configuration moves to outlet level — reversing a decision ADR-0018 names,
+dates and gives as its worked example — and it settles ten open backlog entries, including one
+the walk had explicitly flagged as *worth asking whether it is wanted* on the same day the
+client answered no.

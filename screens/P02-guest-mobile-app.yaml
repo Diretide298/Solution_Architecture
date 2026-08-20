@@ -43,7 +43,7 @@ platform:
 screens:
 - id: GST-001
   name: Home – Default
-  module: white-label
+  module: TODO
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -55,7 +55,8 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -84,11 +85,10 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - white-label
+  density: comfortable
 - id: GST-002
   name: Explore Categories
-  module: catalogue
+  module: TODO
   purpose: Find explore categories for this venue.
   wave: 1
   layout:
@@ -100,7 +100,9 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -130,11 +132,10 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  modules:
-  - catalogue
+  density: comfortable
 - id: GST-003
   name: Attractions List
-  module: catalogue
+  module: TODO
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -146,7 +147,9 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -180,12 +183,10 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  modules:
-  - catalogue
-  - queue
+  density: comfortable
 - id: GST-004
   name: Attraction Details
-  module: catalogue
+  module: TODO
   purpose: See attraction details for this venue.
   wave: 1
   layout:
@@ -197,7 +198,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -233,12 +235,10 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  modules:
-  - catalogue
-  - queue
+  density: comfortable
 - id: GST-005
   name: What's On
-  module: catalogue
+  module: TODO
   purpose: Find what's on for this venue.
   wave: 1
   layout:
@@ -250,7 +250,9 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -282,11 +284,10 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  modules:
-  - catalogue
+  density: comfortable
 - id: GST-006
   name: Event / Exhibition Details
-  module: catalogue
+  module: TODO
   purpose: See event / exhibition details for this venue.
   wave: 1
   layout:
@@ -298,7 +299,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -330,11 +332,10 @@ screens:
     contract: catalogue
     purpose: Read a product
     trigger: onLoad
-  modules:
-  - catalogue
+  density: comfortable
 - id: GST-007
   name: Select Date & Time
-  module: catalogue
+  module: TODO
   purpose: See select date & time for this venue.
   wave: 1
   layout:
@@ -346,7 +347,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -381,11 +383,10 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
-  modules:
-  - catalogue
+  density: comfortable
 - id: GST-008
   name: Tickets & Add-ons
-  module: orders
+  module: TODO
   purpose: Find tickets & add-ons for this venue.
   wave: 1
   layout:
@@ -397,7 +398,8 @@ screens:
       - kind: cardList
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -427,11 +429,10 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-009
   name: Review & Payment
-  module: orders
+  module: TODO
   purpose: Check what you are buying and pay for it.
   wave: 1
   layout:
@@ -443,7 +444,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Order summary, then the payment methods this venue accepts
-    empty: —
+    emptyFirstRun: —
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not reach the gateway. The order is held, not lost** — and a payment whose outcome
       is unknown goes to `inquirePaymentStatus` rather than being retried, because retrying an unknown
       charge is how a guest is charged twice'
@@ -496,11 +498,10 @@ screens:
     and F11 routed food payment through the AI concierge instead. **Card only, so tender currency equals
     base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not
     ours and is not recorded as ours.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-010
   name: Booking Confirmation
-  module: orders
+  module: TODO
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 1
   layout:
@@ -512,7 +513,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -540,11 +541,10 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-011
   name: Wallet Overview
-  module: retail
+  module: TODO
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -556,7 +556,9 @@ screens:
       - kind: cardList
   states:
     loading: Terminal or gateway state, shown plainly
-    empty: —
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -591,11 +593,10 @@ screens:
     contract: retail
     purpose: Wallet transaction history
     trigger: onLoad
-  modules:
-  - retail
+  density: comfortable
 - id: GST-012
   name: My Tickets
-  module: orders
+  module: TODO
   purpose: Find my tickets for this venue.
   wave: 1
   layout:
@@ -607,7 +608,8 @@ screens:
       - kind: cardList
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -637,11 +639,10 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-013
   name: Ticket Details
-  module: orders
+  module: TODO
   purpose: Find ticket details for this venue.
   wave: 1
   layout:
@@ -653,7 +654,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -683,11 +684,10 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-014
   name: Ticket Transfer
-  module: orders
+  module: TODO
   purpose: Work with ticket transfer for this venue.
   wave: 2
   layout:
@@ -699,7 +699,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -734,11 +734,10 @@ screens:
     contract: orders
     purpose: Claim transferred tickets
     trigger: onAction
-  modules:
-  - orders
+  density: comfortable
 - id: GST-015
   name: Memberships
-  module: cross-cell
+  module: TODO
   purpose: Find memberships for this venue.
   wave: 2
   layout:
@@ -750,7 +749,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -786,12 +786,10 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - cross-cell
-  - catalogue
+  density: comfortable
 - id: GST-016
   name: My Reservations
-  module: orders
+  module: TODO
   purpose: Find my reservations for this venue.
   wave: 2
   layout:
@@ -803,7 +801,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -839,11 +838,10 @@ screens:
     contract: orders
     purpose: Cancel a reservation
     trigger: onAction
-  modules:
-  - orders
+  density: comfortable
 - id: GST-017
   name: Reservation Details
-  module: orders
+  module: TODO
   purpose: See reservation details for this venue.
   wave: 2
   layout:
@@ -855,7 +853,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -887,11 +886,10 @@ screens:
     contract: orders
     purpose: Cancel a reservation
     trigger: onAction
-  modules:
-  - orders
+  density: comfortable
 - id: GST-018
   name: Add to Calendar / Reminders
-  module: orders
+  module: TODO
   purpose: Find add to calendar / reminders for this venue.
   wave: 3
   layout:
@@ -903,7 +901,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -937,11 +936,10 @@ screens:
     contract: orders
     purpose: List orders
     trigger: onLoad
-  modules:
-  - orders
+  density: comfortable
 - id: GST-019
   name: Order History (Wallet)
-  module: orders
+  module: TODO
   purpose: Find order history (wallet) for this venue.
   wave: 2
   layout:
@@ -953,7 +951,8 @@ screens:
       - kind: cardList
   states:
     loading: Terminal or gateway state, shown plainly
-    empty: —
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -982,11 +981,10 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-020
   name: Saved Items / Wishlist
-  module: marketing-crm
+  module: TODO
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -998,7 +996,8 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1052,11 +1051,10 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: comfortable
 - id: GST-021
   name: Interactive Map
-  module: catalogue
+  module: TODO
   purpose: See where things are in relation to each other.
   wave: 2
   layout:
@@ -1067,9 +1065,12 @@ screens:
       - kind: scanTarget
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
-    offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
+    offline: '**The cached map and graph.** Live wait times are absent and routing still works — which
+      is the right way round, because a guest with no signal in the middle of a park needs directions
+      more than they need a queue length.'
   wireframe:
     status: drafted
     board: wireframes/P02 Guest App.dc.html#gst-021
@@ -1090,8 +1091,14 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Wired to
+    the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally
+    — which is also what makes it work with no signal in the middle of a park. **Routing happens on
+    the device.** The platform guarantees the graph — connected, versioned, with step-free marked —
+    and the client walks it, because a phone with the graph cached routes with no signal and a server
+    round-trip per step does not. **The version is how a stale route is caught**: a guest holding a
+    route across a path that closed this morning gets told, rather than walking into a barrier.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -1101,12 +1108,18 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  modules:
-  - catalogue
-  - queue
+  - operationId: getVenueMap
+    contract: venue-map
+    purpose: A map with its points and paths
+    trigger: onLoad
+  - operationId: getVenueMapGraph
+    contract: venue-map
+    purpose: The navigation graph, ready to route over
+    trigger: onLoad
+  density: comfortable
 - id: GST-022
   name: Attraction Wait Times
-  module: queue
+  module: TODO
   purpose: See attraction wait times for this venue.
   wave: 2
   layout:
@@ -1118,7 +1131,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1151,11 +1164,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
     with the queue platform F21 runs on.
-  modules:
-  - queue
+  density: comfortable
 - id: GST-023
   name: Virtual Queue / Join Queue
-  module: queue
+  module: TODO
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -1167,7 +1179,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1203,11 +1215,10 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - queue
+  density: comfortable
 - id: GST-024
   name: F&B – Browse & Order
-  module: fnb
+  module: TODO
   purpose: Order food to where the guest is sitting, or for collection.
   wave: 2
   layout:
@@ -1219,7 +1230,8 @@ screens:
       - kind: cardList
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1270,11 +1282,10 @@ screens:
     - GST-003
     - GST-009
     fromFlows: true
-  modules:
-  - fnb
+  density: comfortable
 - id: GST-025
   name: F&B – Order Tracking
-  module: fnb
+  module: TODO
   purpose: Track an order to the point it reaches the guest.
   wave: 2
   layout:
@@ -1286,7 +1297,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1325,11 +1336,10 @@ screens:
     - GST-002
     - GST-003
     fromFlows: true
-  modules:
-  - fnb
+  density: comfortable
 - id: GST-026
   name: Retail / Merchandise
-  module: games
+  module: TODO
   purpose: Find retail / merchandise for this venue.
   wave: 2
   layout:
@@ -1341,7 +1351,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1379,12 +1390,10 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - games
-  - retail
+  density: comfortable
 - id: GST-027
   name: Parking – Reserve & Pay
-  module: access
+  module: TODO
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 3
   layout:
@@ -1396,7 +1405,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Terminal or gateway state, shown plainly
-    empty: —
+    emptyFirstRun: —
     error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -1432,11 +1441,10 @@ screens:
     contract: access
     purpose: Change the plate, or revoke
     trigger: onAction
-  modules:
-  - access
+  density: comfortable
 - id: GST-028
   name: Parking – Reservation Confirmed
-  module: access
+  module: TODO
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 3
   layout:
@@ -1448,7 +1456,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1483,11 +1492,10 @@ screens:
     contract: access
     purpose: Car parks at a venue, and how each integrates
     trigger: onLoad
-  modules:
-  - access
+  density: comfortable
 - id: GST-029
   name: Venue Info & Services
-  module: fnb
+  module: TODO
   purpose: See venue info & services for this venue.
   wave: 2
   layout:
@@ -1499,7 +1507,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1533,11 +1541,10 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - fnb
+  density: comfortable
 - id: GST-030
   name: In-Venue Notifications
-  module: fnb
+  module: TODO
   purpose: Work with in-venue notifications for this venue.
   wave: 2
   layout:
@@ -1549,7 +1556,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1581,11 +1588,10 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - fnb
+  density: comfortable
 - id: GST-031
   name: AI Concierge – Home
-  module: fnb
+  module: TODO
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -1597,7 +1603,9 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1635,12 +1643,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error.
-  modules:
-  - fnb
-  - ai
+  density: comfortable
 - id: GST-032
   name: AI Concierge – Chat
-  module: orders
+  module: TODO
   purpose: Add ai concierge – chat for this venue.
   wave: 2
   layout:
@@ -1652,7 +1658,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1714,14 +1721,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error.
-  modules:
-  - orders
-  - fnb
-  - marketing-crm
-  - ai
+  density: comfortable
 - id: GST-033
   name: AI Concierge – Contextual Help
-  module: ai
+  module: TODO
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -1733,7 +1736,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1769,11 +1773,10 @@ screens:
     contract: ai
     purpose: Ask
     trigger: onAction
-  modules:
-  - ai
+  density: comfortable
 - id: GST-034
   name: Lost & Found
-  module: fnb
+  module: TODO
   purpose: See lost & found for this venue.
   wave: 2
   layout:
@@ -1785,7 +1788,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1818,11 +1821,10 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - fnb
+  density: comfortable
 - id: GST-035
   name: Feedback & Ratings
-  module: marketing-crm
+  module: TODO
   purpose: Work with feedback & ratings for this venue.
   wave: 3
   layout:
@@ -1834,7 +1836,8 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1862,11 +1865,10 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: comfortable
 - id: GST-036
   name: Loyalty & Rewards
-  module: marketing-crm
+  module: TODO
   purpose: Your points, your tier, and what is within reach.
   wave: 2
   layout:
@@ -1878,7 +1880,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Balance and tier
-    empty: Not enrolled — explains what joining gives you rather than showing zero
+    emptyFirstRun: Not enrolled — explains what joining gives you rather than showing zero
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Redeeming is blocked** rather than attempted against an unknown balance
     offline: Last known balance with its age. **Points earned since are not shown**, and that is said
   wireframe:
@@ -1913,11 +1916,10 @@ screens:
     contract: marketing-crm
     purpose: List loyalty programmes
     trigger: onLoad
-  modules:
-  - marketing-crm
+  density: comfortable
 - id: GST-037
   name: Offers & Promotions
-  module: promotions
+  module: TODO
   purpose: Find offers & promotions for this venue.
   wave: 2
   layout:
@@ -1929,7 +1931,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1967,11 +1970,10 @@ screens:
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
-  modules:
-  - promotions
+  density: comfortable
 - id: GST-038
   name: Digital Companion Mode
-  module: white-label
+  module: TODO
   purpose: 'The in-venue home: your tickets, the map, and what is near you.'
   wave: 3
   layout:
@@ -1983,7 +1985,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2021,13 +2024,10 @@ screens:
     August — it reads as a framing for the in-venue capabilities rather than a capability of its own,
     and CF-92 asks whether it is a real screen or a name for a mode.'
   provenance: none — see CF-92
-  modules:
-  - white-label
-  - queue
-  - catalogue
+  density: comfortable
 - id: GST-039
   name: Profile
-  module: marketing-crm
+  module: TODO
   purpose: What we hold about a guest, and what they can change.
   wave: 1
   layout:
@@ -2039,7 +2039,8 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2069,11 +2070,10 @@ screens:
     contract: marketing-crm
     purpose: Record a consent decision
     trigger: onAction
-  modules:
-  - marketing-crm
+  density: comfortable
 - id: GST-040
   name: Help & Support
-  module: white-label
+  module: TODO
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -2085,7 +2085,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2127,12 +2128,10 @@ screens:
     contract: marketing-crm
     purpose: Raise a service case
     trigger: onAction
-  modules:
-  - white-label
-  - marketing-crm
+  density: comfortable
 - id: GST-041
   name: Checkout Entry
-  module: orders
+  module: TODO
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 1
   layout:
@@ -2144,7 +2143,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Terminal or gateway state, shown plainly
-    empty: —
+    emptyFirstRun: —
     error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -2179,11 +2178,10 @@ screens:
     contract: orders
     purpose: Turn the cart into an order
     trigger: onAction
-  modules:
-  - orders
+  density: comfortable
 - id: GST-042
   name: Simple Registration & OTP
-  module: identity
+  module: TODO
   purpose: Work with simple registration & otp for this venue.
   wave: 1
   layout:
@@ -2195,7 +2193,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2303,8 +2301,7 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
+  density: comfortable
 - id: GST-043
   name: Arabic / RTL Experience
   module: TODO
@@ -2320,7 +2317,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2345,9 +2342,10 @@ screens:
     - GST-003
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  density: comfortable
 - id: GST-044
   name: Multi-Currency & Pricing
-  module: finance
+  module: TODO
   purpose: See prices in your own currency, in the app, before and during the visit.
   wave: 2
   layout:
@@ -2359,8 +2357,9 @@ screens:
       - kind: primaryButton
   states:
     loading: Rates and prices, with the base currency shown first
-    empty: One currency configured at this venue — the selector is hidden rather than shown with a single
-      option
+    emptyFirstRun: One currency configured at this venue — the selector is hidden rather than shown
+      with a single option
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
       rate is worse than no rate, because a guest who budgets against it arrives short
     offline: '**Last known rates, with their age shown.** A rate is a number a guest may act on, and
@@ -2403,12 +2402,10 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  modules:
-  - finance
-  - catalogue
+  density: comfortable
 - id: GST-045
   name: Ticket Delivery & Sharing
-  module: orders
+  module: TODO
   purpose: Find ticket delivery & sharing for this venue.
   wave: 2
   layout:
@@ -2420,7 +2417,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2451,11 +2448,10 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-046
   name: Branded Queue / Waiting Room
-  module: queue
+  module: TODO
   purpose: Find branded queue / waiting room for this venue.
   wave: 1
   layout:
@@ -2467,7 +2463,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2497,11 +2493,10 @@ screens:
     trigger: onLoad
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - queue
+  density: comfortable
 - id: GST-047
   name: Maintenance / Upgrade Page
-  module: white-label
+  module: TODO
   purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
@@ -2513,7 +2508,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2542,11 +2537,10 @@ screens:
   notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel
     7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not
     two screens. Both had the same single operation and the same purpose.
-  modules:
-  - white-label
+  density: comfortable
 - id: GST-048
   name: Upsell / Cross-Sell
-  module: orders
+  module: TODO
   purpose: See upsell / cross-sell for this venue.
   wave: 2
   layout:
@@ -2558,7 +2552,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2592,12 +2587,10 @@ screens:
     contract: promotions
     purpose: Suggestions for a cart
     trigger: onAction
-  modules:
-  - orders
-  - promotions
+  density: comfortable
 - id: GST-049
   name: Interactive Seat Selection
-  module: seating
+  module: TODO
   purpose: See interactive seat selection for this venue.
   wave: 2
   layout:
@@ -2608,7 +2601,8 @@ screens:
       - kind: scanTarget
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2644,11 +2638,10 @@ screens:
     contract: seating
     purpose: Recommend seats for a party
     trigger: onAction
-  modules:
-  - seating
+  density: comfortable
 - id: GST-050
   name: Resource Booking – Cabana
-  module: catalogue
+  module: TODO
   purpose: Book a cabana or other capacity-based resource.
   wave: 3
   layout:
@@ -2660,7 +2653,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2702,12 +2696,10 @@ screens:
     purpose: Live remaining capacity
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.8
-  modules:
-  - catalogue
-  - orders
+  density: comfortable
 - id: GST-051
   name: Plan Your Adventure – Start
-  module: queue
+  module: TODO
   purpose: Start a plan for the visit — which attractions, in what order — before arriving.
   wave: 3
   layout:
@@ -2719,7 +2711,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2754,12 +2747,10 @@ screens:
     purpose: List products
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
-  modules:
-  - queue
-  - catalogue
+  density: comfortable
 - id: GST-052
   name: Suggested Itineraries
-  module: catalogue
+  module: TODO
   purpose: Curated plans a guest can take rather than build.
   wave: 3
   layout:
@@ -2771,7 +2762,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2806,11 +2798,10 @@ screens:
     purpose: List published bundles
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
-  modules:
-  - catalogue
+  density: comfortable
 - id: GST-053
   name: Build Your Own Itinerary
-  module: orders
+  module: TODO
   purpose: Choose the attractions and the order yourself.
   wave: 3
   layout:
@@ -2822,7 +2813,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2865,13 +2857,10 @@ screens:
     purpose: Wait times across a venue
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
-  modules:
-  - orders
-  - catalogue
-  - queue
+  density: comfortable
 - id: GST-054
   name: AI Optimized Itinerary
-  module: queue
+  module: TODO
   purpose: Let the assistant order the day around waits and opening times.
   wave: 3
   layout:
@@ -2883,7 +2872,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Falls back to the manual planner** (GST-053) rather than to an error. A guest who wanted
       a plan should get one, optimised or not'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -2925,13 +2915,10 @@ screens:
     purpose: Ask
     trigger: onAction
   provenance: MoM 10 August 2026 §4.9
-  modules:
-  - queue
-  - catalogue
-  - ai
+  density: comfortable
 - id: GST-055
   name: Dynamic QR Ticket
-  module: orders
+  module: TODO
   purpose: Find dynamic qr ticket for this venue.
   wave: 1
   layout:
@@ -2942,7 +2929,7 @@ screens:
       - kind: scanTarget
   states:
     loading: Availability is live, never cached
-    empty: '**Sold out is a real answer.** Offers the next available rather than a dead end'
+    emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2973,11 +2960,10 @@ screens:
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: comfortable
 - id: GST-056
   name: Bundle Package
-  module: catalogue
+  module: TODO
   purpose: See bundle package for this venue.
   wave: 2
   layout:
@@ -2989,7 +2975,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3025,13 +3012,10 @@ screens:
     contract: orders
     purpose: Add something
     trigger: onAction
-  modules:
-  - catalogue
-  - promotions
-  - orders
+  density: comfortable
 - id: GST-057
   name: Accessibility Information
-  module: white-label
+  module: TODO
   purpose: Step-free routes, facilities and what to expect.
   wave: 2
   layout:
@@ -3043,7 +3027,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3074,11 +3059,10 @@ screens:
     purpose: List custom content pages
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.1
-  modules:
-  - white-label
+  density: comfortable
 - id: GST-058
   name: Resource Availability (Cabana)
-  module: catalogue
+  module: TODO
   purpose: See which cabanas are free, by area and date, before choosing one.
   wave: 3
   layout:
@@ -3090,7 +3074,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3127,11 +3112,10 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  modules:
-  - catalogue
+  density: comfortable
 - id: GST-059
   name: Plan My Day – In Progress
-  module: queue
+  module: TODO
   purpose: The plan while you are in the venue, against live waits.
   wave: 3
   layout:
@@ -3143,7 +3127,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    empty: Nothing here yet, with what to do about it
+    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3178,12 +3163,10 @@ screens:
     purpose: List products
     trigger: onLoad
   provenance: MoM 10 August 2026 §4.9
-  modules:
-  - queue
-  - catalogue
+  density: comfortable
 - id: GST-061
   name: Menu Item Detail
-  module: fnb
+  module: In-Venue Experience
   purpose: Decide on a dish, choose modifiers, check allergens.
   capability: C05
   wave: 2
@@ -3206,7 +3189,7 @@ screens:
         notes: Allergens. Always present; not a field a tenant may omit (4.8.9)
   states:
     loading: Item skeleton
-    empty: Not applicable
+    emptyFirstRun: Not applicable
     error: Item unavailable, with a route back to the menu
     offline: Cached menu shown with a staleness warning. Ordering is refused — availability changes
       by the minute
@@ -3227,11 +3210,10 @@ screens:
     exitTo:
     - GST-001
     - GST-062
-  modules:
-  - fnb
+  density: comfortable
 - id: GST-062
   name: Shop & Drop Collection
-  module: retail
+  module: In-Venue Experience
   purpose: Collect shopping left earlier, using the ticket rather than a receipt.
   capability: C21
   wave: 3
@@ -3246,7 +3228,9 @@ screens:
         notes: Collect-by time. Usually venue close
   states:
     loading: List skeleton
-    empty: Nothing awaiting collection
+    emptyFirstRun: Nothing awaiting collection
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Lookup unavailable — the collection point can still find it by receipt
     offline: Cannot look up. Shows the drop reference held locally so a guest can quote it
   wireframe:
@@ -3271,11 +3255,10 @@ screens:
     contract: retail
     purpose: Find a guest's dropped goods
     trigger: onLoad
-  modules:
-  - retail
+  density: comfortable
 - id: GST-063
   name: Search
-  module: catalogue
+  module: Discovery
   purpose: Find something when you do not know what it is called.
   capability: C00
   wave: 1
@@ -3292,7 +3275,8 @@ screens:
     trigger: onLoad
   states:
     loading: Results as you type
-    empty: '**Nothing matched. Offers what is on** rather than a dead end'
+    emptyFirstRun: '**Nothing matched. Offers what is on** rather than a dead end'
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Search unavailable. Falls back to browsing categories
     offline: '**Searches the cached catalogue only**, with a note that newer items may exist'
   navigation:
@@ -3310,11 +3294,10 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.
-  modules:
-  - catalogue
+  density: comfortable
 - id: GST-065
   name: Newsletter & Preferences
-  module: marketing-crm
+  module: Marketing
   purpose: What we may send you, and how.
   capability: C00
   wave: 3
@@ -3335,7 +3318,9 @@ screens:
     trigger: onLoad
   states:
     loading: Your current consents
-    empty: —
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not save. Consent is not recorded on a failed request** — a subscription the guest
       believes happened and did not is worse than a visible failure'
     offline: '**Not available.** A consent change must reach the server to mean anything'
@@ -3354,5 +3339,4 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with WEB-027. **Not on the wireframe board** — needs drawing. CF-93.
-  modules:
-  - marketing-crm
+  density: comfortable

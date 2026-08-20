@@ -1,0 +1,66 @@
+# Gift card — state model
+# Contract: retail.GiftCard.status
+# Checked by tools/check-states.py.
+
+entity: Gift card
+contract: retail
+enum: GiftCard.status
+enumKind: inline
+enumSchema: GiftCard
+enumProperty: status
+owner: retail
+initial:
+- issued
+terminal:
+- redeemed
+- expired
+- blocked
+transitions:
+- from: issued
+  to: active
+  operation: activateGiftCard
+  trigger: operation
+  guard: '**Activated at the till, not at print.** A rack of cards that work before they are bought
+    is a rack that gets stolen'
+- from: active
+  to: partiallyRedeemed
+  operation: redeemGiftCard
+  trigger: operation
+  guard: Part of the value spent
+- from: partiallyRedeemed
+  to: redeemed
+  operation: redeemGiftCard
+  trigger: operation
+  guard: Exhausted
+- from: active
+  to: redeemed
+  operation: redeemGiftCard
+  trigger: operation
+  guard: Spent in one transaction
+- from: active
+  to: blocked
+  operation: blockGiftCard
+  trigger: operation
+  guard: Reported lost or stolen. **Balance preserved for reissue**
+- from: partiallyRedeemed
+  to: blocked
+  operation: blockGiftCard
+  trigger: operation
+  guard: Blocked with a balance remaining
+- from: blocked
+  to: active
+  operation: activateGiftCard
+  trigger: operation
+  guard: Unblocked, or reissued to the same holder
+  isReversal: true
+- from: active
+  to: expired
+  trigger: timer
+  guard: '**Whether the balance is forfeited is a legal question in some jurisdictions**, not a product
+    decision'
+- from: partiallyRedeemed
+  to: expired
+  trigger: timer
+  guard: Lapsed with value remaining
+notes: Activation at sale is the control that makes physical cards safe to display. **A card that works
+  on the shelf is cash on the shelf.**

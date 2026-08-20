@@ -3,13 +3,15 @@
 **Status:** Accepted
 **Date:** 13 August 2026
 **Closes:** CF-31
-**Constrains:** ADR-0001 cells · Product & Entitlement spine · Order & Payment spine · Finance & Ledger
+**Constrains:** ADR-0001 (retired — see ADR-0014 and ADR-0017) cells · Product & Entitlement spine · Order & Payment spine · Finance & Ledger
 
 ---
 
 ## Context
 
-A cell serves one tenant in one jurisdiction (ADR-0001). CF-31 asked whether a guest's
+A cell serves one tenant in one jurisdiction (ADR-0001 — **superseded in part by ADR-0014**, which
+allows several tenants on a shared cell; the entitlement ownership rule below is unaffected because
+it turns on the *home cell*, not on how many tenants share one). CF-31 asked whether a guest-app's
 entitlements, wallet, membership and identity are confined to one cell, or span them.
 
 Four features depend on the answer:
@@ -17,7 +19,7 @@ Four features depend on the answer:
 - A multi-venue pass whose venues sit in different countries
 - A membership valid across a tenant's whole estate
 - A wallet balance spendable at any venue
-- One guest account across all channels and venues
+- One guest-app account across all channels and venues
 
 **Client decision: yes, these cross jurisdictions.**
 
@@ -40,7 +42,7 @@ transaction, and no personal data crossing a border without a basis.
 ### 1. Guest Link Registry — Control Plane, pseudonymous only
 
 A global registry mapping a stable pseudonymous `guestLinkId` to the cells holding a local
-record for that guest.
+record for that guest-app.
 
 ```
 GuestLink {
@@ -56,11 +58,11 @@ GuestLink {
 number, date of birth or biometric template. Each cell holds its own `Subject` record with
 its own PII, referenced locally.
 
-A guest who has never transacted across jurisdictions never acquires a link.
+A guest-app who has never transacted across jurisdictions never acquires a link.
 
 ### 2. Linking is explicit and consented
 
-Creating a link is a **guest action with recorded consent**, not a silent side effect of
+Creating a link is a **guest-app action with recorded consent**, not a silent side effect of
 buying a cross-border product. The consent record is the Article 23 basis and carries the
 version of the notice shown.
 
@@ -130,7 +132,7 @@ Ledger, not in the entitlement model.
 
 ### 7. DSAR and erasure fan out
 
-A guest linked across cells exists in both. Access, rectification and erasure are
+A guest-app linked across cells exists in both. Access, rectification and erasure are
 orchestrated from the Control Plane by `guestLinkId`, fanning out to each linked cell.
 
 Erasure deletes each cell's PII record. The link is severed. Ledger entries retain their
@@ -149,7 +151,7 @@ opaque subject reference and stay intact.
 | **Finance** | Inter-company settlement, transfer pricing, cross-currency allocation |
 | **Availability** | A linked-cell spend depends on the home cell, unless allocation covers it |
 | **Latency** | Cross-cell wallet authorisation adds a round trip. Entitlement redemption does not — it is local |
-| **Testing** | The reference fixture must include a two-cell tenant with a linked guest |
+| **Testing** | The reference fixture must include a two-cell tenant with a linked guest-app |
 
 ### What does *not* change
 
@@ -165,8 +167,8 @@ opaque subject reference and stay intact.
 | Rejected | Why |
 |---|---|
 | Entitlements confined to one jurisdiction | Simplest, and the client has ruled it out. A portfolio pass that stops at a border is not the product |
-| Shared global entitlement database | Puts entitlement data — and by association guest data — outside every jurisdiction. Fails residency |
-| Full guest replication across cells | PII crossing borders continuously. Maximum compliance exposure for minimal gain |
+| Shared global entitlement database | Puts entitlement data — and by association guest-app data — outside every jurisdiction. Fails residency |
+| Full guest-app replication across cells | PII crossing borders continuously. Maximum compliance exposure for minimal gain |
 | Distributed transaction across cells | Two-phase commit across regions, over the public internet, in the sale path. Unacceptable latency and failure modes |
 | **Home-cell ownership with delegated redemption** | **Accepted.** No PII crosses, no distributed transaction, gates stay offline-capable |
 

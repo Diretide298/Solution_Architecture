@@ -20,6 +20,104 @@ description: >
   - **Patterns** — recurring arrangements worth naming, because getting them subtly
     different across screens is a real cost.
 
+# ── screen states ────────────────────────────────────────────────────
+# **`empty` was one field holding three different screens** until 18 August, and that is the
+# defect Phase 0 exists to fix. A back office table with no records yet, one whose filter matched
+# nothing, and one the person may not see are three different pieces of copy with three different
+# actions — and a single `empty` string made all of them read as *"nothing here yet"*.
+#
+# **The permission case is the worst of the three.** Telling somebody a list is empty when they
+# simply lack the right to see it is a lie, and the one they will act on.
+screenStates:
+  - key: loading
+    required: true
+    description: The screen is fetching. Skeleton or spinner, and the count renders first where it can.
+  - key: emptyFirstRun
+    required: true
+    description: >
+      **Nothing exists yet and this person may create the first one.** The call to action is the
+      whole state — a first-run empty that does not say what to do is a dead end.
+  - key: emptyNoResults
+    required: false
+    description: >
+      **A filter or a search matched nothing.** Different from first run because the data exists;
+      the action is to widen or clear, never to create.
+    requiredWhen: the screen has a searchField, a filter, or a dataTable
+  - key: emptyNoAccess
+    required: false
+    description: >
+      **The person may not see this.** Never rendered as empty — an empty list where the truth is
+      a permission is a lie a person will act on, and they will ask why the data vanished.
+    requiredWhen: the screen resolves a permission that some roles lack
+  - key: error
+    required: true
+    description: The fetch failed. Says what is unaffected, because a person needs to know what they can still do.
+  - key: offline
+    required: false
+    requiredWhen: the platform is offline-capable
+    description: What still works from cache, and what is absent.
+  - key: partial
+    required: false
+    description: >
+      Some sources answered and some did not. **A dashboard with four tiles where one failed must
+      say so** rather than showing three tiles and a gap.
+
+# ── content ──────────────────────────────────────────────────────────
+# **The copy is a deliverable and it was nowhere.** A screen said which operations it calls and
+# never what a field is labelled, what a validation message reads, or what an empty state tells a
+# person to do.
+#
+# `"Nothing here yet, with what to do about it"` appeared on 50 screens and **does not say what to
+# do about it** — which is the whole finding in one string.
+#
+# This is not a translation file. **Arabic and English are variants of a decided message**, and
+# deciding the message is the work; translating it is not.
+contentSpec:
+  fields:
+    description: >
+      Label, helper text and validation message per field. **The validation message is the one that
+      matters** — a form that says *"invalid"* has told the person nothing, and every field on a
+      guest surface will eventually be filled in wrong by somebody in a queue.
+    shape:
+      key: The field key, matching the contract property where there is one.
+      label: What a person reads.
+      helper: Optional. What it is for, where the label cannot carry it.
+      required: Whether the person must fill it.
+      validationMessage: >
+        **What is wrong and how to fix it.** *"Enter a phone number starting +971"* rather than
+        *"invalid format"*.
+  emptyStates:
+    description: >
+      Per empty state: the line, and the action. **The action is the point of the state** and a
+      first-run empty with no action is a dead end.
+    shape:
+      state: One of the `emptyFirstRun`, `emptyNoResults`, `emptyNoAccess` keys.
+      line: One sentence.
+      action: The button, or null where there is genuinely nothing to do.
+  errors:
+    description: >
+      What a person sees when an operation fails, keyed by the response the contract documents.
+      **A 409 is not a 500 and must not read like one** — one is something they can fix and the
+      other is ours.
+  confirmations:
+    description: >
+      Destructive and irreversible acts. **Named in the confirmation, never generic** — *"Cancel 40
+      tickets and refund AED 3,200?"* rather than *"Are you sure?"*, because a person who reads
+      *"are you sure"* is not being asked anything.
+
+# ── density and breakpoint ───────────────────────────────────────────
+# **A back-office table and a kiosk button grid are not one screen at two widths.** A screen
+# declares which densities it is designed for; anything else is a rendering nobody drew.
+densities:
+  - key: compact
+    description: Back office at desktop width. Information-dense, pointer input, hover available.
+  - key: comfortable
+    description: Tablet and staff handheld. Touch targets, no hover.
+  - key: touchLarge
+    description: >
+      Kiosk and POS. **Gloved hands, a queue behind, and a person who did not choose to use this** —
+      the largest targets and the fewest choices per screen.
+
 regions:
   - id: appHeader
     description: Logo, title, notifications, account. Tenant-branded on guest surfaces.
@@ -198,6 +296,22 @@ components:
     description: Device-framed preview of guest-facing configuration.
     states: [loading, ready, error]
     notes: Must toggle platform, theme and direction. RTL preview is not optional.
+
+  - kind: treeNav
+    description: A hierarchical navigator — sections containing items, collapsible, with a current selection.
+    states: [loading, empty, error]
+    notes: >
+      **Added 18 August for the developer portal.** A flat `cardList` cannot express 28 contracts
+      containing 923 operations, and a developer thinks in domains rather than in an alphabetical
+      list. **Selection is a route, not a scroll position** — a developer sends a colleague a link
+      to an operation, and it has to open there.
+  - kind: codeBlock
+    description: A syntax-highlighted, copyable code sample with a language selector.
+    states: [loading, error]
+    notes: >
+      **Copy-paste that runs.** A sample with a placeholder token teaches nothing about auth,
+      which is where integrations actually fail — so the sample carries a real sandbox credential
+      or it says plainly where to get one.
 
 patterns:
   - id: listDetailSplit

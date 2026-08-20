@@ -1,0 +1,633 @@
+{
+ "generated": "2026-08-18",
+ "clusters": [
+  {
+   "id": "CL-01",
+   "name": "Resource management",
+   "conflicts": "CF-125",
+   "entries": [
+    "BL-039",
+    "BL-040",
+    "BL-041",
+    "BL-042",
+    "BL-043",
+    "BL-045",
+    "BL-135",
+    "BL-049",
+    "BL-050"
+   ],
+   "entryCount": 9,
+   "rowCitations": 98,
+   "what": "One bounded context \u2014 a bookable resource with a type, a calendar, conflict detection, check-out and check-in, a deposit, and the staff skills that qualify someone to operate it.",
+   "why": "**The single largest cluster, and the one the delivery plan puts at P3.** Rentals (7.6, fifteen rows, none served), lockers, cabanas, wheelchairs and strollers, instructor and equipment allocation, maintenance resource planning, session manifests and event resourcing all resolve to it. **7.6.15 says so in the client's own words** \u2014 *not currently covered in the proposed solution*. Serial-number tracking is the sharpest form: a specific stroller checked out to a named guest and back.",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "catalogue",
+    "finance",
+    "inventory",
+    "maintenance",
+    "orders",
+    "workforce"
+   ]
+  },
+  {
+   "id": "CL-02",
+   "name": "Reporting data sources",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-053",
+    "BL-143"
+   ],
+   "entryCount": 2,
+   "rowCitations": 115,
+   "what": "One enum extension, not seventy-five gaps.",
+   "why": "**BL-053 appears against 75 rows and BL-143 against 40, and they are the same finding from two ends.** BL-053 says *the generic builder covers it but the data source does not exist*; BL-143 names exactly where coverage stops \u2014 `DataSource` has fourteen values and the matrix asks reports about stock counts, workstations, principals, loyalty, reviews, queue entries, conversations, consent, seating, devices, maintenance and messaging. **Every one of those already persists.** This is a source declaration exercise, and it collapses 115 row-citations into one settled-lane edit.",
+   "lanes": [
+    "deferred",
+    "settled"
+   ],
+   "contracts": [
+    "reporting"
+   ]
+  },
+  {
+   "id": "CL-03",
+   "name": "Something happens, someone is told",
+   "conflicts": "CF-134",
+   "entries": [
+    "BL-052",
+    "BL-152",
+    "BL-155",
+    "BL-174",
+    "BL-020",
+    "BL-017"
+   ],
+   "entryCount": 6,
+   "rowCitations": 81,
+   "what": "One notification and alerting mechanism, guest-facing and operational, internal and outbound.",
+   "why": "**Four entries, ~80 row-citations, one absence.** The guest half (BL-052) and the operational half (BL-152) are the same missing thing seen from two sides, and BL-155's outbound webhooks are the same again pointed outside the platform. **Every condition is already computed** \u2014 `RegisteredDevice.status` reaches `error`, `ShiftCloseResult.requiresAcceptance` fires on variance, `QueueFeedHealth.isHealthy` goes false, `PromotionUsage.isBudgetExhausted` knows the money ran out. Six contracts detect their own trouble and none tells a person. Retry, priority and channel failover (BL-174) are properties of the same mechanism.",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "approvals",
+    "marketing-crm",
+    "platform-ops",
+    "queue",
+    "reporting",
+    "workforce"
+   ]
+  },
+  {
+   "id": "CL-04",
+   "name": "Waivers, consent capture and guest documents",
+   "conflicts": "CF-129",
+   "entries": [
+    "BL-101",
+    "BL-062",
+    "BL-171",
+    "BL-133"
+   ],
+   "entryCount": 4,
+   "rowCitations": 79,
+   "what": "A configurable form the platform can present, capture, version and retain \u2014 serving waivers, demographic capture and surveys alike.",
+   "why": "**Three separately-raised gaps with one shape.** A waiver is a versioned document a guest signs; a data-capture form is a configurable set of fields; a survey is a form with a scale. All three need field configuration, conditional logic, a captured response bound to a subject, a retained version and an erasure path. **2.15.13 and 22.13.5 ask for the same versioning `white-label.Policy` already implements** \u2014 *a guest who consented to version 3 consented to version 3*. Waivers carry the legal exposure and 2.15.7's parental consent is a distinct act; capture carries the CF-69 reporting obligation.",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "assets",
+    "catalogue",
+    "marketing-crm",
+    "orders"
+   ]
+  },
+  {
+   "id": "CL-05",
+   "name": "Portfolio, household and organisation",
+   "conflicts": "CF-132",
+   "entries": [
+    "BL-013",
+    "BL-028",
+    "BL-035",
+    "BL-051"
+   ],
+   "entryCount": 4,
+   "rowCitations": 49,
+   "what": "An owner that is not the buyer \u2014 a family, a school, a corporate account \u2014 holding entitlements and money for named members.",
+   "why": "**Eleven appearances across ten sections.** Section 5.5 specifies it fully: multiple portfolios per account, a primary holder assigning entitlements, transfer between linked portfolios, shared wallets with individual tracking, merging while preserving balances, and restrictions on transfer, spending and age. **The corporate half (BL-035) and the partner hierarchy (BL-075) are the same shape in different contracts** and should not be built twice. **Age and spend limits on a child's portfolio are child-safety controls, not preferences.**",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "catalogue",
+    "marketing-crm",
+    "orders",
+    "subscription"
+   ]
+  },
+  {
+   "id": "CL-06",
+   "name": "Payments platform",
+   "conflicts": "CF-131",
+   "entries": [
+    "BL-116",
+    "BL-100",
+    "BL-074",
+    "BL-119",
+    "BL-118",
+    "BL-115",
+    "BL-072",
+    "BL-113",
+    "BL-086",
+    "BL-087",
+    "BL-070"
+   ],
+   "entryCount": 11,
+   "rowCitations": 48,
+   "what": "A gateway abstraction with routing, a stored payment credential, and the four things that depend on the credential.",
+   "why": "**Tokenisation is the keystone.** Recurring membership billing (BL-100), wallet auto-reload, one-click checkout and payment links (BL-072) all require a stored credential and none can be designed until it is decided \u2014 and it moves the PCI boundary, which is a compliance position. Terminal behaviour (BL-119), tender-by-channel (BL-115), issuer promotions (BL-113), presentment currency (BL-070) and cross-currency refund rate (BL-087) are all properties of the same layer. **The integration register has Stripe amber and NI Payment Gateway red \u2014 Network International being the dominant UAE acquirer.**",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "finance",
+    "orders",
+    "promotions",
+    "tenancy"
+   ]
+  },
+  {
+   "id": "CL-07",
+   "name": "Marketing platform",
+   "conflicts": "CF-137",
+   "entries": [
+    "BL-170",
+    "BL-173",
+    "BL-175",
+    "BL-172",
+    "BL-177",
+    "BL-034",
+    "BL-018",
+    "BL-022",
+    "BL-021",
+    "BL-082",
+    "BL-083"
+   ],
+   "entryCount": 11,
+   "rowCitations": 83,
+   "what": "Four modules the matrix asks for and `marketing-crm` does not hold \u2014 journeys, gamification, SEO and the authoring surface \u2014 plus attribution.",
+   "why": "**Each is a module rather than a gap, and journeys are the one that blocks the others.** A journey is a graph of steps with branches and waits; `CampaignTrigger` fires one campaign from one event. Sixteen requirements at 22.3 depend on it, and it compounds CL-03 \u2014 a journey with no business events to branch on cannot start. **SEO is twelve requirements against nothing, with `CMS-013` a specified screen and zero operations**, and `ContentPage` has a slug with no canonical URL or redirect, so every URL change silently breaks inbound links.",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "marketing-crm",
+    "white-label"
+   ]
+  },
+  {
+   "id": "CL-08",
+   "name": "Loyalty earn, spend and membership benefit",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-063",
+    "BL-018",
+    "BL-037",
+    "BL-016",
+    "BL-031"
+   ],
+   "entryCount": 5,
+   "rowCitations": 36,
+   "what": "The loyalty engine is configured and nothing runs it.",
+   "why": "**Better built than first assessed** \u2014 `LoyaltyProgramme` carries `earnRules`, `tiers`, `pointsExpireAfterMonths` and `pointsLiabilityAccountId`, so the rules exist and post to a liability account. **What is missing is narrow: nothing applies the earn rules on a completed order, and a guest cannot spend points.** Membership benefits as automatic entitlements rather than discounts (BL-037) sit on the same mechanism, as does the guest-facing membership view (BL-016).",
+   "lanes": [
+    "deferred"
+   ],
+   "contracts": [
+    "catalogue",
+    "marketing-crm",
+    "orders",
+    "promotions"
+   ]
+  },
+  {
+   "id": "CL-09",
+   "name": "Guest self-service and identity",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-064",
+    "BL-012",
+    "BL-132",
+    "BL-149"
+   ],
+   "entryCount": 4,
+   "rowCitations": 32,
+   "what": "A guest cannot identify themselves by any token, correct their own record, recover a locked account, or export their data.",
+   "why": "**BL-012 is a legal right rather than a convenience** \u2014 22.13.13 asks for rectification under PDPL and `updateGuestProfile` is staff-only. **The 18 August workshop decided the unified profile** \u2014 *a single, unified customer profile across ticketing, F&B and retail* \u2014 which is BL-064's six appearances answered by the client. DSAR erasure is built and the access half is not.",
+   "lanes": [
+    "deferred",
+    "settled"
+   ],
+   "contracts": [
+    "cross-cell",
+    "identity",
+    "marketing-crm"
+   ]
+  },
+  {
+   "id": "CL-10",
+   "name": "Versioning as one mechanism",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-058",
+    "BL-030",
+    "BL-047",
+    "BL-102"
+   ],
+   "entryCount": 4,
+   "rowCitations": 27,
+   "what": "Eight entities need version history and one contract already implements it well.",
+   "why": "**`white-label` has the pattern** \u2014 `listConfigVersions`, `restoreConfigVersion`, `diffConfigVersion` with a `contentHash` and `scheduledFor`. Products, events, recipes, access policies, recognition rules, approval matrices, device configuration and media templates each ask for the same thing. **Recognition rules are the sharpest**: after a restatement the question is which rule was in force on the day. `seating` versions by convention \u2014 structural changes to a published map are refused, so clone, amend and publish.",
+   "lanes": [
+    "deferred"
+   ],
+   "contracts": [
+    "catalogue",
+    "orders"
+   ]
+  },
+  {
+   "id": "CL-11",
+   "name": "Developer platform",
+   "conflicts": "CF-135",
+   "entries": [
+    "BL-156",
+    "BL-157",
+    "BL-080",
+    "BL-069"
+   ],
+   "entryCount": 4,
+   "rowCitations": 64,
+   "what": "Four separable questions behind one uncontracted domain, and the commercial one comes first.",
+   "why": "**Documentation is nearly there** \u2014 ADR-0024 makes the contract the deliverable and 25 OpenAPI files are the schema documentation; what is missing is a portal. **A developer is not a partner** \u2014 `registerPartner` onboards a reseller with credit and commission, and outbound credentials (BL-080) exist nowhere. **Rate limiting has a screen and no operation.** If integrations are a handful of named partners, an event feed and issued credentials suffice; if TICVAI is sold as extensible, that is a product line.",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "identity",
+    "platform-ops",
+    "subscription"
+   ]
+  },
+  {
+   "id": "CL-12",
+   "name": "Authorisation and platform security",
+   "conflicts": "CF-130 \u00b7 CF-136",
+   "entries": [
+    "BL-110",
+    "BL-147",
+    "BL-146",
+    "BL-161",
+    "BL-144",
+    "BL-145"
+   ],
+   "entryCount": 6,
+   "rowCitations": 65,
+   "what": "Whether to replace a settled role-based model, plus four security controls that are absent regardless of the answer.",
+   "why": "**About a third of 3.3 is already met** by `Grant` with scope inheritance \u2014 real-time evaluation, caching, offline evaluation, least privilege, temporary grants, audit. The ABAC question is whether the remaining two thirds justify replacing ADR-0002 and ADR-0018. **Four things do not depend on that answer**: no password policy or lockout (BL-144), no SoD enforcement beyond one guard (BL-147), no IP or device restriction (BL-146), and **no device authentication at all (BL-161)** \u2014 a reader on a gate holding an offline package of entitlements, on an unauthenticated channel.",
+   "lanes": [
+    "decision",
+    "deferred",
+    "settled"
+   ],
+   "contracts": [
+    "identity",
+    "tenancy"
+   ]
+  },
+  {
+   "id": "CL-13",
+   "name": "Catalogue product model",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-027",
+    "BL-025",
+    "BL-026",
+    "BL-036",
+    "BL-054",
+    "BL-093",
+    "BL-046",
+    "BL-032",
+    "BL-059",
+    "BL-148",
+    "BL-090",
+    "BL-055"
+   ],
+   "entryCount": 12,
+   "rowCitations": 48,
+   "what": "Twelve primitives the product model does not carry, and they are why domain 1 scores 31%.",
+   "why": "**`catalogue` is a spine contract with 53 operations and the highest gap rate of any spine domain.** Purchase eligibility (BL-027, six appearances) is the most cited; future-dated publication (BL-054) is CF-74's misfiled pricing calendar; person type (BL-093) blocks the child-versus-adult light at the gate. **These are small individually and they compound** \u2014 a product cannot be published on a date, restricted to a buyer, priced by weekday, or told who may hold it.",
+   "lanes": [
+    "deferred"
+   ],
+   "contracts": [
+    "access",
+    "catalogue",
+    "orders"
+   ]
+  },
+  {
+   "id": "CL-14",
+   "name": "Media and ticket production",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-102",
+    "BL-095",
+    "BL-103",
+    "BL-029"
+   ],
+   "entryCount": 4,
+   "rowCitations": 21,
+   "what": "Nothing produces a ticket \u2014 no template, no stock, no recycling, no wallet pass.",
+   "why": "**A venue changing its ticket artwork has no path that is not a code change.** Media stock is unmodelled (which ribbon is loaded, how much is left), media cannot be released and reassigned, and replacement does not blacklist the old code \u2014 **though F23 states that rule for contractor badges and not for guest media**, so a replaced wristband may still open a gate. Apple and Google Wallet is the fourth appearance.",
+   "lanes": [
+    "deferred"
+   ],
+   "contracts": [
+    "inventory",
+    "orders",
+    "tenancy",
+    "white-label"
+   ]
+  },
+  {
+   "id": "CL-15",
+   "name": "Partner and channel",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-075",
+    "BL-076",
+    "BL-067",
+    "BL-078",
+    "BL-081",
+    "BL-077"
+   ],
+   "entryCount": 6,
+   "rowCitations": 37,
+   "what": "A partner is a flat account with no hierarchy, no channel manager, no ERP interface and no branding.",
+   "why": "**CF-128 found the integration register was built from the Integrations sheet alone** and missed the OTAs by name \u2014 Viator, Klook, Headout, GetYourGuide \u2014 telephony, and Oracle. The commercial model for a reseller is covered; **a live channel-manager feed is not**, and 3.7.1 asks for bundles containing external supplier products. ERP invoicing (BL-077) is cited fourteen times.",
+   "lanes": [
+    "deferred"
+   ],
+   "contracts": [
+    "catalogue",
+    "finance",
+    "identity",
+    "orders",
+    "subscription",
+    "white-label"
+   ]
+  },
+  {
+   "id": "CL-16",
+   "name": "Finance ledger completeness",
+   "conflicts": "CF-133",
+   "entries": [
+    "BL-141",
+    "BL-142",
+    "BL-139",
+    "BL-140",
+    "BL-117",
+    "BL-138",
+    "BL-091",
+    "BL-123",
+    "BL-088",
+    "BL-038"
+   ],
+   "entryCount": 10,
+   "rowCitations": 73,
+   "what": "Ten things missing from an otherwise excellent double-entry model.",
+   "why": "**`finance` answers 219 requirements at 18\u201320% and three sections at zero.** What is absent is bounded and specific: a **suspense account** (BL-142, settled lane) is the control that turns an unmapped posting into a visible balance somebody clears rather than a silent imbalance; **two recognition schedules may both claim a product kind with nothing resolving precedence** (BL-141), which is a silent double-recognition; a **deposit** is a liability taken before fulfilment and `createReservation` takes no payment at all; and **tax invoices and credit memos are a UAE VAT obligation** with mandated format and gapless numbering that interacts with ADR-0013 and ADR-0014.",
+   "lanes": [
+    "decision",
+    "deferred",
+    "settled"
+   ],
+   "contracts": [
+    "catalogue",
+    "finance",
+    "inventory",
+    "orders"
+   ]
+  },
+  {
+   "id": "CL-17",
+   "name": "Device fleet management",
+   "conflicts": "CF-136",
+   "entries": [
+    "BL-160",
+    "BL-163",
+    "BL-061",
+    "BL-119"
+   ],
+   "entryCount": 4,
+   "rowCitations": 34,
+   "what": "The device model registers and monitors and does not deploy, retire or link to an asset.",
+   "why": "**`tenancy` covers more of domain 16 than its name suggests** \u2014 twenty device kinds under ADR-0015, heartbeat reporting *paper low, drawer open, reader offline*, remote configuration through `DeviceBinding`. **Firmware records a version and nothing deploys one**, which is a site visit per device for the life of the contract. **A device is not an asset**, so a scanner sent for repair leaves the device list saying it is merely offline. And staff devices cannot register for push (BL-163), so CL-03's alerting has nowhere to deliver on the staff side.",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "maintenance",
+    "marketing-crm",
+    "orders",
+    "tenancy",
+    "workforce"
+   ]
+  },
+  {
+   "id": "CL-18",
+   "name": "Seat map completeness",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-166",
+    "BL-168",
+    "BL-167"
+   ],
+   "entryCount": 3,
+   "rowCitations": 21,
+   "what": "Everything that is a seat is well built; the map holds nothing else.",
+   "why": "**`seating` scores 10% across 112 rows** \u2014 blocks with reasons, holds with TTL, buffer and orphan rules, recommendation returning contiguous groups, two-phase import validated against real client files. **The map itself is only seats**: no standing zone, suite, stage, entry or exit. `layerMapping` names a `stageLayer`, **so the importer can read a stage and the model cannot hold one** \u2014 and 21.8.3's accessible route needs entries and exits to route between, which is an accessibility obligation.",
+   "lanes": [
+    "deferred",
+    "settled"
+   ],
+   "contracts": [
+    "seating"
+   ]
+  },
+  {
+   "id": "CL-19",
+   "name": "F&B kitchen and outlet operations",
+   "conflicts": "CF-138",
+   "entries": [
+    "BL-129",
+    "BL-125",
+    "BL-127",
+    "BL-131",
+    "BL-126",
+    "BL-130",
+    "BL-066"
+   ],
+   "entryCount": 7,
+   "rowCitations": 29,
+   "what": "Seven F&B gaps, five of them settled by the client on 18 August.",
+   "why": "**The 18 August workshop decided most of this cluster** \u2014 course-wise firing with an elapsed timer that resets per course, the table status flow *Available \u2192 Ordered \u2192 Table Closed \u2192 Reserved* with *Cleaning* rejected, an optional deposit against the bill, production and batch management with planned-versus-actual-versus-yield, and *Change Server* on the table activity log. **`TableReservationStatus` does not match the agreed flow and needs reconciling.** Allergens (BL-127) are the safety one: substituting an ingredient changes the allergen set, and `fnb-menuPublished` already carries `allergensChanged`.",
+   "lanes": [
+    "deferred"
+   ],
+   "contracts": [
+    "fnb",
+    "retail"
+   ]
+  },
+  {
+   "id": "CL-20",
+   "name": "Compliance and regulatory obligations",
+   "conflicts": "CF-127 \u00b7 CF-64",
+   "entries": [
+    "BL-073",
+    "BL-176",
+    "BL-096",
+    "BL-106",
+    "BL-065",
+    "BL-134"
+   ],
+   "entryCount": 6,
+   "rowCitations": 28,
+   "what": "Six obligations that are legal rather than functional.",
+   "why": "**Cookie consent (BL-073) is normally bought rather than built** \u2014 CF-127 asks build, buy or drop, and 22.10.29's analytics injection cannot fire before consent. **A personal-data breach has its own regulator and clock under PDPL** and no home, while `maintenance.reportIncident` handles physical incidents well. **Face Tag versus Face Pass is a retention distinction** \u2014 a same-day tag deleted at close is a far easier posture to justify than an enduring enrolment. Accessibility (BL-065) is a closed artefact class with authored content unchecked.",
+   "lanes": [
+    "decision",
+    "deferred",
+    "settled"
+   ],
+   "contracts": [
+    "access",
+    "marketing-crm",
+    "white-label"
+   ]
+  },
+  {
+   "id": "CL-21",
+   "name": "Product and catalogue operations at scale",
+   "conflicts": "\u2014",
+   "entries": [
+    "BL-057",
+    "BL-114",
+    "BL-098",
+    "BL-112",
+    "BL-084",
+    "BL-085",
+    "BL-089",
+    "BL-048",
+    "BL-056",
+    "BL-105"
+   ],
+   "entryCount": 10,
+   "rowCitations": 38,
+   "what": "Bulk operations, dry runs and the operational verbs a catalogue of thousands needs.",
+   "why": "**The package simulates in four places** \u2014 `dryRun` on performance cancellation, recognition, FX revaluation and period close, each an expensive irreversible act \u2014 **and a promotion is the same category**: `budgetCap` stops it after the money is spent and nothing estimates exposure beforehand (BL-114). Bulk upload and environment import (BL-057) is cited seventeen times. **Performance targets (BL-098) are one of three artefact classes still open**, and a latency budget stated late is one met by accident.",
+   "lanes": [
+    "deferred",
+    "settled"
+   ],
+   "contracts": [
+    "access",
+    "catalogue",
+    "orders",
+    "promotions"
+   ]
+  },
+  {
+   "id": "CL-22",
+   "name": "Queue and wayfinding",
+   "conflicts": "CF-123 \u00b7 CF-51",
+   "entries": [
+    "BL-136",
+    "BL-137",
+    "BL-011",
+    "BL-023"
+   ],
+   "entryCount": 4,
+   "rowCitations": 18,
+   "what": "The queue is well built for one lane, and the venue has no map.",
+   "why": "**`queue` answers 46 rows at 15%** with wait-time provenance \u2014 sensor, throughput or manual, with `isStale` \u2014 and closure that releases and notifies every waiting guest because *closing without notifying is not offered*. **A queue has one capacity, no type and no operating window**, so nine queue types become nine queue records. **The wayfinding map is cited by three contracts and exists in none** (BL-011, CF-123), which also blocks the accessible route, the vehicle locator and the live access-point map.",
+   "lanes": [
+    "decision",
+    "deferred"
+   ],
+   "contracts": [
+    "access",
+    "ai",
+    "queue",
+    "white-label"
+   ]
+  }
+ ],
+ "unclustered": [
+  "BL-165",
+  "BL-060",
+  "BL-092",
+  "BL-120",
+  "BL-153",
+  "BL-150",
+  "BL-151",
+  "BL-162",
+  "BL-122",
+  "BL-044",
+  "BL-068",
+  "BL-154",
+  "BL-121",
+  "BL-111",
+  "BL-159",
+  "BL-033",
+  "BL-071",
+  "BL-099",
+  "BL-104",
+  "BL-178",
+  "BL-002",
+  "BL-003",
+  "BL-004",
+  "BL-005",
+  "BL-006",
+  "BL-014",
+  "BL-015",
+  "BL-019",
+  "BL-079",
+  "BL-094",
+  "BL-097",
+  "BL-107",
+  "BL-108",
+  "BL-109",
+  "BL-128",
+  "BL-164",
+  "BL-169",
+  "BL-007",
+  "BL-008",
+  "BL-009",
+  "BL-010",
+  "BL-024"
+ ]
+}

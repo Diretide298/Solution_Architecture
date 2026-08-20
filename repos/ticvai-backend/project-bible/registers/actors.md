@@ -23,7 +23,7 @@
 | A05 | Super User | Back office | Training sheet Ref 2 |
 | A06 | Finance Controller *(posts)* | Back office | 07 Aug §10; 5.7, 5.12 |
 | A32 | Finance Manager / Director *(approves)* | Back office | 12 Aug §15 |
-| A07 | Approver *(parameterised)* | Back office + employee app | 10 Aug §5.5; 11.1.x |
+| A07 | Approver *(parameterised)* | Back office + venue-staff-app app | 10 Aug §5.5; 11.1.x |
 | A08 | Marketing User | Back office | 7.1.12; 22.1.5 |
 | A09 | Accreditation Officer | Back office | 12.1.x (58) |
 
@@ -49,7 +49,7 @@ A07 is **one** actor. Ops Manager, Finance and CEO perform an identical interact
 
 | ID | Actor | Surface | Evidence |
 |---|---|---|---|
-| A19 | Gate / Turnstile Scanner Operator | Dedicated scanner app | 03 Aug §12; 10 Aug §5.7 |
+| A19 | Gate / Turnstile Scanner Operator | Dedicated venue-scanner app | 03 Aug §12; 10 Aug §5.7 |
 | A20 | Podium / Turnstile Supervisor | Handheld or turnstile keyboard | 3.2.73 |
 
 A19 scans. A20 supervises turnstiles — lookup, override, mode switching. Different job, different device.
@@ -58,8 +58,8 @@ A19 scans. A20 supervises turnstiles — lookup, override, mode switching. Diffe
 
 | ID | Actor | Surface | Evidence |
 |---|---|---|---|
-| A21 | Duty Supervisor | POS + employee app | 07 Aug §4; 5.8.8, 5.9.5, 7.1.4 |
-| A22 | Venue Manager | Back office + employee app | 7.1.12 |
+| A21 | Duty Supervisor | POS + venue-staff-app app | 07 Aug §4; 5.8.8, 5.9.5, 7.1.4 |
+| A22 | Venue Manager | Back office + venue-staff-app app | 7.1.12 |
 | A23 | Maintenance Technician | Employee app | 10 Aug §5.3 |
 | A24 | Storekeeper / Procurement Officer | Employee app + back office | 10 Aug §5.4 |
 | A25 | Guest Services / Lost & Found | Employee app + back office | 10 Aug §4.6, §5.6 |
@@ -71,7 +71,7 @@ A19 scans. A20 supervises turnstiles — lookup, override, mode switching. Diffe
 | ID | Actor | Surface | Evidence |
 |---|---|---|---|
 | A27 | Guest (B2C) | Guest app, web, kiosk | 10 Aug §§4.1–4.12 |
-| A34 | Refund Requester *(guest self-service)* | Guest app | 12 Aug §9 |
+| A34 | Refund Requester *(guest-app self-service)* | Guest app | 12 Aug §9 |
 | A28 | B2B Partner Admin | B2B portal | 05 Aug §2 |
 | A29 | B2B Partner Agent *(child account)* | B2B portal | 07 Aug §11 |
 | A30 | Partner Developer | Developer portal | 13.1–13.3 (94) |

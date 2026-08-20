@@ -82,6 +82,16 @@ CREATE TABLE IF NOT EXISTS verdict (
   -- seen in the frontend and fixed in the backend, and one column cannot say
   -- both.
   tag         TEXT    NOT NULL DEFAULT '',
+  -- Whose review this is: 'internal' or 'client'. Taken from the account's
+  -- role at the moment of writing and never from the request, because it is
+  -- the one field a caller would have a reason to lie about.
+  --
+  -- It exists so the two reviews can be read apart. A client signing off is
+  -- worth having and is not the same act as the team signing off: the current
+  -- verdict is the newest row per artefact, so without this a client's
+  -- approval would silently become the standing verdict on something the team
+  -- had rejected. Two tracks on one artefact, neither overwriting the other.
+  audience    TEXT    NOT NULL DEFAULT 'internal',
   verdict     TEXT    NOT NULL,
   note        TEXT    NOT NULL DEFAULT '',
   account_id  INTEGER NOT NULL REFERENCES account(id),
@@ -91,12 +101,44 @@ CREATE TABLE IF NOT EXISTS verdict (
   -- records that it has been dealt with. Nullable because "not done" is the
   -- absence of a date rather than a flag that could disagree with one.
   done_at     TEXT,
-  done_by     INTEGER REFERENCES account(id)
+  done_by     INTEGER REFERENCES account(id),
+  -- An admin looked at what was marked done and did not accept it. Kept beside
+  -- the completion rather than undoing it, so which one stands is decided by
+  -- which happened last: mark done, sent back, marked done again. Clearing the
+  -- completion instead would lose the fact that somebody had thought it
+  -- finished, and clearing the rejection on the next attempt would lose the
+  -- reason it was not.
+  --
+  -- The note is not optional. Sending work back without saying why is how it
+  -- comes back the same.
+  sent_back_at   TEXT,
+  sent_back_by   INTEGER REFERENCES account(id),
+  sent_back_note TEXT NOT NULL DEFAULT ''
 );
 -- Verdicts are append-only: a row is a thing someone said at a time, and
 -- rewriting it would lose the fact that they once thought otherwise. The
 -- current verdict is the newest row for that target.
-CREATE INDEX IF NOT EXISTS verdict_target ON verdict(target_kind, target_id, id DESC);
+CREATE INDEX IF NOT EXISTS verdict_target ON verdict(target_kind, target_id, audience, id DESC);
+
+-- Somebody named in a note. A row per person per verdict, rather than parsing
+-- the note again on every read: the note is prose and people get renamed, and
+-- a mention that stopped resolving because somebody changed their display name
+-- would be a notification that silently never arrives.
+--
+-- ON DELETE CASCADE because a discarded verdict must take its mentions with
+-- it. Without it, discarding a note would leave somebody with a notification
+-- pointing at a row that no longer exists.
+CREATE TABLE IF NOT EXISTS mention (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  verdict_id INTEGER NOT NULL REFERENCES verdict(id) ON DELETE CASCADE,
+  account_id INTEGER NOT NULL REFERENCES account(id),
+  created_at TEXT    NOT NULL,
+  -- When they looked at it. Null is unread; a date is what makes the count
+  -- go down rather than a flag that could disagree with one.
+  seen_at    TEXT
+);
+CREATE INDEX IF NOT EXISTS mention_for ON mention(account_id, seen_at, id DESC);
+CREATE INDEX IF NOT EXISTS mention_verdict ON mention(verdict_id);
 """
 
 
@@ -176,11 +218,30 @@ def init() -> None:
         # and not the other is a store an interrupted migration left behind.
         if "done_at" not in have:
             cur.execute("ALTER TABLE verdict ADD COLUMN done_at TEXT")
+        if "audience" not in have:
+            cur.execute(
+                "ALTER TABLE verdict ADD COLUMN audience TEXT NOT NULL DEFAULT 'internal'")
+            # Every existing row is internal by construction — a client could
+            # not write one until now — so the default is already right and
+            # there is nothing to backfill.
+            #
+            # The index has to be rebuilt by hand: CREATE INDEX IF NOT EXISTS
+            # above leaves the old two-column one in place, and "the newest row
+            # for this artefact and this audience" is a different lookup.
+            cur.execute("DROP INDEX IF EXISTS verdict_target")
+            cur.execute(
+                "CREATE INDEX verdict_target "
+                "ON verdict(target_kind, target_id, audience, id DESC)")
         if "done_by" not in have:
             # No REFERENCES here: SQLite cannot add a column with a foreign key
             # to an existing table, and the constraint on the fresh schema above
             # is the one that matters for a store made from now on.
             cur.execute("ALTER TABLE verdict ADD COLUMN done_by INTEGER")
+        if "sent_back_at" not in have:
+            cur.execute("ALTER TABLE verdict ADD COLUMN sent_back_at TEXT")
+            cur.execute("ALTER TABLE verdict ADD COLUMN sent_back_by INTEGER")
+            cur.execute(
+                "ALTER TABLE verdict ADD COLUMN sent_back_note TEXT NOT NULL DEFAULT ''")
 
 
 def fold(email: str) -> str:

@@ -1,11 +1,18 @@
-# History
+# Active
 
-> **Purpose:** Where the project has been  
-> **Owner:** Chitrangi  
+> **Purpose:** What is in flight now  
+> **Owner:** Chinmay  
 > **Status:** Living
 
-[milestones](milestones.md) — dated decisions and deliverables.
-[timeline](timeline.md) — MoM-derived chronology, 30 Jul 2026 onward.
+Current wave, current context, open blockers, this week's gates.
 
-**MoM decisions are rank-1 in the source hierarchy.** This section is the index into them,
-not a replacement.
+| Page | |
+|---|---|
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

@@ -23,9 +23,13 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
-CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+# The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
+# outside the package, so every validator passed for whoever had that repo checked out and read
+# nothing for anyone working from the zip — which is the worst failure a checker can have, because
+# it is silent and it looks like success.
+CONTRACTS = ROOT / "contracts"
 if not CONTRACTS.exists():
-    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+    CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 
 CHECK = "--check" in sys.argv
 
@@ -39,7 +43,7 @@ def main() -> int:
     # --- operationId -> contract, from the contracts
     op_contract: dict[str, str] = {}
     for f in contract_files():
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         for item in (doc.get("paths") or {}).values():
             if not isinstance(item, dict):
                 continue
@@ -52,7 +56,7 @@ def main() -> int:
     op_screens: dict[str, list[str]] = defaultdict(list)
     screen_files = sorted(SCREENS.glob("P*.yaml"))
     for f in screen_files:
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         code = doc["platform"]["code"]
         for s in doc["screens"]:
             for api in s.get("apis", []) or []:
@@ -72,7 +76,7 @@ def main() -> int:
 
     # --- write `contract` back into the screens
     for f in screen_files:
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         changed = False
         for s in doc["screens"]:
             for api in s.get("apis", []) or []:
@@ -81,7 +85,7 @@ def main() -> int:
                     api["contract"] = op_contract[oid]
                     changed = True
         if changed:
-            head = "".join(l for l in f.read_text().splitlines(keepends=True) if l.startswith("#"))
+            head = "".join(l for l in f.read_text(encoding="utf-8").splitlines(keepends=True) if l.startswith("#"))
             with f.open("w") as out:
                 out.write(head + "\n")
                 yaml.safe_dump(doc, out, sort_keys=False, allow_unicode=True, width=98)
@@ -94,7 +98,7 @@ def main() -> int:
     import re as _re
     consumed = uncovered = 0
     for f in contract_files():
-        text = f.read_text()
+        text = f.read_text(encoding="utf-8")
         # strip any previous block, so the operation is idempotent
         text = _re.sub(r"\n      x-ticvai-consumed-by:\n(?:        - [^\n]*\n)+", "\n", text)
         n = 0
@@ -115,8 +119,8 @@ def main() -> int:
         else:
             text = _re.sub(r"(\n  version: [^\n]+\n)", rf"\1  x-ticvai-screen-count: {n}\n",
                            text, count=1)
-        f.write_text(text)
-        yaml.safe_load(f.read_text())  # fail loudly rather than leave a broken contract
+        f.write_text(text, encoding="utf-8")
+        yaml.safe_load(f.read_text(encoding="utf-8"))  # fail loudly rather than leave a broken contract
 
     print(f"linked {consumed} operations to screens")
     print(f"{uncovered} operations have no screen consuming them")

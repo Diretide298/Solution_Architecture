@@ -1,0 +1,49 @@
+# Resale listing — state model
+# Contract: orders.ResaleListing.status
+
+entity: Resale listing
+contract: orders
+enum: ResaleListing.status
+enumKind: inline
+enumSchema: ResaleListing
+enumProperty: status
+owner: orders
+initial:
+- listed
+terminal:
+- sold
+- withdrawn
+- expired
+transitions:
+- from: listed
+  to: reserved
+  operation: createResaleListing
+  trigger: operation
+  guard: A buyer is in checkout. **Held, because two buyers on one seat is the failure this prevents**
+- from: reserved
+  to: sold
+  operation: createResaleListing
+  trigger: operation
+  guard: '**The seller entitlement is voided and a new one issued to the buyer** — the ticket that admits
+    is always one the venue issued'
+- from: reserved
+  to: listed
+  operation: createResaleListing
+  trigger: operation
+  guard: Checkout abandoned. Back on the market
+  isReversal: true
+- from: listed
+  to: withdrawn
+  operation: createResaleListing
+  trigger: operation
+  guard: The seller changed their mind
+- from: listed
+  to: expired
+  trigger: timer
+  guard: The performance started. **A listing outliving its event is a listing that sells nothing**
+notes: '**The seller is paid after the buyer is admitted, not after they pay** — a resale refunded at
+  the gate for a void ticket cannot be clawed back from a seller who already has the money.
+
+
+  **`reserved` is what stops two buyers on one seat**, and it is the only reason this is a state machine
+  rather than a flag.'

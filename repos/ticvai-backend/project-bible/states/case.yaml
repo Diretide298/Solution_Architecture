@@ -5,6 +5,8 @@
 entity: Service case
 contract: marketing-crm
 enum: CaseStatus
+enumKind: named
+enumSchema: CaseStatus
 owner: marketing
 initial:
 - open
@@ -56,5 +58,7 @@ transitions:
   to: closed
   trigger: timer
   guard: No further contact within the window
+  emits:
+  - marketing.caseClosed
 notes: '`resolved` and `closed` differ by the reopen window. Closing immediately would make every follow-up
   a new case and hide repeat problems.'

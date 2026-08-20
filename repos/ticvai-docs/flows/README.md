@@ -1,59 +1,58 @@
 # User flows
 
-**A flow is one job a person came to do, traced across screens.**
+**23 written.** Every contract is touched by at least one, and every platform appears in at
+least one. That is the coverage measure worth having — the earlier target of sixty was invented.
 
-    _schema.yaml        the meta-schema
-    F01…F05.yaml        one file per flow
-    ../tools/check-flows.py
+| | Flow | Actor | Steps | Branches | Criticality |
+|---|---|---|---|---|---|
+| F01 | Guest buys a ticket online | guest | 8 | **7** | revenue |
+| F02 | Guest buys seated tickets | guest | 5 | **5** | revenue |
+| F03 | Partner books on credit | partner | 4 | **3** | revenue |
+| F04 | Platform admin ships a release | platformAdmin | 4 | **4** | operational |
+| F05 | Agent resolves a guest complaint | agent | 3 | **3** | operational |
+| F06 | Guest enters the venue | gateOperator | 6 | **8** | revenue |
+| F07 | Guest buys at a kiosk | guest | 8 | **7** | revenue |
+| F08 | Steward works a shift on the employee app | supervisor | 8 | **7** | operational |
+| F09 | Event is cancelled and refunded | venueManager | 5 | **8** | revenue |
+| F10 | Partner books, uses and settles | partner | 6 | **7** | revenue |
+| F11 | Guest orders food to a lounger | guest | 7 | **7** | convenience |
+| F12 | Asset fails and closes a queue | technician | 5 | **7** | safety |
+| F13 | Month end closes | financeController | 6 | **7** | financial |
+| F14 | A discount needs a manager | cashier | 5 | **6** | financial |
+| F15 | A part is needed and ordered | technician | 5 | **7** | operational |
+| F16 | A venue opens for the first time | platformAdmin | 7 | **5** | operational |
+| F17 | A guest buys merchandise and collects later | guest | 5 | **5** | revenue |
+| F18 | A guest plays an arcade game | guest | 4 | **4** | convenience |
+| F19 | A membership works in another country | guest | 5 | **6** | revenue |
+| F20 | A manager asks a question and gets an answer | venueManager | 3 | **6** | operational |
+| F21 | A ride queue fills and a guest is redirected | guest | 5 | **6** | convenience |
+| F22 | A tenant rebrands their app | venueManager | 6 | **6** | operational |
+| F23 | A contractor gets a badge and uses it | contractor | 5 | **6** | safety |
+| | | | **125** | **137** | |
 
-## Why flows are separate from screens
+## Why the branches matter more than the steps
 
-A screen is owned by whoever builds it. A flow crosses screens, often crosses apps, and is
-owned by nobody unless it is written down.
-
-The failures that cost most are almost never inside a screen. They are in the joins — a hold
-that expires while the guest is on the payment page, a payment taken with no response
-received, a plan applied against cell state that has since moved. Those live between screens,
-so they are recorded between screens.
-
-## The branch rule
-
-**Every flow declares its unhappy paths, and `branches` cannot be empty.** A flow with only a
-happy path describes a demo, not a product.
-
-The five flows here carry 21 branches between them. Several are the reason a design decision
-exists at all — the payment-taken-no-response branch in F01 is why `createOrder` runs before
-`createPayment`, and why the screen offers inquiry rather than retry.
-
-## What the check catches
-
-| | |
-|---|---|
-| Screen does not exist | |
-| Operation does not exist | |
-| **A step calls an operation the screen does not declare** | The useful one |
-| Branch at a step that does not exist | |
-| No branches at all | |
-
-That third check found nine mismatches on first run — every one a case of the **screens being
-behind the flows**. The P09 screens were generated before `platform-ops` existed, so they
-carried "no contract" against operations that now do exist. The flow was right and the screen
-inventory was stale, which is exactly the drift this comparison exists to surface.
+`check-flows.py` fails a flow with no branches, because a flow with only a happy path describes
+a demo. **Between them these have found one missing screen, two missing contracts, twenty-odd
+missing operations and a cart** — and every one of those was invisible to a checker, because a
+checker verifies what exists and cannot notice what was never named.
 
 ## Coverage
 
-| Flow | Actor | Steps | Branches | Criticality |
-|---|---|---|---|---|
-| **F01** Guest buys a ticket online | guest | 8 | 7 | revenue |
-| **F02** Guest buys seated tickets | guest | 4 | 4 | revenue |
-| **F03** Partner books on credit | partner | 4 | 3 | revenue |
-| **F04** Platform admin ships a release | platformAdmin | 4 | 4 | operational |
-| **F05** Agent resolves a guest complaint | agent | 3 | 3 | operational |
+| | |
+|---|---|
+| Contracts touched | **25 of 25** |
+| Platforms appearing | **12 of 12** |
+| Operations named in a step | 129 |
 
-**Five of roughly sixty.** These are the five whose screens are specified. The rest —
-gate admission, POS sale, offline recovery, shift close-out, stock count, work order — cross
-platforms whose screens have no definitions yet, so a flow written now could not be checked
-against anything.
+**Operations named in a step is deliberately low.** A flow names the operation that carries the
+step, not every call the screen makes — a flow listing forty operations is a call graph, and
+nobody reviews a call graph.
 
-Writing an unverifiable flow is how a flow becomes fiction. The remaining fifty-five wait for
-their screens.
+## What is not written
+
+The remaining journeys are variations rather than new territory: refunds by channel, membership
+renewal and freeze, group bookings, stock counts with a variance, DSAR end to end. **Each would
+find something**, and none covers a contract or a platform that has nothing.
+
+**A flow is cheap and finds expensive things.** That has held for twenty-three of them.

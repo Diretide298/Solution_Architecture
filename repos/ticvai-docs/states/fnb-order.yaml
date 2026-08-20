@@ -5,6 +5,8 @@
 entity: F&B order
 contract: fnb
 enum: FnbOrderStatus
+enumKind: named
+enumSchema: FnbOrderStatus
 owner: fnb
 initial:
 - ordered
@@ -14,11 +16,6 @@ terminal:
 - delivered
 - cancelled
 - refunded
-offlineReachable:
-- ordered
-- accepted
-- inPreparation
-- ready
 transitions:
 - from: ordered
   to: accepted
@@ -87,3 +84,8 @@ transitions:
   requiresApproval: true
 notes: Three distinct closing states, from 4.6.35. A server putting a plate down, a counter handover
   and a runner delivery are different events, and the dispute is always about which one happened.
+offlineReachable:
+- ordered
+- accepted
+- inPreparation
+- ready

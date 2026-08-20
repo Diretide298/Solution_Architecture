@@ -1,0 +1,35 @@
+# Guest device — state model
+# Contract: marketing-crm.GuestDevice.status
+# Checked by tools/check-states.py.
+
+entity: Guest device
+contract: marketing-crm
+enum: GuestDevice.status
+enumKind: inline
+enumSchema: GuestDevice
+enumProperty: status
+owner: marketing-crm
+initial:
+- active
+terminal:
+- revoked
+- failed
+transitions:
+- from: active
+  to: revoked
+  operation: revokeGuestDevice
+  trigger: operation
+  guard: Signed out, or the guest removed it
+- from: active
+  to: failed
+  trigger: job
+  guard: '**The push token was rejected repeatedly.** The app was deleted, and continuing to send is
+    a cost with no recipient'
+- from: failed
+  to: active
+  operation: registerGuestDevice
+  trigger: operation
+  guard: Reinstalled and re-registered
+  isReversal: true
+notes: '`failed` exists so a dead token stops being paid for. **A push provider charges for attempts**,
+  and a device that has rejected fifty in a row will reject the fifty-first.'

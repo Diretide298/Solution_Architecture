@@ -50,7 +50,7 @@ platform:
 screens:
 - id: POS-001
   name: Begin Shift
-  module: shift
+  module: Shift
   purpose: Count the opening float and open the till.
   capability: C11
   wave: 1
@@ -80,7 +80,8 @@ screens:
         label: Review & confirm
   states:
     loading: Denominations from region settings
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Open failed. Counts are kept on screen
     offline: Opens locally and syncs. A gate that cannot open a till because the network is down is
       a gate that does not sell
@@ -157,11 +158,10 @@ screens:
     - POS-002
     - POS-007
     - POS-009
-  modules:
-  - shift
+  density: touchLarge
 - id: POS-002
   name: Sell — Ticket Catalogue
-  module: orders
+  module: Sell
   purpose: Find a product and add it to the cart.
   capability: C01
   wave: 1
@@ -207,7 +207,9 @@ screens:
         label: Clear cart
   states:
     loading: Tiles from the local bundle. Instant — this screen must not wait on a network
-    empty: No products in this category
+    emptyFirstRun: No products in this category
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Bundle stale or missing. The terminal refuses to sell rather than selling at an unknown price
     offline: Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal
       does not know whether it has a network.
@@ -405,16 +407,10 @@ screens:
     - POS-006
     - POS-010
     fromFlows: true
-  modules:
-  - orders
-  - promotions
-  - catalogue
-  - retail
-  - games
-  - approvals
+  density: touchLarge
 - id: POS-003
   name: Sell — Timed Entry
-  module: catalogue
+  module: Sell
   purpose: Pick a date, a session and ticket quantities.
   capability: C81
   wave: 1
@@ -441,7 +437,9 @@ screens:
         label: Add to cart
   states:
     loading: Slot skeleton
-    empty: No sessions on this date, with the next available offered
+    emptyFirstRun: No sessions on this date, with the next available offered
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Availability unavailable. Selection blocked — overselling is worse than waiting
     offline: '**Availability is never served from the bundle.** A lease is acquired against the server;
       without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)'
@@ -532,11 +530,10 @@ screens:
     - POS-004
     - POS-005
     - POS-006
-  modules:
-  - catalogue
+  density: touchLarge
 - id: POS-004
   name: Sell — Seat Map
-  module: seating
+  module: Sell
   purpose: Choose specific seats for a seated event.
   capability: C51
   wave: 2
@@ -562,7 +559,8 @@ screens:
         label: Add seats to cart
   states:
     loading: Map skeleton at the venue aspect ratio
-    empty: No seats in the selected category
+    emptyFirstRun: No seats in the selected category
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Map unavailable, with best-available offered instead
     offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
       seat is unrecoverable'
@@ -639,14 +637,10 @@ screens:
     - POS-003
     - POS-005
     - POS-006
-  modules:
-  - seating
-  - catalogue
-  - orders
-  - approvals
+  density: touchLarge
 - id: POS-005
   name: Payment
-  module: orders
+  module: Payment
   purpose: Take payment and complete the sale.
   capability: C04
   wave: 1
@@ -685,7 +679,8 @@ screens:
         label: Cancel order
   states:
     loading: Button disabled while processing. Double submission impossible
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Declined, with the reason. Retry reuses the same idempotency key
     offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
       never saw is a sale that vanishes at settlement
@@ -756,12 +751,10 @@ screens:
     - POS-001
     - POS-002
     fromFlows: true
-  modules:
-  - orders
-  - retail
+  density: touchLarge
 - id: POS-006
   name: Held Orders
-  module: orders
+  module: Sell
   purpose: Find and resume a parked sale.
   capability: C01
   wave: 1
@@ -781,7 +774,9 @@ screens:
         label: Resume
   states:
     loading: List skeleton
-    empty: Nothing held
+    emptyFirstRun: Nothing held
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: List unavailable. A held order can still be resumed by its number
     offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
       till's sale needs the server
@@ -863,11 +858,10 @@ screens:
     - POS-002
     - POS-003
     - POS-004
-  modules:
-  - orders
+  density: touchLarge
 - id: POS-007
   name: Close Shift
-  module: shift
+  module: Shift
   purpose: Count the drawer and close the till.
   capability: C11
   wave: 1
@@ -891,7 +885,9 @@ screens:
         label: Submit count
   states:
     loading: Denominations
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Close failed. The count is preserved
     offline: Cannot close. Closing requires the server total, and a locally computed variance is not
       a variance
@@ -967,11 +963,10 @@ screens:
     - POS-001
     - POS-009
     inferred: true
-  modules:
-  - shift
+  density: touchLarge
 - id: POS-008
   name: Reports
-  module: reporting
+  module: Reports
   purpose: See how the day is going from the terminal.
   capability: C21
   wave: 2
@@ -994,7 +989,9 @@ screens:
         label: Export
   states:
     loading: Tile skeletons
-    empty: No sales yet today
+    emptyFirstRun: No sales yet today
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Reporting unavailable. Selling is unaffected
     offline: '**Not available.** Reporting reads the analytical replica (ADR-0016) and a terminal-local
       figure would disagree with the back office'
@@ -1054,12 +1051,10 @@ screens:
     exitTo:
     - POS-001
     - POS-002
-  modules:
-  - reporting
-  - finance
+  density: touchLarge
 - id: POS-009
   name: Staff Roster
-  module: shift
+  module: Shift
   purpose: See who is on duty and on which terminal.
   capability: C11
   wave: 2
@@ -1076,7 +1071,9 @@ screens:
         label: Export roster
   states:
     loading: Table skeleton
-    empty: Nobody on duty
+    emptyFirstRun: Nobody on duty
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Roster unavailable
     offline: Last known roster, with its age shown
   wireframe:
@@ -1150,11 +1147,10 @@ screens:
     a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
     removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
     does not handle money should not be able to move it (CF-87's class).
-  modules:
-  - shift
+  density: touchLarge
 - id: POS-010
   name: Add to Existing Ticket
-  module: assets
+  module: Sell
   purpose: Sell something onto media the guest is already carrying.
   capability: C01
   wave: 1
@@ -1168,46 +1164,10 @@ screens:
     contract: orders
     purpose: Attach the new purchase to the same media
     trigger: onAction
-  - operationId: completeUpload
-    contract: assets
-    purpose: Confirm an upload and create the asset
-    trigger: onAction
-  - operationId: createCollection
-    contract: assets
-    purpose: Create a collection
-    trigger: onAction
-  - operationId: createUpload
-    contract: assets
-    purpose: Request a signed upload URL
-    trigger: onAction
-  - operationId: deleteMediaAsset
-    contract: assets
-    purpose: Delete an asset
-    trigger: onAction
-  - operationId: getExpiringRights
-    contract: assets
-    purpose: Assets whose licence is expiring or expired
-    trigger: onLoad
   - operationId: getMediaAsset
     contract: assets
     purpose: Read an asset with derivatives and usage
     trigger: onLoad
-  - operationId: listCollections
-    contract: assets
-    purpose: List collections
-    trigger: onLoad
-  - operationId: replaceMediaAsset
-    contract: assets
-    purpose: Replace the file behind an asset
-    trigger: onAction
-  - operationId: searchMedia
-    contract: assets
-    purpose: Search the asset library
-    trigger: onLoad
-  - operationId: updateMediaAsset
-    contract: assets
-    purpose: Amend metadata, tags or rights
-    trigger: onAction
   layout:
     template: detail
     regions:
@@ -1229,7 +1189,8 @@ screens:
         label: Add and pay
   states:
     loading: Media lookup. Reads the primary — a stale entitlement set is a wrong one
-    empty: Media recognised and carries nothing. Unusual, and worth showing rather than hiding
+    emptyFirstRun: Media recognised and carries nothing. Unusual, and worth showing rather than hiding
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Media not recognised at this venue
     offline: '**Not available.** The entitlement set must be read live; appending to a stale picture
       double-sells a locker'
@@ -1251,7 +1212,8 @@ screens:
     status: drafted
     board: wireframes/P04 Staff POS.dc.html#pos-010
     designReference: sources/designs/Park_POS_dc.html
-  notes: CF-58, from the 14 August MoM. Not in the delivered mockups.
-  modules:
-  - assets
-  - orders
+  notes: 'CF-58, from the 14 August MoM. Not in the delivered mockups. **9 assets operations removed
+    18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item
+    to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same
+    shape as CF-87, one level up: that attached sibling operations, this attached a whole contract.'
+  density: touchLarge

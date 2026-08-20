@@ -172,13 +172,42 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
             elif ops and oid not in ops:
                 ERRORS.append(f"{name}: {sid} references unknown operationId '{oid}'")
 
+        # **`empty` became three states on 18 August.** One field held "nothing exists yet",
+        # "your filter matched nothing" and "you may not see this", and they are three different
+        # screens with three different actions. The permission case is the one that mattered —
+        # **an empty list where the truth is a permission is a lie a person will act on.**
         states = s.get("states") or {}
-        for required in ("loading", "empty", "error"):
+        for required in ("loading", "emptyFirstRun", "error"):
             if required not in states:
                 ERRORS.append(f"{name}: {sid} is missing the '{required}' state")
+        if "empty" in states:
+            ERRORS.append(f"{name}: {sid} still declares 'empty' — split it into emptyFirstRun, "
+                          "emptyNoResults and emptyNoAccess")
+        # A screen that filters must say what no-results looks like. A list with a search box and
+        # one empty state tells a person their data is gone when their filter is just narrow.
+        # Named \, not \ — the parameter is the vocabulary, and shadowing it
+        # here made every component on every screen after the first read as unknown. 218 false
+        # failures from one variable name.
+        screen_kinds = {c.get("kind")
+                        for region in (s.get("layout") or {}).get("regions", [])
+                        for c in region.get("components", [])}
+        if screen_kinds & {"dataTable", "cardList", "searchField", "timeline"} and "emptyNoResults" not in states:
+            WARNINGS.append(f"{name}: {sid} lists or filters and declares no emptyNoResults")
         if offline_capable and "offline" not in states:
             ERRORS.append(f"{name}: {sid} is offline-capable but declares no offline state")
-        if todo := [k for k, v in states.items() if v == "TODO"]:
+        # **Density follows formFactor, not the platform number.** Assigned by platform code on
+        # 18 August, which put the handheld scanner on `compact` — a gate device held in one hand
+        # while the other takes a ticket is not a desktop, and `formFactor` said so all along.
+        want = {"web": "compact", "posTerminal": "touchLarge", "kiosk": "touchLarge",
+                "mobileApp": "comfortable", "handheld": "comfortable",
+                "wearable": "comfortable"}.get(doc["platform"].get("formFactor"))
+        if want and s.get("density") != want:
+            ERRORS.append(f"{name}: {sid} is density '{s.get('density')}' on a "
+                          f"{doc['platform']['formFactor']} platform — expected '{want}'")
+        if s.get("density") not in ("compact", "comfortable", "touchLarge"):
+            ERRORS.append(f"{name}: {sid} declares no density — a back-office table and a kiosk "
+                          "button grid are not one screen at two widths")
+        if todo := [k for k, v in states.items() if str(v).startswith("TODO")]:
             WARNINGS.append(f"{name}: {sid} has TODO states — {', '.join(todo)}")
         if (s.get("purpose") or "").startswith("TODO"):
             WARNINGS.append(f"{name}: {sid} has no purpose written")

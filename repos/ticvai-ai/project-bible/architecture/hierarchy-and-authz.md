@@ -23,7 +23,7 @@ What the workstation still determines — none of it authorisation:
 
 | Concern | Why device-bound |
 |---|---|
-| Hardware binding | Printer, drawer, scanner, payment terminal are physically attached |
+| Hardware binding | Printer, drawer, venue-scanner, payment terminal are physically attached |
 | Sale Board / landing UI | The F&B terminal opens the F&B board (12 Aug §3) |
 | Till / deposit box identity | Cash reconciles to a drawer, not a person |
 | Access Point inheritance | The gate derives from the workstation, never selected |

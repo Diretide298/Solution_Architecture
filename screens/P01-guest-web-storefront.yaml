@@ -43,7 +43,7 @@ platform:
 screens:
 - id: WEB-001
   name: Home / Landing
-  module: white-label
+  module: Discovery & Browse
   purpose: Show a guest what is on and give them one obvious way to start booking.
   wave: 1
   layout:
@@ -68,8 +68,10 @@ screens:
           a disabled module must not render at all
   states:
     loading: Section skeletons in configured order. Header renders immediately from cache.
-    empty: No sections configured. Shows the tenant contact block rather than a blank page — a storefront
-      with nothing on it should still tell a guest how to reach the venue.
+    emptyFirstRun: No sections configured. Shows the tenant contact block rather than a blank page —
+      a storefront with nothing on it should still tell a guest how to reach the venue.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Config fetch failed. Falls back to the last cached configuration with a dismissible warning.
       A storefront that will not load because branding is unavailable is worse than an unbranded one.
   wireframe:
@@ -104,12 +106,10 @@ screens:
     route: /discovery-and-browse/home-landing
     component: apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx
     status: notStarted
-  modules:
-  - white-label
-  - catalogue
+  density: compact
 - id: WEB-002
   name: Event & Attraction Listing
-  module: catalogue
+  module: Discovery & Browse
   purpose: Browse and filter everything bookable.
   wave: 1
   layout:
@@ -129,8 +129,10 @@ screens:
         notes: Cursor pagination. Infinite scroll with an explicit load-more fallback
   states:
     loading: Card skeletons at the current page size.
-    empty: No products match. Names the most restrictive filter and offers to clear it — an empty state
-      with no action is a dead end.
+    emptyFirstRun: No products match. Names the most restrictive filter and offers to clear it — an
+      empty state with no action is a dead end.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Retry with filters preserved. Filters are never silently reset.
   wireframe:
     status: drafted
@@ -163,11 +165,10 @@ screens:
     contract: catalogue
     purpose: Find something by name
     trigger: onLoad
-  modules:
-  - catalogue
+  density: compact
 - id: WEB-003
   name: Search Results
-  module: catalogue
+  module: Discovery & Browse
   purpose: Find something when the guest does not know what it is called.
   wave: 1
   layout:
@@ -179,8 +180,10 @@ screens:
       - kind: dataTable
   states:
     loading: Results stream in; facets render first
-    empty: '**No results is a real answer.** Offers what is on rather than an empty page, because a
-      guest who searched for a closed attraction still came to buy something'
+    emptyFirstRun: '**No results is a real answer.** Offers what is on rather than an empty page, because
+      a guest who searched for a closed attraction still came to buy something'
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Search unavailable. Falls back to browsing the catalogue
   wireframe:
     status: drafted
@@ -210,11 +213,10 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  modules:
-  - catalogue
+  density: compact
 - id: WEB-004
   name: Event / Attraction Detail
-  module: catalogue
+  module: Discovery & Browse
   purpose: Decide whether to book this.
   wave: 1
   layout:
@@ -235,7 +237,8 @@ screens:
         notes: Disabled with a stated reason when not sellable
   states:
     loading: Detail skeleton with the image slot reserved to avoid layout shift.
-    empty: Not applicable — a product either exists or the screen is notFound.
+    emptyFirstRun: Not applicable — a product either exists or the screen is notFound.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Product unavailable, with a route back to the listing.
   wireframe:
     status: drafted
@@ -266,11 +269,10 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onLoad
-  modules:
-  - catalogue
+  density: compact
 - id: WEB-005
   name: Ticket Type Selection
-  module: promotions
+  module: Booking & Selection
   purpose: Choose which ticket and how many.
   wave: 1
   layout:
@@ -291,7 +293,9 @@ screens:
         label: Continue
   states:
     loading: Variant rows skeleton.
-    empty: No ticket types on sale, with the next on-sale date if known.
+    emptyFirstRun: No ticket types on sale, with the next on-sale date if known.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Pricing unavailable. Continue is blocked rather than showing a stale price.
   wireframe:
     status: drafted
@@ -321,12 +325,10 @@ screens:
     contract: catalogue
     purpose: List generated variants
     trigger: onLoad
-  modules:
-  - promotions
-  - catalogue
+  density: compact
 - id: WEB-006
   name: Date & Session Selection
-  module: catalogue
+  module: Booking & Selection
   purpose: Pick a date and time that has capacity.
   wave: 1
   layout:
@@ -346,7 +348,9 @@ screens:
         label: Continue
   states:
     loading: Calendar skeleton with the current month reserved.
-    empty: No sessions in range, with the next available date offered.
+    emptyFirstRun: No sessions in range, with the next available date offered.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Availability unavailable. Selection blocked — overselling is worse than waiting.
   wireframe:
     status: drafted
@@ -374,11 +378,10 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
-  modules:
-  - catalogue
+  density: compact
 - id: WEB-007
   name: Seat Map Selection
-  module: seating
+  module: Booking & Selection
   purpose: Choose specific seats.
   wave: 2
   layout:
@@ -401,7 +404,8 @@ screens:
         label: Continue to checkout
   states:
     loading: Map skeleton at the venue's aspect ratio.
-    empty: No seats available in the selected category.
+    emptyFirstRun: No seats available in the selected category.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Map unavailable, with the option to continue on best-available instead.
   wireframe:
     status: drafted
@@ -433,11 +437,10 @@ screens:
     contract: seating
     purpose: Seat status for a performance
     trigger: onLoad
-  modules:
-  - seating
+  density: compact
 - id: WEB-008
   name: Add-ons & Upsell
-  module: orders
+  module: Booking & Selection
   purpose: See add-ons & upsell for this venue.
   wave: 2
   layout:
@@ -448,7 +451,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Upsells resolve after the cart is priced
-    empty: No add-ons for this product — the step is skipped entirely rather than shown empty
+    emptyFirstRun: No add-ons for this product — the step is skipped entirely rather than shown empty
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Upsells unavailable. **The purchase continues** — a failed upsell must never block a sale
   wireframe:
     status: drafted
@@ -483,13 +487,10 @@ screens:
     contract: promotions
     purpose: Suggestions for a cart
     trigger: onAction
-  modules:
-  - orders
-  - catalogue
-  - promotions
+  density: compact
 - id: WEB-009
   name: Wishlist
-  module: marketing-crm
+  module: Booking & Selection
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -500,7 +501,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Saved items load
-    empty: Nothing saved — explains what the list is for
+    emptyFirstRun: Nothing saved — explains what the list is for
     error: Could not load
   wireframe:
     status: drafted
@@ -553,11 +554,10 @@ screens:
     - WEB-005
     - WEB-006
     - WEB-007
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-010
   name: Shopping Cart
-  module: orders
+  module: Cart & Checkout
   purpose: Review and confirm what is being bought.
   wave: 1
   layout:
@@ -579,7 +579,8 @@ screens:
         label: Checkout
   states:
     loading: Totals skeleton. Line items render immediately from local state.
-    empty: Empty cart with a route back to browsing.
+    emptyFirstRun: Empty cart with a route back to browsing.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Pricing failed. Checkout blocked rather than proceeding on a stale total.
   wireframe:
     status: drafted
@@ -639,12 +640,10 @@ screens:
     route: /cart-and-checkout/shopping-cart
     component: apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx
     status: notStarted
-  modules:
-  - orders
-  - promotions
+  density: compact
 - id: WEB-011
   name: Guest Details & Attendee Forms
-  module: marketing-crm
+  module: Cart & Checkout
   purpose: Collect who is coming and how to reach them.
   wave: 1
   layout:
@@ -672,7 +671,8 @@ screens:
         label: Continue to payment
   states:
     loading: Form renders immediately; prefill populates when it arrives.
-    empty: Not applicable.
+    emptyFirstRun: Not applicable.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Prefill failed. The form still works, entered manually.
   wireframe:
     status: drafted
@@ -732,11 +732,10 @@ screens:
     route: /cart-and-checkout/guest-details-and-attendee-forms
     component: apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
     status: notStarted
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-012
   name: Checkout — Payment
-  module: orders
+  module: Cart & Checkout
   purpose: Take payment and create the order.
   wave: 1
   layout:
@@ -754,7 +753,8 @@ screens:
         label: Pay now
   states:
     loading: Button enters loading and is disabled. Double submission is impossible.
-    empty: Not applicable.
+    emptyFirstRun: Not applicable.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Declined, with the reason where it is safe to show, and a retry that reuses the same idempotency
       key.
   wireframe:
@@ -797,11 +797,10 @@ screens:
     route: /cart-and-checkout/checkout-payment
     component: apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
     status: notStarted
-  modules:
-  - orders
+  density: compact
 - id: WEB-013
   name: Order Confirmation
-  module: orders
+  module: Cart & Checkout
   purpose: Confirm the purchase and deliver the tickets.
   wave: 1
   layout:
@@ -819,7 +818,8 @@ screens:
         label: Resend confirmation
   states:
     loading: Skeleton. Order number shows immediately from the create response.
-    empty: Not applicable.
+    emptyFirstRun: Not applicable.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Payment succeeded but confirmation did not load. Shows the order number and a support route
       — never implies the purchase failed.
   wireframe:
@@ -854,11 +854,10 @@ screens:
     route: /cart-and-checkout/order-confirmation
     component: apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
     status: notStarted
-  modules:
-  - orders
+  density: compact
 - id: WEB-014
   name: Payment Link Landing
-  module: orders
+  module: Cart & Checkout
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 2
   layout:
@@ -869,7 +868,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Resolving the payment link
-    empty: —
+    emptyFirstRun: —
     error: '**Link expired, already paid, or cancelled — each says which.** A guest following a link
       from an email needs to know whether they are late or whether it worked'
   wireframe:
@@ -901,11 +900,10 @@ screens:
     - WEB-011
     - WEB-012
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: compact
 - id: WEB-015
   name: Virtual Waiting Room
-  module: queue
+  module: High-Demand Access
   purpose: Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting
     room.
   wave: 2
@@ -917,7 +915,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Position in the queue, updating
-    empty: —
+    emptyFirstRun: —
     error: '**Lost the queue position.** The worst failure on this screen: it re-queues rather than
       silently admitting, and says so, because a guest who thinks they lost their place will open a
       second tab and make it worse'
@@ -953,11 +951,10 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  modules:
-  - queue
+  density: compact
 - id: WEB-016
   name: Login / Register
-  module: identity
+  module: Account & Self-Service
   purpose: Get a guest into the app, fast, on a device that may be shared.
   wave: 1
   layout:
@@ -969,7 +966,8 @@ screens:
       - kind: dataTable
   states:
     loading: Checking the session
-    empty: —
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Sign-in failed. Wrong password reads differently from an unavailable identity provider
   wireframe:
     status: drafted
@@ -1080,12 +1078,10 @@ screens:
     - WEB-018
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
-  - orders
+  density: compact
 - id: WEB-017
   name: My Account Dashboard
-  module: marketing-crm
+  module: Account & Self-Service
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -1097,7 +1093,7 @@ screens:
       - kind: chart
   states:
     loading: Tiles skeleton
-    empty: A new account with no orders — offers what to do next
+    emptyFirstRun: A new account with no orders — offers what to do next
     error: Partial. Each tile fails independently
   wireframe:
     status: drafted
@@ -1148,11 +1144,10 @@ screens:
     - WEB-018
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-018
   name: My Tickets
-  module: orders
+  module: Account & Self-Service
   purpose: Find my tickets for this venue.
   wave: 1
   layout:
@@ -1163,7 +1158,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Tickets load
-    empty: No tickets — distinguishes never bought from all past
+    emptyFirstRun: No tickets — distinguishes never bought from all past
     error: Could not load
   wireframe:
     status: drafted
@@ -1191,11 +1186,10 @@ screens:
     - WEB-016
     - WEB-017
     - WEB-019
-  modules:
-  - orders
+  density: compact
 - id: WEB-019
   name: Order History
-  module: orders
+  module: Account & Self-Service
   purpose: Find order history for this venue.
   wave: 1
   layout:
@@ -1207,7 +1201,8 @@ screens:
       - kind: dataTable
   states:
     loading: Orders, newest first
-    empty: No orders yet
+    emptyFirstRun: No orders yet
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
     error: Could not load
   wireframe:
     status: drafted
@@ -1234,11 +1229,10 @@ screens:
     - WEB-017
     - WEB-018
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: compact
 - id: WEB-020
   name: Profile & Preferences
-  module: marketing-crm
+  module: Account & Self-Service
   purpose: Change how profile behaves here, and see which level the current value came from.
   wave: 1
   layout:
@@ -1249,7 +1243,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Profile and consents
-    empty: —
+    emptyFirstRun: —
     error: '**Save failed and the form keeps what was typed.** A consent change that silently did not
       save is a compliance failure, so the screen states it rather than showing success'
   wireframe:
@@ -1302,11 +1296,10 @@ screens:
     - WEB-016
     - WEB-017
     - WEB-018
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-021
   name: Wallet & Gift Cards
-  module: retail
+  module: Membership, Loyalty & Value
   purpose: See wallet & gift cards for this venue.
   wave: 2
   layout:
@@ -1317,7 +1310,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Balance and gift cards
-    empty: No wallet — offers to top up
+    emptyFirstRun: No wallet — offers to top up
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Balance unavailable. **Spending is blocked** rather than attempted against an unknown balance
   wireframe:
     status: drafted
@@ -1352,11 +1346,10 @@ screens:
     contract: retail
     purpose: Check a gift card balance
     trigger: onLoad
-  modules:
-  - retail
+  density: compact
 - id: WEB-022
   name: Membership Plans
-  module: catalogue
+  module: Membership, Loyalty & Value
   purpose: Membership Plans — the screen a person opens when they need to deal with membership plans.
   wave: 2
   layout:
@@ -1367,7 +1360,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Plans load
-    empty: No memberships on sale at this venue
+    emptyFirstRun: No memberships on sale at this venue
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -1398,11 +1392,10 @@ screens:
     contract: catalogue
     purpose: Read a product
     trigger: onLoad
-  modules:
-  - catalogue
+  density: compact
 - id: WEB-023
   name: Membership Management
-  module: orders
+  module: Membership, Loyalty & Value
   purpose: Work with membership management for this venue.
   wave: 2
   layout:
@@ -1414,7 +1407,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Membership and its benefits
-    empty: —
+    emptyFirstRun: —
     error: Could not load. Cancellation and renewal are both blocked
   wireframe:
     status: drafted
@@ -1441,11 +1434,10 @@ screens:
     - WEB-022
     - WEB-024
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: compact
 - id: WEB-024
   name: Loyalty & Rewards
-  module: marketing-crm
+  module: Membership, Loyalty & Value
   purpose: See loyalty & rewards for this venue.
   wave: 3
   layout:
@@ -1456,7 +1448,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Points and rewards
-    empty: No points yet — explains how they accrue
+    emptyFirstRun: No points yet — explains how they accrue
     error: Could not load
   wireframe:
     status: drafted
@@ -1507,11 +1499,10 @@ screens:
     - WEB-023
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-025
   name: Help Centre / FAQ
-  module: white-label
+  module: Engagement & Support
   purpose: Answer a question without needing a person.
   wave: 1
   layout:
@@ -1522,7 +1513,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Articles load
-    empty: No articles — offers contact instead of an empty help centre
+    emptyFirstRun: No articles — offers contact instead of an empty help centre
     error: Could not load
   wireframe:
     status: drafted
@@ -1550,11 +1541,10 @@ screens:
     - WEB-027
     - WEB-028
     inferred: true
-  modules:
-  - white-label
+  density: compact
 - id: WEB-026
   name: Survey & Feedback
-  module: marketing-crm
+  module: Engagement & Support
   purpose: Work with survey & feedback for this venue.
   wave: 3
   layout:
@@ -1565,7 +1555,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Survey loads
-    empty: —
+    emptyFirstRun: —
     error: Could not submit. **The answers are kept** and retried
   wireframe:
     status: drafted
@@ -1592,11 +1582,10 @@ screens:
     - WEB-028
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-027
   name: Newsletter Subscription
-  module: marketing-crm
+  module: Engagement & Support
   purpose: Record newsletter subscription for this venue.
   wave: 2
   layout:
@@ -1607,7 +1596,7 @@ screens:
       - kind: detailPanel
   states:
     loading: —
-    empty: —
+    emptyFirstRun: —
     error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
       the guest believes happened and did not is worse than a visible failure
   wireframe:
@@ -1659,11 +1648,10 @@ screens:
     - WEB-028
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-028
   name: Contact & Venue Information
-  module: white-label
+  module: Engagement & Support
   purpose: Find contact & venue information for this venue.
   wave: 1
   layout:
@@ -1675,7 +1663,7 @@ screens:
       - kind: primaryButton
   states:
     loading: Venue details
-    empty: —
+    emptyFirstRun: —
     error: Could not load. Falls back to the tenant contact details from the cached config
   wireframe:
     status: drafted
@@ -1702,11 +1690,10 @@ screens:
     - WEB-026
     - WEB-027
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - white-label
+  density: compact
 - id: WEB-029
   name: Error / Sold Out / Maintenance
-  module: white-label
+  module: System States
   purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
@@ -1717,7 +1704,7 @@ screens:
       - kind: detailPanel
   states:
     loading: —
-    empty: —
+    emptyFirstRun: —
     error: '**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable
       — three different things a guest must not confuse, because only one means come back later'
   wireframe:
@@ -1744,11 +1731,10 @@ screens:
     inferred: true
     exitTo:
     - WEB-001
-  modules:
-  - white-label
+  density: compact
 - id: WEB-030
   name: Ticket Transfer
-  module: orders
+  module: Ticketing
   purpose: Send a ticket to someone else, and see what you have sent.
   capability: C00
   wave: 1
@@ -1773,7 +1759,9 @@ screens:
     trigger: onLoad
   states:
     loading: Your transferable tickets
-    empty: Nothing transferable — already used, or not transferable by product rule
+    emptyFirstRun: Nothing transferable — already used, or not transferable by product rule
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Transferring is blocked** — sending a ticket you could not read is sending
       the wrong one
   navigation:
@@ -1793,11 +1781,10 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-014. **Not on the wireframe board** — needs drawing. CF-93.
-  modules:
-  - orders
+  density: compact
 - id: WEB-031
   name: My Reservations
-  module: orders
+  module: Ticketing
   purpose: What you have booked and not yet paid for.
   capability: C00
   wave: 2
@@ -1822,7 +1809,9 @@ screens:
     trigger: onAction
   states:
     loading: Reservations, soonest first
-    empty: Nothing reserved
+    emptyFirstRun: Nothing reserved
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Cancelling is blocked
   navigation:
     exitTo:
@@ -1841,11 +1830,10 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.
-  modules:
-  - orders
+  density: compact
 - id: WEB-032
   name: Offers & Promotions
-  module: promotions
+  module: Promotions
   purpose: What is on, and what applies to you.
   capability: C00
   wave: 2
@@ -1870,7 +1858,9 @@ screens:
     trigger: onAction
   states:
     loading: Offers load
-    empty: Nothing running — said plainly rather than shown as an empty page
+    emptyFirstRun: Nothing running — said plainly rather than shown as an empty page
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -1887,11 +1877,10 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.
-  modules:
-  - promotions
+  density: compact
 - id: WEB-033
   name: Shop
-  module: retail
+  module: Retail
   purpose: Merchandise, browsable before you arrive.
   capability: C00
   wave: 2
@@ -1920,7 +1909,9 @@ screens:
     trigger: onAction
   states:
     loading: Products load
-    empty: Nothing available online at this venue
+    emptyFirstRun: Nothing available online at this venue
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Reserving is blocked** — a reservation against unknown stock is a promise
       we cannot keep
   navigation:
@@ -1938,12 +1929,10 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
-  modules:
-  - retail
-  - orders
+  density: compact
 - id: WEB-034
   name: Lost & Found
-  module: marketing-crm
+  module: Support
   purpose: Report something you left behind.
   capability: C00
   wave: 3
@@ -1964,7 +1953,9 @@ screens:
     trigger: onAction
   states:
     loading: Your reports
-    empty: Nothing reported
+    emptyFirstRun: Nothing reported
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not submit. **The report is kept** and retried
   navigation:
     exitTo:
@@ -1981,11 +1972,10 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-001
     designReference: sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf
   notes: Added 17 August for parity with GST-034. **Not on the wireframe board** — needs drawing. CF-93.
-  modules:
-  - marketing-crm
+  density: compact
 - id: WEB-035
   name: Multi-Currency & Pricing
-  module: finance
+  module: Ticketing
   purpose: Compare prices in your own currency before you travel.
   capability: C00
   wave: 1
@@ -2006,8 +1996,10 @@ screens:
     trigger: onLoad
   states:
     loading: Rates and prices, with the base currency shown first
-    empty: One currency configured at this venue — the selector is hidden rather than shown with a single
-      option
+    emptyFirstRun: One currency configured at this venue — the selector is hidden rather than shown
+      with a single option
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
       rate is worse than no rate, because a guest who budgets against it arrives short
   navigation:
@@ -2033,6 +2025,4 @@ screens:
     wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not
     need the venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a
     rate exists only for a currency the venue enabled, so the two questions have one answer.'
-  modules:
-  - finance
-  - catalogue
+  density: compact

@@ -101,6 +101,25 @@ if (!adminCookie) {
   console.log('\ncannot continue without an admin session');
   process.exit(1);
 }
+// A row of the admin's own, for the checks below that need one belonging to
+// somebody other than the client. Made here rather than assuming an id exists:
+// this harness pointed at verdict 1 until the day somebody discarded verdict 1,
+// and then reported a permission failure that was really a missing row.
+// Removed at the end through the same endpoint it is testing.
+let adminVerdictId = null;
+{
+  const made = await fetch(`${API}/api/validation`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie: adminCookie },
+    body: JSON.stringify({
+      target_kind: 'screen', target_id: 'HARNESS-000',
+      verdict: 'needs-work', note: 'written by client-check.mjs, removed by it too',
+    }),
+  });
+  ok(made.ok, `the harness recorded an admin verdict to test against → ${made.status}`);
+  adminVerdictId = made.ok ? (await made.json()).id : null;
+}
+
 {
   const res = await get(V, '/api/decisions', adminCookie);
   ok(res.status === 200, `/api/decisions → ${res.status} (want 200 — an admin may read it)`);
@@ -187,33 +206,131 @@ console.log('\nthe client boundary — asked of the server, not the browser');
      `layers = ${JSON.stringify(session.layers)} (want everything but decisions)`);
 }
 
-// ── 5. read-only, enforced on the server ──────────────────────────────
-console.log('\nread-only');
+// ── 5. a client may review, into its own track ────────────────────
+//
+// A client signing off on what was built for them is the point of showing it
+// to them. What must hold is that their verdict does not become the team's:
+// the audience comes from the role on the session, so it cannot be named by
+// the caller, and the team's standing verdict is unmoved by anything a client
+// records.
+console.log('\nthe client review — allowed, and kept apart');
 {
   const wrote = await fetch(`${API}/api/validation`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', cookie: clientCookie },
     body: JSON.stringify({
       target_kind: 'screen', target_id: 'GST-001',
-      verdict: 'approved', note: 'a client should not be able to say this',
+      verdict: 'approved', note: 'looks right to us',
+      // Named deliberately: the server must ignore it and use the role.
+      audience: 'internal',
     }),
   });
-  ok(wrote.status === 403, `POST /api/validation as a client → ${wrote.status} (want 403)`);
+  ok(wrote.ok, `POST /api/validation as a client → ${wrote.status} (want 200)`);
+  const filed = wrote.ok ? await wrote.json() : {};
+  ok(filed.audience === 'client',
+     `filed under audience=${filed.audience} (want client, whatever was asked for)`);
 
-  // Marking a verdict complete is a second way to write, added after the first
-  // and easy to leave open — it changes a row rather than inserting one, which
-  // is exactly the shape of thing that gets a different decorator by accident.
-  const closed = await fetch(`${API}/api/verdicts/1/done`, {
+  const both = await fetch(`${API}/api/validation/screen/GST-001`).then((r) => r.json());
+  ok(both.client_current?.verdict === 'approved',
+     `client_current = ${both.client_current?.verdict} (want approved)`);
+  ok(!both.current,
+     `the team's current is ${JSON.stringify(both.current)} (want none — a client cannot fill it)`);
+
+  const team = await fetch(`${API}/api/validation?target_kind=screen`).then((r) => r.json());
+  ok(!team.items.some((i) => i.target_id === 'GST-001'),
+     'the default sign-off summary does not carry the client verdict');
+  const theirs = await fetch(`${API}/api/validation?target_kind=screen&audience=client`)
+    .then((r) => r.json());
+  ok(theirs.items.some((i) => i.target_id === 'GST-001'),
+     'asking for audience=client does carry it');
+
+  // Naming somebody delivers a notification to them and to nobody else. The
+  // client's own inbox is checked too: they are mentionable like anyone, and
+  // a note addressed to them is not a route into anything they may not read —
+  // verdicts are never on a Decisions artefact.
+  const named = await fetch(`${API}/api/validation`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie: adminCookie },
+    body: JSON.stringify({
+      target_kind: 'screen', target_id: 'HARNESS-000',
+      verdict: 'needs-work',
+      note: `@${CLIENT_EMAIL.split('@')[0]} please look, and @nobody.at.all is not an account`,
+    }),
+  });
+  const namedBody = named.ok ? await named.json() : {};
+  ok(namedBody.mentioned === 1,
+     `naming a client and a stranger recorded ${namedBody.mentioned} mention (want 1)`);
+
+  const inbox = await fetch(`${API}/api/mentions`, { headers: { cookie: clientCookie } })
+    .then((r) => r.json());
+  ok(inbox.unseen === 1, `the client has ${inbox.unseen} unread mention (want 1)`);
+
+  const gone = await fetch(`${API}/api/verdicts/${namedBody.id}`, {
+    method: 'DELETE', headers: { cookie: adminCookie },
+  });
+  const after2 = await fetch(`${API}/api/mentions`, { headers: { cookie: clientCookie } })
+    .then((r) => r.json());
+  ok(gone.ok && after2.mentions.length === 0,
+     'discarding the note took its notification with it');
+
+  // Rejecting a completion is admin-only, unlike marking one done. Anyone may
+  // say a thing is finished; deciding it is not is a call about somebody
+  // else's work.
+  const sentBack = await fetch(`${API}/api/verdicts/${adminVerdictId}/send-back`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie: clientCookie },
+    body: JSON.stringify({ note: 'not good enough' }),
+  });
+  ok(sentBack.status === 403,
+     `POST send-back on the admin's row as a client → ${sentBack.status} (want 403)`);
+
+  // Discarding is the one thing that removes a row, so both sides of it are
+  // asserted: a client can take back their own, and nobody can take back
+  // anybody else's — not even the admin who invited them. A register of who
+  // signed off on what is only evidence while that is true.
+  const mine = filed.id;
+  const notMine = await fetch(`${API}/api/verdicts/${adminVerdictId}`, {
+    method: 'DELETE', headers: { cookie: clientCookie },
+  });
+  ok(notMine.status === 403,
+     `DELETE somebody else's verdict as a client → ${notMine.status} (want 403)`);
+
+  const adminTries = await fetch(`${API}/api/verdicts/${mine}`, {
+    method: 'DELETE', headers: { cookie: adminCookie },
+  });
+  ok(adminTries.status === 403,
+     `DELETE a client's verdict as the admin → ${adminTries.status} (want 403 — no override)`);
+
+  const ownGone = await fetch(`${API}/api/verdicts/${mine}`, {
+    method: 'DELETE', headers: { cookie: clientCookie },
+  });
+  ok(ownGone.ok, `DELETE your own verdict as a client → ${ownGone.status} (want 200)`);
+
+  const after = await fetch(`${API}/api/validation/screen/GST-001`).then((r) => r.json());
+  ok(!after.client_current,
+     'the discarded verdict is gone from the client review');
+
+  // Closing an item is the team's record of its own queue, and stays theirs.
+  // It changes a row rather than inserting one, which is exactly the shape of
+  // thing that gets the wrong decorator when a neighbouring rule is relaxed —
+  // and the rule next door was just relaxed.
+  const closed = await fetch(`${API}/api/verdicts/${adminVerdictId}/done`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', cookie: clientCookie },
     body: JSON.stringify({ done: true }),
   });
   ok(closed.status === 403,
-     `POST /api/verdicts/1/done as a client → ${closed.status} (want 403)`);
+     `POST done on the admin's row as a client → ${closed.status} (want 403)`);
 }
 
 // ── tidy up ───────────────────────────────────────────────────────────
 console.log('\ncleaning up');
+if (adminVerdictId) {
+  const gone = await fetch(`${API}/api/verdicts/${adminVerdictId}`, {
+    method: 'DELETE', headers: { cookie: adminCookie },
+  });
+  ok(gone.ok, `the harness removed its own admin verdict → ${gone.status}`);
+}
 forgetTestClient('post-clean');
 
 console.log(`\n${failures ? `${failures} FAILURES` : 'all checks passed'}\n`);

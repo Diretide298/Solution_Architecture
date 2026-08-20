@@ -41,10 +41,17 @@ consumers:
   onFailure: retry
   isCritical: false
 - context: queue
-  purpose: Release a held virtual queue slot on entry
+  purpose: Release a held virtual queue slot on entry. **Capacity leaks if this is lost.** A guest who
+    entered still holds a virtual queue slot, and that slot is one nobody can use
   idempotencyKey: scanId
-  onFailure: retry
-  isCritical: false
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 7 days. At scan volume the outbox becomes the largest table in the cell otherwise
-notes: '**High volume — the highest in the platform.** No critical consumer, deliberately: admission
-  already happened at the gate, and nothing downstream can undo it. Everything here is derived.'
+notes: '**High volume — the highest in the platform.** Most consumers are derived and none can undo
+  an admission that already happened at the gate.
+
+
+  **One consumer is critical, and it is not reporting.** `queue` releases a held virtual slot on entry,
+  so losing this event **leaks capacity** — a guest who came in still holds a place nobody else can
+  take. That was added on 17 August and this note still said *no critical consumer* until an external
+  audit caught the contradiction in the same file.'

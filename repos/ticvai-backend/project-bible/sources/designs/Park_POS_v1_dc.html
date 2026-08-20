@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#eef0f3;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0e7a5f;text-decoration:none}a:hover{color:#0a5c47}
+button{font-family:inherit}
+input{font-family:inherit}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#d6dae1;border-radius:8px}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;min-height:760px;font-family:Manrope,system-ui,sans-serif;color:#101828;background:#f5f6f8;overflow:hidden">
+
+  <aside style="width:96px;flex:none;background:#0f1b22;display:flex;flex-direction:column;align-items:center;padding:16px 0 14px;gap:4px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:18px">
+      <div style="width:38px;height:38px;border-radius:11px;background:#19c37d;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#052f22">V</div>
+      <div style="font-size:9px;letter-spacing:.16em;font-weight:700;color:#6f8590">VERDANT</div>
+    </div>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="7">
+      <button onClick="{{ n.go }}" style="{{ n.style }}" style-hover="filter:brightness(1.25)">
+        <div style="{{ n.dot }}"></div>
+        <span style="font-size:10px;font-weight:600;letter-spacing:.02em">{{ n.label }}</span>
+      </button>
+    </sc-for>
+    <div style="margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:6px;color:#93a5ad;font-size:10px;font-weight:600">
+      <div style="width:26px;height:26px;border-radius:8px;border:1px solid #2b3c45"></div>
+      LOG OUT
+    </div>
+  </aside>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+    <header style="height:62px;flex:none;background:#fff;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:18px;padding:0 20px">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;max-width:460px;height:38px;border:1px solid #e4e7ec;border-radius:9px;background:#f8f9fb;padding:0 12px">
+        <div style="width:13px;height:13px;border:1.6px solid #98a2b3;border-radius:50%"></div>
+        <input placeholder="Search tickets, packages, guests, orders…" style="border:0;background:transparent;outline:none;font-size:13px;width:100%;color:#101828">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#98a2b3;border:1px solid #e4e7ec;border-radius:5px;padding:2px 5px;background:#fff">⌘K</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <sc-for list="{{ topActions }}" as="t" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 12px;border-radius:9px;color:#475467" style-hover="background:#f2f4f7">
+            <div style="{{ t.dot }}"></div>
+            <span style="font-size:10px;font-weight:600">{{ t.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:16px">
+        <div style="text-align:right;line-height:1.25">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600">11:59 AM</div>
+          <div style="font-size:10px;color:#667085">Sun, 2 Aug · Gate 3 · POS-01</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;border:1px solid #e4e7ec;border-radius:10px;padding:5px 11px 5px 6px">
+          <div style="width:28px;height:28px;border-radius:8px;background:#dff3e9;color:#0e7a5f;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">JD</div>
+          <div style="line-height:1.2">
+            <div style="font-size:12px;font-weight:700">John Doe</div>
+            <div style="font-size:10px;color:#667085">Cashier · Shift open</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div style="flex:1;display:flex;min-height:0">
+
+      <sc-if value="{{ isCatalogue }}" hint-placeholder-val="{{ true }}">
+      <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+        <div style="padding:16px 20px 0;display:flex;gap:8px;overflow-x:auto">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="7">
+            <button onClick="{{ c.go }}" style="{{ c.style }}" style-hover="border-color:#0e7a5f">
+              <div style="{{ c.chip }}"></div>
+              <span style="font-size:11.5px;font-weight:700;white-space:nowrap">{{ c.label }}</span>
+              <span style="font-size:10px;color:#98a2b3;font-family:'IBM Plex Mono',monospace">{{ c.count }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="padding:14px 20px 10px;display:flex;align-items:center;gap:10px">
+          <div style="display:flex;background:#eceff3;border-radius:8px;padding:3px">
+            <sc-for list="{{ admissionTabs }}" as="a" hint-placeholder-count="3">
+              <button onClick="{{ a.go }}" style="{{ a.style }}">{{ a.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;color:#667085">{{ resultLine }}</div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#475467">
+            <span>Sort</span>
+            <div style="border:1px solid #e4e7ec;border-radius:8px;padding:6px 10px;background:#fff;font-weight:600">Popular ▾</div>
+            <div style="border:1px solid #e4e7ec;border-radius:8px;padding:6px 10px;background:#fff;font-weight:600">Filters</div>
+          </div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:2px 20px 16px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:14px">
+            <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+              <div onClick="{{ p.open }}" style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer" style-hover="border-color:#0e7a5f;box-shadow:0 6px 20px rgba(16,24,40,.08)">
+                <div style="height:104px;position:relative;background:repeating-linear-gradient(135deg,#eef1f4 0 9px,#e5e9ee 9px 18px);display:flex;align-items:flex-end;padding:8px">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8b96a5;background:rgba(255,255,255,.82);border-radius:4px;padding:2px 5px">{{ p.shot }}</span>
+                  <span style="{{ p.chipStyle }}">{{ p.category }}</span>
+                </div>
+                <div style="padding:10px 11px 11px;display:flex;flex-direction:column;gap:7px;flex:1">
+                  <div style="font-size:13px;font-weight:700;line-height:1.25;min-height:32px">{{ p.name }}</div>
+                  <div style="display:flex;gap:9px;font-size:10.5px;color:#667085;font-weight:500">
+                    <span>{{ p.duration }}</span><span>·</span><span>{{ p.audience }}</span>
+                  </div>
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto">
+                    <div>
+                      <div style="font-size:9.5px;color:#98a2b3;font-weight:600;letter-spacing:.04em">FROM</div>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">{{ p.priceLabel }}</div>
+                    </div>
+                    <button onClick="{{ p.add }}" style="width:34px;height:34px;border-radius:9px;border:0;background:#0e7a5f;color:#fff;font-size:19px;line-height:0;cursor:pointer" style-hover="background:#0a5c47">+</button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ showQuickActions }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:none;border-top:1px solid #e4e7ec;background:#fff;padding:10px 20px;display:flex;gap:8px;overflow-x:auto">
+          <sc-for list="{{ quickActions }}" as="q" hint-placeholder-count="6">
+            <button onClick="{{ q.go }}" style="display:flex;align-items:center;gap:8px;border:1px solid #e4e7ec;background:#fff;border-radius:9px;padding:8px 13px;font-size:11.5px;font-weight:700;color:#344054;cursor:pointer;white-space:nowrap" style-hover="background:#f8f9fb;border-color:#0e7a5f">
+              <div style="{{ q.dot }}"></div>{{ q.label }}
+            </button>
+          </sc-for>
+        </div>
+        </sc-if>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 20px">
+        <button onClick="{{ backToCatalogue }}" style="border:1px solid #e4e7ec;background:#fff;border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:700;color:#475467;cursor:pointer;margin-bottom:12px">← Back to catalogue</button>
+        <div style="display:grid;grid-template-columns:262px 1fr;gap:18px;align-items:start">
+          <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;overflow:hidden">
+            <div style="height:150px;background:repeating-linear-gradient(135deg,#eef1f4 0 9px,#e5e9ee 9px 18px);display:flex;align-items:flex-end;padding:9px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8b96a5;background:rgba(255,255,255,.85);border-radius:4px;padding:2px 5px">{{ sel.shot }}</span>
+            </div>
+            <div style="padding:13px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:#0e7a5f">{{ sel.category }}</div>
+              <div style="font-size:17px;font-weight:800;margin:5px 0 8px;line-height:1.2">{{ sel.name }}</div>
+              <div style="font-size:11.5px;color:#475467;line-height:1.55">{{ sel.blurb }}</div>
+              <div style="margin-top:12px;display:flex;flex-direction:column;gap:7px">
+                <sc-for list="{{ sel.facts }}" as="f" hint-placeholder-count="3">
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;border-top:1px solid #f0f2f5;padding-top:7px">
+                    <span style="color:#667085">{{ f.k }}</span><span style="font-weight:700">{{ f.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;padding:14px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:10px">1 · Select date</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ dates }}" as="d" hint-placeholder-count="7">
+                  <button onClick="{{ d.go }}" style="{{ d.style }}">
+                    <div style="font-size:10px;font-weight:700;opacity:.7">{{ d.dow }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">{{ d.day }}</div>
+                    <div style="font-size:9px;opacity:.7">{{ d.mon }}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;padding:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <div style="font-size:12px;font-weight:800">2 · Select time slot</div>
+                <div style="display:flex;gap:12px;font-size:10px;color:#667085;font-weight:600">
+                  <span>● High</span><span style="color:#b4690e">● Medium</span><span style="color:#98a2b3">● Sold out</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">
+                <sc-for list="{{ slots }}" as="s" hint-placeholder-count="8">
+                  <button onClick="{{ s.go }}" style="{{ s.style }}">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600">{{ s.time }}</div>
+                    <div style="font-size:10px;{{ s.availColor }}">{{ s.avail }}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;padding:14px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:10px">3 · Ticket type &amp; quantity</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <sc-for list="{{ ticketTypes }}" as="t" hint-placeholder-count="4">
+                  <div style="{{ t.style }}">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                      <div>
+                        <div style="font-size:12.5px;font-weight:700">{{ t.name }}</div>
+                        <div style="font-size:10.5px;color:#667085">{{ t.note }}</div>
+                      </div>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600">{{ t.price }}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:11px">
+                      <div style="display:flex;align-items:center;gap:9px">
+                        <button onClick="{{ t.dec }}" style="width:30px;height:30px;border-radius:8px;border:1px solid #e4e7ec;background:#fff;font-size:16px;cursor:pointer;color:#344054">−</button>
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;min-width:14px;text-align:center">{{ t.qty }}</span>
+                        <button onClick="{{ t.inc }}" style="width:30px;height:30px;border-radius:8px;border:1px solid #0e7a5f;background:#0e7a5f;color:#fff;font-size:16px;cursor:pointer">+</button>
+                      </div>
+                      <div style="font-size:11px;color:#667085">Subtotal <b style="color:#101828;font-family:'IBM Plex Mono',monospace">{{ t.sub }}</b></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:13px">
+                <div style="font-size:11px;color:#667085">Valid only for the selected date and time slot. Re-entry not permitted.</div>
+                <button onClick="{{ addConfigured }}" style="margin-left:auto;border:0;background:#0e7a5f;color:#fff;border-radius:9px;padding:11px 20px;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:#0a5c47">Add {{ configuredCount }} to cart · {{ configuredTotal }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isPayment }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 20px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:20px;font-weight:800">Payment</div>
+            <div style="font-size:11.5px;color:#667085">Select a method and complete the transaction · Order #TP-40219</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:10px;color:#667085;font-weight:700;letter-spacing:.05em">TOTAL PAYABLE</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600">{{ totalLabel }}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:250px 1fr;gap:16px;align-items:start">
+          <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;padding:13px">
+            <div style="font-size:12px;font-weight:800;margin-bottom:10px">1 · Method</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ methods }}" as="m" hint-placeholder-count="6">
+                <button onClick="{{ m.go }}" style="{{ m.style }}">
+                  <div style="{{ m.dot }}"></div>
+                  <div style="text-align:left">
+                    <div style="font-size:12.5px;font-weight:700">{{ m.name }}</div>
+                    <div style="font-size:10.5px;color:#667085">{{ m.note }}</div>
+                  </div>
+                  <div style="{{ m.check }}"></div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;padding:14px">
+            <div style="font-size:12px;font-weight:800;margin-bottom:11px">2 · {{ methodTitle }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+              <div style="border:1px solid #e4e7ec;border-radius:10px;padding:11px;background:#f8f9fb">
+                <div style="font-size:10.5px;color:#667085;font-weight:700">Total payable</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">{{ totalLabel }}</div>
+              </div>
+              <div style="border:1px solid #cdead9;border-radius:10px;padding:11px;background:#f1faf5">
+                <div style="font-size:10.5px;color:#0e7a5f;font-weight:700">Amount received</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#0e7a5f">{{ receivedLabel }}</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 168px;gap:12px">
+              <div>
+                <div style="border:1px solid #e4e7ec;border-radius:10px;padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;text-align:right;margin-bottom:9px;background:#fff">{{ keypadDisplay }}</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+                  <sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+                    <button onClick="{{ k.go }}" style="{{ k.style }}">{{ k.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:10.5px;font-weight:700;color:#667085">Quick tender</div>
+                <sc-for list="{{ tenders }}" as="t" hint-placeholder-count="5">
+                  <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+                </sc-for>
+                <div style="margin-top:auto;border:1px solid #e4e7ec;border-radius:10px;padding:10px;background:#f8f9fb">
+                  <div style="font-size:10.5px;color:#667085;font-weight:700">Change due</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600">{{ changeLabel }}</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:9px;margin-top:13px">
+              <button onClick="{{ backToCatalogue }}" style="border:1px solid #e4e7ec;background:#fff;border-radius:9px;padding:11px 16px;font-size:12px;font-weight:700;color:#475467;cursor:pointer">Back to cart</button>
+              <button onClick="{{ complete }}" style="flex:1;border:0;background:#0e7a5f;color:#fff;border-radius:9px;padding:12px;font-size:13px;font-weight:800;cursor:pointer" style-hover="background:#0a5c47">Complete payment · change {{ changeLabel }}</button>
+              <button style="border:1px solid #fecdca;background:#fff;color:#b42318;border-radius:9px;padding:11px 16px;font-size:12px;font-weight:700;cursor:pointer">Cancel</button>
+            </div>
+            <sc-if value="{{ paid }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:11px;border:1px solid #cdead9;background:#f1faf5;border-radius:10px;padding:11px 13px;font-size:12px;font-weight:700;color:#0e7a5f">Payment captured · 3 tickets printed · receipt emailed to guest</div>
+            </sc-if>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 20px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:20px;font-weight:800">Staff &amp; shifts</div>
+            <div style="font-size:11.5px;color:#667085">Gate 3 · Sunday, 2 August 2026 · 4 terminals live</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="border:1px solid #e4e7ec;background:#fff;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700;color:#475467;cursor:pointer">Export roster</button>
+            <button style="border:0;background:#0e7a5f;color:#fff;border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer">Begin shift</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
+          <sc-for list="{{ shiftStats }}" as="s" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:13px">
+              <div style="font-size:10.5px;font-weight:700;color:#667085;letter-spacing:.04em">{{ s.label }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;margin-top:6px">{{ s.value }}</div>
+              <div style="font-size:10.5px;color:#667085;margin-top:2px">{{ s.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start">
+          <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;overflow:hidden">
+            <div style="padding:12px 14px;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:10px">
+              <div style="font-size:12.5px;font-weight:800">On duty today</div>
+              <div style="font-size:11px;color:#667085">6 of 8 scheduled</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr .9fr .9fr;padding:9px 14px;font-size:10px;font-weight:700;color:#667085;letter-spacing:.05em;background:#f8f9fb;border-bottom:1px solid #e4e7ec">
+              <div>STAFF</div><div>ROLE / TERMINAL</div><div>SHIFT</div><div>SALES</div><div>STATUS</div>
+            </div>
+            <sc-for list="{{ staff }}" as="s" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr .9fr .9fr;padding:11px 14px;border-bottom:1px solid #f0f2f5;align-items:center;font-size:12px">
+                <div style="display:flex;align-items:center;gap:9px">
+                  <div style="width:30px;height:30px;border-radius:9px;background:#eef1f4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#475467">{{ s.initials }}</div>
+                  <div><div style="font-weight:700">{{ s.name }}</div><div style="font-size:10.5px;color:#667085">{{ s.id }}</div></div>
+                </div>
+                <div><div style="font-weight:600">{{ s.role }}</div><div style="font-size:10.5px;color:#667085">{{ s.terminal }}</div></div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#475467">{{ s.shift }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ s.sales }}</div>
+                <div><span style="{{ s.badge }}">{{ s.status }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;padding:14px">
+              <div style="font-size:12.5px;font-weight:800;margin-bottom:4px">Opening float — POS-01</div>
+              <div style="font-size:11px;color:#667085;margin-bottom:11px">Counted by John Doe at 11:03 AM</div>
+              <sc-for list="{{ floatRows }}" as="f" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:56px 1fr 74px;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #f0f2f5;font-size:11.5px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ f.denom }}</div>
+                  <div style="color:#667085">× {{ f.pieces }} pcs</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">{{ f.amount }}</div>
+                </div>
+              </sc-for>
+              <div style="display:flex;justify-content:space-between;border-top:1.5px solid #101828;margin-top:8px;padding-top:9px;font-size:13px;font-weight:800">
+                <span>Total float</span><span style="font-family:'IBM Plex Mono',monospace">AED 500.00</span>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #e4e7ec;border-radius:13px;padding:14px">
+              <div style="font-size:12.5px;font-weight:800;margin-bottom:9px">Shift activity</div>
+              <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+                <div style="display:flex;gap:9px;padding:7px 0;border-top:1px solid #f0f2f5">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#98a2b3;padding-top:1px">{{ a.time }}</div>
+                  <div style="font-size:11.5px;color:#344054">{{ a.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ showCart }}" hint-placeholder-val="{{ true }}">
+      <aside style="width:334px;flex:none;background:#fff;border-left:1px solid #e4e7ec;display:flex;flex-direction:column">
+        <div style="padding:13px 15px;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:9px">
+          <div style="font-size:14px;font-weight:800">Cart</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;background:#eef1f4;border-radius:6px;padding:2px 7px">{{ cartCount }}</div>
+          <button onClick="{{ clearCart }}" style="margin-left:auto;border:1px solid #e4e7ec;background:#fff;border-radius:7px;padding:5px 9px;font-size:10.5px;font-weight:700;color:#b42318;cursor:pointer">Clear</button>
+        </div>
+        <div style="padding:9px 15px;border-bottom:1px solid #e4e7ec;background:#f1faf5;font-size:11px;font-weight:700;color:#0e7a5f;display:flex;justify-content:space-between">
+          <span>Gold member · Sara Al Mansouri</span><span>{{ discountPctLabel }} off</span>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:10px 15px;display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ cart }}" as="c" hint-placeholder-count="3">
+            <div style="display:flex;gap:10px;border:1px solid #eef1f4;border-radius:11px;padding:9px">
+              <div style="width:44px;height:44px;flex:none;border-radius:8px;background:repeating-linear-gradient(135deg,#eef1f4 0 7px,#e5e9ee 7px 14px)"></div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;gap:6px">
+                  <div style="font-size:12px;font-weight:700;line-height:1.25">{{ c.name }}</div>
+                  <button onClick="{{ c.remove }}" style="border:0;background:transparent;color:#98a2b3;font-size:14px;cursor:pointer;line-height:1">×</button>
+                </div>
+                <div style="font-size:10.5px;color:#667085;margin:2px 0 7px">{{ c.meta }}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <button onClick="{{ c.dec }}" style="width:24px;height:24px;border-radius:7px;border:1px solid #e4e7ec;background:#fff;cursor:pointer;font-size:13px;color:#344054">−</button>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ c.qty }}</span>
+                    <button onClick="{{ c.inc }}" style="width:24px;height:24px;border-radius:7px;border:1px solid #e4e7ec;background:#fff;cursor:pointer;font-size:13px;color:#344054">+</button>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600">{{ c.lineTotal }}</div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px dashed #dfe3e9;border-radius:11px;padding:26px 14px;text-align:center;color:#98a2b3;font-size:11.5px">Cart is empty — tap a product to add tickets.</div>
+          </sc-if>
+        </div>
+        <div style="border-top:1px solid #e4e7ec;padding:12px 15px">
+          <div style="display:flex;gap:7px;margin-bottom:11px">
+            <input placeholder="Promo code" style="flex:1;border:1px solid #e4e7ec;border-radius:8px;padding:8px 10px;font-size:11.5px;outline:none">
+            <button style="border:1px solid #e4e7ec;background:#f8f9fb;border-radius:8px;padding:8px 13px;font-size:11.5px;font-weight:700;cursor:pointer">Apply</button>
+          </div>
+          <sc-for list="{{ summary }}" as="s" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#475467;padding:3px 0">
+              <span>{{ s.k }}</span><span style="font-family:'IBM Plex Mono',monospace;{{ s.tone }}">{{ s.v }}</span>
+            </div>
+          </sc-for>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #e4e7ec;margin-top:8px;padding-top:9px">
+            <span style="font-size:13px;font-weight:800">Total</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">{{ totalLabel }}</span>
+          </div>
+          <button onClick="{{ goPayment }}" style="width:100%;margin-top:11px;border:0;background:#0e7a5f;color:#fff;border-radius:10px;padding:13px;font-size:13.5px;font-weight:800;cursor:pointer" style-hover="background:#0a5c47">Checkout · {{ totalLabel }}</button>
+          <div style="text-align:center;font-size:10.5px;color:#98a2b3;margin-top:7px">Secure checkout · PCI-DSS terminal</div>
+        </div>
+      </aside>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;currency&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;AED&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;memberDiscount&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:5,&quot;min&quot;:0,&quot;max&quot;:25,&quot;step&quot;:1,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;taxIncluded&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showQuickActions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const CATS = ["All","Exhibitions","Experiences","Guided Tours","Shows & Films","Packages","Food"];
+const TONES = {
+  "Exhibitions":["#eaf1fb","#1c4f9c"],"Experiences":["#e9f6ef","#0e7a5f"],"Guided Tours":["#fdf1e3","#b4690e"],
+  "Shows & Films":["#f2eefb","#5b3bb0"],"Packages":["#fdeef1","#b42352"],"Food":["#eef7ec","#3d7a1f"]
+};
+const P = [
+  ["Ancient Civilizations Exhibition","Exhibitions",60,"1–2 hrs","All ages","exhibit hall photo"],
+  ["Ocean Life Aquarium","Exhibitions",90,"1–1.5 hrs","All ages","aquarium tunnel"],
+  ["Sky Coaster Experience","Experiences",120,"20 min","120cm+","coaster photo"],
+  ["Kids Art Workshop","Experiences",75,"45 min","4–12 yrs","workshop photo"],
+  ["Mountain Exploration Tour","Guided Tours",200,"3 hrs","10 yrs+","trail photo"],
+  ["Heritage Walk with Guide","Guided Tours",130,"90 min","All ages","guide with group"],
+  ["Nocturnal Planetarium Show","Shows & Films",45,"40 min","All ages","dome projection"],
+  ["4D Wildlife Film","Shows & Films",35,"25 min","6 yrs+","cinema seats"],
+  ["Full Park Day Pass","Packages",450,"Full day","All ages","park aerial"],
+  ["Family Bundle · 2+2","Packages",690,"Full day","Family","family at gate"],
+  ["Safari Grill Meal Voucher","Food",55,"Any time","All ages","meal tray"],
+  ["Lagoon Café Combo","Food",38,"Any time","All ages","cafe counter"]
+];
+const money = n => "AED " + n.toFixed(2);
+const btn = (on, base) => Object.assign({
+  display:"flex",alignItems:"center",gap:8,border:"1px solid " + (on?"#0e7a5f":"#e4e7ec"),
+  background:on?"#f1faf5":"#fff",borderRadius:10,padding:"9px 12px",cursor:"pointer",color:"#101828"
+}, base||{});
+
+class Component extends DCLogic {
+  state = {
+    screen:"catalogue", cat:"All", adm:"All",
+    cart:[{k:"p0",name:"Ancient Civilizations Exhibition",meta:"Tue 4 Aug · 11:00 AM · Adult",price:60,qty:1},
+          {k:"p8",name:"Full Park Day Pass",meta:"Sun 2 Aug · Adult",price:450,qty:1},
+          {k:"p10",name:"Safari Grill Meal Voucher",meta:"Any time · Standard",price:55,qty:1}],
+    sel:null, dateIdx:0, slotIdx:2, tickets:[2,1,0,0],
+    method:"cash", received:"", paid:false
+  };
+  set = o => this.setState(o);
+
+  addToCart(item, meta, qty) {
+    const q = qty || 1;
+    this.setState(s => {
+      const cart = s.cart.slice();
+      const i = cart.findIndex(c => c.name === item.name && c.meta === meta);
+      if (i >= 0) cart[i] = Object.assign({}, cart[i], {qty: cart[i].qty + q});
+      else cart.push({k:item.name+meta, name:item.name, meta, price:item.price, qty:q});
+      return {cart};
+    });
+  }
+  bump(i, d) {
+    this.setState(s => {
+      const cart = s.cart.slice();
+      const q = cart[i].qty + d;
+      if (q <= 0) cart.splice(i,1); else cart[i] = Object.assign({}, cart[i], {qty:q});
+      return {cart};
+    });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const cur = this.props.currency ?? "AED";
+    const fmt = n => cur + " " + n.toFixed(2);
+    const discPct = this.props.memberDiscount ?? 5;
+    const taxIncluded = this.props.taxIncluded ?? true;
+    const screen = st.screen;
+    const products = P.map((p,i) => ({name:p[0],category:p[1],price:p[2],duration:p[3],audience:p[4],shot:p[5],idx:i}));
+    const visible = products.filter(p => st.cat === "All" || p.category === st.cat);
+
+    const sub = st.cart.reduce((a,c) => a + c.price*c.qty, 0);
+    const disc = sub * discPct/100;
+    const total = sub - disc;
+    const received = parseFloat(st.received || "0") || 0;
+    const change = Math.max(0, received - total);
+
+    const sel = st.sel != null ? products[st.sel] : products[0];
+    const dates = ["Sun|2|Aug","Mon|3|Aug","Tue|4|Aug","Wed|5|Aug","Thu|6|Aug","Fri|7|Aug","Sat|8|Aug"].map((d,i) => {
+      const [dow,day,mon] = d.split("|"); const on = i === st.dateIdx;
+      return {dow,day,mon,go:()=>this.set({dateIdx:i}),style:{width:64,padding:"8px 0",borderRadius:10,textAlign:"center",cursor:"pointer",
+        border:"1px solid "+(on?"#0e7a5f":"#e4e7ec"),background:on?"#0e7a5f":"#fff",color:on?"#fff":"#101828"}};
+    });
+    const slotData = [["09:00 AM",42],["10:00 AM",28],["11:00 AM",36],["12:00 PM",9],["01:00 PM",24],["02:00 PM",0],["03:00 PM",31],["04:00 PM",15]];
+    const slots = slotData.map((s,i) => {
+      const on = i === st.slotIdx, out = s[1] === 0;
+      return {time:s[0], avail: out ? "Sold out" : "Available " + s[1],
+        availColor: out ? "color:#98a2b3" : (s[1] < 15 ? "color:#b4690e" : "color:#0e7a5f"),
+        go: out ? (()=>{}) : (()=>this.set({slotIdx:i})),
+        style:{padding:"9px 10px",borderRadius:10,textAlign:"left",cursor:out?"not-allowed":"pointer",opacity:out?.55:1,
+          border:"1px solid "+(on?"#0e7a5f":"#e4e7ec"),background:on?"#f1faf5":"#fff",color:"#101828"}};
+    });
+    const tt = [["Adult","Ages 13 and above",sel.price],["Child","Ages 3 to 12",Math.round(sel.price*0.62)],
+                ["Senior","Ages 60+",Math.round(sel.price*0.7)],["Infant","Under 3",0]];
+    const ticketTypes = tt.map((t,i) => ({
+      name:t[0], note:t[1], price: t[2] === 0 ? "Free" : fmt(t[2]), qty: st.tickets[i], sub: fmt(t[2]*st.tickets[i]),
+      inc:()=>this.setState(s=>{const q=s.tickets.slice();q[i]++;return{tickets:q}}),
+      dec:()=>this.setState(s=>{const q=s.tickets.slice();q[i]=Math.max(0,q[i]-1);return{tickets:q}}),
+      style:{border:"1px solid "+(st.tickets[i]>0?"#0e7a5f":"#e4e7ec"),background:st.tickets[i]>0?"#f1faf5":"#fff",borderRadius:11,padding:12}
+    }));
+    const cfgCount = st.tickets.reduce((a,b)=>a+b,0);
+    const cfgTotal = tt.reduce((a,t,i)=>a+t[2]*st.tickets[i],0);
+    const slotMeta = dates[st.dateIdx].dow + " " + dates[st.dateIdx].day + " " + dates[st.dateIdx].mon + " · " + slotData[st.slotIdx][0];
+
+    const keys = ["1","2","3","4","5","6","7","8","9",".","0","⌫"].map(k => ({
+      label:k, go:()=>this.setState(s=>({received: k==="⌫" ? s.received.slice(0,-1) : s.received + k, paid:false})),
+      style:{padding:"13px 0",borderRadius:10,border:"1px solid #e4e7ec",background:"#fff",fontSize:17,fontWeight:600,
+        fontFamily:"'IBM Plex Mono',monospace",cursor:"pointer",color:"#101828"}
+    }));
+    const tenderVals = [total, 100, 200, 500, 1000];
+    const tenders = tenderVals.map((v,i) => ({
+      label: i === 0 ? "Exact " + total.toFixed(2) : cur + " " + v,
+      go:()=>this.set({received: v.toFixed(2), paid:false}),
+      style:{padding:"9px 0",borderRadius:9,border:"1px solid #e4e7ec",background:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'IBM Plex Mono',monospace"}
+    }));
+    const methodList = [["cash","Cash","Notes and coins"],["card","Card","Debit or credit"],["wallet","Digital wallet","Apple / Google Pay"],
+      ["gift","Gift card","Redeem voucher"],["link","Payment link","SMS or QR"],["split","Split payment","Two or more methods"]];
+    const methods = methodList.map(m => {
+      const on = st.method === m[0];
+      return {name:m[1], note:m[2], go:()=>this.set({method:m[0]}),
+        style:{display:"flex",alignItems:"center",gap:10,width:"100%",border:"1px solid "+(on?"#0e7a5f":"#e4e7ec"),
+          background:on?"#f1faf5":"#fff",borderRadius:10,padding:"10px 11px",cursor:"pointer"},
+        dot:{width:26,height:26,borderRadius:8,flex:"none",background:on?"#0e7a5f":"#eef1f4"},
+        check:{marginLeft:"auto",width:15,height:15,borderRadius:"50%",border:"1.5px solid "+(on?"#0e7a5f":"#d0d5dd"),background:on?"#0e7a5f":"#fff"}};
+    });
+
+    const navItems = [["catalogue","SELL"],["catalogue","TICKETS"],["catalogue","PACKAGES"],["detail","SCHEDULE"],
+      ["payment","PAYMENTS"],["staff","STAFF"],["staff","REPORTS"]];
+    const nav = navItems.map((n,i) => {
+      const on = (screen === n[0]) && ((screen === "catalogue" && i === 0) || (screen === "detail" && i === 3) || (screen === "payment" && i === 4) || (screen === "staff" && i === 5));
+      return {label:n[1], go:()=>this.set({screen:n[0]}),
+        style:{width:72,display:"flex",flexDirection:"column",alignItems:"center",gap:5,padding:"9px 0",borderRadius:11,
+          border:0,cursor:"pointer",background:on?"#1c3540":"transparent",color:on?"#fff":"#8ea0a9"},
+        dot:{width:19,height:19,borderRadius:6,background:on?"#19c37d":"#33454e"}};
+    });
+
+    return {
+      isCatalogue: screen === "catalogue", isDetail: screen === "detail", isPayment: screen === "payment", isStaff: screen === "staff",
+      showCart: screen === "catalogue" || screen === "detail",
+      showQuickActions: this.props.showQuickActions ?? true,
+      nav,
+      topActions: [["Scan"],["Guests"],["Orders"],["Alerts"]].map(t => ({label:t[0], dot:{width:18,height:18,borderRadius:6,background:"#eef1f4"}})),
+      cats: CATS.map(c => {
+        const on = st.cat === c, tone = TONES[c] || ["#eef1f4","#475467"];
+        return {label:c, count: c === "All" ? P.length : P.filter(p=>p[1]===c).length, go:()=>this.set({cat:c}),
+          style:{display:"flex",alignItems:"center",gap:8,padding:"9px 13px",borderRadius:11,cursor:"pointer",
+            border:"1px solid "+(on?"#0e7a5f":"#e4e7ec"),background:on?"#f1faf5":"#fff",color:"#101828"},
+          chip:{width:22,height:22,borderRadius:7,background:tone[0],border:"1px solid "+tone[1]+"22"}};
+      }),
+      admissionTabs: ["All","General admission","Timed entry"].map(a => ({label:a, go:()=>this.set({adm:a}),
+        style:{border:0,borderRadius:6,padding:"6px 12px",fontSize:11.5,fontWeight:700,cursor:"pointer",
+          background: st.adm===a?"#fff":"transparent", color: st.adm===a?"#101828":"#667085",
+          boxShadow: st.adm===a?"0 1px 2px rgba(16,24,40,.1)":"none"}})),
+      resultLine: visible.length + " products · " + (st.cat === "All" ? "all categories" : st.cat),
+      products: visible.map(p => ({
+        name:p.name, category:p.category, duration:p.duration, audience:p.audience, shot:p.shot,
+        priceLabel: fmt(p.price),
+        chipStyle:{position:"absolute",top:8,left:8,fontSize:9.5,fontWeight:700,padding:"3px 7px",borderRadius:6,
+          background:TONES[p.category][0], color:TONES[p.category][1]},
+        open:()=>this.set({screen:"detail", sel:p.idx}),
+        add:(e)=>{ if(e && e.stopPropagation) e.stopPropagation(); this.addToCart(p, "Sun 2 Aug · Standard", 1); }
+      })),
+      quickActions: [["Quick add"],["Open orders"],["Hold order"],["Discount"],["Reprint ticket"],["Shift summary"]].map(q => ({
+        label:q[0], go:()=>{}, dot:{width:15,height:15,borderRadius:5,background:"#eef1f4"}})),
+      sel: {name:sel.name, category:sel.category, shot:sel.shot,
+        blurb:"Timed-entry admission with capacity management. Guests scan at the gate; wristbands are issued on entry.",
+        facts:[{k:"Duration",v:sel.duration},{k:"Audience",v:sel.audience},{k:"Capacity left",v:"186 of 400"},{k:"Location",v:"Zone B · Gate 3"}]},
+      dates, slots, ticketTypes,
+      configuredCount: cfgCount, configuredTotal: fmt(cfgTotal),
+      addConfigured: () => { if (cfgCount > 0) { this.addToCart({name:sel.name, price: Math.round(cfgTotal/Math.max(1,cfgCount))}, slotMeta + " · " + cfgCount + " pax", cfgCount); this.set({screen:"catalogue"}); } },
+      backToCatalogue: () => this.set({screen:"catalogue"}),
+      goPayment: () => this.set({screen:"payment", received:"", paid:false}),
+      complete: () => this.set({paid:true}),
+      clearCart: () => this.set({cart:[]}),
+      cart: st.cart.map((c,i) => ({name:c.name, meta:c.meta, qty:c.qty, lineTotal: fmt(c.price*c.qty),
+        inc:()=>this.bump(i,1), dec:()=>this.bump(i,-1), remove:()=>this.setState(s=>{const x=s.cart.slice();x.splice(i,1);return{cart:x}})})),
+      cartEmpty: st.cart.length === 0,
+      cartCount: st.cart.reduce((a,c)=>a+c.qty,0),
+      discountPctLabel: discPct + "%",
+      summary: [{k:"Subtotal (" + st.cart.reduce((a,c)=>a+c.qty,0) + " items)", v: fmt(sub), tone:""},
+                {k:"Member discount (" + discPct + "%)", v:"− " + fmt(disc), tone:"color:#0e7a5f"},
+                {k: taxIncluded ? "VAT 5% (included)" : "VAT 5%", v: fmt(sub*0.05), tone:"color:#667085"}],
+      totalLabel: fmt(total),
+      receivedLabel: fmt(received),
+      changeLabel: fmt(change),
+      keypadDisplay: st.received === "" ? "0.00" : st.received,
+      keys, tenders, methods,
+      methodTitle: st.method === "cash" ? "Cash tendered" : "Charge to " + (methodList.find(m=>m[0]===st.method)||["","card"])[1].toLowerCase(),
+      paid: st.paid,
+      shiftStats: [{label:"GROSS SALES",value:fmt(18420.5),sub:"142 transactions"},{label:"CASH IN DRAWER",value:fmt(4310),sub:"float AED 500.00"},
+        {label:"TICKETS ISSUED",value:"389",sub:"62 timed entry"},{label:"AVG BASKET",value:fmt(129.7),sub:"+8.4% vs yesterday"}],
+      staff: [["JD","John Doe","EMP-2041","Cashier","POS-01 · Gate 3","11:00 – 19:00",fmt(6120),"On duty"],
+        ["SA","Sara Aziz","EMP-2088","Cashier","POS-02 · Gate 3","09:00 – 17:00",fmt(5240),"On duty"],
+        ["MR","Marco Ruiz","EMP-1902","Supervisor","Floor · Zone B","09:00 – 18:00",fmt(0),"On duty"],
+        ["LN","Lena Novak","EMP-2130","Guide","Tours desk","10:00 – 16:00",fmt(2180),"On tour"],
+        ["AK","Amir Khan","EMP-2201","Cashier","POS-04 · Food court","12:00 – 20:00",fmt(3760),"Break"],
+        ["TB","Tara Bell","EMP-2255","Host","Shows & Films","13:00 – 21:00",fmt(1120),"Scheduled"]].map(s => {
+        const tone = s[7]==="On duty" ? ["#e9f6ef","#0e7a5f"] : s[7]==="Break" ? ["#fdf1e3","#b4690e"] : s[7]==="On tour" ? ["#eaf1fb","#1c4f9c"] : ["#f2f4f7","#667085"];
+        return {initials:s[0],name:s[1],id:s[2],role:s[3],terminal:s[4],shift:s[5],sales:s[6],status:s[7],
+          badge:{fontSize:10.5,fontWeight:700,padding:"3px 9px",borderRadius:20,background:tone[0],color:tone[1]}};
+      }),
+      floatRows: [["200",1,"200.00"],["100",1,"100.00"],["50",2,"100.00"],["20",2,"40.00"],["10",1,"10.00"],["5",2,"10.00"],["Coins",4,"40.00"]]
+        .map(f => ({denom:f[0], pieces:f[1], amount:f[2]})),
+      activity: [{time:"11:03",text:"John Doe opened shift with AED 500.00 float"},{time:"11:41",text:"Cash drop AED 2,000 to safe · verified by Marco Ruiz"},
+        {time:"12:15",text:"Refund AED 120.00 · order TP-40188 · supervisor approved"},{time:"13:02",text:"Amir Khan started break — POS-04 locked"}]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+{
+ "code": "P14",
+ "name": "Developer Portal",
+ "shortName": "Developer",
+ "app": "developer-portal-web",
+ "operator": "partner",
+ "audience": "partner",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-20",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 8,
+  "operations": 21,
+  "contracts": 1,
+  "modules": 1,
+  "undrawn": 8,
+  "operationsWithNoScreen": 1
+ },
+ "waves": {
+  "wave2": 7,
+  "wave3": 1
+ },
+ "modules": [
+  {
+   "module": "Developer & API",
+   "screens": 8,
+   "waves": [
+    2,
+    3
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "public-api",
+   "operations": 21
+  }
+ ],
+ "screens": [
+  {
+   "id": "DEV-001",
+   "name": "API Reference",
+   "module": "Developer & API",
+   "wave": 2,
+   "route": "/developer/reference",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "DEV-002",
+   "name": "Register & Organisation",
+   "module": "Developer & API",
+   "wave": 2,
+   "route": "/developer/organisation",
+   "operations": 2,
+   "drawn": false
+  },
+  {
+   "id": "DEV-003",
+   "name": "Clients & Credentials",
+   "module": "Developer & API",
+   "wave": 2,
+   "route": "/developer/clients",
+   "operations": 4,
+   "drawn": false
+  },
+  {
+   "id": "DEV-004",
+   "name": "Sandbox",
+   "module": "Developer & API",
+   "wave": 2,
+   "route": "/developer/sandbox",
+   "operations": 3,
+   "drawn": false
+  },
+  {
+   "id": "DEV-005",
+   "name": "Webhooks",
+   "module": "Developer & API",
+   "wave": 2,
+   "route": "/developer/webhooks",
+   "operations": 4,
+   "drawn": false
+  },
+  {
+   "id": "DEV-006",
+   "name": "Usage & Limits",
+   "module": "Developer & API",
+   "wave": 2,
+   "route": "/developer/usage",
+   "operations": 1,
+   "drawn": false
+  },
+  {
+   "id": "DEV-007",
+   "name": "Marketplace Listing",
+   "module": "Developer & API",
+   "wave": 3,
+   "route": "/developer/marketplace",
+   "operations": 2,
+   "drawn": false
+  },
+  {
+   "id": "DEV-008",
+   "name": "Programme Administration",
+   "module": "Developer & API",
+   "wave": 2,
+   "route": "/developer/admin",
+   "operations": 4,
+   "drawn": false
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "issueApiToken",
+    "contract": "public-api",
+    "verb": "POST",
+    "summary": "Exchange a credential for an access token"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "Developer & API",
+    "waves": [
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [
+   {
+    "id": "DEV-001",
+    "name": "API Reference",
+    "wave": 2
+   },
+   {
+    "id": "DEV-002",
+    "name": "Register & Organisation",
+    "wave": 2
+   },
+   {
+    "id": "DEV-003",
+    "name": "Clients & Credentials",
+    "wave": 2
+   },
+   {
+    "id": "DEV-004",
+    "name": "Sandbox",
+    "wave": 2
+   },
+   {
+    "id": "DEV-005",
+    "name": "Webhooks",
+    "wave": 2
+   },
+   {
+    "id": "DEV-006",
+    "name": "Usage & Limits",
+    "wave": 2
+   },
+   {
+    "id": "DEV-007",
+    "name": "Marketplace Listing",
+    "wave": 3
+   },
+   {
+    "id": "DEV-008",
+    "name": "Programme Administration",
+    "wave": 2
+   }
+  ],
+  "flowsNamingAMissingScreen": []
+ }
+}

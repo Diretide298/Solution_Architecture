@@ -5,6 +5,8 @@
 entity: Cell
 contract: subscription
 enum: CellStatus
+enumKind: named
+enumSchema: CellStatus
 owner: control
 initial:
 - provisioning

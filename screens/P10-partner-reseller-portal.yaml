@@ -37,7 +37,7 @@ platform:
 screens:
 - id: PTR-001
   name: Partner Login / MFA
-  module: identity
+  module: TODO
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 2
   layout:
@@ -49,7 +49,9 @@ screens:
       - kind: dataTable
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -121,13 +123,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
-  - orders
-  - subscription
+  density: compact
 - id: PTR-002
   name: Partner Dashboard
-  module: orders
+  module: TODO
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -139,7 +138,8 @@ screens:
       - kind: chart
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -230,11 +230,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
-  modules:
-  - orders
+  density: compact
 - id: PTR-003
   name: Profile & Company Details
-  module: identity
+  module: TODO
   purpose: What we hold about staff, and what they can change.
   wave: 2
   layout:
@@ -245,7 +244,9 @@ screens:
       - kind: detailPanel
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   wireframe:
@@ -285,11 +286,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
+  density: compact
 - id: PTR-004
   name: Notifications
-  module: marketing-crm
+  module: TODO
   purpose: Work with notifications for this venue.
   wave: 3
   layout:
@@ -300,7 +300,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -331,11 +332,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: compact
 - id: PTR-005
   name: Inventory & Allocation View
-  module: orders
+  module: TODO
   purpose: See inventory & allocation view for this venue.
   wave: 2
   layout:
@@ -346,7 +346,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -449,12 +450,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
-  modules:
-  - orders
-  - catalogue
+  density: compact
 - id: PTR-006
   name: Product Catalog (B2B Pricing)
-  module: catalogue
+  module: TODO
   purpose: Find product catalog (b2b pricing) for this venue.
   wave: 2
   layout:
@@ -466,7 +465,9 @@ screens:
       - kind: dataTable
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -557,11 +558,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - catalogue
+  density: compact
 - id: PTR-007
   name: Availability Search
-  module: catalogue
+  module: TODO
   purpose: Find something when the guest does not know what it is called.
   wave: 2
   layout:
@@ -573,7 +573,9 @@ screens:
       - kind: dataTable
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -603,11 +605,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - catalogue
+  density: compact
 - id: PTR-008
   name: Booking Creation
-  module: orders
+  module: TODO
   purpose: Add booking creation for this venue.
   wave: 2
   layout:
@@ -619,7 +620,8 @@ screens:
       - kind: primaryButton
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   wireframe:
     status: drafted
@@ -697,17 +699,16 @@ screens:
     - PTR-002
     - PTR-003
     - PTR-016
-    - SCN-004
+    - SCN-003
     flowDerived: true
     fromFlows: true
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: compact
 - id: PTR-009
   name: Group / Bulk Booking
-  module: seating
+  module: TODO
   purpose: Work with group / bulk booking for this venue.
   wave: 3
   layout:
@@ -718,7 +719,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -757,11 +759,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - seating
+  density: compact
 - id: PTR-010
   name: Cart & Quote
-  module: promotions
+  module: TODO
   purpose: Work with cart & quote for this venue.
   wave: 3
   layout:
@@ -772,7 +773,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -859,12 +861,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - promotions
-  - orders
+  density: compact
 - id: PTR-011
   name: Quote Management
-  module: subscription
+  module: TODO
   purpose: Find quote management for this venue.
   wave: 3
   layout:
@@ -876,7 +876,9 @@ screens:
       - kind: primaryButton
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   wireframe:
@@ -909,11 +911,10 @@ screens:
     contract: subscription
     purpose: What the partner earned and what is owed
     trigger: onLoad
-  modules:
-  - subscription
+  density: compact
 - id: PTR-012
   name: Checkout / Credit Purchase
-  module: orders
+  module: TODO
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 2
   layout:
@@ -925,7 +926,8 @@ screens:
       - kind: primaryButton
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -969,11 +971,10 @@ screens:
     in AED. **`creditLimit` is in the settlement currency**, so a limit in the wrong currency is a limit
     that moves with the exchange rate. Which rate converts the sale is `fxPolicy` and it is a commercial
     term, not a default.
-  modules:
-  - orders
+  density: compact
 - id: PTR-013
   name: Credit Limit & Balance
-  module: orders
+  module: TODO
   purpose: See credit limit & balance for this venue.
   wave: 2
   layout:
@@ -984,7 +985,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -1019,11 +1021,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: compact
 - id: PTR-014
   name: Settlement & Payment History
-  module: finance
+  module: TODO
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 3
   layout:
@@ -1035,7 +1036,9 @@ screens:
       - kind: dataTable
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   wireframe:
@@ -1079,11 +1082,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - finance
+  density: compact
 - id: PTR-015
   name: Order History
-  module: orders
+  module: TODO
   purpose: Find order history for this venue.
   wave: 2
   layout:
@@ -1095,7 +1097,9 @@ screens:
       - kind: dataTable
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -1176,11 +1180,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - orders
+  density: compact
 - id: PTR-016
   name: Voucher / Ticket Download
-  module: orders
+  module: TODO
   purpose: Work with voucher / ticket download for this venue.
   wave: 2
   layout:
@@ -1191,7 +1194,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -1269,11 +1273,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class).
-  modules:
-  - orders
+  density: compact
 - id: PTR-017
   name: Commission Statement
-  module: subscription
+  module: TODO
   purpose: Answer a question about commission with numbers someone can check.
   wave: 3
   layout:
@@ -1284,7 +1287,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   wireframe:
     status: drafted
@@ -1316,11 +1320,10 @@ screens:
     contract: subscription
     purpose: Commercial agreements with B2B partners
     trigger: onLoad
-  modules:
-  - subscription
+  density: compact
 - id: PTR-018
   name: Reports & Sales Performance
-  module: reporting
+  module: TODO
   purpose: Answer a question about reports with numbers someone can check.
   wave: 3
   layout:
@@ -1332,7 +1335,8 @@ screens:
       - kind: chart
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -1391,9 +1395,7 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - reporting
-  - finance
+  density: compact
 - id: PTR-019
   name: API Credentials & Integration
   module: TODO
@@ -1408,7 +1410,7 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
     error: Could not load
   wireframe:
     status: drafted
@@ -1431,9 +1433,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: PTR-020
   name: Sub-Agent Management
-  module: identity
+  module: TODO
   purpose: Add sub-agent management for this venue.
   wave: 3
   layout:
@@ -1445,7 +1448,9 @@ screens:
       - kind: primaryButton
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   wireframe:
@@ -1481,11 +1486,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - identity
+  density: compact
 - id: PTR-021
   name: Support & Contact
-  module: marketing-crm
+  module: TODO
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -1496,7 +1500,8 @@ screens:
       - kind: detailPanel
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   wireframe:
     status: drafted
@@ -1547,5 +1552,4 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
-  modules:
-  - marketing-crm
+  density: compact

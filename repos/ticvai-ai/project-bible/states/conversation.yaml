@@ -1,0 +1,105 @@
+# Conversation — state model
+# Contract: marketing-crm.ConversationState
+# Checked by tools/check-states.py.
+
+entity: Conversation
+contract: marketing-crm
+enum: ConversationState
+enumKind: named
+enumSchema: ConversationState
+owner: marketing-crm
+initial:
+- withAssistant
+- queued
+terminal:
+- resolved
+- abandoned
+- timedOut
+transitions:
+- from: withAssistant
+  to: queued
+  operation: handoverToAgent
+  trigger: operation
+  guard: 22.8.5. **The whole thread goes with it and the guest does not repeat themselves** — a handover
+    that loses context is worse than no assistant, because the effort was already spent
+  emits:
+  - conversation.handedOver
+- from: queued
+  to: withAgent
+  operation: claimConversation
+  trigger: operation
+  guard: '**Claiming is what stops two agents answering the same guest**, which reads as chaos from
+    the guest’s side'
+- from: withAgent
+  to: queued
+  operation: transferConversation
+  trigger: operation
+  guard: Back to a queue for another team. **The context travels again**
+  isReversal: true
+- from: withAgent
+  to: withAgent
+  operation: transferConversation
+  trigger: operation
+  guard: Straight to a named agent, without re-queuing
+- from: withAgent
+  to: waitingOnGuest
+  operation: sendConversationMessage
+  trigger: operation
+  guard: '**The agent answered and the clock stops.** Time waiting on a guest is not time in a queue,
+    and merging them makes the service level unmeasurable'
+- from: waitingOnGuest
+  to: withAgent
+  operation: sendConversationMessage
+  trigger: operation
+  guard: The guest replied
+  isReversal: true
+- from: withAssistant
+  to: resolved
+  operation: closeConversation
+  trigger: operation
+  guard: '**The assistant handled it end to end.** The number that says whether the concierge is worth
+    its tokens'
+- from: withAgent
+  to: resolved
+  operation: closeConversation
+  trigger: operation
+  guard: An agent handled it
+- from: withAgent
+  to: resolved
+  operation: escalateCase
+  trigger: operation
+  guard: Closed by raising a case. **The conversation ends; the problem does not**
+- from: withAssistant
+  to: abandoned
+  trigger: timer
+  guard: The guest left mid-conversation. **Distinct from resolved** — a service-level report that merges
+    them is measuring nothing
+- from: queued
+  to: abandoned
+  trigger: timer
+  guard: '**Left while waiting, which is the worst one.** They asked for a person and gave up before
+    getting one'
+- from: waitingOnGuest
+  to: timedOut
+  trigger: timer
+  guard: The agent answered and nobody came back. Not abandonment — **the guest may simply have been
+    satisfied**
+- from: queued
+  to: withAssistant
+  trigger: timer
+  guard: '**No agent came and the assistant takes it back** rather than leaving the guest with nothing.
+    Only where the venue allows it'
+  isReversal: true
+notes: '**A conversation is not a case.** A case is a ticket measured in hours; this is a live session
+  measured in seconds with somebody waiting. A conversation may create a case (22.8.12); it is not one
+  — and the support screens were wired to `listCases` until 17 August, which left the queue, the routing
+  and the agent state with nowhere to live.
+
+
+  **`withAssistant` and `queued` must not be merged.** Time with a bot is not time in a queue, and only
+  the second has a person waiting.
+
+
+  **`abandoned` from `queued` is the number to watch.** A guest who asked for a person and gave up before
+  getting one is a staffing failure, and it looks identical to a resolved conversation in any report
+  that does not separate them.'

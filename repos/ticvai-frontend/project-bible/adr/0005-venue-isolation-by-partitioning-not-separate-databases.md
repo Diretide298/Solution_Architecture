@@ -5,7 +5,7 @@
 
 ## Context
 
-10 Aug 2026 settled one database per tenant, with all channels connecting to it, so that guest identity and session stay consistent across channels. The question was whether venues within a tenant warrant separate databases.
+10 Aug 2026 settled one database per tenant, with all channels connecting to it, so that guest-app identity and session stay consistent across channels. The question was whether venues within a tenant warrant separate databases.
 
 ## Decision
 
@@ -13,7 +13,7 @@
 
 ## Consequences
 
-- Multi-venue passes with revenue split (12 Aug §16), memberships, wallets, guest identity and consolidated brand reporting all remain single-transaction
+- Multi-venue passes with revenue split (12 Aug §16), memberships, wallets, guest-app identity and consolidated brand reporting all remain single-transaction
 - Partition pruning gives per-venue query isolation; independent archival and vacuum per venue
 - Migration and backup targets stay at one per tenant rather than one per venue
 - **Partitioning gives data isolation, not resource isolation** — venues share a primary. Mitigated by capacity-counter sharding, per-venue rate limits and reserved connection minimums

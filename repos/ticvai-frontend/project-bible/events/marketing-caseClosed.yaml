@@ -1,0 +1,52 @@
+# marketing.caseClosed v1 — published by marketing
+# Checked by tools/check-states.py.
+
+name: marketing.caseClosed
+version: 1
+publisher: marketing
+description: A service case was resolved and closed.
+aggregate: case
+emittedWhen: CaseStatus resolved to closed
+payload:
+- field: caseId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: category
+  type: string
+- field: subject
+  type: string
+- field: resolution
+  type: string
+  notes: What was actually done. **The retrievable part**
+- field: wasEscalated
+  type: boolean
+- field: daysToResolve
+  type: number
+- field: closedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Index the resolution so the next agent can find it
+  idempotencyKey: caseId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Case metrics and SLA
+  idempotencyKey: caseId
+  onFailure: retry
+  isCritical: false
+- context: cache
+  purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
+    invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
+    venue’s behalf, which is worse than a slow one
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: '**Indexed on close, not on resolve.** The reopen window exists because guests come back, and
+  indexing a resolution that gets reopened teaches the assistant an answer that did not work.
+
+
+  **Deliberately non-critical.** If the resolution is not indexed an agent can still find the case in
+  the case list — degraded retrieval, not a broken workflow.'

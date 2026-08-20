@@ -6,8 +6,8 @@ platform:
   code: P12
   audience: staff
   formFactor: web
-  shortName: Staff Web
-  name: Staff Web — Support Console
+  shortName: Venue Support
+  name: Venue Support — Agent Console
   surface: staffFacing
   runtime: reactWeb
   offlineCapable: false
@@ -18,7 +18,7 @@ platform:
   - ltr
   - rtl
   screenCount: 8
-  app: support-console
+  app: venue-support-web
   appStatus: not scaffolded
   packages:
   - design-tokens
@@ -33,11 +33,22 @@ platform:
     deviceOwnership: agent workstation
     networkAssumption: corporate network
     releaseCadence: weekly
+  wireframeBoard: wireframes/P12 Support Console.dc.html
+  reachesOtherPlatforms:
+  - screen: ADM-035
+    platform: P09
+    board: wireframes/P09 Admin Web.dc.html#adm-035
+    note: An agent escalates to platform support
+  - screen: PTR-021
+    platform: P10
+    board: wireframes/P10 Partner Web.dc.html#ptr-021
+    note: A partner query resolved from the partner record
+  operator: venue
 screens:
 - id: SUP-001
   name: Agent Login
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 3
   layout:
     template: list
@@ -47,29 +58,68 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-001
   capability: C35
   apis:
   - operationId: login
     contract: identity
     purpose: from page inventory
     trigger: onLoad
+  - operationId: forceLogout
+    contract: identity
+    purpose: Supervisor termination of an abandoned session
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: listActiveSessions
+    contract: identity
+    purpose: List active sessions
+    trigger: onLoad
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: revokeAllSessions
+    contract: identity
+    purpose: Revoke every session in scope
+    trigger: onAction
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/agent-login
-    component: apps/support-console/src/routes/general/AgentLoginList.tsx
+    component: apps/venue-support-web/src/routes/general/AgentLoginList.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
     inferred: true
+    exitTo:
+    - SUP-002
+    - SUP-003
+    - SUP-004
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: SUP-002
   name: Agent Dashboard
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
     template: dashboard
@@ -79,30 +129,72 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-002
   capability: C32
   apis:
   - operationId: listCases
     contract: marketing-crm
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addCaseMessage
+    contract: marketing-crm
+    purpose: Add a message or internal note
+    trigger: onAction
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+  - operationId: escalateCase
+    contract: marketing-crm
+    purpose: Escalate a case
+    trigger: onAction
+  - operationId: getCase
+    contract: marketing-crm
+    purpose: Read a case with its thread
+    trigger: onLoad
+  - operationId: reopenCase
+    contract: marketing-crm
+    purpose: Reopen a resolved case
+    trigger: onAction
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Assign, reprioritise or resolve a case
+    trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
+  - operationId: setAgentAvailability
+    contract: marketing-crm
+    purpose: An agent goes available, away or offline
+    trigger: onAction
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/agent-dashboard
-    component: apps/support-console/src/routes/general/AgentDashboard.tsx
+    component: apps/venue-support-web/src/routes/general/AgentDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-003
+    - SUP-004
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: SUP-003
   name: Availability & Routing Settings
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Change how availability behaves here, and see which level the current value came from.
   wave: 3
   layout:
     template: form
@@ -112,27 +204,44 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Current values, with the level each resolves from
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-003
   openQuestions:
   - No contract — agent routing not modelled
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/availability-and-routing-settings
-    component: apps/support-console/src/routes/general/AvailabilityAndRoutingSettingsForm.tsx
+    component: apps/venue-support-web/src/routes/general/AvailabilityAndRoutingSettingsForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-004
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: setAgentAvailability
+    contract: marketing-crm
+    purpose: An agent goes available, away or offline
+    trigger: onAction
+  density: compact
 - id: SUP-004
   name: Conversation Queue
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
-  wave: 3
+  purpose: Find the right one quickly, and act on it without opening it.
+  wave: 2
   layout:
     template: list
     regions:
@@ -141,33 +250,81 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-004
   capability: C32
   apis:
   - operationId: listCases
     contract: marketing-crm
     purpose: from page inventory
     trigger: onLoad
+  - operationId: addCaseMessage
+    contract: marketing-crm
+    purpose: Add a message or internal note
+    trigger: onAction
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+  - operationId: escalateCase
+    contract: marketing-crm
+    purpose: Escalate a case
+    trigger: onAction
+  - operationId: getCase
+    contract: marketing-crm
+    purpose: Read a case with its thread
+    trigger: onLoad
+  - operationId: reopenCase
+    contract: marketing-crm
+    purpose: Reopen a resolved case
+    trigger: onAction
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Assign, reprioritise or resolve a case
+    trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
+  - operationId: claimConversation
+    contract: marketing-crm
+    purpose: An agent takes it
+    trigger: onAction
+  - operationId: transferConversation
+    contract: marketing-crm
+    purpose: Pass it to another agent or queue
+    trigger: onAction
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/conversation-queue
-    component: apps/support-console/src/routes/general/ConversationQueueList.tsx
+    component: apps/venue-support-web/src/routes/general/ConversationQueueList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - SUP-001
     exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
     - SUP-005
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101).
+    **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace
+    move; the rest of the console stays Wave 3.
+  density: compact
 - id: SUP-005
   name: Live Chat Workspace
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
-  wave: 3
+  purpose: Work with live chat workspace for this venue.
+  wave: 2
   layout:
     template: detail
     regions:
@@ -175,11 +332,13 @@ screens:
       components:
       - kind: detailPanel
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-005
   capability: C32
   apis:
   - operationId: addCaseMessage
@@ -198,10 +357,38 @@ screens:
     contract: marketing-crm
     purpose: Escalate with a reason
     trigger: onLoad
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+  - operationId: listCases
+    contract: marketing-crm
+    purpose: List service cases
+    trigger: onLoad
+  - operationId: reopenCase
+    contract: marketing-crm
+    purpose: Reopen a resolved case
+    trigger: onAction
+  - operationId: getConversation
+    contract: marketing-crm
+    purpose: One conversation and everything before it
+    trigger: onLoad
+  - operationId: sendConversationMessage
+    contract: marketing-crm
+    purpose: Say something, as a guest or an agent
+    trigger: onAction
+  - operationId: closeConversation
+    contract: marketing-crm
+    purpose: End it
+    trigger: onAction
+  - operationId: transferConversation
+    contract: marketing-crm
+    purpose: Pass it to another agent or queue
+    trigger: onAction
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/live-chat-workspace
-    component: apps/support-console/src/routes/general/LiveChatWorkspaceDetail.tsx
+    component: apps/venue-support-web/src/routes/general/LiveChatWorkspaceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -210,12 +397,20 @@ screens:
     - SUP-005
     inferred: true
     exitTo:
-    - SUP-005
+    - SUP-001
+    - SUP-002
+    - SUP-003
     flowDerived: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
+    with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting
+    can wait.
+  density: compact
 - id: SUP-006
   name: Knowledge Base Search
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find something when the guest does not know what it is called.
   wave: 3
   layout:
     template: list
@@ -225,32 +420,202 @@ screens:
       - kind: searchField
       - kind: dataTable
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-006
   capability: C105
   apis:
   - operationId: listFaqs
     contract: white-label
     purpose: from page inventory
     trigger: onLoad
+  - operationId: createBanner
+    contract: white-label
+    purpose: Create a banner
+    trigger: onAction
+  - operationId: createContentPage
+    contract: white-label
+    purpose: Create a content page
+    trigger: onAction
+  - operationId: createPreview
+    contract: white-label
+    purpose: Generate a preview link
+    trigger: onAction
+  - operationId: createPromoBlock
+    contract: white-label
+    purpose: Create a promotional block
+    trigger: onAction
+  - operationId: deleteBanner
+    contract: white-label
+    purpose: Delete a banner
+    trigger: onAction
+  - operationId: deleteContentPage
+    contract: white-label
+    purpose: Delete a content page
+    trigger: onAction
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: getAppIcons
+    contract: white-label
+    purpose: Read app icon set
+    trigger: onLoad
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: getFeatureToggles
+    contract: white-label
+    purpose: Read tenant feature toggles
+    trigger: onLoad
+  - operationId: getFonts
+    contract: white-label
+    purpose: Read font configuration
+    trigger: onLoad
+  - operationId: getHomepageLayout
+    contract: white-label
+    purpose: Read homepage layout
+    trigger: onLoad
+  - operationId: getModuleEnablement
+    contract: white-label
+    purpose: Read module enablement
+    trigger: onLoad
+  - operationId: getNavigation
+    contract: white-label
+    purpose: Read navigation
+    trigger: onLoad
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: listBanners
+    contract: white-label
+    purpose: List banners
+    trigger: onLoad
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: listContentPages
+    contract: white-label
+    purpose: List custom content pages
+    trigger: onLoad
+  - operationId: listPolicies
+    contract: white-label
+    purpose: List legal policies
+    trigger: onLoad
+  - operationId: listPromoBlocks
+    contract: white-label
+    purpose: List promotional blocks
+    trigger: onLoad
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
+  - operationId: setAppIcons
+    contract: white-label
+    purpose: Set app icons
+    trigger: onAction
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: setFaqs
+    contract: white-label
+    purpose: Set FAQ categories and entries
+    trigger: onAction
+  - operationId: setFeatureToggles
+    contract: white-label
+    purpose: Set feature toggles
+    trigger: onAction
+  - operationId: setFonts
+    contract: white-label
+    purpose: Set fonts
+    trigger: onAction
+  - operationId: setHeader
+    contract: white-label
+    purpose: Configure the header
+    trigger: onAction
+  - operationId: setHomepageLayout
+    contract: white-label
+    purpose: Set homepage section order
+    trigger: onAction
+  - operationId: setLanguages
+    contract: white-label
+    purpose: Set enabled languages and default
+    trigger: onAction
+  - operationId: setMaintenanceMode
+    contract: white-label
+    purpose: Enable or clear maintenance mode
+    trigger: onAction
+  - operationId: setModuleEnablement
+    contract: white-label
+    purpose: Enable or disable modules
+    trigger: onAction
+  - operationId: setNavigation
+    contract: white-label
+    purpose: Set main and overflow navigation
+    trigger: onAction
+  - operationId: setPolicy
+    contract: white-label
+    purpose: Publish a policy version
+    trigger: onAction
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
+  - operationId: updateBanner
+    contract: white-label
+    purpose: Amend or activate a banner
+    trigger: onAction
+  - operationId: updateContentPage
+    contract: white-label
+    purpose: Amend a content page
+    trigger: onAction
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: Validate the working draft
+    trigger: onAction
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/knowledge-base-search
-    component: apps/support-console/src/routes/general/KnowledgeBaseSearchList.tsx
+    component: apps/venue-support-web/src/routes/general/KnowledgeBaseSearchList.tsx
     status: notStarted
   navigation:
     entryFrom:
     - SUP-001
     exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
     - SUP-005
     inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: SUP-007
   name: Canned Response Management
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Find canned response management for this venue.
   wave: 3
   layout:
     template: form
@@ -260,30 +625,46 @@ screens:
       - kind: textField
       - kind: primaryButton
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Current values, with the level each resolves from
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-007
   capability: C60
   apis:
   - operationId: listMessageTemplates
     contract: marketing-crm
     purpose: from page inventory
     trigger: onLoad
+  - operationId: createMessageTemplate
+    contract: marketing-crm
+    purpose: Create a message template
+    trigger: onAction
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/canned-response-management
-    component: apps/support-console/src/routes/general/CannedResponseManagementForm.tsx
+    component: apps/venue-support-web/src/routes/general/CannedResponseManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
 - id: SUP-008
   name: Agent Performance & SLA View
   module: TODO
-  purpose: TODO — one sentence, what the user came here to do
+  purpose: Produce agent performance & sla view for this venue.
   wave: 3
   layout:
     template: dashboard
@@ -293,23 +674,69 @@ screens:
       - kind: metricTile
       - kind: chart
   states:
-    loading: TODO
-    empty: TODO
-    error: TODO
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
   wireframe:
-    status: notStarted
+    status: drafted
+    board: wireframes/P12 Support Console.dc.html#sup-008
   capability: C21
   apis:
   - operationId: runReport
     contract: reporting
     purpose: from page inventory
     trigger: onLoad
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Natural-language reporting query
+    trigger: onAction
+  - operationId: createReport
+    contract: reporting
+    purpose: Create a custom report definition
+    trigger: onAction
+  - operationId: deleteReport
+    contract: reporting
+    purpose: Retire a report definition
+    trigger: onAction
+  - operationId: getFinancialReport
+    contract: finance
+    purpose: P&L, balance sheet or cash flow
+    trigger: onLoad
+  - operationId: getReport
+    contract: reporting
+    purpose: Read a report definition
+    trigger: onLoad
+  - operationId: listReports
+    contract: reporting
+    purpose: List available report definitions
+    trigger: onLoad
+  - operationId: saveNaturalLanguageQuery
+    contract: reporting
+    purpose: Save a natural-language answer as a report definition
+    trigger: onAction
+  - operationId: updateReport
+    contract: reporting
+    purpose: Publish a new version of a definition
+    trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
   implementation:
-    app: support-console
+    app: venue-support-web
     route: /general/agent-performance-and-sla-view
-    component: apps/support-console/src/routes/general/AgentPerformanceAndSlaViewDashboard.tsx
+    component: apps/venue-support-web/src/routes/general/AgentPerformanceAndSlaViewDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
     - SUP-001
     inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact

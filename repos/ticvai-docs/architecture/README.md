@@ -1,14 +1,18 @@
-# Architecture
+# Active
 
-> **Purpose:** Section index  
-> **Owner:** Chinmay + Dinesh  
-> **Status:** Stub
+> **Purpose:** What is in flight now  
+> **Owner:** Chinmay  
+> **Status:** Living
 
-| Page | Covers |
+Current wave, current context, open blockers, this week's gates.
+
+| Page | |
 |---|---|
-| [cells-and-tenancy](cells-and-tenancy.md) | Cell = tenant × jurisdiction |
-| [hierarchy-and-authz](hierarchy-and-authz.md) | Seven levels, deny-overrides-allow |
-| [offline-and-sync](offline-and-sync.md) | Outbox, ordering, conflict policy |
-| [data-model](data-model.md) | Spine aggregates, partitioning, data mask |
-| [ai-platform](ai-platform.md) | Building AI features |
-| [observability](observability.md) | Tracing, metrics, per-venue attribution |
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

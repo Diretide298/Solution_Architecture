@@ -1,64 +1,64 @@
 # Screen definitions
 
-**One file per platform.** A team owns a platform, a platform owns a file, and two teams
-never edit the same one.
+**364 screens across twelve platforms.** Everything inventoried is defined.
 
-    _schema.yaml        the meta-schema — every field and why it exists
-    _components.yaml    the component vocabulary. A `kind` not in here fails validation
-    P01-…yaml           per-platform screen definitions
+Each carries an id, a purpose, a module and wave, the operations it calls, its layout as
+regions and component kinds, its states, its navigation and its implementation path.
 
-    ../tools/check-screens.py
+| | Platform | Purpose | Screens | With ops | States written |
+|---|---|---|---|---|---|
+| P01 | **Guest Web** | Storefront | 29 | 26 | 10 |
+| P02 | **Guest App** | Mobile | 62 | 21 | 2 |
+| P04 | **Staff POS** | Terminal and Tablet | 10 | 10 | 10 |
+| P05 | **Guest Kiosk** | Self-Service | 14 | 11 | 0 |
+| P06 | **Staff App** | Operations | 50 | 7 | 0 |
+| P07 | **Staff Scanner** | Access Control | 16 | 15 | 0 |
+| P08 | **Staff Web** | Venue Back Office | 73 | 5 | 5 |
+| P09 | **Admin Web** | Platform Console | 36 | 24 | 0 |
+| P10 | **Partner Web** | Reseller Portal | 21 | 18 | 0 |
+| P11 | **Public Web** | Accreditation | 8 | 0 | 0 |
+| P12 | **Staff Web** | Support Console | 8 | 7 | 0 |
+| P13 | **Staff Web** | White-Label CMS | 20 | 0 | 0 |
+| | | | **347** | **144** | **27** |
 
-## What these are for
+## Two levels of done
 
-They sit between the page inventory and the wireframes. The inventory answers *what screens
-exist*; these answer *what is on them* — regions, components, states, navigation, and the
-permissions that gate each one.
+**Defined** means the screen exists with a purpose, a route and navigation. All 347 are.
 
-A wireframe is authoritative for how a screen looks. It is a poor source for what a screen
-*does*: which endpoint fills each region, what happens when that endpoint returns empty,
-which permission hides a button. Those answers live here, and a designer and an engineer
-reading the same file cannot drift.
+**Specified** means it also names its operations, its components and its states. **Twenty-seven
+are.** The difference is not cosmetic: the states are where the behaviour lives, and on an
+offline surface the offline state is the most important line on the page.
 
-This is the contract a wireframe implements, in the same sense OpenAPI is the contract an
-endpoint implements.
+167 of these arrived on 14 August, extracted from the wireframe boards in `wireframes/`. The
+boards carry real purposes and real navigation, so those are real. They carry no states,
+because a picture does not say what happens when the network dies.
 
-## What validation catches
+## Reading a definition
 
-| Check | Why it matters |
-|---|---|
-| **Component vocabulary** | A screen calling for `fancyDatePickerV2` either needs it adding deliberately, or is asking for something the design system already has. Free-text names are how a product ends up with four date pickers |
-| **operationIds resolve** | Catches a wireframe drawn against an endpoint that does not exist. The expensive one — it survives design review, survives estimation, and surfaces at build |
-| **Four states** | `loading`, `empty`, `error`, and `offline` where the platform is offline-capable. The empty state is the one that reaches production unconsidered |
-| **Navigation resolves** | Every entry and exit points at a screen that exists |
+```yaml
+id: SCN-004
+name: Admitted
+purpose: ...            # why the screen exists
+apis:                   # validated against 689 operations
+  - operationId: validateAccess
+layout:
+  template: fullscreen
+  regions: [...]        # vocabulary from _components.yaml, 34 kinds
+states:
+  offline: ...          # required on offline-capable platforms
+navigation:
+  exitTo: [SCN-003]     # checked against the flows
+implementation:
+  app: venue-scanner
+  route: /access/admitted
+```
 
-`operationIds` validate against all 554 in the contracts. That link is the point of the
-exercise, and it caught two wrong ids on first run — `listVariants` (actually
-`listProductVariants`) and `inquirePayment` (actually `inquirePaymentStatus`). Both looked
-right and neither existed.
+`check-screens.py` validates the component vocabulary, every operation id, required states,
+navigation resolution, and that a `posTerminal` or `handheld` platform declares
+`offlineCapable` — a gate that cannot validate without a network is a queue.
 
-## Status
+## What to do next
 
-| Platform | Screens | Detail |
-|---|---|---|
-| P01 Guest Web Storefront | 29 | **Purchase path fully specified** (WEB-001→013) |
-| P09 Platform Admin Console | 36 | Structure and open questions |
-| P10 Partner & Reseller Portal | 21 | Structure and open questions |
-| P11 Accreditation Portal | 8 | **Blocked** on the workshop |
-| P12 Support Agent Console | 8 | Structure and open questions |
-
-The 203 screens on platforms that have UI/UX boards are not here yet — the boards are more
-detailed than these files would be, and converting them is worth doing when the wireframes
-are next revised, not before.
-
-Warnings are expected on anything not yet detailed. **Errors are not** — a TODO state is a
-warning; an unknown component or a dangling operationId is a failure.
-
-## Open questions that block work
-
-- **Wishlist** (WEB-009) has no contract anywhere. Add it or drop the screen
-- **Virtual Waiting Room** (WEB-015) is Q2 infrastructure, not the Q1 queue contract
-- **Seat maps with no geometry** (WEB-007) — does the storefront fall back to a category
-  list, or refuse the seated flow?
-- **19 of 36 Platform Admin screens** have no contract. Thirteen are the release-management
-  scope raised on 30 July that never reached a requirement
+**Write the states before writing more screens.** Sixteen venue-scanner screens have `TODO` offline
+states and the venue-scanner is the surface where offline matters most. P07 and P04 together are
+twenty-six screens and would take the specified count from 27 to 43.

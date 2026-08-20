@@ -26,15 +26,24 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+# The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
+# outside the package, so every validator passed for whoever had that repo checked out and read
+# nothing for anyone working from the zip — which is the worst failure a checker can have, because
+# it is silent and it looks like success.
+CONTRACTS = ROOT / "contracts"
 if not CONTRACTS.exists():
-    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+    CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
 
+#  joined on 18 August (CF-138). **Restricted to F&B and retail** — the client decided
+# their configuration belongs at outlet, and no other domain trades from a place inside a venue.
 VALID = ("tenant", "region", "venue")
-RANK = {"tenant": 0, "region": 1, "venue": 2, "department": 3, "sub_department": 4, "workstation": 5}
+OUTLET_DOMAINS = ("fnb", "retail")
+# Outlet sits below venue on the commercial branch, beside department on the organisational one.
+# Both are depth 3; neither is an ancestor of the other.
+RANK = {"tenant": 0, "region": 1, "venue": 2, "department": 3, "outlet": 3, "sub_department": 4, "workstation": 5}
 
 # Settled and not open to preference. ADR-0018, and ADR-0008 / ADR-0006 before it.
 MUST_BE_REGION = re.compile(
@@ -62,7 +71,7 @@ def main() -> int:
     by_scope: dict[str, int] = {}
 
     for f in files:
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         for path, item in (doc.get("paths") or {}).items():
             if not isinstance(item, dict):
                 continue
@@ -85,10 +94,22 @@ def main() -> int:
                 tagged += 1
                 by_scope[scope] = by_scope.get(scope, 0) + 1
 
-                if scope not in VALID:
-                    ERRORS.append(f"{f.stem}.{oid}: config scope '{scope}' — only tenant, "
-                                  "region and venue configure. Below venue you assign a "
-                                  "profile, you do not configure one")
+                # `outlet` is valid only in F&B and retail. Those two trade from a place inside
+                # a venue — a restaurant has its own menu and a shop its own range — and the
+                # client moved their configuration there on 18 August (CF-138). **Everywhere else
+                # venue is still the floor**, because the argument that produced that rule was
+                # about workstations, and a workstation is a device rather than a business.
+                allowed = VALID + (("outlet",) if f.stem in OUTLET_DOMAINS else ())
+                if scope not in allowed:
+                    if scope == "outlet":
+                        ERRORS.append(f"{f.stem}.{oid}: config scope 'outlet' outside F&B and "
+                                      "retail. An outlet is where those two trade; no other "
+                                      "domain has one (ADR-0018, amended 18 August)")
+                    else:
+                        ERRORS.append(f"{f.stem}.{oid}: config scope '{scope}' — tenant, region "
+                                      "and venue configure, and outlet configures in F&B and "
+                                      "retail. Below that you assign a profile, you do not "
+                                      "configure one")
                     continue
 
                 caller = op.get("x-ticvai-scope-level")
@@ -105,7 +126,7 @@ def main() -> int:
                                   "one app and one directory (ADR-0006)")
 
     print(f"configuration operations: {total}, tagged {tagged}")
-    for k in VALID:
+    for k in VALID + ("outlet",):
         if by_scope.get(k):
             print(f"  {k:10}{by_scope[k]}")
     print()

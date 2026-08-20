@@ -1,0 +1,55 @@
+# Shop and drop — state model
+# Contract: retail.ShopAndDrop.status
+# Checked by tools/check-states.py.
+
+entity: Shop and drop
+contract: retail
+enum: ShopAndDrop.status
+enumKind: inline
+enumSchema: ShopAndDrop
+enumProperty: status
+owner: retail
+initial:
+- awaitingCollection
+terminal:
+- collected
+- uncollected
+- disposed
+transitions:
+- from: awaitingCollection
+  to: partiallyCollected
+  operation: collectShopAndDrop
+  trigger: operation
+  guard: Some bags taken. **Common with a family splitting up**
+- from: partiallyCollected
+  to: collected
+  operation: collectShopAndDrop
+  trigger: operation
+  guard: The rest taken
+- from: awaitingCollection
+  to: collected
+  operation: collectShopAndDrop
+  trigger: operation
+  guard: All taken at once
+- from: awaitingCollection
+  to: uncollected
+  trigger: timer
+  guard: '**The guest went home without it.** Paid for and belonging to someone — not unsold stock'
+- from: partiallyCollected
+  to: uncollected
+  trigger: timer
+  guard: Part of the order left behind
+- from: uncollected
+  to: collected
+  operation: collectShopAndDrop
+  trigger: operation
+  guard: '**Came back for it the next day.** The reason uncollected is not terminal'
+  isReversal: true
+- from: uncollected
+  to: disposed
+  operation: disposeShopAndDrop
+  trigger: operation
+  guard: Held for the stated period and then disposed of. **The period is venue policy and must be told
+    to the guest at drop-off**
+notes: '`uncollected` is not lost property and not unsold stock. **It is a paid item belonging to a
+  named guest**, and a guest who comes back tomorrow should find it.'

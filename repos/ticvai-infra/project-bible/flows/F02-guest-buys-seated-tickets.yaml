@@ -5,7 +5,6 @@
 id: F02
 name: Guest buys seated tickets
 actor: guest
-capability: C51
 wave: 2
 frequency: daily
 criticality: revenue
@@ -85,3 +84,10 @@ exitStates:
   description: Seats sold, hold converted
 - state: abandoned
   description: Hold expired and seats returned to the pool automatically
+primaryContract: seating
+contracts:
+- seating
+- marketing-crm
+- orders
+- catalogue
+- promotions

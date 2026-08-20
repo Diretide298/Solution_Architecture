@@ -68,11 +68,11 @@ lease over specific seats at a gate is not worth the complexity.
 | Step | |
 |---|---|
 | 1 | Write to a local **write-ahead journal** |
-| 2 | **Commit before the cashier is acknowledged.** The guest is not waiting on a network |
+| 2 | **Commit before the cashier is acknowledged.** The guest-app is not waiting on a network |
 | 3 | Idempotent, ordered sync on reconnect — the existing outbox |
 | 4 | **Server re-prices every line on ingest** |
 
-Step 4 is the integrity guarantee. The local price gives the guest an immediate, correct
+Step 4 is the integrity guarantee. The local price gives the guest-app an immediate, correct
 answer; the server remains authoritative for the ledger.
 
 ### 4. Deployment profiles — configuration, not architecture
@@ -161,16 +161,16 @@ against stale data.
 
 **Server re-prices on ingest. What happens when it disagrees?**
 
-The guest was quoted and charged a local price. The server computes a different one — a
+The guest-app was quoted and charged a local price. The server computes a different one — a
 promotion expired, a price list changed, a tax rule updated between bundle and sync.
 
 | Option | Consequence |
 |---|---|
 | **Honour the quoted price** | Guest experience intact. Ledger records a variance against list. Requires a variance account and a reporting line |
-| Reject the transaction | Unacceptable — the guest has left with the ticket |
-| Post the server price | The guest was charged one amount and the ledger says another. Reconciliation nightmare |
+| Reject the transaction | Unacceptable — the guest-app has left with the ticket |
+| Post the server price | The guest-app was charged one amount and the ledger says another. Reconciliation nightmare |
 
-**Recommendation: honour the quoted price, post the variance.** The guest transaction is
+**Recommendation: honour the quoted price, post the variance.** The guest-app transaction is
 already complete and irreversible; the ledger's job is to record what happened, not what
 should have happened.
 
@@ -217,7 +217,7 @@ the two artefacts describe one design rather than two.
 
 - `Envelope` gains channel allocations. `AcquireLeaseRequest` gains an optional channel;
   the session's channel is used when it is omitted
-- Availability is reported **per channel**, not only in total. A guest seeing "sold out"
+- Availability is reported **per channel**, not only in total. A guest-app seeing "sold out"
   online while seats remain at the counter is correct behaviour, not a defect
 - Unsold channel allocation may be released back to a general pool at a configured time
   before the performance — the standard mechanism for freeing OTA holds close to the event

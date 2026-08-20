@@ -1,0 +1,47 @@
+# assets.documentIndexed v1 — published by assets
+# Checked by tools/check-states.py.
+
+name: assets.documentIndexed
+version: 1
+publisher: assets
+description: Text was extracted from an uploaded document and is ready to embed.
+aggregate: mediaAsset
+emittedWhen: MediaStatus processing to ready, where the asset is a document
+payload:
+- field: assetId
+  type: uuid
+- field: tenantId
+  type: uuid
+- field: title
+  type: string
+- field: mimeType
+  type: string
+- field: pageCount
+  type: integer
+- field: extractedChars
+  type: integer
+  notes: '**Zero means a scanned image with no OCR.** Indexing it embeds nothing and silently returns
+    no results'
+- field: containsPersonalData
+  type: boolean
+  notes: Set by the scan. If true, indexing is refused unless the policy permits it
+- field: indexedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Embed the extracted text. **The only consumer.** If it is lost the document is never retrievable,
+    which is the whole reason it was uploaded
+  idempotencyKey: assetId + indexedAt
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: cache
+  purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
+    invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
+    venue’s behalf, which is worse than a slow one
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: Separate from `media.uploaded` because extraction happens after upload and an event fired too
+  early indexes an empty document. **`extractedChars` of zero is the common failure** — a scanned PDF
+  with no OCR looks successful and retrieves nothing.

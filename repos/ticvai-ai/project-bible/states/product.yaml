@@ -5,6 +5,8 @@
 entity: Product
 contract: catalogue
 enum: ProductLifecycleState
+enumKind: named
+enumSchema: ProductLifecycleState
 owner: catalogue
 initial:
 - draft

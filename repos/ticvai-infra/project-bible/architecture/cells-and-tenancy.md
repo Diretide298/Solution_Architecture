@@ -61,10 +61,10 @@ One database per tenant (10 Aug 2026). Venues are isolated by **Postgres list pa
 | Partition pruning | Yes | Yes |
 | Independent archival and vacuum | Yes | Yes |
 | **Single transaction across venues** | **Yes** | No |
-| **One guest identity, one wallet** | **Yes** | No |
+| **One guest-app identity, one wallet** | **Yes** | No |
 | Migration targets | 1 per tenant | 1 per venue |
 
-Five features cross venue boundaries inside one transaction and would need distributed transactions otherwise: multi-venue passes with revenue split (12 Aug §16) · memberships across venues · wallet balances · consistent guest identity (the stated reason for one DB) · consolidated brand reporting (12 Aug §14).
+Five features cross venue boundaries inside one transaction and would need distributed transactions otherwise: multi-venue passes with revenue split (12 Aug §16) · memberships across venues · wallet balances · consistent guest-app identity (the stated reason for one DB) · consolidated brand reporting (12 Aug §14).
 
 Partition the hot tables — orders, order lines, tickets, scan events, payments, ledger entries, F&B orders. Leave shared reference data unpartitioned: guests, products, price lists, roles, entitlement definitions. Those must be visible across venues.
 
@@ -95,4 +95,4 @@ Promotion is an exception path, not the default topology.
 
 Cross-tenant and cross-region reporting is served from a central warehouse fed by per-cell event export of aggregated, pseudonymised data. **Cells are never queried directly.**
 
-See [compliance/data-residency](../compliance/data-residency.md).
+See compliance/data-residency.

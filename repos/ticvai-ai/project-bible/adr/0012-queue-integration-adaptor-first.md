@@ -1,6 +1,6 @@
 # ADR-0012: Queue Integration — Adaptor-First, Vendor Deferred
 
-**Status:** Accepted (partial — vendor selection deferred)
+**Status:** Accepted in part — vendor selection deferred (CF-48)
 **Date:** 13 August 2026
 **Partially closes:** CF-33
 

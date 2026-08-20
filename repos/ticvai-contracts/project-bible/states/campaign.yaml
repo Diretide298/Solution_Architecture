@@ -5,6 +5,8 @@
 entity: Campaign
 contract: marketing-crm
 enum: CampaignStatus
+enumKind: named
+enumSchema: CampaignStatus
 owner: marketing
 initial:
 - draft

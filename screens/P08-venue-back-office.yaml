@@ -20,7 +20,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 91
+  screenCount: 99
   app: venue-management-web
   appStatus: scaffolded
   packages:
@@ -41,7 +41,7 @@ platform:
 screens:
 - id: BO-001
   name: Queue Directory
-  module: queue
+  module: Queue Management
   purpose: See every queue in the venue and whether its data is arriving.
   capability: C05
   wave: 1
@@ -57,7 +57,9 @@ screens:
         notes: Queues whose feed has gone quiet. The first thing a duty manager checks
   states:
     loading: Table skeleton
-    empty: No queues configured, with the action to create one
+    emptyFirstRun: No queues configured, with the action to create one
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Queue service unavailable. Manual wait times can still be set — the fallback must not depend
       on the thing that failed
   wireframe:
@@ -156,12 +158,10 @@ screens:
     - BO-004
     - BO-005
     inferred: true
-  modules:
-  - queue
-  - catalogue
+  density: compact
 - id: BO-002
   name: Queue Configuration
-  module: queue
+  module: Queue Management
   purpose: Create a queue and set how it behaves.
   capability: C05
   wave: 1
@@ -187,7 +187,8 @@ screens:
         label: Save
   states:
     loading: Form skeleton
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Save failed, with the field named. Values are never silently dropped
   wireframe:
     status: drafted
@@ -264,13 +265,10 @@ screens:
     - BO-003
     - BO-004
     fromFlows: true
-  modules:
-  - queue
-  - catalogue
-  - seating
+  density: compact
 - id: BO-003
   name: Queue Integration Setup
-  module: orders
+  module: Queue Management
   purpose: Connect a queue to an on-site system, or leave it on manual entry.
   capability: C05
   wave: 1
@@ -308,7 +306,8 @@ screens:
         label: Save
   states:
     loading: Form skeleton
-    empty: Not applicable
+    emptyFirstRun: Not applicable
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Save failed. The test result stays on screen — losing it forces the configurer to run the
       test again
   wireframe:
@@ -418,13 +417,10 @@ screens:
     - BO-002
     - BO-004
     fromFlows: true
-  modules:
-  - orders
-  - queue
-  - fnb
+  density: compact
 - id: BO-004
   name: Manual Wait Time Entry
-  module: queue
+  module: Queue Management
   purpose: Set a wait time by hand, whether or not a feed exists.
   capability: C05
   wave: 1
@@ -445,7 +441,9 @@ screens:
         label: Publish
   states:
     loading: Rows skeleton. Current values render immediately
-    empty: No queues configured
+    emptyFirstRun: No queues configured
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Publish failed. The entered value is kept on screen
   wireframe:
     status: drafted
@@ -513,12 +511,10 @@ screens:
     - BO-003
     - BO-005
     fromFlows: true
-  modules:
-  - queue
-  - orders
+  density: compact
 - id: BO-005
   name: Queue Monitor
-  module: marketing-crm
+  module: Queue Management
   purpose: Watch queues during operation and call parties forward.
   capability: C05
   wave: 1
@@ -539,7 +535,9 @@ screens:
         label: Call next
   states:
     loading: Tiles skeleton
-    empty: Nobody waiting
+    emptyFirstRun: Nobody waiting
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Live data unavailable. Last known values shown with their age
   wireframe:
     status: drafted
@@ -639,12 +637,10 @@ screens:
     fromFlows: true
   notes: 'Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1
     flow cannot step through a Wave 2 screen.'
-  modules:
-  - marketing-crm
-  - queue
+  density: compact
 - id: BO-006
   name: Parking Configuration
-  module: access
+  module: Parking
   purpose: Change how parking behaves here, and see which level the current value came from.
   capability: C39
   wave: 2
@@ -657,7 +653,9 @@ screens:
         notes: TODO
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   wireframe:
@@ -699,11 +697,10 @@ screens:
     contract: access
     purpose: Configure a car park and its integration
     trigger: onAction
-  modules:
-  - access
+  density: compact
 - id: BO-007
   name: Product Directory
-  module: catalogue
+  module: Venue Operations
   purpose: Find anything sellable at this venue.
   capability: C00
   wave: 1
@@ -716,7 +713,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -778,11 +776,10 @@ screens:
     contract: catalogue
     purpose: Update a product
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-008
   name: Product Detail & Variants
-  module: finance
+  module: Venue Operations
   purpose: Define what is sold and the ticket types under it.
   capability: C00
   wave: 1
@@ -795,7 +792,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -829,11 +827,10 @@ screens:
     contract: finance
     purpose: Revalue monetary balances at close
     trigger: onAction
-  modules:
-  - finance
+  density: compact
 - id: BO-009
   name: Pricing Rules
-  module: catalogue
+  module: Venue Operations
   purpose: Set what something costs, and when that changes.
   capability: C00
   wave: 1
@@ -846,7 +843,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -897,11 +896,10 @@ screens:
     contract: catalogue
     purpose: Amend a price list
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-010
   name: Promotions & Coupons
-  module: promotions
+  module: Venue Operations
   purpose: Issue a code and control what it does.
   capability: C00
   wave: 2
@@ -914,7 +912,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -996,11 +995,10 @@ screens:
     contract: promotions
     purpose: Amend a promotion
     trigger: onAction
-  modules:
-  - promotions
+  density: compact
 - id: BO-011
   name: Packages & Bundles
-  module: catalogue
+  module: Venue Operations
   purpose: Sell several products as one line.
   capability: C00
   wave: 2
@@ -1013,7 +1011,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -1051,11 +1050,10 @@ screens:
     contract: catalogue
     purpose: Report that a workstation applied a bundle
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-012
   name: Membership Products
-  module: catalogue
+  module: Venue Operations
   purpose: Define what a membership includes.
   capability: C00
   wave: 2
@@ -1068,7 +1066,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -1138,11 +1137,10 @@ screens:
     contract: catalogue
     purpose: Update a product
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-013
   name: Channel & Distribution
-  module: catalogue
+  module: Venue Operations
   purpose: Decide where each product can be sold.
   capability: C00
   wave: 2
@@ -1155,7 +1153,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   navigation:
     exitTo:
@@ -1201,11 +1200,10 @@ screens:
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-014
   name: Catalogue Publishing
-  module: catalogue
+  module: Venue Operations
   purpose: Push catalogue changes live, or schedule them.
   capability: C00
   wave: 1
@@ -1218,7 +1216,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -1280,11 +1279,10 @@ screens:
     contract: catalogue
     purpose: Update a product
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-015
   name: Session Calendar
-  module: catalogue
+  module: Venue Operations
   purpose: See what is scheduled and how full it is.
   capability: C00
   wave: 1
@@ -1297,7 +1295,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -1363,12 +1362,10 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
-  modules:
-  - catalogue
-  - seating
+  density: compact
 - id: BO-016
   name: Session Template
-  module: catalogue
+  module: Venue Operations
   purpose: Define the pattern the calendar is generated from.
   capability: C00
   wave: 1
@@ -1381,7 +1378,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -1448,12 +1447,10 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
-  modules:
-  - catalogue
-  - seating
+  density: compact
 - id: BO-017
   name: Capacity Management
-  module: catalogue
+  module: Venue Operations
   purpose: Change how many people a session can take.
   capability: C00
   wave: 1
@@ -1466,7 +1463,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -1513,11 +1512,10 @@ screens:
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-018
   name: Allocation & Holds
-  module: catalogue
+  module: Venue Operations
   purpose: See who is holding capacity, and release it.
   capability: C00
   wave: 2
@@ -1530,7 +1528,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -1572,11 +1571,10 @@ screens:
     contract: catalogue
     purpose: Extend a lease TTL
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-019
   name: Closures & Blackouts
-  module: catalogue
+  module: Venue Operations
   purpose: Stop selling something, for a reason.
   capability: C00
   wave: 2
@@ -1589,7 +1587,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -1655,12 +1654,10 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
-  modules:
-  - catalogue
-  - seating
+  density: compact
 - id: BO-020
   name: Timed Entry Rules
-  module: fnb
+  module: Venue Operations
   purpose: Control how early and how late a ticket admits.
   capability: C00
   wave: 2
@@ -1673,7 +1670,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -1743,11 +1742,10 @@ screens:
     contract: fnb
     purpose: Configure stations and item routing
     trigger: onAction
-  modules:
-  - fnb
+  density: compact
 - id: BO-021
   name: Order Search
-  module: fnb
+  module: Venue Operations
   purpose: Find any order taken at this venue.
   capability: C00
   wave: 1
@@ -1760,7 +1758,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   navigation:
     exitTo:
@@ -1790,11 +1789,10 @@ screens:
     contract: fnb
     purpose: Track an order
     trigger: onLoad
-  modules:
-  - fnb
+  density: compact
 - id: BO-022
   name: Order Detail
-  module: orders
+  module: Venue Operations
   purpose: See everything about one order in one place.
   capability: C00
   wave: 1
@@ -1807,7 +1805,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -1885,11 +1884,10 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-023
   name: Refunds & Exchanges
-  module: orders
+  module: Venue Operations
   purpose: Give money back, or move the booking.
   capability: C00
   wave: 1
@@ -1902,7 +1900,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -1981,11 +1980,10 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-024
   name: Payment Exceptions
-  module: orders
+  module: Venue Operations
   purpose: Resolve payments that never resolved themselves.
   capability: C00
   wave: 1
@@ -1998,7 +1996,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -2040,11 +2039,10 @@ screens:
     contract: orders
     purpose: Ask the provider what actually happened
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-025
   name: Chargebacks & Disputes
-  module: finance
+  module: Venue Operations
   purpose: Answer the acquirer with the evidence attached.
   capability: C00
   wave: 2
@@ -2057,7 +2055,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -2099,11 +2098,10 @@ screens:
     contract: finance
     purpose: List settlement batches
     trigger: onLoad
-  modules:
-  - finance
+  density: compact
 - id: BO-026
   name: Group Bookings
-  module: orders
+  module: Venue Operations
   purpose: Handle a booking that arrives as a school, not a guest.
   capability: C00
   wave: 2
@@ -2116,7 +2114,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -2194,11 +2193,10 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-027
   name: Reissue & Media Replacement
-  module: assets
+  module: Venue Operations
   purpose: Replace media a guest has lost or damaged.
   capability: C00
   wave: 2
@@ -2211,7 +2209,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   navigation:
     exitTo:
@@ -2229,64 +2228,34 @@ screens:
     status: drafted
     owner: wireframe board
     board: wireframes/P08 Staff Web Back Office.dc.html#bo-027
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **8 assets
+    operations removed 18 August (CF-114).** The whole media contract was attached to this screen. **A
+    till adding an item to a ticket does not manage a media library** — it reads the asset it needs
+    and nothing else. Same shape as CF-87, one level up: that attached sibling operations, this attached
+    a whole contract.'
   apis:
   - operationId: getMediaEntitlements
     contract: orders
     purpose: What is already on this media
     trigger: onLoad
-  - operationId: searchMedia
-    contract: assets
-    purpose: Search the asset library
-    trigger: onLoad
   - operationId: appendEntitlementToMedia
     contract: orders
     purpose: Add something to a ticket the guest already holds
     trigger: onAction
-  - operationId: completeUpload
-    contract: assets
-    purpose: Confirm an upload and create the asset
-    trigger: onAction
-  - operationId: createCollection
-    contract: assets
-    purpose: Create a collection
-    trigger: onAction
-  - operationId: createUpload
-    contract: assets
-    purpose: Request a signed upload URL
-    trigger: onAction
-  - operationId: deleteMediaAsset
-    contract: assets
-    purpose: Delete an asset
-    trigger: onAction
-  - operationId: getExpiringRights
-    contract: assets
-    purpose: Assets whose licence is expiring or expired
-    trigger: onLoad
   - operationId: getMediaAsset
     contract: assets
     purpose: Read an asset with derivatives and usage
-    trigger: onLoad
-  - operationId: listCollections
-    contract: assets
-    purpose: List collections
     trigger: onLoad
   - operationId: replaceMediaAsset
     contract: assets
     purpose: Replace the file behind an asset
     trigger: onAction
-  - operationId: updateMediaAsset
-    contract: assets
-    purpose: Amend metadata, tags or rights
-    trigger: onAction
-  modules:
-  - assets
-  - orders
+  density: compact
 - id: BO-028
   name: Refund Approval Queue
-  module: orders
+  module: Venue Operations
   purpose: Approve the refunds a cashier is not allowed to make alone.
   capability: C00
   wave: 1
@@ -2299,7 +2268,7 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -2326,11 +2295,10 @@ screens:
     contract: orders
     purpose: Guest-initiated refund request
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-029
   name: Report Builder
-  module: reporting
+  module: Venue Operations
   purpose: Build the report nobody wrote down, without asking for a release.
   capability: C00
   wave: 2
@@ -2343,7 +2311,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -2401,12 +2370,10 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
-  modules:
-  - reporting
-  - finance
+  density: compact
 - id: BO-030
   name: Access Point Directory
-  module: maintenance
+  module: Venue Operations
   purpose: See every gate and what it is doing.
   capability: C00
   wave: 1
@@ -2419,7 +2386,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -2507,11 +2475,10 @@ screens:
     contract: maintenance
     purpose: Assign, reprioritise or amend
     trigger: onAction
-  modules:
-  - maintenance
+  density: compact
 - id: BO-031
   name: Access Point Configuration
-  module: maintenance
+  module: Venue Operations
   purpose: Define what a gate is and where it is.
   capability: C00
   wave: 1
@@ -2524,7 +2491,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -2575,11 +2544,10 @@ screens:
     contract: maintenance
     purpose: Take an asset out of service or return it
     trigger: onAction
-  modules:
-  - maintenance
+  density: compact
 - id: BO-032
   name: Admission Profiles
-  module: access
+  module: Venue Operations
   purpose: Set the rules a gate enforces, including offline.
   capability: C00
   wave: 1
@@ -2592,7 +2560,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -2627,11 +2597,10 @@ screens:
     contract: access
     purpose: Update an admission profile
     trigger: onAction
-  modules:
-  - access
+  density: compact
 - id: BO-033
   name: Blacklist Management
-  module: access
+  module: Venue Operations
   purpose: Bar a media code outright.
   capability: C00
   wave: 1
@@ -2644,7 +2613,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -2679,11 +2650,10 @@ screens:
     contract: access
     purpose: Remove a blacklist entry
     trigger: onAction
-  modules:
-  - access
+  density: compact
 - id: BO-034
   name: Scan Activity
-  module: access
+  module: Venue Operations
   purpose: See what the gates have been doing.
   capability: C00
   wave: 1
@@ -2696,7 +2666,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -2746,11 +2717,10 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-  modules:
-  - access
+  density: compact
 - id: BO-035
   name: Override Audit
-  module: access
+  module: Venue Operations
   purpose: Review every admission that broke a rule.
   capability: C00
   wave: 1
@@ -2763,7 +2733,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -2813,11 +2784,10 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-  modules:
-  - access
+  density: compact
 - id: BO-036
   name: Device Registry
-  module: marketing-crm
+  module: Venue Operations
   purpose: Know which handheld is where, and whether it has synced.
   capability: C00
   wave: 2
@@ -2830,7 +2800,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -2900,12 +2871,10 @@ screens:
     contract: marketing-crm
     purpose: Amend a guest profile
     trigger: onAction
-  modules:
-  - marketing-crm
-  - tenancy
+  density: compact
 - id: BO-037
   name: Offline Package Status
-  module: catalogue
+  module: Venue Operations
   purpose: Know what each device is enforcing right now.
   capability: C00
   wave: 1
@@ -2918,7 +2887,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -2956,11 +2926,10 @@ screens:
     contract: catalogue
     purpose: Report that a workstation applied a bundle
     trigger: onAction
-  modules:
-  - catalogue
+  density: compact
 - id: BO-038
   name: Reconciliation Queue
-  module: queue
+  module: Venue Operations
   purpose: Handle scans the server disagreed with.
   capability: C00
   wave: 1
@@ -2973,7 +2942,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -3032,11 +3002,10 @@ screens:
     contract: queue
     purpose: Amend queue configuration
     trigger: onAction
-  modules:
-  - queue
+  density: compact
 - id: BO-039
   name: Shift Directory
-  module: shift
+  module: Venue Operations
   purpose: See every till, open or closed.
   capability: C00
   wave: 1
@@ -3049,7 +3018,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -3123,11 +3093,10 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
-  modules:
-  - shift
+  density: compact
 - id: BO-040
   name: Variance Approval
-  module: shift
+  module: Venue Operations
   purpose: Accept or refuse a till that did not balance.
   capability: C00
   wave: 1
@@ -3140,7 +3109,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -3217,11 +3187,10 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
-  modules:
-  - shift
+  density: compact
 - id: BO-041
   name: Cash Movements
-  module: shift
+  module: Venue Operations
   purpose: Track money in and out of a drawer that is not a sale.
   capability: C00
   wave: 2
@@ -3234,7 +3203,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -3309,11 +3279,10 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
-  modules:
-  - shift
+  density: compact
 - id: BO-042
   name: Banking & Safe
-  module: shift
+  module: Venue Operations
   purpose: Move the day’s cash out of the tills.
   capability: C00
   wave: 2
@@ -3326,7 +3295,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -3401,11 +3371,10 @@ screens:
     contract: shift
     purpose: Suspend a shift so another user can log in
     trigger: onAction
-  modules:
-  - shift
+  density: compact
 - id: BO-043
   name: Daily Reconciliation
-  module: finance
+  module: Venue Operations
   purpose: Prove the day balances before anyone goes home.
   capability: C00
   wave: 1
@@ -3418,7 +3387,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Figures load; the expected total renders last
-    empty: Nothing in the period — reported as a result, not an empty screen
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
   navigation:
@@ -3469,11 +3439,10 @@ screens:
     contract: finance
     purpose: Resolve a settlement exception
     trigger: onAction
-  modules:
-  - finance
+  density: compact
 - id: BO-044
   name: F&B Outlets
-  module: fnb
+  module: Venue Operations
   purpose: See every outlet and whether it is trading.
   capability: C00
   wave: 2
@@ -3486,7 +3455,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -3552,13 +3522,10 @@ screens:
     contract: tenancy
     purpose: Amend an outlet
     trigger: onAction
-  modules:
-  - fnb
-  - retail
-  - tenancy
+  density: compact
 - id: BO-045
   name: Menu Management
-  module: fnb
+  module: Venue Operations
   purpose: Change what is on sale and what is in it.
   capability: C00
   wave: 2
@@ -3571,7 +3538,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -3614,11 +3583,10 @@ screens:
     contract: fnb
     purpose: Amend a menu
     trigger: onAction
-  modules:
-  - fnb
+  density: compact
 - id: BO-046
   name: Kitchen Display
-  module: fnb
+  module: Venue Operations
   purpose: Show the kitchen what to make, in order.
   capability: C00
   wave: 2
@@ -3631,7 +3599,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -3673,11 +3642,10 @@ screens:
     contract: fnb
     purpose: Configure stations and item routing
     trigger: onAction
-  modules:
-  - fnb
+  density: compact
 - id: BO-047
   name: F&B Order Management
-  module: orders
+  module: Venue Operations
   purpose: Fix an order that has gone wrong.
   capability: C00
   wave: 2
@@ -3690,7 +3658,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -3769,11 +3739,10 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-048
   name: Retail Products
-  module: retail
+  module: Venue Operations
   purpose: Manage what the shop sells.
   capability: C00
   wave: 2
@@ -3786,7 +3755,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -3826,11 +3796,10 @@ screens:
     contract: retail
     purpose: Amend a merchandise item
     trigger: onAction
-  modules:
-  - retail
+  density: compact
 - id: BO-049
   name: Stock Levels
-  module: inventory
+  module: Venue Operations
   purpose: Know what is on the shelf and what is on order.
   capability: C00
   wave: 2
@@ -3843,7 +3812,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -3873,11 +3843,10 @@ screens:
     contract: inventory
     purpose: Stock value by location and category
     trigger: onLoad
-  modules:
-  - inventory
+  density: compact
 - id: BO-050
   name: Stock Count
-  module: inventory
+  module: Venue Operations
   purpose: Count the shelf and account for the difference.
   capability: C00
   wave: 2
@@ -3890,7 +3859,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -3920,11 +3890,10 @@ screens:
     contract: inventory
     purpose: Stock value by location and category
     trigger: onLoad
-  modules:
-  - inventory
+  density: compact
 - id: BO-051
   name: Purchase Orders
-  module: orders
+  module: Venue Operations
   purpose: Order more of what is running out.
   capability: C00
   wave: 2
@@ -3937,7 +3906,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4013,11 +3983,10 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-052
   name: Goods Receipt
-  module: inventory
+  module: Venue Operations
   purpose: Book in what actually arrived.
   capability: C00
   wave: 2
@@ -4030,7 +3999,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4096,11 +4066,10 @@ screens:
     contract: inventory
     purpose: Issue the order to the supplier
     trigger: onAction
-  modules:
-  - inventory
+  density: compact
 - id: BO-053
   name: Staff Directory
-  module: identity
+  module: Venue Operations
   purpose: Find anyone who works at this venue.
   capability: C00
   wave: 1
@@ -4113,7 +4082,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -4151,11 +4121,10 @@ screens:
     contract: identity
     purpose: Update or deactivate a principal
     trigger: onAction
-  modules:
-  - identity
+  density: compact
 - id: BO-054
   name: Role Assignment
-  module: identity
+  module: Venue Operations
   purpose: Give somebody the permissions their job needs.
   capability: C00
   wave: 1
@@ -4168,7 +4137,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4198,11 +4168,10 @@ screens:
     contract: identity
     purpose: Create a role
     trigger: onAction
-  modules:
-  - identity
+  density: compact
 - id: BO-055
   name: Rota & Scheduling
-  module: workforce
+  module: Venue Operations
   purpose: Decide who is on which gate, when.
   capability: C00
   wave: 2
@@ -4215,7 +4184,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4253,11 +4223,10 @@ screens:
     contract: workforce
     purpose: Ask someone to take your shift
     trigger: onAction
-  modules:
-  - workforce
+  density: compact
 - id: BO-056
   name: Time & Attendance
-  module: workforce
+  module: Venue Operations
   purpose: Record who actually turned up.
   capability: C00
   wave: 2
@@ -4270,7 +4239,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4304,11 +4274,10 @@ screens:
     contract: workforce
     purpose: Clock in, clock out, or take a break
     trigger: onAction
-  modules:
-  - workforce
+  density: compact
 - id: BO-057
   name: Training & Certification
-  module: identity
+  module: Venue Operations
   purpose: Know who is allowed to do what.
   capability: C00
   wave: 3
@@ -4321,7 +4290,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -4347,11 +4317,10 @@ screens:
     contract: identity
     purpose: List principals
     trigger: onLoad
-  modules:
-  - identity
+  density: compact
 - id: BO-058
   name: Reporting Home
-  module: reporting
+  module: Venue Operations
   purpose: Find the report rather than build it.
   capability: C00
   wave: 1
@@ -4364,7 +4333,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4424,12 +4394,10 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
-  modules:
-  - reporting
-  - finance
+  density: compact
 - id: BO-059
   name: Sales Reports
-  module: reporting
+  module: Venue Operations
   purpose: See what sold, through which channel.
   capability: C00
   wave: 1
@@ -4442,7 +4410,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4500,12 +4469,10 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
-  modules:
-  - reporting
-  - finance
+  density: compact
 - id: BO-060
   name: Attendance & Footfall
-  module: reporting
+  module: Venue Operations
   purpose: See how many people actually came in.
   capability: C00
   wave: 2
@@ -4518,7 +4485,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4604,13 +4572,10 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-  modules:
-  - reporting
-  - access
-  - finance
+  density: compact
 - id: BO-061
   name: Scheduled Reports
-  module: reporting
+  module: Venue Operations
   purpose: Send a report to somebody without them asking.
   capability: C00
   wave: 3
@@ -4623,7 +4588,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4681,12 +4647,10 @@ screens:
     contract: reporting
     purpose: Publish a new version of a definition
     trigger: onAction
-  modules:
-  - reporting
-  - finance
+  density: compact
 - id: BO-062
   name: Venue Profile
-  module: orders
+  module: Venue Operations
   purpose: The facts every other surface reads.
   capability: C00
   wave: 1
@@ -4699,7 +4663,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -4738,12 +4704,10 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
-  modules:
-  - orders
-  - fnb
+  density: compact
 - id: BO-063
   name: Opening Hours & Calendar
-  module: catalogue
+  module: Venue Operations
   purpose: Say when the venue is open, including the exceptions.
   capability: C00
   wave: 1
@@ -4756,7 +4720,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -4822,12 +4787,10 @@ screens:
     contract: catalogue
     purpose: Amend a performance
     trigger: onAction
-  modules:
-  - catalogue
-  - seating
+  density: compact
 - id: BO-064
   name: Zones & Areas
-  module: access
+  module: Venue Operations
   purpose: Divide the venue into the things gates control.
   capability: C00
   wave: 1
@@ -4840,7 +4803,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -4902,12 +4866,10 @@ screens:
     contract: tenancy
     purpose: Rename or deactivate a scope node
     trigger: onAction
-  modules:
-  - access
-  - tenancy
+  density: compact
 - id: BO-065
   name: Venue Configuration
-  module: orders
+  module: Venue Operations
   purpose: Set the venue-level values everything inherits from.
   capability: C00
   wave: 1
@@ -4920,7 +4882,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -4959,12 +4923,10 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
-  modules:
-  - orders
-  - fnb
+  density: compact
 - id: BO-066
   name: Notification Settings
-  module: workforce
+  module: Venue Operations
   purpose: Decide what this venue tells people, and how.
   capability: C00
   wave: 2
@@ -4977,7 +4939,9 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Current values, with the level each resolves from
-    empty: Nothing set at this level — the inherited value is shown and labelled as inherited (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
   navigation:
@@ -5016,8 +4980,7 @@ screens:
     contract: workforce
     purpose: Who has acknowledged, and who has not
     trigger: onLoad
-  modules:
-  - workforce
+  density: compact
 - id: BO-067
   name: Integrations
   module: Venue Operations
@@ -5033,7 +4996,7 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
     error: Could not load
   navigation:
     exitTo:
@@ -5054,9 +5017,10 @@ screens:
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
     for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  density: compact
 - id: BO-068
   name: Audit Log
-  module: ai
+  module: Venue Operations
   purpose: See who changed what at this venue.
   capability: C00
   wave: 2
@@ -5069,7 +5033,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -5095,11 +5060,10 @@ screens:
     contract: ai
     purpose: Every prompt, response and action
     trigger: onLoad
-  modules:
-  - ai
+  density: compact
 - id: BO-069
   name: Asset Register
-  module: maintenance
+  module: Venue Operations
   purpose: Know what equipment exists and where.
   capability: C00
   wave: 2
@@ -5112,7 +5076,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -5178,12 +5143,10 @@ screens:
     contract: games
     purpose: Replay plays recorded offline
     trigger: onAction
-  modules:
-  - maintenance
-  - games
+  density: compact
 - id: BO-070
   name: Work Orders
-  module: orders
+  module: Venue Operations
   purpose: Get something fixed, and know it was.
   capability: C00
   wave: 2
@@ -5196,7 +5159,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -5272,11 +5236,10 @@ screens:
     contract: orders
     purpose: Void an order
     trigger: onAction
-  modules:
-  - orders
+  density: compact
 - id: BO-071
   name: Planned Maintenance
-  module: maintenance
+  module: Venue Operations
   purpose: Schedule the work that stops the emergencies.
   capability: C00
   wave: 3
@@ -5289,7 +5252,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -5323,11 +5287,10 @@ screens:
     contract: maintenance
     purpose: Planned tasks due or overdue
     trigger: onLoad
-  modules:
-  - maintenance
+  density: compact
 - id: BO-072
   name: Incident Log
-  module: maintenance
+  module: Venue Operations
   purpose: Record what happened, while it is fresh.
   capability: C00
   wave: 2
@@ -5340,7 +5303,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: List skeleton; the count renders first
-    empty: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load . Actions on the list are disabled
   navigation:
     exitTo:
@@ -5382,11 +5346,10 @@ screens:
     contract: maintenance
     purpose: Investigate, escalate or close an incident
     trigger: onAction
-  modules:
-  - maintenance
+  density: compact
 - id: BO-073
   name: Lost & Found Register
-  module: marketing-crm
+  module: Venue Operations
   purpose: Match what was lost to what was handed in.
   capability: C00
   wave: 2
@@ -5399,7 +5362,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
   states:
     loading: Detail loads
-    empty: Not found — it may have been deleted or moved out of scope
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -5429,11 +5393,10 @@ screens:
     contract: marketing-crm
     purpose: Raise a service case
     trigger: onAction
-  modules:
-  - marketing-crm
+  density: compact
 - id: BO-074
   name: Chart of Accounts
-  module: finance
+  module: Finance
   purpose: Accounts, cost centres and legal entities.
   capability: C00
   wave: 1
@@ -5479,7 +5442,9 @@ screens:
     trigger: onAction
   states:
     loading: Accounts load as a tree
-    empty: No chart configured — a blocking gap before the first posting, shown as one
+    emptyFirstRun: No chart configured — a blocking gap before the first posting, shown as one
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Editing is blocked
   navigation:
     exitTo:
@@ -5502,11 +5467,10 @@ screens:
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts
     blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.
-  modules:
-  - finance
+  density: compact
 - id: BO-075
   name: Account Mapping
-  module: finance
+  module: Finance
   purpose: Which product or movement posts to which account.
   capability: C00
   wave: 1
@@ -5548,7 +5512,10 @@ screens:
     trigger: onAction
   states:
     loading: Mappings with the level each resolves from
-    empty: Nothing mapped — **every sale would post to a suspense account**, so this is a blocking gap
+    emptyFirstRun: Nothing mapped — **every sale would post to a suspense account**, so this is a blocking
+      gap
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Saving is blocked
   navigation:
     exitTo:
@@ -5571,11 +5538,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense.
-  modules:
-  - finance
+  density: compact
 - id: BO-076
   name: Revenue Recognition
-  module: finance
+  module: Finance
   purpose: Deferred revenue, its ageing, and the schedules that release it.
   capability: C00
   wave: 2
@@ -5605,7 +5571,9 @@ screens:
     trigger: onAction
   states:
     loading: Balance and ageing
-    empty: Nothing deferred
+    emptyFirstRun: Nothing deferred
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Running recognition is blocked** — a run against an unread balance posts
       numbers nobody checked
   navigation:
@@ -5627,11 +5595,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - finance
+  density: compact
 - id: BO-077
   name: FX Rates & Variances
-  module: finance
+  module: Finance
   purpose: Rates, and the price variances waiting for review.
   capability: C00
   wave: 2
@@ -5661,7 +5628,9 @@ screens:
     trigger: onAction
   states:
     loading: Rates and open variances
-    empty: No variances — reported as a result
+    emptyFirstRun: No variances — reported as a result
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Setting a rate is blocked
   navigation:
     exitTo:
@@ -5682,11 +5651,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - finance
+  density: compact
 - id: BO-078
   name: Requisitions
-  module: inventory
+  module: Inventory
   purpose: Raise, track and approve a request to buy something.
   capability: C00
   wave: 1
@@ -5732,7 +5700,9 @@ screens:
     trigger: onLoad
   states:
     loading: Requisitions, oldest pending first
-    empty: Nothing outstanding
+    emptyFirstRun: Nothing outstanding
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Approving is blocked
   navigation:
     exitTo:
@@ -5755,11 +5725,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - inventory
+  density: compact
 - id: BO-079
   name: Stock Count
-  module: inventory
+  module: Inventory
   purpose: Count what is there, blind, and resolve the variance.
   capability: C00
   wave: 1
@@ -5797,7 +5766,9 @@ screens:
     trigger: onLoad
   states:
     loading: Count sheet loads
-    empty: No count in progress
+    emptyFirstRun: No count in progress
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Posting is blocked.** A count posted against an unread expected figure
       is not a count'
   navigation:
@@ -5819,11 +5790,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - inventory
+  density: compact
 - id: BO-080
   name: Stock Transfers
-  module: inventory
+  module: Inventory
   purpose: Move stock between venues, and receive what arrives.
   capability: C00
   wave: 2
@@ -5853,7 +5823,9 @@ screens:
     trigger: onAction
   states:
     loading: Transfers in flight and recently received
-    empty: Nothing in transit
+    emptyFirstRun: Nothing in transit
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. Receipt is blocked
   navigation:
     exitTo:
@@ -5874,11 +5846,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - inventory
+  density: compact
 - id: BO-081
   name: Inventory Items
-  module: inventory
+  module: Inventory
   purpose: What the venue stocks, and where.
   capability: C00
   wave: 2
@@ -5920,7 +5891,9 @@ screens:
     trigger: onAction
   states:
     loading: Items load, paged
-    empty: Nothing stocked at this venue
+    emptyFirstRun: Nothing stocked at this venue
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -5941,11 +5914,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - inventory
+  density: compact
 - id: BO-082
   name: Stock Movements
-  module: inventory
+  module: Inventory
   purpose: Every movement, and why it happened.
   capability: C00
   wave: 2
@@ -5967,7 +5939,9 @@ screens:
     trigger: onAction
   states:
     loading: Movements, newest first
-    empty: No movements in the period
+    emptyFirstRun: No movements in the period
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Recording a movement is blocked** — a movement against an unknown level
       produces a wrong level
   navigation:
@@ -5989,11 +5963,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - inventory
+  density: compact
 - id: BO-083
   name: Suppliers
-  module: inventory
+  module: Inventory
   purpose: Who we buy from, and what they quoted.
   capability: C00
   wave: 2
@@ -6019,7 +5992,9 @@ screens:
     trigger: onAction
   states:
     loading: Suppliers load
-    empty: No suppliers — a blocking gap before the first purchase order
+    emptyFirstRun: No suppliers — a blocking gap before the first purchase order
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -6040,11 +6015,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - inventory
+  density: compact
 - id: BO-084
   name: Approval Inbox
-  module: approvals
+  module: Approvals
   purpose: What is waiting on this person, sorted by what breaches soonest.
   capability: C00
   wave: 1
@@ -6070,7 +6044,10 @@ screens:
     trigger: onAction
   states:
     loading: Requests load, ordered by SLA proximity rather than age
-    empty: Nothing waiting — reported as a result, because an empty inbox and a broken one look identical
+    emptyFirstRun: Nothing waiting — reported as a result, because an empty inbox and a broken one look
+      identical
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Deciding is blocked** — an approver must not act on a request they could
       not read'
   navigation:
@@ -6094,11 +6071,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - approvals
+  density: compact
 - id: BO-085
   name: Approval Request
-  module: approvals
+  module: Approvals
   purpose: One request, its subject, and the decision.
   capability: C00
   wave: 1
@@ -6132,7 +6108,9 @@ screens:
     trigger: onAction
   states:
     loading: The request, then the subject fetched live from the owning contract
-    empty: —
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Subject unreadable. Deciding is blocked** — the request points at an order or a shift,
       and approving one you cannot see is approving a description'
   navigation:
@@ -6156,11 +6134,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - approvals
+  density: compact
 - id: BO-086
   name: Approval Matrix
-  module: approvals
+  module: Approvals
   purpose: What needs approval here, and who grants it.
   capability: C00
   wave: 2
@@ -6182,7 +6159,9 @@ screens:
     trigger: onAction
   states:
     loading: Rules in order, with the level each resolves from
-    empty: Nothing set at this level — the inherited matrix is shown and labelled (ADR-0018)
+    emptyFirstRun: Nothing set at this level — the inherited matrix is shown and labelled (ADR-0018)
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Saving is blocked** — a matrix saved over an unread one silently loosens
       a control'
   navigation:
@@ -6204,11 +6183,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - approvals
+  density: compact
 - id: BO-087
   name: Approval Delegations
-  module: approvals
+  module: Approvals
   purpose: Who is standing in for whom, and until when.
   capability: C00
   wave: 2
@@ -6234,7 +6212,9 @@ screens:
     trigger: onAction
   states:
     loading: Active and scheduled delegations
-    empty: Nobody delegating
+    emptyFirstRun: Nobody delegating
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Creating is blocked** — a delegation created blind could exceed the delegator’s
       own authority
   navigation:
@@ -6256,11 +6236,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - approvals
+  density: compact
 - id: BO-088
   name: Approval Analytics
-  module: approvals
+  module: Approvals
   purpose: Volumes, decision times and where requests get stuck.
   capability: C00
   wave: 3
@@ -6278,7 +6257,9 @@ screens:
     trigger: onLoad
   states:
     loading: Aggregated from the analytical replica
-    empty: No requests in the period
+    emptyFirstRun: No requests in the period
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load
   navigation:
     exitTo:
@@ -6299,11 +6280,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - approvals
+  density: compact
 - id: BO-089
   name: Journal Entries
-  module: finance
+  module: Finance
   purpose: Every posting, and the ones waiting for approval.
   capability: C00
   wave: 1
@@ -6341,7 +6321,9 @@ screens:
     trigger: onAction
   states:
     loading: Entries load, unposted first
-    empty: Nothing in the period
+    emptyFirstRun: Nothing in the period
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**Could not load. Posting and reversal are both blocked** — a journal is append-only and
       a blind posting cannot be taken back, only reversed'
   navigation:
@@ -6365,11 +6347,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - finance
+  density: compact
 - id: BO-090
   name: Period Close
-  module: finance
+  module: Finance
   purpose: Close a fiscal period, and see what is stopping it.
   capability: C00
   wave: 1
@@ -6407,7 +6388,9 @@ screens:
     trigger: onLoad
   states:
     loading: Period state and the blocking checks, each reporting separately
-    empty: —
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: '**A check that cannot run is a failed check, not a passed one.** Closing is blocked'
   navigation:
     exitTo:
@@ -6430,11 +6413,10 @@ screens:
     designReference: sources/designs/Park_POS_dc.html
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
-  modules:
-  - finance
+  density: compact
 - id: BO-091
   name: AI Policy & Spend
-  module: ai
+  module: AI
   purpose: What the assistant may do here, what it has cost, and what happens at the ceiling.
   capability: C00
   wave: 1
@@ -6459,7 +6441,8 @@ screens:
     trigger: onLoad
   states:
     loading: Policy with the level each value resolves from, then spend against the ceiling
-    empty: No policy at this level — the inherited one applies and is labelled (ADR-0018)
+    emptyFirstRun: No policy at this level — the inherited one applies and is labelled (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
     error: Could not load. **Editing is blocked** — a ceiling saved over an unread one could be lower
       than what has already been spent
   navigation:
@@ -6479,5 +6462,401 @@ screens:
   notes: Added 17 August. **Staff and guest spend shown separately** — a venue can manage the first
     and cannot stop guests asking questions. At the ceiling the manager decides whether to continue;
     the assistant does not stop on its own (CF-14).
-  modules:
-  - ai
+  density: compact
+- id: BO-092
+  name: Venue Maps
+  module: venue-map
+  wave: 2
+  purpose: Every map for this venue, and which is published.
+  apis:
+  - operationId: listVenueMaps
+    contract: venue-map
+    purpose: Maps
+    trigger: onLoad
+  - operationId: createVenueMap
+    contract: venue-map
+    purpose: Start one
+    trigger: onAction
+  states:
+    loading: Maps, published first
+    emptyFirstRun: No map yet. **The venue is navigable without one and a guest is not** — the empty
+      state says what uploading a plan gets them
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. The published map is unaffected — this screen edits drafts
+  notes: CF-123. **A venue may have several maps** — a park map and a floor plan per building are different
+    maps, not layers of one, because a guest on the second floor should not be shown the ground floor
+    toilets.
+  navigation:
+    exitTo:
+    - BO-093
+    - BO-094
+  implementation:
+    app: venue-management-web
+    route: /venue-mapping/venue-maps
+    component: apps/venue-management-web/src/routes/venue-mapping/VenueMapList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  density: compact
+- id: BO-093
+  name: Map Import & Labelling
+  module: venue-map
+  wave: 2
+  purpose: Upload a plan, check what was read, and review what the assistant suggests.
+  apis:
+  - operationId: importVenueGeometry
+    contract: venue-map
+    purpose: Read the drawing
+    trigger: onAction
+  - operationId: proposeVenueLabels
+    contract: ai
+    purpose: Suggest labels
+    trigger: onAction
+  - operationId: acceptVenueLabelProposals
+    contract: venue-map
+    purpose: Accept or reject
+    trigger: onAction
+  states:
+    loading: Parsing the drawing
+    emptyFirstRun: '**No shapes found.** Every layer name in the file is listed so a role can be mapped
+      by reading rather than guessing'
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Unreadable, or no layer matched.** The two are shown separately — a file that could not
+      be opened and a file whose layers nobody claimed need different fixes'
+  notes: CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic
+    and reports which layers it found; labelling is a proposal with a confidence. **A mis-parsed layer
+    and a bad suggestion look identical if the screen blurs them**, and the operator is left saying
+    only that the map is wrong. **Low-confidence proposals are shown, not filtered** — the shape the
+    assistant is unsure about is the one most worth a human looking at.
+  navigation:
+    exitTo:
+    - BO-092
+    - BO-094
+  implementation:
+    app: venue-management-web
+    route: /venue-mapping/map-import
+    component: apps/venue-management-web/src/routes/venue-mapping/VenueMapImportForm.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  density: compact
+- id: BO-094
+  name: Map Editor & Publish
+  module: venue-map
+  wave: 2
+  purpose: Place booths, toilets, exits, rides and restaurants, then publish.
+  apis:
+  - operationId: getVenueMap
+    contract: venue-map
+    purpose: The draft
+    trigger: onLoad
+  - operationId: setVenuePoint
+    contract: venue-map
+    purpose: Place a point
+    trigger: onAction
+  - operationId: publishVenueMap
+    contract: venue-map
+    purpose: Publish
+    trigger: onAction
+  - operationId: validateVenueMapGraph
+    contract: venue-map
+    purpose: What is unreachable, before anyone publishes it
+    trigger: onAction
+  - operationId: setPathClosure
+    contract: venue-map
+    purpose: Close a route during works or an incident
+    trigger: onAction
+  - operationId: getVenueMapGraph
+    contract: venue-map
+    purpose: The navigation graph, ready to route over
+    trigger: onLoad
+  states:
+    loading: The draft with its points and paths
+    emptyFirstRun: An imported map with no points. **Import gives geometry; this gives it meaning**
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not save. The published map is untouched
+  notes: 'CF-123. **Publishing is a separate act from saving**, and the screen makes that visible —
+    editing a live map under a guest standing in front of it is how a route ends at a wall. **Refuses
+    to publish a point linked to a closed outlet**, naming which one: a restaurant point pointing nowhere
+    is worse than no point, because a guest walks there. **`isStepFree` on a path is the field to get
+    right** — a wheelchair user routed up a staircase was failed by the map, not the venue. **Graph
+    validation runs before publish and on demand.** The screen separates two findings that read the
+    same and are not: **an unreachable point is a defect, and a point reachable only by steps is a map
+    that works until a wheelchair user opens it.** **Critical points — first aid, emergency exits, assembly
+    points — are listed apart**, because an unreachable gift shop and an unreachable assembly point
+    should not sit in one list of two hundred.'
+  navigation:
+    exitTo:
+    - BO-092
+  implementation:
+    app: venue-management-web
+    route: /venue-mapping/map-editor
+    component: apps/venue-management-web/src/routes/venue-mapping/VenueMapEditorForm.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  density: compact
+- id: BO-095
+  name: Resources
+  module: Venue Operations
+  wave: 2
+  purpose: Every bookable object at this venue, and whether it is free.
+  apis:
+  - operationId: listResources
+    contract: resources
+    purpose: Resources with status
+    trigger: onLoad
+  - operationId: createResource
+    contract: resources
+    purpose: Define one
+    trigger: onAction
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: No bookable resources yet. **A cabana sold as a product sells a slot** — define the
+      object here and it becomes something a guest can be handed and can return.
+    emptyNoResults: No resource matches this kind or window. Widen the window rather than the kind —
+      availability moves, definitions do not.
+    emptyNoAccess: You do not have RESOURCE_VIEW. The list is not empty.
+    error: Could not load resources. Existing bookings are unaffected.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        label: Search resources
+      - kind: multiSelect
+        label: Kind
+      - kind: dataTable
+        bindsTo: Resource[]
+        notes: Status column carries the reason — **booked and under repair need different responses
+          from somebody looking for something free**
+  density: compact
+  navigation:
+    exitTo:
+    - BO-096
+    - BO-097
+  implementation:
+    app: venue-management-web
+    route: /resources/directory
+    component: apps/venue-management-web/src/routes/resources/ResourceList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: CF-125. **A resource is a specific object, not a quantity** — forty identical strollers are
+    forty rows, because guest twelve returned stroller twelve.
+- id: BO-096
+  name: Resource Calendar
+  module: Venue Operations
+  wave: 2
+  purpose: See what is free, and book it without double-booking.
+  apis:
+  - operationId: getResourceAvailability
+    contract: resources
+    purpose: Free windows
+    trigger: onLoad
+  - operationId: bookResource
+    contract: resources
+    purpose: Reserve
+    trigger: onAction
+  states:
+    loading: Calendar grid; today renders first
+    emptyFirstRun: Nothing booked in this window. **Free is the default state and it is worth showing
+      plainly** — an empty calendar at a venue that takes bookings is either a quiet week or a resource
+      nobody knows exists.
+    emptyNoResults: No availability in this window. The response says why — booked, setup, teardown,
+      maintenance or closed — because **wait and look elsewhere are different answers**.
+    emptyNoAccess: You do not have RESOURCE_VIEW.
+    error: Could not load availability. **Do not book blind** — a booking made against a stale calendar
+      is the double-booking this screen exists to prevent.
+  layout:
+    template: calendar
+    regions:
+    - name: contentBody
+      components:
+      - kind: timeline
+        bindsTo: ResourceAvailability
+        notes: Setup and teardown render as their own bands, not as part of the booking — **a 30-minute
+          turnaround is invisible if it is drawn inside the booking**
+      - kind: primaryButton
+        label: Book
+      - kind: banner
+        notes: Conflicts, named with times. *Not available* on something a guest can see is not an answer
+  density: compact
+  navigation:
+    entryFrom:
+    - BO-095
+    exitTo:
+    - BO-097
+  implementation:
+    app: venue-management-web
+    route: /resources/calendar
+    component: apps/venue-management-web/src/routes/resources/ResourceCalendar.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: CF-125. **Conflict detection before assignment is the whole point** — two bookings on one cabana
+    is a guest arriving to find somebody in their chair, and it must be impossible rather than unlikely.
+- id: BO-097
+  name: Check Out & Check In
+  module: Venue Operations
+  wave: 2
+  purpose: Hand it over with a deposit, take it back, settle.
+  apis:
+  - operationId: checkOutResource
+    contract: resources
+    purpose: Hand over
+    trigger: onAction
+  - operationId: checkInResource
+    contract: resources
+    purpose: Take back
+    trigger: onAction
+  - operationId: authoriseStoredValue
+    contract: orders
+    purpose: Hold the deposit
+    trigger: onAction
+  - operationId: releaseStoredValue
+    contract: orders
+    purpose: Release it
+    trigger: onAction
+  states:
+    loading: The booking and its condition history
+    emptyFirstRun: Nothing is out. **The list a poolside attendant checks at close** — anything still
+      here at the end of the day is a conversation.
+    emptyNoResults: Nothing matches. Overdue items are shown by default because they are the ones that
+      need chasing.
+    emptyNoAccess: You do not have RESOURCE_BOOK.
+    error: Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on
+      sync.
+    offline: Queued locally. The deposit is authorised on sync, and **the condition note taken now is
+      the only defence against a dispute later**.
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        bindsTo: ResourceBooking
+      - kind: textField
+        label: Condition note
+      - kind: fileUpload
+        label: Condition photos
+        notes: Taken on the way out, not only on the way back
+      - kind: primaryButton
+        label: Check out
+      - kind: secondaryButton
+        label: Check in
+  density: compact
+  navigation:
+    entryFrom:
+    - BO-095
+    - BO-096
+  implementation:
+    app: venue-management-web
+    route: /resources/check-out
+    component: apps/venue-management-web/src/routes/resources/ResourceCheckOutForm.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: CF-125, CF-126. **The deposit is held, not taken** — a deposit taken and refunded is two transactions
+    and a fee. **Damage routes the resource to maintenance directly**, because routing through available
+    leaves a window where the next guest books a broken item. **The deposit operations are declared
+    here because this screen calls them** — F25 named them at steps 4 and 5 and the screen did not,
+    which the flow checker refused. **A step calling an operation its screen does not declare is one
+    of the two out of step**, and in this case it was the screen.
+- id: BO-098
+  name: Qualifications
+  module: Venue Operations
+  wave: 2
+  purpose: What a person is certified to do, and until when.
+  apis:
+  - operationId: setResourceQualifications
+    contract: resources
+    purpose: Set qualifications
+    trigger: onAction
+  states:
+    loading: Qualifications with their expiry
+    emptyFirstRun: No qualifications recorded. **A role is not a skill** — 1.2.36 requires the check
+      before assignment, not after.
+    emptyNoResults: Nobody matches. Expiring-soon is the default filter, because that is the list somebody
+      acts on.
+    emptyNoAccess: You do not have RESOURCE_MANAGE.
+    error: Could not load.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        bindsTo: Qualification[]
+        notes: Sorted by expiry, not by name — **a lifeguard certificate that lapsed last month is a
+          safety failure, not a data-quality one**
+      - kind: banner
+        notes: Expired qualifications held by staff on today rota
+  density: compact
+  navigation:
+    entryFrom:
+    - BO-095
+  implementation:
+    app: venue-management-web
+    route: /resources/qualifications
+    component: apps/venue-management-web/src/routes/resources/QualificationList.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: CF-125. **Expiry is the field that makes this worth having** — a certification with no expiry
+    is one nobody renews.
+- id: BO-099
+  name: Session Manifest
+  module: Venue Operations
+  wave: 2
+  purpose: Who is in a session, in what order.
+  apis:
+  - operationId: getSessionManifest
+    contract: resources
+    purpose: The manifest
+    trigger: onLoad
+  - operationId: reorderSessionManifest
+    contract: resources
+    purpose: Change the order
+    trigger: onAction
+  states:
+    loading: Participants in running order
+    emptyFirstRun: Nobody booked into this session yet.
+    emptyNoResults: No participants match.
+    emptyNoAccess: You do not have RESOURCE_VIEW.
+    error: Could not load the manifest.
+    offline: The cached manifest. **An instructor at the water edge needs this more than anyone**, and
+      that is where the signal is worst.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        bindsTo: SessionParticipant[]
+        notes: Drag to reorder. **The running order is operational** — an instructor takes beginners
+          first, and booking order puts one between two advanced riders
+      - kind: banner
+        notes: Unsigned waivers, named. **An instructor about to start does not want to discover one
+          at the water edge**
+  density: compact
+  navigation:
+    entryFrom:
+    - BO-096
+  implementation:
+    app: venue-management-web
+    route: /resources/session-manifest
+    component: apps/venue-management-web/src/routes/resources/SessionManifest.tsx
+    status: notStarted
+  wireframe:
+    status: notStarted
+    board: null
+  notes: CF-125, CF-129. Distinct from duration, which variants already handle.

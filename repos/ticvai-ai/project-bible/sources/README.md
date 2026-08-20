@@ -11,7 +11,7 @@ Chitrangi and a revised document is added; the original stays.
 
 ## Authority
 
-Per [overview](../overview.md) §2, these rank differently. This is the single most
+Per [overview](../docs/overview.md) §2, these rank differently. This is the single most
 important thing to understand about this folder:
 
 | Rank | Folder | Authority |
@@ -33,10 +33,10 @@ Rank 1. Highest authority in the project.
 |---|---|---|
 | 30 Jul 2026 | `TICVAI_Kickoff_MoM_30Jul2026__2_.docx` | Programme setup; HLD/LLD ownership |
 | 31 Jul 2026 | `TICVAI_MoM_31Jul2026__1_.docx` | Offline-first POS · in-house traffic throttling · 7-year audit trail · KDS integration only |
-| 03 Aug 2026 | `TICVAI_UIUX_MoM_03Aug2026__1_.docx` | Two mobile apps · dedicated scanner · consistent POS across device types |
+| 03 Aug 2026 | `TICVAI_UIUX_MoM_03Aug2026__1_.docx` | Two mobile apps · dedicated venue-scanner · consistent POS across device types |
 | 05 Aug 2026 | `TICVAI_Kickoff_MoM_2026-08-05.docx` | Three B2B models · **identity ≠ entitlement** · kiosk channel |
 | 07 Aug 2026 | `TICVAI_BackendDeepDive_MoM_07Aug2026.docx` | Five-level permissions · data mask · **ticket ID ≠ media code** · component/attribute variants |
-| 10 Aug 2026 | `TICVAI_Kickoff_MoM_2026-08-10.docx` | **Database per tenant** · module licensing · guest app scope · queue wait-time via third-party feed |
+| 10 Aug 2026 | `TICVAI_Kickoff_MoM_2026-08-10.docx` | **Database per tenant** · module licensing · guest-app app scope · queue wait-time via third-party feed |
 | 12 Aug 2026 | `TICVAI_Kickoff_MoM_12Aug2026.docx` | **Finance deep-dive** · single session · Sale Board per workstation · conditional role selection |
 
 ### Known record defects
@@ -44,10 +44,10 @@ Rank 1. Highest authority in the project.
 | Defect | Detail |
 |---|---|
 | **Lost subject** | 10 Aug §5.1 — *"agreed this makes more sense and will be adopted"* names nobody. No owner for a decision since partially reversed. CF-23 |
-| **Self-contradiction** | 12 Aug decision block — one bullet says front-end selection is role-driven and not device-driven; another says it auto-loads from the workstation. Resolved by [ADR-0002](../adr/0002-authorisation-is-user-driven-not-workstation-driven.md) |
+| **Self-contradiction** | 12 Aug decision block — one bullet says front-end selection is role-driven and not device-driven; another says it auto-loads from the workstation. Resolved by [ADR-0002](../docs/adr/0002-authorisation-is-user-driven-not-workstation-driven.md) |
 | **Party inversion** | 12 Aug §23, §25 — party attribution is inverted relative to every prior MoM. Five action items have ambiguous ownership. CF-25 |
 
-Per [overview](../overview.md) §8, decisions that contradict each other within one record,
+Per [overview](../docs/overview.md) §8, decisions that contradict each other within one record,
 or omit the deciding party, are returned for correction before being treated as binding.
 
 ---
@@ -114,15 +114,15 @@ reference conflicts with a MoM decision, the MoM wins.
 
 Rank 3, but load-bearing. It is the source for:
 
-- The seven-level hierarchy ([architecture/hierarchy-and-authz](../architecture/hierarchy-and-authz.md))
+- The seven-level hierarchy ([architecture/hierarchy-and-authz](../docs/architecture/hierarchy-and-authz.md))
 - Region owning currency, decimals, date format and time zone — inherited by all venues
 - Venue-level configuration isolation
 - **"No cross-venue data access unless explicitly permitted"** — the assertion driving row-level security
 - Unified reporting at all seven levels, which forces the central warehouse
 
 The client's own example spans **two jurisdictions** — AED at 2 decimal places, OMR at 3 —
-which is the origin of [ADR-0001](../adr/0001-cell-architecture-one-tenant-per-jurisdiction.md)
-and [ADR-0008](../adr/0008-money-carries-per-region-scale.md).
+which is the origin of [ADR-0001](../docs/adr/0001-cell-architecture-one-tenant-per-jurisdiction.md)
+and [ADR-0008](../docs/adr/0008-money-carries-per-region-scale.md).
 
 ---
 
@@ -147,7 +147,7 @@ three permitted uses; do not copy them back in.
    raise it as a question. It becomes scope only once it appears in the matrix or a MoM.
 2. **Edge-case discovery.** Anti-passback, re-entry rules, overshort thresholds, failure
    modes. Cheaper than discovering them at UAT.
-3. **Domain vocabulary.** Sourced into the [glossary](../glossary.md), which is the durable
+3. **Domain vocabulary.** Sourced into the [glossary](../docs/glossary.md), which is the durable
    artefact — the manuals themselves are not needed once the glossary is agreed.
 
 ### Never used for
@@ -184,7 +184,31 @@ Recorded here so the manuals do not need re-reading:
 1. Drop it in the correct rank folder. **Never edit an existing file.**
    Reference-system material does not belong here — see above.
 2. Add a row to the table above with date and what it decides or supplies.
-3. If it is a MoM, add it to [history/timeline](../history/timeline.md).
+3. If it is a MoM, add it to history/timeline.
 4. If it changes a settled position, raise a CF item in
-   [registers/conflicts](../registers/conflicts.md) — a new document does not silently
+   [registers/conflicts](../docs/registers/conflicts.md) — a new document does not silently
    supersede a decision.
+
+## What arrived on 18 August, and what it changed
+
+**Five client documents had never entered this package**, and the requirement walk had verified
+the matrix against the contracts without ever checking the other direction. They are now filed.
+
+| | Was missing | What it settled |
+|---|---|---|
+| `rfp/` | **The RFP itself** | Evaluation criteria — **AI at 15%, naming the four capabilities CF-73 parked.** CF-139 |
+| `planning/` | **The delivery plan** | 23 epics, 7,552 person-days, and priorities that contradict the dependency order. CF-140 |
+| `planning/` | Task tracker from workshops | Workshop actions, not yet swept |
+| `mom/` | 14 August MoM | Referenced 29 times in the package and never filed |
+| `mom/` | **18 August MoM** | Ten backlog entries settled, one ADR contradicted. CF-138 |
+| `requirements/` | Seating manifest and amphitheatre plan | The CF-17 sample, used on 18 August and never filed |
+
+**The lesson is the filing, not the reading.** The 14 August minute was cited twenty-nine times
+across the package by people who had read it, and it was never put where the next person would
+find it. A source consulted and not filed is a source the package cannot be checked against.
+
+**The 18 August workshop is the sharpest instance of why this matters.** It records a client
+decision that F&B configuration moves to outlet level — reversing a decision ADR-0018 names,
+dates and gives as its worked example — and it settles ten open backlog entries, including one
+the walk had explicitly flagged as *worth asking whether it is wanted* on the same day the
+client answered no.

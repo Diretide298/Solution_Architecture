@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#eef1f6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0a55c7}
+button,input{font-family:inherit}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#dfe4ec;border-radius:8px}
+@keyframes pulseGlow{0%,100%{opacity:.55}50%{opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;min-height:780px;font-family:Manrope,system-ui,sans-serif;color:#1F2937;background:#F7F9FC;overflow:hidden">
+
+  <aside style="{{ sidebarStyle }}">
+    <div style="position:absolute;inset:0;background:radial-gradient(340px 220px at 0% 8%,rgba(0,184,255,.30),transparent 70%),radial-gradient(300px 260px at 100% 96%,rgba(0,212,196,.22),transparent 72%);pointer-events:none"></div>
+    <div style="{{ headerRowStyle }}">
+      <div role="img" aria-label="TICVAI" style="{{ logoStyle }}"></div>
+
+      <button onClick="{{ toggleRail }}" style="{{ toggleStyle }}" style-hover="background:rgba(255,255,255,.16)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CFE6FF" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+    </div>
+
+    <nav style="position:relative;display:flex;flex-direction:column;gap:3px;padding:12px 10px;overflow-y:auto">
+      <button onClick="{{ nav.sell.go }}" style="{{ nav.sell.style }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>
+        <span style="{{ labelStyle }}">Sell</span>
+      </button>
+      <button onClick="{{ nav.schedule.go }}" style="{{ nav.schedule.style }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
+        <span style="{{ labelStyle }}">Timed entry</span>
+      </button>
+      <button onClick="{{ nav.payments.go }}" style="{{ nav.payments.style }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"></rect><path d="M2 10h20M6 15h4"></path></svg>
+        <span style="{{ labelStyle }}">Payments</span>
+      </button>
+      <button onClick="{{ nav.staff.go }}" style="{{ nav.staff.style }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 20a6 6 0 0 1 12 0"></path><circle cx="17.5" cy="9.5" r="2.4"></circle><path d="M16 20a5.6 5.6 0 0 1 5-5.5"></path></svg>
+        <span style="{{ labelStyle }}">Staff &amp; shifts</span>
+      </button>
+      <div style="height:1px;background:rgba(255,255,255,.10);margin:9px 6px"></div>
+      <button onClick="{{ nav.reports.go }}" style="{{ nav.reports.style }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>
+        <span style="{{ labelStyle }}">Reports</span>
+      </button>
+      <button style="{{ nav.idle.style }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.33-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6h.09A1.7 1.7 0 0 0 10 3.05V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1Z"></path></svg>
+        <span style="{{ labelStyle }}">Settings</span>
+      </button>
+    </nav>
+
+    <div style="{{ shiftCardStyle }}">
+      <div style="display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;color:#7FD7FF;letter-spacing:.08em">
+        <span style="width:7px;height:7px;border-radius:50%;background:#00D4C4;animation:pulseGlow 2.4s infinite"></span>SHIFT OPEN
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#fff;margin-top:5px">AED 18,420</div>
+      <div style="font-size:10.5px;color:#9CB6D6">142 orders · since 11:03 AM</div>
+    </div>
+
+    <div style="position:relative;margin-top:auto;padding:12px 12px 14px">
+      <button style="{{ logoutStyle }}" style-hover="background:rgba(255,255,255,.10)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M15 17l5-5-5-5M20 12H9M12 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"></path></svg>
+        <span style="{{ labelStyle }}">Log out</span>
+      </button>
+    </div>
+  </aside>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+    <header style="height:64px;flex:none;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:16px;padding:0 20px">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;max-width:440px;height:40px;border:1px solid #E5E7EB;border-radius:11px;background:#F7F9FC;padding:0 13px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>
+        <input placeholder="Search tickets, packages, guests, orders…" style="border:0;background:transparent;outline:none;font-size:13px;width:100%;color:#1F2937">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9CA3AF;border:1px solid #E5E7EB;border-radius:6px;padding:2px 6px;background:#fff">⌘K</span>
+      </div>
+
+      <div style="display:flex;gap:6px">
+        <button style="display:flex;align-items:center;gap:7px;border:1px solid #E5E7EB;background:#fff;border-radius:10px;padding:8px 12px;font-size:11.5px;font-weight:700;color:#4B5563;cursor:pointer" style-hover="border-color:#0D6EFD;color:#0D6EFD">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M3 12h18"></path></svg>Scan
+        </button>
+        <button style="display:flex;align-items:center;gap:7px;border:1px solid #E5E7EB;background:#fff;border-radius:10px;padding:8px 12px;font-size:11.5px;font-weight:700;color:#4B5563;cursor:pointer" style-hover="border-color:#0D6EFD;color:#0D6EFD">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg>Guests
+        </button>
+        <button style="position:relative;border:1px solid #E5E7EB;background:#fff;border-radius:10px;padding:8px 11px;cursor:pointer;color:#4B5563" style-hover="border-color:#0D6EFD;color:#0D6EFD">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 9a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7M10.5 20a2 2 0 0 0 3 0"></path></svg>
+          <span style="position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px">3</span>
+        </button>
+        <button onClick="{{ toggleCart }}" style="{{ cartBtnStyle }}" title="Show or hide cart">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.55L20.5 8H6.2"></path><circle cx="10" cy="20" r="1.3"></circle><circle cx="17.5" cy="20" r="1.3"></circle></svg>
+          <span style="{{ cartBtnBadge }}">{{ cartCount }}</span>
+        </button>
+      </div>
+
+      <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+        <div style="text-align:right;line-height:1.25">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13.5px;font-weight:600">11:59 AM</div>
+          <div style="font-size:10px;color:#9CA3AF">Sun, 2 Aug · Gate 3 · POS-01</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;border:1px solid #E5E7EB;border-radius:12px;padding:5px 12px 5px 6px;background:#fff">
+          <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px">JD</div>
+          <div style="line-height:1.2">
+            <div style="font-size:12px;font-weight:700">John Doe</div>
+            <div style="font-size:10px;color:#9CA3AF">Cashier · POS-01</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div style="flex:1;display:flex;min-height:0;position:relative">
+
+      <sc-if value="{{ isCatalogue }}" hint-placeholder-val="{{ true }}">
+      <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+        <div style="padding:16px 20px 0;display:flex;gap:9px;overflow-x:auto">
+          <button onClick="{{ tab.all.go }}" style="{{ tab.all.style }}">
+            <div style="{{ tab.all.chip }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>
+            </div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:11.5px;font-weight:700;white-space:nowrap">All</div>
+              <div style="font-size:9.5px;opacity:.7;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ tab.all.count }} items</div>
+            </div>
+          </button>
+          <button onClick="{{ tab.exhibitions.go }}" style="{{ tab.exhibitions.style }}">
+            <div style="{{ tab.exhibitions.chip }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="m6 15 4-4 3 3 2-2 3 3"></path><circle cx="9" cy="9" r="1.2"></circle></svg>
+            </div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:11.5px;font-weight:700;white-space:nowrap">Exhibitions</div>
+              <div style="font-size:9.5px;opacity:.7;font-family:'IBM Plex Mono',monospace">{{ tab.exhibitions.count }} items</div>
+            </div>
+          </button>
+          <button onClick="{{ tab.experiences.go }}" style="{{ tab.experiences.style }}">
+            <div style="{{ tab.experiences.chip }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"></path><circle cx="12" cy="12" r="3.4"></circle></svg>
+            </div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:11.5px;font-weight:700;white-space:nowrap">Experiences</div>
+              <div style="font-size:9.5px;opacity:.7;font-family:'IBM Plex Mono',monospace">{{ tab.experiences.count }} items</div>
+            </div>
+          </button>
+          <button onClick="{{ tab.tours.go }}" style="{{ tab.tours.style }}">
+            <div style="{{ tab.tours.chip }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"></path><circle cx="12" cy="10" r="2.6"></circle></svg>
+            </div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:11.5px;font-weight:700;white-space:nowrap">Guided Tours</div>
+              <div style="font-size:9.5px;opacity:.7;font-family:'IBM Plex Mono',monospace">{{ tab.tours.count }} items</div>
+            </div>
+          </button>
+          <button onClick="{{ tab.shows.go }}" style="{{ tab.shows.style }}">
+            <div style="{{ tab.shows.chip }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M10 9.5v5l4-2.5z"></path></svg>
+            </div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:11.5px;font-weight:700;white-space:nowrap">Shows &amp; Films</div>
+              <div style="font-size:9.5px;opacity:.7;font-family:'IBM Plex Mono',monospace">{{ tab.shows.count }} items</div>
+            </div>
+          </button>
+          <button onClick="{{ tab.packages.go }}" style="{{ tab.packages.style }}">
+            <div style="{{ tab.packages.chip }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5z"></path><path d="M3 8.5 12 13l9-4.5M12 13v7"></path></svg>
+            </div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:11.5px;font-weight:700;white-space:nowrap">Packages</div>
+              <div style="font-size:9.5px;opacity:.7;font-family:'IBM Plex Mono',monospace">{{ tab.packages.count }} items</div>
+            </div>
+          </button>
+          <button onClick="{{ tab.food.go }}" style="{{ tab.food.style }}">
+            <div style="{{ tab.food.chip }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2 2 0 0 0 4 0V3M8 11v10"></path><path d="M17 3c-1.6 1.4-2.2 3.4-2 6 .1 1.3.8 2 2 2v10"></path></svg>
+            </div>
+            <div style="text-align:left;line-height:1.2">
+              <div style="font-size:11.5px;font-weight:700;white-space:nowrap">Food</div>
+              <div style="font-size:9.5px;opacity:.7;font-family:'IBM Plex Mono',monospace">{{ tab.food.count }} items</div>
+            </div>
+          </button>
+        </div>
+
+        <div style="padding:14px 20px 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">
+          <div style="display:flex;background:#EDF1F7;border-radius:10px;padding:3px;flex:none">
+            <sc-for list="{{ admissionTabs }}" as="a" hint-placeholder-count="3">
+              <button onClick="{{ a.go }}" style="{{ a.style }}">{{ a.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;color:#9CA3AF;min-width:0;flex:1 1 120px">{{ resultLine }}</div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#4B5563;position:relative;flex:none">
+            <button onClick="{{ toggleSort }}" style="{{ sortBtnStyle }}">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3"></path></svg>
+              {{ sortLabel }}
+            </button>
+            <button onClick="{{ toggleFilters }}" style="{{ filterBtnStyle }}">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+              Filters
+              <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
+                <span style="min-width:16px;height:16px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ filterCount }}</span>
+              </sc-if>
+            </button>
+
+            <sc-if value="{{ sortOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:40px;right:78px;z-index:30;width:198px;background:#fff;border:1px solid #E5E7EB;border-radius:13px;box-shadow:0 18px 40px rgba(11,19,36,.16);padding:6px">
+                <div style="font-size:9.5px;font-weight:800;letter-spacing:.07em;color:#9CA3AF;padding:6px 10px 4px">SORT BY</div>
+                <sc-for list="{{ sortOptions }}" as="s" hint-placeholder-count="4">
+                  <button onClick="{{ s.go }}" style="{{ s.style }}">{{ s.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ filtersOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:40px;right:0;z-index:30;width:250px;background:#fff;border:1px solid #E5E7EB;border-radius:13px;box-shadow:0 18px 40px rgba(11,19,36,.16);padding:13px">
+                <div style="font-size:9.5px;font-weight:800;letter-spacing:.07em;color:#9CA3AF;margin-bottom:7px">PRICE</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+                  <sc-for list="{{ bandOptions }}" as="b" hint-placeholder-count="4">
+                    <button onClick="{{ b.go }}" style="{{ b.style }}">{{ b.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="font-size:9.5px;font-weight:800;letter-spacing:.07em;color:#9CA3AF;margin-bottom:7px">TAG</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ flagOptions }}" as="g" hint-placeholder-count="5">
+                    <button onClick="{{ g.go }}" style="{{ g.style }}">{{ g.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:13px">
+                  <button onClick="{{ clearFilters }}" style="flex:1;border:1px solid #E5E7EB;background:#fff;border-radius:9px;padding:8px;font-size:11.5px;font-weight:700;color:#4B5563;cursor:pointer">Clear</button>
+                  <button onClick="{{ toggleFilters }}" style="flex:1;border:0;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;border-radius:9px;padding:8px;font-size:11.5px;font-weight:800;cursor:pointer">Done</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:2px 20px 16px">
+          <sc-if value="{{ showTrending }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;min-height:246px;border-radius:20px;overflow:hidden;margin:8px 0 16px;background:#0B1324">
+              <div style="{{ trend.bgStyle }}"></div>
+              <div style="position:absolute;inset:0;overflow:hidden">{{ trendVideo }}</div>
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,19,36,.94) 8%,rgba(11,19,36,.72) 42%,rgba(11,19,36,.12) 78%);pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;padding:22px 26px;min-height:246px">
+                <div style="max-width:min(560px,62%)">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+                    <span style="font-size:9.5px;font-weight:800;letter-spacing:.1em;color:#0B1324;background:linear-gradient(135deg,#00D4C4,#00B8FF);border-radius:6px;padding:4px 9px">{{ trend.kicker }}</span>
+                    <span style="font-size:10.5px;font-weight:700;color:#7FD7FF">{{ trend.tag }}</span>
+                  </div>
+                  <div style="font-size:27px;font-weight:800;color:#fff;line-height:1.12;letter-spacing:-.01em">{{ trend.title }}</div>
+                  <div style="font-size:12px;color:#CFE0F5;margin-top:7px;max-width:440px;line-height:1.5">{{ trend.blurb }}</div>
+                  <div style="display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap">
+                    <button onClick="{{ trend.book }}" style="border:0;border-radius:12px;padding:11px 20px;font-size:12.5px;font-weight:800;cursor:pointer;color:#fff;white-space:nowrap;background:linear-gradient(135deg,#0D6EFD,#00B8FF);box-shadow:0 10px 24px rgba(13,110,253,.4)">{{ trend.cta }}</button>
+                    <div style="font-size:11.5px;color:#9FC6F5">{{ trend.meta }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#fff">{{ trend.price }}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px;margin-top:16px">
+                    <button onClick="{{ trendPrev }}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(13,110,253,.85)">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"></path></svg>
+                    </button>
+                    <button onClick="{{ trendNext }}" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(13,110,253,.85)">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"></path></svg>
+                    </button>
+                    <div style="display:flex;gap:7px;margin-left:4px">
+                      <sc-for list="{{ trendDots }}" as="d" hint-placeholder-count="3">
+                        <button onClick="{{ d.go }}" style="{{ d.style }}"></button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:15px">
+            <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+              <div onClick="{{ p.open }}" style="position:relative;background:#fff;border:1px solid #E5E7EB;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;box-shadow:0 1px 2px rgba(11,19,36,.04)" style-hover="border-color:#0D6EFD;box-shadow:0 12px 28px rgba(13,110,253,.14);transform:translateY(-2px)">
+                <div style="height:118px;position:relative;background:#EDF1F7">
+                  <div role="img" aria-label="{{ p.name }}" style="{{ p.imgStyle }}"></div>
+                  <span style="{{ p.chipStyle }}">{{ p.category }}</span>
+                  <span style="{{ p.flagStyle }}">{{ p.flag }}</span>
+                </div>
+                <div style="padding:11px 12px 12px;display:flex;flex-direction:column;gap:7px;flex:1">
+                  <div style="font-size:13px;font-weight:700;line-height:1.28;min-height:33px">{{ p.name }}</div>
+                  <div style="display:flex;gap:7px;font-size:10.5px;color:#9CA3AF;font-weight:600">
+                    <span>{{ p.duration }}</span><span>·</span><span>{{ p.audience }}</span>
+                  </div>
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto">
+                    <div>
+                      <div style="font-size:9.5px;color:#9CA3AF;font-weight:700;letter-spacing:.05em">FROM</div>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">{{ p.priceLabel }}</div>
+                    </div>
+                    <button onClick="{{ p.add }}" style="width:36px;height:36px;border-radius:11px;border:0;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(13,110,253,.32)" style-hover="filter:brightness(1.08)">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    </button>
+                  </div>
+                </div>
+                <sc-if value="{{ p.quickOpen }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ p.stop }}" style="position:absolute;inset:0;z-index:5;background:rgba(11,19,36,.90);backdrop-filter:blur(2px);display:flex;flex-direction:column;padding:13px;gap:9px;cursor:default">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <div style="font-size:11px;font-weight:800;color:#7FD7FF;letter-spacing:.06em">QUICK ADD</div>
+                      <button onClick="{{ p.closeQuick }}" style="margin-left:auto;width:22px;height:22px;border-radius:7px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                      </button>
+                    </div>
+                    <div style="font-size:12px;font-weight:700;color:#fff;line-height:1.3">{{ p.name }}</div>
+                    <div style="display:flex;gap:6px">
+                      <sc-for list="{{ p.types }}" as="t" hint-placeholder-count="3">
+                        <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+                      </sc-for>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:9px;margin-top:auto">
+                      <button onClick="{{ p.dec }}" style="width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);color:#fff;font-size:15px;font-weight:700;cursor:pointer">−</button>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#fff;min-width:18px;text-align:center">{{ p.qty }}</div>
+                      <button onClick="{{ p.inc }}" style="width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);color:#fff;font-size:15px;font-weight:700;cursor:pointer">+</button>
+                      <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#7FD7FF">{{ p.quickTotal }}</div>
+                    </div>
+                    <button onClick="{{ p.confirm }}" style="border:0;border-radius:11px;padding:10px;font-size:12px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,#0D6EFD,#00B8FF);box-shadow:0 8px 18px rgba(13,110,253,.4)">Add to cart</button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ showQuickActions }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:none;border-top:1px solid #E5E7EB;background:#fff;padding:11px 20px;display:flex;gap:8px;overflow-x:auto">
+          <sc-for list="{{ quickActions }}" as="q" hint-placeholder-count="6">
+            <button onClick="{{ q.go }}" style="display:flex;align-items:center;gap:8px;border:1px solid #E5E7EB;background:#fff;border-radius:10px;padding:9px 14px;font-size:11.5px;font-weight:700;color:#4B5563;cursor:pointer;white-space:nowrap" style-hover="border-color:#0D6EFD;color:#0D6EFD;background:#F5F9FF">
+              <div style="{{ q.dot }}"></div>{{ q.label }}
+            </button>
+          </sc-for>
+        </div>
+        </sc-if>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 20px">
+        <button onClick="{{ backToCatalogue }}" style="border:1px solid #E5E7EB;background:#fff;border-radius:9px;padding:7px 13px;font-size:11.5px;font-weight:700;color:#4B5563;cursor:pointer;margin-bottom:13px">← Back to catalogue</button>
+        <div style="display:grid;grid-template-columns:268px 1fr;gap:18px;align-items:start">
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;overflow:hidden">
+            <div style="height:168px;position:relative;background:#EDF1F7">
+              <div role="img" aria-label="{{ sel.name }}" style="{{ sel.imgStyle }}"></div>
+            </div>
+            <div style="padding:14px">
+              <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:#0D6EFD">{{ sel.category }}</div>
+              <div style="font-size:17px;font-weight:800;margin:5px 0 8px;line-height:1.2">{{ sel.name }}</div>
+              <div style="font-size:11.5px;color:#4B5563;line-height:1.6">{{ sel.blurb }}</div>
+              <div style="margin-top:12px;display:flex;flex-direction:column;gap:7px">
+                <sc-for list="{{ sel.facts }}" as="f" hint-placeholder-count="4">
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;border-top:1px solid #F1F4F9;padding-top:7px">
+                    <span style="color:#9CA3AF">{{ f.k }}</span><span style="font-weight:700">{{ f.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ sel.seated }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ goSeats }}" style="width:100%;margin-top:13px;border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer">Choose seats on the map →</button>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:15px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:11px">1 · Select date</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ dates }}" as="d" hint-placeholder-count="7">
+                  <button onClick="{{ d.go }}" style="{{ d.style }}">
+                    <div style="font-size:10px;font-weight:700;opacity:.75">{{ d.dow }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">{{ d.day }}</div>
+                    <div style="font-size:9px;opacity:.75">{{ d.mon }}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:15px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+                <div style="font-size:12px;font-weight:800">2 · Select time slot</div>
+                <div style="display:flex;gap:13px;font-size:10px;font-weight:700">
+                  <span style="color:#00A38F">● High availability</span><span style="color:#C2761B">● Filling fast</span><span style="color:#9CA3AF">● Sold out</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px">
+                <sc-for list="{{ slots }}" as="s" hint-placeholder-count="8">
+                  <button onClick="{{ s.go }}" style="{{ s.style }}">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600">{{ s.time }}</div>
+                    <div style="{{ s.availStyle }}">{{ s.avail }}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:15px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:11px">3 · Ticket type &amp; quantity</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <sc-for list="{{ ticketTypes }}" as="t" hint-placeholder-count="4">
+                  <div style="{{ t.style }}">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                      <div>
+                        <div style="font-size:12.5px;font-weight:700">{{ t.name }}</div>
+                        <div style="font-size:10.5px;color:#9CA3AF">{{ t.note }}</div>
+                      </div>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600">{{ t.price }}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:11px">
+                      <div style="display:flex;align-items:center;gap:9px">
+                        <button onClick="{{ t.dec }}" style="width:31px;height:31px;border-radius:9px;border:1px solid #E5E7EB;background:#fff;font-size:16px;cursor:pointer;color:#4B5563">−</button>
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;min-width:14px;text-align:center">{{ t.qty }}</span>
+                        <button onClick="{{ t.inc }}" style="width:31px;height:31px;border-radius:9px;border:0;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;font-size:16px;cursor:pointer">+</button>
+                      </div>
+                      <div style="font-size:11px;color:#9CA3AF">Subtotal <b style="color:#1F2937;font-family:'IBM Plex Mono',monospace">{{ t.sub }}</b></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+                <div style="font-size:11px;color:#9CA3AF">Valid only for the selected date and time slot · re-entry not permitted</div>
+                <button onClick="{{ addConfigured }}" style="margin-left:auto;border:0;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;border-radius:11px;padding:12px 22px;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(13,110,253,.30)">Add {{ configuredCount }} to cart · {{ configuredTotal }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isSeats }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 20px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:13px;gap:16px">
+          <div style="display:flex;align-items:center;gap:13px">
+            <button onClick="{{ backToCatalogue }}" style="border:1px solid #E5E7EB;background:#fff;border-radius:9px;padding:7px 12px;font-size:11.5px;font-weight:700;color:#4B5563;cursor:pointer">←</button>
+            <div style="width:150px;height:96px;border-radius:12px;overflow:hidden;position:relative;flex:none;background:#EDF1F7">
+              <div role="img" aria-label="Show poster" style="position:absolute;inset:0;background-image:url(https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=720&q=70);background-size:cover;background-position:center"></div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:#0D6EFD">SHOWS &amp; FILMS · SEAT SELECTION</div>
+              <div style="font-size:20px;font-weight:800;margin-top:3px">{{ showTitle }}</div>
+              <div style="font-size:11.5px;color:#9CA3AF">Dome Theatre · Sun 2 Aug · 07:30 PM · 40 min</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <sc-for list="{{ showtimes }}" as="s" hint-placeholder-count="4">
+              <button onClick="{{ s.go }}" style="{{ s.style }}">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600">{{ s.time }}</div>
+                <div style="font-size:9.5px;opacity:.75">{{ s.left }}</div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 268px;gap:16px;align-items:start">
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:18px;padding:18px 16px 16px">
+            <div style="margin:0 auto 22px;max-width:620px">
+              <div style="height:32px;border-radius:0 0 60% 60%/0 0 100% 100%;background:linear-gradient(180deg,#0B1324,#1e3560);color:#7FD7FF;font-size:11px;font-weight:800;letter-spacing:.28em;display:flex;align-items:center;justify-content:center">SCREEN</div>
+              <div style="height:26px;background:radial-gradient(60% 100% at 50% 0%,rgba(0,184,255,.22),transparent 75%)"></div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+              <sc-for list="{{ seatTiers }}" as="tier" hint-placeholder-count="3">
+                <div style="width:100%">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;padding:0 6px">
+                    <span style="{{ tier.badge }}">{{ tier.name }}</span>
+                    <span style="font-size:10.5px;color:#9CA3AF;font-weight:600">{{ tier.priceLabel }}</span>
+                    <div style="flex:1;height:1px;background:#F1F4F9"></div>
+                    <span style="font-size:10px;color:#9CA3AF;font-family:'IBM Plex Mono',monospace">{{ tier.availLabel }}</span>
+                  </div>
+                  <sc-for list="{{ tier.rows }}" as="row" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:5px">
+                      <span style="width:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9CA3AF;text-align:center">{{ row.label }}</span>
+                      <sc-for list="{{ row.seats }}" as="seat" hint-placeholder-count="16">
+                        <button onClick="{{ seat.go }}" style="{{ seat.style }}">{{ seat.num }}</button>
+                      </sc-for>
+                      <span style="width:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9CA3AF;text-align:center">{{ row.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid #F1F4F9;font-size:10.5px;font-weight:600;color:#4B5563">
+              <span style="display:flex;align-items:center;gap:6px"><i style="width:14px;height:14px;border-radius:5px;border:1px solid #CBD5E1;background:#fff;display:inline-block"></i>Available</span>
+              <span style="display:flex;align-items:center;gap:6px"><i style="width:14px;height:14px;border-radius:5px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);display:inline-block"></i>Selected</span>
+              <span style="display:flex;align-items:center;gap:6px"><i style="width:14px;height:14px;border-radius:5px;background:#E5E7EB;display:inline-block"></i>Sold</span>
+              <span style="display:flex;align-items:center;gap:6px"><i style="width:14px;height:14px;border-radius:5px;background:#fff;border:1px dashed #00D4C4;display:inline-block"></i>Accessible</span>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:13px">
+            <div style="background:linear-gradient(150deg,#0B1324,#16305c);border-radius:16px;padding:15px;color:#fff">
+              <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#7FD7FF">YOUR SELECTION</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;margin:6px 0 2px">{{ seatCountLabel }}</div>
+              <div style="font-size:11.5px;color:#9CB6D6">{{ seatListLabel }}</div>
+              <div style="height:1px;background:rgba(255,255,255,.14);margin:12px 0"></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#CFE0F5"><span>Seat total</span><span style="font-family:'IBM Plex Mono',monospace">{{ seatTotalLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#CFE0F5;margin-top:5px"><span>Booking fee</span><span style="font-family:'IBM Plex Mono',monospace">{{ seatFeeLabel }}</span></div>
+              <button onClick="{{ addSeats }}" style="width:100%;margin-top:13px;border:0;border-radius:11px;padding:12px;font-size:12.5px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#0D6EFD,#00D4C4);color:#fff">Add seats to cart</button>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:14px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:9px">Price tiers</div>
+              <sc-for list="{{ tierLegend }}" as="t" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid #F1F4F9">
+                  <i style="{{ t.swatch }}"></i>
+                  <div style="flex:1"><div style="font-size:11.5px;font-weight:700">{{ t.name }}</div><div style="font-size:10px;color:#9CA3AF">{{ t.note }}</div></div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ t.price }}</div>
+                </div>
+              </sc-for>
+              <div style="margin-top:10px;font-size:10.5px;color:#9CA3AF;line-height:1.5">Seats are held for 8 minutes once selected. Wheelchair spaces are marked with a dashed outline.</div>
+            </div>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isPayment }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 20px">
+        <div style="position:relative;overflow:hidden;border-radius:18px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;background:linear-gradient(120deg,#0B1324 0%,#122a52 52%,#0a3f8f 100%);color:#fff">
+          <div style="position:absolute;inset:0;background:radial-gradient(420px 220px at 88% 10%,rgba(0,184,255,.35),transparent 70%),radial-gradient(360px 240px at 0% 110%,rgba(0,212,196,.22),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.09em;color:#7FD7FF">CHECKOUT · ORDER #TP-40219</div>
+            <div style="font-size:22px;font-weight:800;margin-top:4px">Payment</div>
+            <div style="font-size:11.5px;color:#CFE0F5">Select a method, tender the amount, then complete the transaction</div>
+          </div>
+          <div style="position:relative;display:flex;align-items:flex-end;gap:22px">
+            <div>
+              <div style="font-size:10px;color:#9FC6F5;font-weight:800;letter-spacing:.06em">ITEMS</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">{{ cartCount }}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:10px;color:#9FC6F5;font-weight:800;letter-spacing:.06em">TOTAL PAYABLE</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:29px;font-weight:600;color:#7FD7FF">{{ totalLabel }}</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:252px 1fr 292px;gap:14px;align-items:start">
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:14px">
+            <div style="font-size:12px;font-weight:800;margin-bottom:10px">1 · Method</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button onClick="{{ pm.cash.go }}" style="{{ pm.cash.style }}" style-hover="border-color:#BFE0FF">
+                <div style="{{ pm.cash.dot }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"></rect><circle cx="12" cy="12" r="2.6"></circle><path d="M6 9.5v5M18 9.5v5"></path></svg></div>
+                <div style="line-height:1.25">
+                  <div style="font-size:12.5px;font-weight:700">{{ pm.cash.name }}</div>
+                  <div style="font-size:10.5px;color:#9CA3AF">{{ pm.cash.note }}</div>
+                </div>
+                <div style="{{ pm.cash.check }}"></div>
+              </button>
+              <button onClick="{{ pm.card.go }}" style="{{ pm.card.style }}" style-hover="border-color:#BFE0FF">
+                <div style="{{ pm.card.dot }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"></rect><path d="M2.5 10h19M6 15h3"></path></svg></div>
+                <div style="line-height:1.25">
+                  <div style="font-size:12.5px;font-weight:700">{{ pm.card.name }}</div>
+                  <div style="font-size:10.5px;color:#9CA3AF">{{ pm.card.note }}</div>
+                </div>
+                <div style="{{ pm.card.check }}"></div>
+              </button>
+              <button onClick="{{ pm.wallet.go }}" style="{{ pm.wallet.style }}" style-hover="border-color:#BFE0FF">
+                <div style="{{ pm.wallet.dot }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H17a2 2 0 0 1 2 2v1"></path><rect x="3" y="7.5" width="18" height="11.5" rx="2.5"></rect><circle cx="16.5" cy="13.2" r="1.3"></circle></svg></div>
+                <div style="line-height:1.25">
+                  <div style="font-size:12.5px;font-weight:700">{{ pm.wallet.name }}</div>
+                  <div style="font-size:10.5px;color:#9CA3AF">{{ pm.wallet.note }}</div>
+                </div>
+                <div style="{{ pm.wallet.check }}"></div>
+              </button>
+              <button onClick="{{ pm.gift.go }}" style="{{ pm.gift.style }}" style-hover="border-color:#BFE0FF">
+                <div style="{{ pm.gift.dot }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="2"></rect><path d="M3 13h18M12 9v11"></path><path d="M12 9c-3.5 0-5-1-5-2.6C7 5.1 8 4.3 9.2 4.3c1.9 0 2.8 2 2.8 4.7 0-2.7.9-4.7 2.8-4.7 1.2 0 2.2.8 2.2 2.1C17 8 15.5 9 12 9Z"></path></svg></div>
+                <div style="line-height:1.25">
+                  <div style="font-size:12.5px;font-weight:700">{{ pm.gift.name }}</div>
+                  <div style="font-size:10.5px;color:#9CA3AF">{{ pm.gift.note }}</div>
+                </div>
+                <div style="{{ pm.gift.check }}"></div>
+              </button>
+              <button onClick="{{ pm.link.go }}" style="{{ pm.link.style }}" style-hover="border-color:#BFE0FF">
+                <div style="{{ pm.link.dot }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M9 7h6M9 11h6M9 15h3"></path></svg></div>
+                <div style="line-height:1.25">
+                  <div style="font-size:12.5px;font-weight:700">{{ pm.link.name }}</div>
+                  <div style="font-size:10.5px;color:#9CA3AF">{{ pm.link.note }}</div>
+                </div>
+                <div style="{{ pm.link.check }}"></div>
+              </button>
+              <button onClick="{{ pm.split.go }}" style="{{ pm.split.style }}" style-hover="border-color:#BFE0FF">
+                <div style="{{ pm.split.dot }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h5l6 12h5"></path><path d="M4 18h5l2-4"></path><path d="m17 15 3 3-3 3M17 3l3 3-3 3"></path></svg></div>
+                <div style="line-height:1.25">
+                  <div style="font-size:12.5px;font-weight:700">{{ pm.split.name }}</div>
+                  <div style="font-size:10.5px;color:#9CA3AF">{{ pm.split.note }}</div>
+                </div>
+                <div style="{{ pm.split.check }}"></div>
+              </button>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:15px">
+            <div style="font-size:12px;font-weight:800;margin-bottom:11px">2 · {{ methodTitle }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+              <div style="border:1px solid #E5E7EB;border-radius:12px;padding:11px;background:#F7F9FC">
+                <div style="font-size:10.5px;color:#9CA3AF;font-weight:700">Total payable</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">{{ totalLabel }}</div>
+              </div>
+              <div style="border:1px solid #BFE0FF;border-radius:12px;padding:11px;background:#F2F8FF">
+                <div style="font-size:10.5px;color:#0D6EFD;font-weight:700">Amount received</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#0D6EFD">{{ receivedLabel }}</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 162px;gap:12px">
+              <div>
+                <div style="border:1px solid #E5E7EB;border-radius:12px;padding:10px 13px;font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;text-align:right;margin-bottom:9px">{{ keypadDisplay }}</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+                  <sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+                    <button onClick="{{ k.go }}" style="{{ k.style }}">{{ k.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:10.5px;font-weight:800;color:#9CA3AF;letter-spacing:.04em">QUICK TENDER</div>
+                <sc-for list="{{ tenders }}" as="t" hint-placeholder-count="5">
+                  <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+                </sc-for>
+                <div style="margin-top:auto;border-radius:12px;padding:11px;background:linear-gradient(150deg,#0B1324,#16305c);color:#fff">
+                  <div style="font-size:10.5px;color:#7FD7FF;font-weight:700">Change due</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">{{ changeLabel }}</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:9px;margin-top:13px">
+              <button onClick="{{ backToCatalogue }}" style="border:1px solid #E5E7EB;background:#fff;border-radius:10px;padding:11px 16px;font-size:12px;font-weight:700;color:#4B5563;cursor:pointer">Back to cart</button>
+              <button onClick="{{ complete }}" style="flex:1;border:0;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;border-radius:10px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(13,110,253,.28)">Complete payment · change {{ changeLabel }}</button>
+              <button style="border:1px solid #FBD5D5;background:#fff;color:#C81E1E;border-radius:10px;padding:11px 16px;font-size:12px;font-weight:700;cursor:pointer">Cancel</button>
+            </div>
+            <sc-if value="{{ paid }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:11px;border:1px solid #A7EFE7;background:#EEFCFA;border-radius:12px;padding:11px 13px;font-size:12px;font-weight:700;color:#00806F">Payment captured · tickets printed · receipt emailed to guest</div>
+            </sc-if>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:12px;font-weight:800">Order summary</div>
+              <button onClick="{{ backToCatalogue }}" style="border:0;background:transparent;color:#0D6EFD;font-size:11px;font-weight:700;cursor:pointer">Edit cart</button>
+            </div>
+            <sc-for list="{{ cart }}" as="c" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #F1F4F9">
+                <div><div style="font-size:11.5px;font-weight:700">{{ c.name }}</div><div style="font-size:10.5px;color:#9CA3AF">{{ c.meta }} · ×{{ c.qty }}</div></div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ c.lineTotal }}</div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ summary }}" as="s" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#4B5563;padding:3px 0">
+                <span>{{ s.k }}</span><span style="{{ s.tone }}">{{ s.v }}</span>
+              </div>
+            </sc-for>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #E5E7EB;margin-top:8px;padding-top:9px">
+              <span style="font-size:13px;font-weight:800">Total payable</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600">{{ totalLabel }}</span>
+            </div>
+            <div style="margin-top:11px;display:flex;gap:8px;border:1px solid #A7EFE7;background:#EEFCFA;border-radius:11px;padding:10px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00806F" stroke-width="2" stroke-linecap="round"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-.8-7-4.6-7-9V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
+              <div style="font-size:10.5px;color:#00806F;line-height:1.45"><b>Secure payment</b><br>Encrypted terminal · PCI-DSS compliant</div>
+            </div>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isReports }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 22px">
+        <div style="position:relative;overflow:hidden;border-radius:18px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;background:linear-gradient(120deg,#0B1324 0%,#122a52 52%,#0a3f8f 100%);color:#fff;flex-wrap:wrap">
+          <div style="position:absolute;inset:0;background:radial-gradient(420px 220px at 92% 6%,rgba(0,184,255,.34),transparent 70%),radial-gradient(360px 240px at 0% 110%,rgba(0,212,196,.2),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.09em;color:#7FD7FF">SYSTEM AT A GLANCE · GATE 3 · POS-01</div>
+            <div style="font-size:22px;font-weight:800;margin-top:4px">Reports &amp; performance</div>
+            <div style="font-size:11.5px;color:#CFE0F5">Sunday, 2 August 2026 · live since 08:00 · updated 11:59 AM</div>
+          </div>
+          <div style="position:relative;display:flex;gap:8px">
+            <sc-for list="{{ reportRanges }}" as="r" hint-placeholder-count="3">
+              <button onClick="{{ r.go }}" style="{{ r.style }}">{{ r.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:15px;padding:14px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="{{ k.dot }}"></div>
+                <div style="font-size:10.5px;font-weight:800;color:#9CA3AF;letter-spacing:.05em">{{ k.label }}</div>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;margin-top:7px">{{ k.value }}</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:5px">
+                <span style="{{ k.deltaStyle }}">{{ k.delta }}</span>
+                <span style="font-size:10.5px;color:#9CA3AF">{{ k.note }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:14px;align-items:start;margin-bottom:14px">
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:16px">
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+              <div style="font-size:13px;font-weight:800">Revenue by hour</div>
+              <div style="font-size:11px;color:#9CA3AF">{{ hourlyNote }}</div>
+              <div style="margin-left:auto;display:flex;gap:12px;font-size:10.5px;color:#4B5563;font-weight:700">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);display:inline-block"></span>Tickets</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:#BFE0FF;display:inline-block"></span>F&amp;B + retail</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:8px;height:186px">
+              <sc-for list="{{ hourly }}" as="h" hint-placeholder-count="12">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9CA3AF">{{ h.total }}</div>
+                  <div style="{{ h.barWrap }}">
+                    <div style="{{ h.retail }}"></div>
+                    <div style="{{ h.tickets }}"></div>
+                  </div>
+                  <div style="font-size:9.5px;color:#9CA3AF;font-weight:700">{{ h.hour }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:16px">
+            <div style="font-size:13px;font-weight:800;margin-bottom:12px">Revenue mix by category</div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <div style="{{ donutStyle }}">
+                <div style="position:absolute;inset:19px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">{{ grossShort }}</div>
+                  <div style="font-size:9px;color:#9CA3AF;font-weight:700;letter-spacing:.05em">GROSS</div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ mix }}" as="m" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="{{ m.swatch }}"></span>
+                    <span style="font-size:11.5px;font-weight:700;flex:1">{{ m.label }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4B5563">{{ m.pct }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:start">
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;overflow:hidden">
+            <div style="padding:13px 16px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:10px">
+              <div style="font-size:13px;font-weight:800">Top selling products</div>
+              <div style="margin-left:auto;font-size:11px;color:#9CA3AF">{{ rangeLabel }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.5fr .6fr 1fr .9fr;padding:9px 16px;font-size:10px;font-weight:800;color:#9CA3AF;letter-spacing:.06em;background:#F7F9FC;border-bottom:1px solid #E5E7EB">
+              <div>PRODUCT</div><div>UNITS</div><div>REVENUE</div><div>SHARE</div>
+            </div>
+            <sc-for list="{{ topProducts }}" as="t" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:1.5fr .6fr 1fr .9fr;padding:11px 16px;border-bottom:1px solid #F1F4F9;align-items:center;font-size:12px">
+                <div style="display:flex;align-items:center;gap:9px;min-width:0">
+                  <div style="{{ t.thumb }}"></div>
+                  <div style="min-width:0">
+                    <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.name }}</div>
+                    <div style="font-size:10px;color:#9CA3AF">{{ t.category }}</div>
+                  </div>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace">{{ t.units }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;white-space:nowrap">{{ t.revenue }}</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:7px;border-radius:4px;background:#EDF1F7;overflow:hidden"><div style="{{ t.barStyle }}"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4B5563">{{ t.share }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:16px">
+              <div style="font-size:13px;font-weight:800;margin-bottom:12px">Sales channels</div>
+              <sc-for list="{{ channels }}" as="c" hint-placeholder-count="4">
+                <div style="margin-bottom:11px">
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:5px">
+                    <span>{{ c.label }}</span><span style="font-family:'IBM Plex Mono',monospace;color:#4B5563">{{ c.value }}</span>
+                  </div>
+                  <div style="height:9px;border-radius:5px;background:#EDF1F7;overflow:hidden"><div style="{{ c.barStyle }}"></div></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;overflow:hidden">
+              <div style="padding:13px 16px;border-bottom:1px solid #E5E7EB;font-size:13px;font-weight:800">Terminal health</div>
+              <sc-for list="{{ terminals }}" as="t" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F9">
+                  <div style="{{ t.status }}"></div>
+                  <div style="min-width:0;flex:1">
+                    <div style="font-size:12px;font-weight:700">{{ t.name }}</div>
+                    <div style="font-size:10.5px;color:#9CA3AF">{{ t.note }}</div>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ t.value }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+      <main style="flex:1;min-width:0;overflow-y:auto;padding:16px 20px 20px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:20px;font-weight:800">Staff &amp; shifts</div>
+            <div style="font-size:11.5px;color:#9CA3AF">Gate 3 · Sunday, 2 August 2026 · 4 terminals live</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="border:1px solid #E5E7EB;background:#fff;border-radius:10px;padding:10px 15px;font-size:12px;font-weight:700;color:#4B5563;cursor:pointer">Export roster</button>
+            <button style="border:0;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;border-radius:10px;padding:10px 15px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(13,110,253,.28)">Begin shift</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
+          <sc-for list="{{ shiftStats }}" as="s" hint-placeholder-count="4">
+            <div style="{{ s.card }}">
+              <div style="font-size:10.5px;font-weight:800;letter-spacing:.05em;{{ s.labelColor }}">{{ s.label }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;margin-top:6px">{{ s.value }}</div>
+              <div style="font-size:10.5px;margin-top:2px;opacity:.75">{{ s.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 306px;gap:14px;align-items:start">
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;overflow:hidden">
+            <div style="padding:13px 15px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:10px">
+              <div style="font-size:12.5px;font-weight:800">On duty today</div>
+              <div style="font-size:11px;color:#9CA3AF">6 of 8 scheduled</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr .9fr .9fr;padding:9px 15px;font-size:10px;font-weight:800;color:#9CA3AF;letter-spacing:.06em;background:#F7F9FC;border-bottom:1px solid #E5E7EB">
+              <div>STAFF</div><div>ROLE / TERMINAL</div><div>SHIFT</div><div>SALES</div><div>STATUS</div>
+            </div>
+            <sc-for list="{{ staff }}" as="s" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr .9fr .9fr;padding:11px 15px;border-bottom:1px solid #F1F4F9;align-items:center;font-size:12px">
+                <div style="display:flex;align-items:center;gap:9px">
+                  <div style="{{ s.avatar }}">{{ s.initials }}</div>
+                  <div><div style="font-weight:700">{{ s.name }}</div><div style="font-size:10.5px;color:#9CA3AF">{{ s.id }}</div></div>
+                </div>
+                <div><div style="font-weight:600">{{ s.role }}</div><div style="font-size:10.5px;color:#9CA3AF">{{ s.terminal }}</div></div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4B5563">{{ s.shift }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ s.sales }}</div>
+                <div><span style="{{ s.badge }}">{{ s.status }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:15px">
+              <div style="font-size:12.5px;font-weight:800;margin-bottom:3px">Opening float — POS-01</div>
+              <div style="font-size:11px;color:#9CA3AF;margin-bottom:11px">Counted by John Doe at 11:03 AM</div>
+              <sc-for list="{{ floatRows }}" as="f" hint-placeholder-count="7">
+                <div style="display:grid;grid-template-columns:58px 1fr 76px;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #F1F4F9;font-size:11.5px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ f.denom }}</div>
+                  <div style="color:#9CA3AF">× {{ f.pieces }} pcs</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">{{ f.amount }}</div>
+                </div>
+              </sc-for>
+              <div style="display:flex;justify-content:space-between;border-top:1.5px solid #1F2937;margin-top:8px;padding-top:9px;font-size:13px;font-weight:800">
+                <span>Total float</span><span style="font-family:'IBM Plex Mono',monospace">AED 500.00</span>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:15px">
+              <div style="font-size:12.5px;font-weight:800;margin-bottom:9px">Shift activity</div>
+              <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+                <div style="display:flex;gap:10px;padding:7px 0;border-top:1px solid #F1F4F9">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9CA3AF;padding-top:1px">{{ a.time }}</div>
+                  <div style="font-size:11.5px;color:#4B5563">{{ a.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </main>
+      </sc-if>
+
+      <sc-if value="{{ showCart }}" hint-placeholder-val="{{ true }}">
+      <div style="width:330px;flex:none"></div>
+      <aside style="position:absolute;top:0;right:0;bottom:0;width:330px;z-index:21;background:#fff;border-left:1px solid #E5E7EB;display:flex;flex-direction:column;box-shadow:-18px 0 44px rgba(11,19,36,.18)">
+        <div style="padding:14px 16px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:9px">
+          <div style="font-size:14px;font-weight:800">Cart</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;background:#F2F7FF;color:#0D6EFD;border-radius:7px;padding:2px 8px">{{ cartCount }}</div>
+          <button onClick="{{ toggleCart }}" style="margin-left:auto;border:1px solid #E5E7EB;background:#fff;border-radius:8px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:#4B5563;cursor:pointer" title="Hide cart">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          </button>
+          <button onClick="{{ clearCart }}" style="border:1px solid #E5E7EB;background:#fff;border-radius:8px;padding:5px 10px;font-size:10.5px;font-weight:700;color:#C81E1E;cursor:pointer">Clear</button>
+        </div>
+        <div style="padding:10px 16px;border-bottom:1px solid #E5E7EB;background:linear-gradient(90deg,#F2F8FF,#EEFCFA);font-size:11px;font-weight:700;color:#0D6EFD;display:flex;justify-content:space-between">
+          <span>Gold member · Sara Al Mansouri</span><span style="color:#00806F">{{ discountPctLabel }} off</span>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:11px 16px;display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ cart }}" as="c" hint-placeholder-count="3">
+            <div style="display:flex;gap:10px;border:1px solid #EDF1F7;border-radius:13px;padding:10px" style-hover="border-color:#BFE0FF">
+              <div style="{{ c.imgStyle }}"></div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;gap:6px">
+                  <div style="font-size:12px;font-weight:700;line-height:1.25">{{ c.name }}</div>
+                  <button onClick="{{ c.remove }}" style="border:0;background:transparent;color:#9CA3AF;font-size:15px;cursor:pointer;line-height:1">×</button>
+                </div>
+                <div style="font-size:10.5px;color:#9CA3AF;margin:2px 0 7px">{{ c.meta }}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <button onClick="{{ c.dec }}" style="width:25px;height:25px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;cursor:pointer;font-size:13px;color:#4B5563">−</button>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ c.qty }}</span>
+                    <button onClick="{{ c.inc }}" style="width:25px;height:25px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;cursor:pointer;font-size:13px;color:#4B5563">+</button>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600">{{ c.lineTotal }}</div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px dashed #DCE3ED;border-radius:13px;padding:28px 14px;text-align:center;color:#9CA3AF;font-size:11.5px">Cart is empty — tap a product to add tickets.</div>
+          </sc-if>
+        </div>
+        <div style="border-top:1px solid #E5E7EB;padding:13px 16px">
+          <div style="display:flex;gap:7px;margin-bottom:11px">
+            <input placeholder="Promo code" style="flex:1;border:1px solid #E5E7EB;border-radius:9px;padding:9px 11px;font-size:11.5px;outline:none">
+            <button style="border:1px solid #E5E7EB;background:#F7F9FC;border-radius:9px;padding:9px 14px;font-size:11.5px;font-weight:700;cursor:pointer">Apply</button>
+          </div>
+          <sc-for list="{{ summary }}" as="s" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#4B5563;padding:3px 0">
+              <span>{{ s.k }}</span><span style="{{ s.tone }}">{{ s.v }}</span>
+            </div>
+          </sc-for>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #E5E7EB;margin-top:8px;padding-top:9px">
+            <span style="font-size:13px;font-weight:800">Total</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">{{ totalLabel }}</span>
+          </div>
+          <button onClick="{{ goPayment }}" style="width:100%;margin-top:11px;border:0;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;border-radius:12px;padding:14px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 10px 22px rgba(13,110,253,.28)" style-hover="filter:brightness(1.06)">Checkout · {{ totalLabel }}</button>
+          <div style="text-align:center;font-size:10.5px;color:#9CA3AF;margin-top:7px">Secure checkout · PCI-DSS terminal</div>
+        </div>
+      </aside>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;background:linear-gradient(135deg,#0B1324,#123a76);color:#fff;box-shadow:0 18px 42px rgba(11,19,36,.38);border:1px solid rgba(127,215,255,.35)">
+      <div style="width:24px;height:24px;border-radius:8px;flex:none;background:linear-gradient(135deg,#00D4C4,#00B8FF);display:flex;align-items:center;justify-content:center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B1324" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"></path></svg>
+      </div>
+      <div style="font-size:12.5px;font-weight:700">{{ toast }}</div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;currency&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;AED&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;memberDiscount&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:5,&quot;min&quot;:0,&quot;max&quot;:25,&quot;step&quot;:1,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;taxIncluded&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showQuickActions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const BLUE="#0D6EFD", CYAN="#00B8FF", TEAL="#00D4C4", INK="#0B1324";
+const CATS = ["All","Exhibitions","Experiences","Guided Tours","Shows & Films","Packages","Food"];
+const TONES = {
+  "Exhibitions":["#EAF2FF","#0D6EFD"],"Experiences":["#E6FBF9","#00806F"],"Guided Tours":["#E8F7FF","#0077A8"],
+  "Shows & Films":["#EEF0FF","#3B4CCA"],"Packages":["#FFF1E8","#C2761B"],"Food":["#F0FAEC","#3D7A1F"]
+};
+const SHOTS = ["1544967082-d9d25d867d66","1519766030446-ae88fde27309","1639595756916-f43d61e511dc",
+  "1503676260728-1c00da094a0b","1689825422854-8e3083c2fb82","1523906834658-6e24ef2386f9",
+  "1489599849927-2ee91cede3ba","1594908900066-3f47337549d8","1513151233558-d860c5398176",
+  "1508672019048-805c876b67e2","1517248135467-4c7edcad34c4","1554118811-1e0d58224f24"];
+const photo = i => "https://images.unsplash.com/photo-" + SHOTS[i % SHOTS.length] + "?auto=format&fit=crop&w=720&q=70";
+const coverStyle = (i, extra) => Object.assign({backgroundImage:"url(" + photo(i) + ")",backgroundSize:"cover",backgroundPosition:"center",backgroundColor:"#EDF1F7"}, extra);
+const VID = n => "https://commons.wikimedia.org/wiki/Special:FilePath/" + n;
+const HOURLY = [["9AM",1200,180],["10AM",2100,340],["11AM",3050,520],["12PM",3600,900],["1PM",2950,1150],
+  ["2PM",3380,780],["3PM",4120,860],["4PM",4650,990],["5PM",5200,1240],["6PM",4780,1420],["7PM",3960,1180],["8PM",2400,760]];
+const MIX = [["Exhibitions",30,"#0D6EFD"],["Packages",26,"#5B4BE0"],["Shows & Films",18,"#F59E0B"],
+  ["Experiences",14,"#00A896"],["Food & retail",12,"#3D7A1F"]];
+const TOPS = [["Full Park Day Pass","Packages",132,59400,8],["Ancient Civilizations Exhibition","Exhibitions",214,12840,0],
+  ["Nocturnal Planetarium Show","Shows & Films",186,15810,6],["Ocean Life Aquarium","Exhibitions",173,15570,1],
+  ["Sky Coaster","Experiences",148,16280,2],["Safari Grill Meal Voucher","Food",161,8855,10]];
+const CHANNELS = [["Gate counter",48200,"#0D6EFD"],["Self-service kiosk",31400,"#00B8FF"],["Online / app",26800,"#00D4C4"],["Travel partners",11900,"#5B4BE0"]];
+const TERMINALS = [["POS-01 · Gate 3","John Doe · 142 orders","AED 18,420","#00A896"],
+  ["POS-02 · Gate 3","Amira K. · 118 orders","AED 14,960","#00A896"],
+  ["KIOSK-07 · North","Unattended · printer low","AED 9,240","#F59E0B"],
+  ["POS-05 · Lagoon","Offline since 11:12","AED 4,110","#C81E1E"]];
+const TICKET_MULT = {"Adult":1, "Child":0.6, "Senior":0.75};
+const BANNERS = {
+  "All": [
+    {title:"Nocturnal Planetarium Show", tag:"Dome Theatre", kicker:"TRENDING NOW", price:"AED 85", cta:"Book seats",
+     meta:"40 min · 7:30 PM daily · 3 slots left", blurb:"A guided journey through the southern night sky, projected across the full 18-metre dome.", idx:6},
+    {title:"Full Park Day Pass", tag:"All zones", kicker:"BEST VALUE", price:"AED 450", cta:"View details",
+     meta:"Valid all day · skip-the-line at 4 gates", blurb:"One wristband for every zone, ride and exhibition — the fastest upsell at the gate.", idx:8},
+    {title:"Ocean Life Aquarium", tag:"Blue Wing", kicker:"NOW LIVE", price:"AED 90", cta:"View details",
+     meta:"Feeding show every hour · 1–1.5 hrs", blurb:"Walk the 40-metre reef tunnel while divers hand-feed the rays overhead.", idx:1,
+     video:VID("Fish_in_aquarium.webm")}
+  ],
+  "Exhibitions": [
+    {title:"Ancient Civilizations", tag:"Hall of Origins", kicker:"NEW EXHIBIT", price:"AED 60", cta:"View details",
+     meta:"Timed entry · 1–2 hrs · all ages", blurb:"Nine reconstructed chambers, from Ur to Petra, with projection-mapped artefacts.", idx:0},
+    {title:"Ocean Life Aquarium", tag:"Blue Wing", kicker:"NOW LIVE", price:"AED 90", cta:"View details",
+     meta:"Feeding show every hour · 1–1.5 hrs", blurb:"Walk the 40-metre reef tunnel while divers hand-feed the rays overhead.", idx:1,
+     video:VID("Jellyfish_in_a_aquarium.webm")}
+  ],
+  "Experiences": [
+    {title:"Sky Coaster", tag:"Thrill Arena", kicker:"HIGH DEMAND", price:"AED 110", cta:"View details",
+     meta:"Height 1.4m+ · 90 sec ride · 2 trains", blurb:"The park's fastest launch — sells out by noon on weekends.", idx:2},
+    {title:"Kids Art Workshop", tag:"Maker Studio", kicker:"FAMILY PICK", price:"AED 45", cta:"View details",
+     meta:"Ages 5–12 · 60 min · materials included", blurb:"Small-group clay and print sessions with a resident artist.", idx:3}
+  ],
+  "Guided Tours": [
+    {title:"Mountain Exploration Tour", tag:"North Ridge", kicker:"GUIDED", price:"AED 180", cta:"View details",
+     meta:"3.5 hrs · 12 guests max · ranger led", blurb:"Ridge-line trail with a naturalist, ending at the canopy viewpoint.", idx:4},
+    {title:"Heritage Walk", tag:"Old Quarter", kicker:"STORYTELLING", price:"AED 75", cta:"View details",
+     meta:"90 min · morning and sunset departures", blurb:"Courtyards, wind towers and trade routes, told by local historians.", idx:5}
+  ],
+  "Shows & Films": [
+    {title:"Nocturnal Planetarium Show", tag:"Dome Theatre", kicker:"TRENDING NOW", price:"AED 85", cta:"Book seats",
+     meta:"40 min · 7:30 PM daily · 3 slots left", blurb:"A guided journey through the southern night sky, projected across the full 18-metre dome.", idx:6},
+    {title:"Deep Blue · 4D Wildlife Film", tag:"Aqua Cinema", kicker:"TOP RATED", price:"AED 70", cta:"Book seats",
+     meta:"25 min · every 45 min · motion seats", blurb:"Reef-level footage with mist, scent and motion effects.", idx:7,
+     video:VID("Varna_Aquarium_video.webm")},
+    {title:"Skyline Coaster Premiere", tag:"Thrill Arena", kicker:"PREMIERE", price:"AED 120", cta:"Book seats",
+     meta:"Opens 6:00 PM · limited premiere seats", blurb:"Front-row premiere passes for the new launch coaster, including a backstage track walk.", idx:2}
+  ],
+  "Packages": [
+    {title:"Full Park Day Pass", tag:"All zones", kicker:"BEST VALUE", price:"AED 450", cta:"View details",
+     meta:"Valid all day · skip-the-line at 4 gates", blurb:"One wristband for every zone, ride and exhibition.", idx:8},
+    {title:"Family Bundle · 2+2", tag:"Save 18%", kicker:"BUNDLE", price:"AED 690", cta:"View details",
+     meta:"2 adults + 2 children · meal vouchers included", blurb:"The easiest upsell for walk-up families — one code, four wristbands.", idx:9}
+  ],
+  "Food": [
+    {title:"Safari Grill Meal Voucher", tag:"Savannah Deck", kicker:"KITCHEN OPEN", price:"AED 55", cta:"View details",
+     meta:"Any time · main, side and drink", blurb:"Flame-grilled mains served all day beside the giraffe deck.", idx:10},
+    {title:"Lagoon Café Combo", tag:"Waterside", kicker:"QUICK BITE", price:"AED 38", cta:"View details",
+     meta:"Any time · pastry and barista coffee", blurb:"Grab-and-go counter at the lagoon crossing — fastest queue in the park.", idx:11}
+  ]
+};
+const P = [
+  ["Ancient Civilizations Exhibition","Exhibitions",60,"1–2 hrs","All ages","exhibit hall photo","Timed entry"],
+  ["Ocean Life Aquarium","Exhibitions",90,"1–1.5 hrs","All ages","aquarium tunnel","Popular"],
+  ["Sky Coaster Experience","Experiences",120,"20 min","120cm+","coaster photo","Thrill"],
+  ["Kids Art Workshop","Experiences",75,"45 min","4–12 yrs","workshop photo",""],
+  ["Mountain Exploration Tour","Guided Tours",200,"3 hrs","10 yrs+","trail photo","Guide"],
+  ["Heritage Walk with Guide","Guided Tours",130,"90 min","All ages","guide with group",""],
+  ["Nocturnal Planetarium Show","Shows & Films",45,"40 min","All ages","dome projection","Seated"],
+  ["4D Wildlife Film","Shows & Films",35,"25 min","6 yrs+","cinema seats","Seated"],
+  ["Full Park Day Pass","Packages",450,"Full day","All ages","park aerial","Best value"],
+  ["Family Bundle · 2+2","Packages",690,"Full day","Family","family at gate",""],
+  ["Safari Grill Meal Voucher","Food",55,"Any time","All ages","meal tray",""],
+  ["Lagoon Café Combo","Food",38,"Any time","All ages","cafe counter",""]
+];
+const TIERS = [
+  {name:"VIP Recliner", price:180, rows:["A","B"], seats:12, note:"Front dome, reclining", color:"#0D6EFD"},
+  {name:"Premium", price:120, rows:["C","D","E"], seats:16, note:"Centre of the dome", color:"#00B8FF"},
+  {name:"Standard", price:75, rows:["F","G","H","I"], seats:18, note:"Rear tiers", color:"#00D4C4"}
+];
+const SOLD = {"A":[3,4,9],"B":[1,2,7,8],"C":[5,6,11],"D":[2,14,15],"E":[],"F":[7,8,9,10],"G":[3],"H":[12,13],"I":[1,2,17,18]};
+const ACCESS = {"F":[1,2],"I":[9,10]};
+
+class Component extends DCLogic {
+  state = {
+    screen:"catalogue", cat:"All", adm:"All", rail:true, cartOpen:true, slide:0, quickIdx:null, quickType:"Adult", quickQty:1, toast:"", range:"Today", sort:"Popular", band:"Any price", flagOnly:"", sortOpen:false, filtersOpen:false,
+    cart:[{name:"Ancient Civilizations Exhibition",meta:"Tue 4 Aug · 11:00 AM · Adult",price:60,qty:1},
+          {name:"Full Park Day Pass",meta:"Sun 2 Aug · Adult",price:450,qty:1},
+          {name:"Safari Grill Meal Voucher",meta:"Any time · Standard",price:55,qty:1}],
+    sel:null, dateIdx:0, slotIdx:2, tickets:[2,1,0,0], showIdx:2,
+    seats:["D8","D9"], method:"cash", received:"", paid:false
+  };
+  componentDidMount() {
+    this._t = setInterval(() => {
+      if (this.state.screen === "catalogue")
+        this.setState(s => { const n = (BANNERS[s.cat] || BANNERS["All"]).length; return {slide:(s.slide + 1) % n}; });
+    }, 5200);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  set = o => this.setState(o);
+
+  flash(msg) {
+    clearTimeout(this._toast);
+    this.setState({toast: msg});
+    this._toast = setTimeout(() => this.setState({toast: ""}), 2600);
+  }
+
+  addToCart(name, meta, price, qty) {
+    this.setState(s => {
+      const cart = s.cart.slice();
+      const i = cart.findIndex(c => c.name === name && c.meta === meta);
+      if (i >= 0) cart[i] = Object.assign({}, cart[i], {qty: cart[i].qty + qty});
+      else cart.push({name, meta, price, qty});
+      return {cart};
+    });
+  }
+  bump(i, d) {
+    this.setState(s => {
+      const cart = s.cart.slice(), q = cart[i].qty + d;
+      if (q <= 0) cart.splice(i,1); else cart[i] = Object.assign({}, cart[i], {qty:q});
+      return {cart};
+    });
+  }
+
+  renderVals() {
+    const st = this.state, screen = st.screen, rail = st.rail;
+    const cur = this.props.currency ?? "AED";
+    const fmt = n => cur + " " + n.toFixed(2);
+    const discPct = this.props.memberDiscount ?? 5;
+    const taxIncluded = this.props.taxIncluded ?? true;
+
+    const products = P.map((p,i) => ({name:p[0],category:p[1],price:p[2],duration:p[3],audience:p[4],shot:p[5],flag:p[6],idx:i}));
+    const BANDS = {"Any price":[0,1e9], "Under 100":[0,99.99], "100 – 300":[100,300], "Over 300":[300.01,1e9]};
+    const band = BANDS[st.band] || BANDS["Any price"];
+    const timed = p => p.flag === "Timed entry" || p.category === "Exhibitions";
+    let visible = products.filter(p =>
+      (st.cat === "All" || p.category === st.cat) &&
+      (st.adm === "All" || (st.adm === "Timed entry" ? timed(p) : !timed(p))) &&
+      (p.price >= band[0] && p.price <= band[1]) &&
+      (!st.flagOnly || p.flag === st.flagOnly));
+    const SORTS = {
+      "Popular": null,
+      "Price · low to high": (a,b) => a.price - b.price,
+      "Price · high to low": (a,b) => b.price - a.price,
+      "Name · A–Z": (a,b) => a.name.localeCompare(b.name)
+    };
+    if (SORTS[st.sort]) visible = visible.slice().sort(SORTS[st.sort]);
+    const sub = st.cart.reduce((a,c) => a + c.price*c.qty, 0);
+    const disc = sub * discPct/100;
+    const total = sub - disc;
+    const received = parseFloat(st.received || "0") || 0;
+    const change = Math.max(0, received - total);
+
+    const navBtn = on => ({
+      display:"flex", alignItems:"center", gap:12, width:"100%", padding: rail ? "10px 12px" : "11px 0",
+      justifyContent: rail ? "flex-start" : "center", borderRadius:12, border:0, cursor:"pointer",
+      background: on ? "linear-gradient(100deg,rgba(13,110,253,.95),rgba(0,184,255,.55))" : "transparent",
+      color: on ? "#fff" : "#9CB6D6", fontSize:12.5, fontWeight:700, textAlign:"left",
+      boxShadow: on ? "0 8px 18px rgba(13,110,253,.35)" : "none", transition:"background .18s"
+    });
+    const active = k => screen === k;
+
+    const sel = st.sel != null ? products[st.sel] : products[0];
+    const seated = sel.category === "Shows & Films";
+    const dates = ["Sun|2|Aug","Mon|3|Aug","Tue|4|Aug","Wed|5|Aug","Thu|6|Aug","Fri|7|Aug","Sat|8|Aug"].map((d,i) => {
+      const [dow,day,mon] = d.split("|"), on = i === st.dateIdx;
+      return {dow,day,mon,go:()=>this.set({dateIdx:i}),style:{width:66,padding:"9px 0",borderRadius:12,textAlign:"center",cursor:"pointer",
+        border:"1px solid "+(on?BLUE:"#E5E7EB"), background:on?"linear-gradient(140deg,"+BLUE+","+CYAN+")":"#fff", color:on?"#fff":"#1F2937",
+        boxShadow:on?"0 8px 18px rgba(13,110,253,.26)":"none"}};
+    });
+    const slotData = [["09:00 AM",42],["10:00 AM",28],["11:00 AM",36],["12:00 PM",9],["01:00 PM",24],["02:00 PM",0],["03:00 PM",31],["04:00 PM",15]];
+    const slots = slotData.map((s,i) => {
+      const on = i === st.slotIdx, out = s[1] === 0;
+      return {time:s[0], avail: out ? "Sold out" : "Available " + s[1],
+        availStyle:{fontSize:10,fontWeight:600,color: out ? "#9CA3AF" : (s[1] < 15 ? "#C2761B" : "#00A38F")},
+        go: out ? (()=>{}) : (()=>this.set({slotIdx:i})),
+        style:{padding:"10px 11px",borderRadius:12,textAlign:"left",cursor:out?"not-allowed":"pointer",opacity:out?.55:1,
+          border:"1px solid "+(on?BLUE:"#E5E7EB"), background:on?"#F2F7FF":"#fff", color:"#1F2937"}};
+    });
+    const tt = [["Adult","Ages 13 and above",sel.price],["Child","Ages 3 to 12",Math.round(sel.price*0.62)],
+                ["Senior","Ages 60+",Math.round(sel.price*0.7)],["Infant","Under 3",0]];
+    const ticketTypes = tt.map((t,i) => ({
+      name:t[0], note:t[1], price: t[2] === 0 ? "Free" : fmt(t[2]), qty: st.tickets[i], sub: fmt(t[2]*st.tickets[i]),
+      inc:()=>this.setState(s=>{const q=s.tickets.slice();q[i]++;return{tickets:q}}),
+      dec:()=>this.setState(s=>{const q=s.tickets.slice();q[i]=Math.max(0,q[i]-1);return{tickets:q}}),
+      style:{border:"1px solid "+(st.tickets[i]>0?BLUE:"#E5E7EB"), background:st.tickets[i]>0?"#F2F7FF":"#fff", borderRadius:13, padding:13}
+    }));
+    const cfgCount = st.tickets.reduce((a,b)=>a+b,0);
+    const cfgTotal = tt.reduce((a,t,i)=>a+t[2]*st.tickets[i],0);
+    const slotMeta = dates[st.dateIdx].dow + " " + dates[st.dateIdx].day + " " + dates[st.dateIdx].mon + " · " + slotData[st.slotIdx][0];
+
+    const seatPrice = id => { const t = TIERS.find(t => t.rows.indexOf(id[0]) >= 0); return t ? t.price : 0; };
+    const seatTotal = st.seats.reduce((a,id)=>a+seatPrice(id),0);
+    const seatFee = st.seats.length * 5;
+    const seatTiers = TIERS.map(t => {
+      let avail = 0;
+      const rows = t.rows.map(r => {
+        const seats = [];
+        for (let n = 1; n <= t.seats; n++) {
+          const id = r + n, sold = (SOLD[r]||[]).indexOf(n) >= 0, acc = (ACCESS[r]||[]).indexOf(n) >= 0;
+          const on = st.seats.indexOf(id) >= 0;
+          if (!sold) avail++;
+          seats.push({num:n, go: sold ? (()=>{}) : (()=>this.setState(s=>{
+            const arr = s.seats.slice(), i = arr.indexOf(id);
+            if (i >= 0) arr.splice(i,1); else arr.push(id);
+            return {seats:arr};
+          })),
+          style:{width:23,height:23,borderRadius:7,fontSize:9,fontWeight:700,cursor:sold?"not-allowed":"pointer",
+            border: on ? "1px solid transparent" : (acc ? "1px dashed "+TEAL : "1px solid #CBD5E1"),
+            background: sold ? "#E5E7EB" : (on ? "linear-gradient(135deg,"+BLUE+","+CYAN+")" : "#fff"),
+            color: sold ? "#B6BDC8" : (on ? "#fff" : "#4B5563"),
+            boxShadow: on ? "0 5px 12px rgba(13,110,253,.35)" : "none", padding:0,
+            transform: on ? "translateY(-1px)" : "none", transition:"transform .12s"}});
+        }
+        return {label:r, seats};
+      });
+      return {name:t.name, priceLabel: fmt(t.price), availLabel: avail + " available", rows,
+        badge:{fontSize:9.5,fontWeight:800,letterSpacing:".06em",padding:"3px 9px",borderRadius:20,background:t.color+"1A",color:t.color}};
+    });
+    const showtimes = [["03:00 PM","62 left"],["05:15 PM","28 left"],["07:30 PM","41 left"],["09:45 PM","Sold out"]].map((s,i) => {
+      const on = i === st.showIdx;
+      return {time:s[0], left:s[1], go:()=>this.set({showIdx:i}),
+        style:{padding:"8px 13px",borderRadius:12,cursor:"pointer",textAlign:"center",
+          border:"1px solid "+(on?BLUE:"#E5E7EB"), background:on?"linear-gradient(140deg,"+BLUE+","+CYAN+")":"#fff", color:on?"#fff":"#1F2937"}};
+    });
+
+    const keys = ["1","2","3","4","5","6","7","8","9",".","0","⌫"].map(k => ({
+      label:k, go:()=>this.setState(s=>({received: k==="⌫" ? s.received.slice(0,-1) : s.received + k, paid:false})),
+      style:{padding:"14px 0",borderRadius:12,border:"1px solid #E5E7EB",background:"#fff",fontSize:17,fontWeight:600,
+        fontFamily:"'IBM Plex Mono',monospace",cursor:"pointer",color:"#1F2937"}
+    }));
+    const tenders = [total,100,200,500,1000].map((v,i) => ({
+      label: i === 0 ? "Exact " + total.toFixed(2) : cur + " " + v,
+      go:()=>this.set({received: v.toFixed(2), paid:false}),
+      style:{padding:"10px 0",borderRadius:10,border:"1px solid #E5E7EB",background:"#fff",fontSize:12,fontWeight:700,
+        cursor:"pointer",fontFamily:"'IBM Plex Mono',monospace",color:"#1F2937"}
+    }));
+    const methodList = [["cash","Cash","Notes and coins"],["card","Card","Debit or credit"],["wallet","Digital wallet","Apple / Google Pay"],
+      ["gift","Gift card","Redeem voucher"],["link","Payment link","SMS or QR"],["split","Split payment","Two or more methods"]];
+    const pm = {};
+    methodList.forEach(m => {
+      const on = st.method === m[0];
+      pm[m[0]] = {name:m[1], note:m[2], on, go:()=>this.set({method:m[0]}),
+        style:{display:"flex",alignItems:"center",gap:11,width:"100%",textAlign:"left",
+          border:"1px solid "+(on?BLUE:"#E5E7EB"), borderRadius:13, padding:"11px 12px", cursor:"pointer",
+          background: on ? "linear-gradient(120deg,#F2F8FF,#EEFCFA)" : "#fff",
+          boxShadow: on ? "0 8px 18px rgba(13,110,253,.14)" : "none", transition:"all .16s ease"},
+        dot:{width:32,height:32,borderRadius:10,flex:"none",display:"flex",alignItems:"center",justifyContent:"center",
+          background: on ? "linear-gradient(135deg,"+BLUE+","+CYAN+")" : "#F2F5FA",
+          color: on ? "#fff" : "#6B7A90", boxShadow: on ? "0 6px 14px rgba(13,110,253,.3)" : "none"},
+        check:{marginLeft:"auto",width:16,height:16,borderRadius:"50%",flex:"none",
+          border:"1.5px solid "+(on?BLUE:"#D3D9E2"),
+          background: on ? "radial-gradient(circle at 50% 50%,#fff 0 2.4px,"+BLUE+" 3px 100%)" : "#fff"}};
+    });
+
+    return {
+      sidebarStyle:{width: rail ? 214 : 78, flex:"none", position:"relative", display:"flex", flexDirection:"column",
+        background:"linear-gradient(165deg,"+INK+" 0%,#122a52 58%,#0a3f8f 130%)", transition:"width .22s ease", overflow:"hidden"},
+      brandStyle:{display: rail ? "block" : "none", lineHeight:1.15, flex:1, marginTop:2},
+      logoStyle:{flex:"none", backgroundImage:"url(ticvai-logo.png)", backgroundRepeat:"no-repeat",
+        backgroundPosition:"left center", backgroundSize:"auto 100%",
+        width: rail ? 146 : 42, height: rail ? 42 : 38, marginRight: rail ? "auto" : 0, transition:"width .22s ease"},
+      labelStyle:{display: rail ? "inline" : "none", whiteSpace:"nowrap"},
+      headerRowStyle:{position:"relative",display:"flex",alignItems:"center",gap:11,padding:"16px 14px 8px",
+        flexDirection: rail ? "row" : "column"},
+      toggleStyle:{marginLeft: rail ? "auto" : 0, width:30,height:30,borderRadius:9,flex:"none",
+        border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.06)",
+        cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"},
+      shiftCardStyle:{display: rail ? "block" : "none", position:"relative", margin:"6px 14px", padding:"12px",
+        borderRadius:14, background:"rgba(255,255,255,.07)", border:"1px solid rgba(127,215,255,.22)"},
+      logoutStyle:{display:"flex",alignItems:"center",gap:12,width:"100%",justifyContent: rail?"flex-start":"center",
+        padding: rail ? "10px 12px" : "11px 0", borderRadius:12,border:"1px solid rgba(255,255,255,.12)",
+        background:"transparent",color:"#9CB6D6",fontSize:12.5,fontWeight:700,cursor:"pointer"},
+      toggleRail: () => this.setState(s => ({rail: !s.rail})),
+      nav: {
+        sell:{go:()=>this.set({screen:"catalogue"}), style:navBtn(active("catalogue"))},
+        schedule:{go:()=>this.set({screen:"detail"}), style:navBtn(active("detail"))},
+        seats:{go:()=>this.set({screen:"seats"}), style:navBtn(active("seats"))},
+        payments:{go:()=>this.set({screen:"payment"}), style:navBtn(active("payment"))},
+        staff:{go:()=>this.set({screen:"staff"}), style:navBtn(active("staff"))},
+        reports:{go:()=>this.set({screen:"reports"}), style:navBtn(active("reports"))},
+        idle:{style:navBtn(false)}
+      },
+
+      isCatalogue: screen === "catalogue", isDetail: screen === "detail", isSeats: screen === "seats",
+      isPayment: screen === "payment", isStaff: screen === "staff", isReports: screen === "reports",
+      showCart: (screen === "catalogue" || screen === "detail") && st.cartOpen,
+      toggleCart: () => this.setState(s => ({cartOpen: !s.cartOpen})),
+      cartBtnStyle:{position:"relative",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",
+        borderRadius:10,padding:"8px 11px",
+        border:"1px solid " + (st.cartOpen ? "transparent" : "#E5E7EB"),
+        background: st.cartOpen ? "linear-gradient(135deg,#0D6EFD,#00B8FF)" : "#fff",
+        color: st.cartOpen ? "#fff" : "#4B5563",
+        boxShadow: st.cartOpen ? "0 8px 18px rgba(13,110,253,.26)" : "none"},
+      cartBtnBadge:{position:"absolute",top:-5,right:-5,minWidth:16,height:16,borderRadius:8,fontSize:9.5,fontWeight:800,
+        display: st.cart.length ? "flex" : "none", alignItems:"center",justifyContent:"center",padding:"0 4px",
+        background: st.cartOpen ? "#fff" : "#0D6EFD", color: st.cartOpen ? "#0D6EFD" : "#fff",
+        border:"1px solid " + (st.cartOpen ? "#0D6EFD" : "transparent")},
+      showQuickActions: this.props.showQuickActions ?? true,
+
+      tab: (() => {
+        const keys = {all:"All", exhibitions:"Exhibitions", experiences:"Experiences", tours:"Guided Tours",
+          shows:"Shows & Films", packages:"Packages", food:"Food"};
+        const ACCENT = {all:["#0D6EFD","#00B8FF","rgba(13,110,253,.28)"], exhibitions:["#5B4BE0","#8E7BFF","rgba(91,75,224,.28)"],
+          experiences:["#00A896","#38DFB6","rgba(0,168,150,.28)"], tours:["#0077A8","#25C0E8","rgba(0,119,168,.28)"],
+          shows:["#C2410C","#F59E0B","rgba(194,65,12,.26)"], packages:["#B4368C","#F472B6","rgba(180,54,140,.26)"],
+          food:["#3D7A1F","#8BC34A","rgba(61,122,31,.26)"]};
+        const out = {};
+        Object.keys(keys).forEach(k => {
+          const c = keys[k], on = st.cat === c, tone = TONES[c] || ["#EDF1F7","#4B5563"];
+          const ac = ACCENT[k];
+          out[k] = {count: c === "All" ? P.length : P.filter(p=>p[1]===c).length, go:()=>this.set({cat:c, slide:0}),
+            style:{display:"flex",alignItems:"center",gap:9,padding:"9px 14px",borderRadius:13,cursor:"pointer",
+              border:"1px solid "+(on?"transparent":"#E5E7EB"), background: on ? "linear-gradient(135deg,"+ac[0]+","+ac[1]+")" : "#fff",
+              color: on ? "#fff" : "#1F2937", boxShadow: on ? "0 8px 18px "+ac[2] : "none", transition:"all .16s ease"},
+            chip:{width:26,height:26,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",flex:"none",
+              background: on ? "rgba(255,255,255,.22)" : tone[0], color: on ? "#fff" : tone[1],
+              border:"1px solid "+(on?"transparent":tone[1]+"26")}};
+        });
+        return out;
+      })(),
+      admissionTabs: ["All","General admission","Timed entry"].map(a => ({label:a, go:()=>this.set({adm:a}),
+        style:{border:0,borderRadius:8,padding:"7px 13px",fontSize:11.5,fontWeight:700,cursor:"pointer",
+          background: st.adm===a?"#fff":"transparent", color: st.adm===a?BLUE:"#9CA3AF",
+          boxShadow: st.adm===a?"0 1px 3px rgba(11,19,36,.12)":"none"}})),
+      sortLabel: st.sort,
+      sortOpen: st.sortOpen,
+      filtersOpen: st.filtersOpen,
+      filterCount: (st.band !== "Any price" ? 1 : 0) + (st.flagOnly ? 1 : 0),
+      hasFilters: st.band !== "Any price" || st.flagOnly !== "",
+      toggleSort: () => this.setState(s => ({sortOpen: !s.sortOpen, filtersOpen:false})),
+      toggleFilters: () => this.setState(s => ({filtersOpen: !s.filtersOpen, sortOpen:false})),
+      clearFilters: () => this.set({band:"Any price", flagOnly:"", filtersOpen:false}),
+      sortBtnStyle:{border:"1px solid " + (st.sortOpen ? "#0D6EFD" : "#E5E7EB"), borderRadius:9, padding:"7px 11px",
+        background: st.sortOpen ? "#F2F7FF" : "#fff", fontWeight:700, fontSize:11.5,
+        color: st.sortOpen ? "#0D6EFD" : "#4B5563", cursor:"pointer", display:"flex", alignItems:"center", gap:6},
+      filterBtnStyle:{border:"1px solid " + (st.filtersOpen || st.band !== "Any price" || st.flagOnly ? "#0D6EFD" : "#E5E7EB"),
+        borderRadius:9, padding:"7px 11px", background: st.filtersOpen ? "#F2F7FF" : "#fff", fontWeight:700, fontSize:11.5,
+        color: st.filtersOpen || st.band !== "Any price" || st.flagOnly ? "#0D6EFD" : "#4B5563", cursor:"pointer",
+        display:"flex", alignItems:"center", gap:6},
+      sortOptions: ["Popular","Price · low to high","Price · high to low","Name · A–Z"].map(s => ({label:s,
+        go:()=>this.set({sort:s, sortOpen:false}),
+        style:{width:"100%",textAlign:"left",border:0,background: st.sort===s?"#F2F7FF":"transparent",
+          color: st.sort===s?"#0D6EFD":"#1F2937", borderRadius:8, padding:"8px 10px", fontSize:11.5,
+          fontWeight: st.sort===s?800:600, cursor:"pointer"}})),
+      bandOptions: ["Any price","Under 100","100 – 300","Over 300"].map(b => ({label:b, go:()=>this.set({band:b}),
+        style:{border:"1px solid " + (st.band===b?"transparent":"#E5E7EB"), borderRadius:9, padding:"6px 10px", fontSize:11,
+          fontWeight:700, cursor:"pointer", color: st.band===b?"#fff":"#4B5563",
+          background: st.band===b?"linear-gradient(135deg,#0D6EFD,#00B8FF)":"#fff"}})),
+      flagOptions: [["","Any tag"],["Popular","Popular"],["Timed entry","Timed entry"],["Seated","Seated"],["Thrill","Thrill"]].map(x => ({label:x[1],
+        go:()=>this.set({flagOnly:x[0]}),
+        style:{border:"1px solid " + (st.flagOnly===x[0]?"transparent":"#E5E7EB"), borderRadius:9, padding:"6px 10px", fontSize:11,
+          fontWeight:700, cursor:"pointer", color: st.flagOnly===x[0]?"#fff":"#4B5563",
+          background: st.flagOnly===x[0]?"linear-gradient(135deg,#0D6EFD,#00B8FF)":"#fff"}})),
+      reportRanges: ["Today","7 days","Month"].map(r => ({label:r, go:()=>this.set({range:r}),
+        style:{border:"1px solid " + (st.range===r ? "transparent" : "rgba(255,255,255,.28)"), borderRadius:10,
+          padding:"8px 14px", fontSize:11.5, fontWeight:800, cursor:"pointer", color:"#fff",
+          background: st.range===r ? "linear-gradient(135deg,#0D6EFD,#00B8FF)" : "rgba(255,255,255,.08)"}})),
+      rangeLabel: st.range === "Today" ? "Today · since 08:00" : st.range === "7 days" ? "Last 7 days" : "Month to date",
+      kpis: (() => {
+        const k = st.range === "Today" ? 1 : st.range === "7 days" ? 6.4 : 24.8;
+        const gross = 118300 * k, tickets = Math.round(2864 * k), refunds = 2140 * k;
+        const comp = n => cur + " " + (n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,"") + "k" : n.toFixed(0));
+        return [
+          ["GROSS SALES", comp(gross), "+12.4%", "vs previous period", "#0D6EFD"],
+          ["TICKETS SOLD", tickets.toLocaleString(), "+8.1%", "across 6 categories", "#00B8FF"],
+          ["AVG BASKET", fmt(Math.round(gross/tickets*2.4*100)/100), "+3.6%", "2.4 items per order", "#00D4C4"],
+          ["REFUNDS", comp(refunds), "-1.9%", "1.8% of gross", "#F59E0B"],
+          ["GATE THROUGHPUT", Math.round(412 * (st.range === "Today" ? 1 : 1.08)) + "/hr", "+5.2%", "peak 06–07 PM", "#5B4BE0"]
+        ].map(x => ({label:x[0], value:x[1], delta:x[2], note:x[3],
+          dot:{width:9,height:9,borderRadius:3,background:x[4]},
+          deltaStyle:{fontSize:10.5,fontWeight:800,padding:"2px 7px",borderRadius:6,
+            background: x[2].startsWith("-") ? "#FDECEC" : "#EEFCFA", color: x[2].startsWith("-") ? "#C81E1E" : "#00806F"}}));
+      })(),
+      hourlyNote: "Peak 6:00 PM · " + fmt(6200) + " in one hour",
+      hourly: (() => {
+        const max = Math.max(...HOURLY.map(h => h[1] + h[2]));
+        return HOURLY.map(h => ({hour:h[0], total:((h[1]+h[2])/1000).toFixed(1) + "k",
+          barWrap:{width:"100%",flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-end",borderRadius:7,overflow:"hidden",background:"#F2F5FA"},
+          retail:{height:((h[2]/max)*100)+"%",background:"#BFE0FF"},
+          tickets:{height:((h[1]/max)*100)+"%",background:"linear-gradient(180deg,#00B8FF,#0D6EFD)"}}));
+      })(),
+      donutStyle: (() => {
+        let a = 0; const stops = MIX.map(m => { const s = a; a += m[1]; return m[2] + " " + s + "% " + a + "%"; });
+        return {width:128,height:128,borderRadius:"50%",position:"relative",flex:"none",
+          background:"conic-gradient(" + stops.join(",") + ")"};
+      })(),
+      grossShort: cur + " " + (st.range === "Today" ? "118k" : st.range === "7 days" ? "757k" : "2.9M"),
+      mix: MIX.map(m => ({label:m[0], pct:m[1] + "%",
+        swatch:{width:10,height:10,borderRadius:3,background:m[2],display:"inline-block",flex:"none"}})),
+      topProducts: TOPS.map(t => {
+        const maxRev = Math.max(...TOPS.map(x => x[3]));
+        return {name:t[0], category:t[1], units:t[2].toLocaleString(), revenue: cur + " " + t[3].toLocaleString(),
+          share: Math.round(t[3]/TOPS.reduce((a,x)=>a+x[3],0)*100) + "%",
+          thumb:Object.assign({width:30,height:30,borderRadius:9,flex:"none"}, coverStyle(t[4], {})),
+          barStyle:{width:(t[3]/maxRev*100)+"%",height:"100%",borderRadius:4,background:"linear-gradient(90deg,#0D6EFD,#00D4C4)"}};
+      }),
+      channels: (() => {
+        const max = Math.max(...CHANNELS.map(c => c[1]));
+        return CHANNELS.map(c => ({label:c[0], value: cur + " " + c[1].toLocaleString(),
+          barStyle:{width:(c[1]/max*100)+"%",height:"100%",borderRadius:5,background:"linear-gradient(90deg," + c[2] + ",#00D4C4)"}}));
+      })(),
+      terminals: TERMINALS.map(t => ({name:t[0], note:t[1], value:t[2],
+        status:{width:10,height:10,borderRadius:"50%",flex:"none",background:t[3],boxShadow:"0 0 0 3px " + t[3] + "22"}})),
+      toast: st.toast,
+      showTrending: true,
+      trend: (() => {
+        const list = BANNERS[st.cat] || BANNERS["All"], t = list[st.slide % list.length];
+        return {title:t.title, tag:t.tag, blurb:t.blurb, meta:t.meta, price:t.price, kicker:t.kicker, cta:t.cta,
+          bgStyle:{position:"absolute",inset:0,backgroundImage:"url(" + photo(t.idx) + ")",
+            backgroundSize:"cover",backgroundPosition:"center",transform:"scale(1.02)"},
+          book:()=>this.set({screen: t.idx === 6 || t.idx === 7 || t.cta === "Book seats" ? "seats" : "detail", sel:t.idx})};
+      })(),
+      trendVideo: (() => {
+        const list = BANNERS[st.cat] || BANNERS["All"], t = list[st.slide % list.length];
+        if (!t.video) return null;
+        return React.createElement("video", {key:t.video, src:t.video, autoPlay:true, muted:true, loop:true, playsInline:true,
+          style:{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",opacity:.92}});
+      })(),
+      trendPrev: () => this.setState(s => { const n = (BANNERS[s.cat] || BANNERS["All"]).length; return {slide:(s.slide + n - 1) % n}; }),
+      trendNext: () => this.setState(s => { const n = (BANNERS[s.cat] || BANNERS["All"]).length; return {slide:(s.slide + 1) % n}; }),
+      trendDots: (BANNERS[st.cat] || BANNERS["All"]).map((t,i) => {
+        const on = i === st.slide % (BANNERS[st.cat] || BANNERS["All"]).length;
+        return {go:()=>this.set({slide:i}),
+          style:{width: on ? 22 : 8, height:8, borderRadius:5, border:0, cursor:"pointer", flex:"none", padding:0,
+            background: on ? "linear-gradient(90deg,#0D6EFD,#00D4C4)" : "rgba(255,255,255,.45)",
+            transition:"width .2s ease"}};
+      }),
+      resultLine: visible.length + " products · " + (st.cat === "All" ? "all categories" : st.cat) + (st.sort === "Popular" ? "" : " · " + st.sort.toLowerCase()),
+      products: visible.map(p => ({
+        name:p.name, category:p.category, duration:p.duration, audience:p.audience, shot:p.shot, flag:p.flag,
+        priceLabel: fmt(p.price),
+        imgStyle: coverStyle(p.idx, {position:"absolute",inset:0}),
+        chipStyle:{position:"absolute",top:8,left:8,fontSize:9.5,fontWeight:800,padding:"3px 8px",borderRadius:7,
+          background:TONES[p.category][0], color:TONES[p.category][1], pointerEvents:"none", zIndex:2},
+        flagStyle:{position:"absolute",top:8,right:8,fontSize:9,fontWeight:800,padding:"3px 8px",borderRadius:7,
+          display: p.flag ? "block" : "none", background:"rgba(11,19,36,.82)", color:"#7FD7FF", pointerEvents:"none", zIndex:2},
+        open:()=>this.set({screen: p.category === "Shows & Films" ? "seats" : "detail", sel:p.idx}),
+        add:(e)=>{ if (e && e.stopPropagation) e.stopPropagation(); this.set({quickIdx:p.idx, quickType:"Adult", quickQty:1}); },
+        quickOpen: st.quickIdx === p.idx,
+        stop:(e)=>{ if (e && e.stopPropagation) e.stopPropagation(); },
+        closeQuick:(e)=>{ if (e && e.stopPropagation) e.stopPropagation(); this.set({quickIdx:null}); },
+        qty: st.quickQty,
+        quickTotal: fmt(Math.round(p.price * TICKET_MULT[st.quickType] * st.quickQty)),
+        types: Object.keys(TICKET_MULT).map(t => ({label:t, go:(e)=>{ if (e && e.stopPropagation) e.stopPropagation(); this.set({quickType:t}); },
+          style:{flex:1,borderRadius:9,padding:"7px 0",fontSize:10.5,fontWeight:700,cursor:"pointer",
+            border:"1px solid " + (st.quickType === t ? "transparent" : "rgba(255,255,255,.24)"),
+            background: st.quickType === t ? "linear-gradient(135deg,#0D6EFD,#00B8FF)" : "rgba(255,255,255,.06)",
+            color:"#fff"}})),
+        inc:(e)=>{ if (e && e.stopPropagation) e.stopPropagation(); this.setState(s=>({quickQty: Math.min(20, s.quickQty+1)})); },
+        dec:(e)=>{ if (e && e.stopPropagation) e.stopPropagation(); this.setState(s=>({quickQty: Math.max(1, s.quickQty-1)})); },
+        confirm:(e)=>{ if (e && e.stopPropagation) e.stopPropagation();
+          const q = st.quickQty, type = st.quickType;
+          this.addToCart(p.name, "Sun 2 Aug · " + type, Math.round(p.price * TICKET_MULT[type]), q);
+          this.set({quickIdx:null, cartOpen:true});
+          this.flash(q + " × " + type + " · " + p.name + " added to cart"); }
+      })),
+      quickActions: [["Quick add"],["Open orders"],["Hold order"],["Discount"],["Reprint ticket"],["Shift summary"]].map(q => ({
+        label:q[0], go:()=>{}, dot:{width:15,height:15,borderRadius:5,background:"linear-gradient(135deg,#DCEBFF,#DFFAF7)"}})),
+
+      showTitle: seated ? sel.name : "Nocturnal Planetarium Show",
+      sel: {name:sel.name, category:sel.category, shot:sel.shot, seated, imgStyle: coverStyle(sel.idx, {position:"absolute",inset:0}),
+        blurb:"Timed-entry admission with live capacity management. Guests scan at the gate and wristbands are issued on entry.",
+        facts:[{k:"Duration",v:sel.duration},{k:"Audience",v:sel.audience},{k:"Capacity left",v:"186 of 400"},{k:"Location",v:"Zone B · Gate 3"}]},
+      dates, slots, ticketTypes, showtimes, seatTiers,
+      configuredCount: cfgCount, configuredTotal: fmt(cfgTotal),
+      addConfigured: () => { if (cfgCount > 0) { this.addToCart(sel.name, slotMeta + " · " + cfgCount + " pax", Math.round(cfgTotal/Math.max(1,cfgCount)), cfgCount); this.set({screen:"catalogue", cartOpen:true}); this.flash(cfgCount + " × " + sel.name + " added to cart"); } },
+      goSeats: () => this.set({screen:"seats"}),
+      seatCountLabel: st.seats.length + (st.seats.length === 1 ? " seat" : " seats"),
+      seatListLabel: st.seats.length ? st.seats.join(" · ") : "Tap seats on the map to select",
+      seatTotalLabel: fmt(seatTotal),
+      seatFeeLabel: fmt(seatFee),
+      tierLegend: TIERS.map(t => ({name:t.name, note:t.note, price: fmt(t.price),
+        swatch:{width:14,height:14,borderRadius:5,display:"inline-block",background:t.color}})),
+      addSeats: () => { if (st.seats.length) { this.addToCart("Nocturnal Planetarium Show", "Sun 2 Aug · 07:30 PM · " + st.seats.join(", "),
+        (seatTotal + seatFee)/st.seats.length, st.seats.length); this.set({screen:"catalogue", seats:[]}); } },
+
+      backToCatalogue: () => this.set({screen:"catalogue"}),
+      goPayment: () => this.set({screen:"payment", received:"", paid:false}),
+      complete: () => this.set({paid:true}),
+      clearCart: () => this.set({cart:[]}),
+      cart: st.cart.map((c,i) => ({name:c.name, meta:c.meta, qty:c.qty, lineTotal: fmt(c.price*c.qty), imgStyle: coverStyle(Math.max(0, P.findIndex(p => p[0] === c.name)), {width:46,height:46,flex:"none",borderRadius:10}),
+        inc:()=>this.bump(i,1), dec:()=>this.bump(i,-1), remove:()=>this.setState(s=>{const x=s.cart.slice();x.splice(i,1);return{cart:x}})})),
+      cartEmpty: st.cart.length === 0,
+      cartCount: st.cart.reduce((a,c)=>a+c.qty,0),
+      discountPctLabel: discPct + "%",
+      summary: [{k:"Subtotal (" + st.cart.reduce((a,c)=>a+c.qty,0) + " items)", v: fmt(sub), tone:{fontFamily:"'IBM Plex Mono',monospace"}},
+                {k:"Member discount (" + discPct + "%)", v:"− " + fmt(disc), tone:{fontFamily:"'IBM Plex Mono',monospace",color:"#00806F"}},
+                {k: taxIncluded ? "VAT 5% (included)" : "VAT 5%", v: fmt(sub*0.05), tone:{fontFamily:"'IBM Plex Mono',monospace",color:"#9CA3AF"}}],
+      totalLabel: fmt(total), receivedLabel: fmt(received), changeLabel: fmt(change),
+      keypadDisplay: st.received === "" ? "0.00" : st.received,
+      keys, tenders, pm,
+      methodTitle: st.method === "cash" ? "Cash tendered" : "Charge to " + (methodList.find(m=>m[0]===st.method)||["","card"])[1].toLowerCase(),
+      paid: st.paid,
+
+      shiftStats: [
+        {label:"GROSS SALES", value:fmt(18420.5), sub:"142 transactions",
+         card:{borderRadius:14,padding:14,color:"#fff",background:"linear-gradient(140deg,"+INK+",#16305c)"}, labelColor:"color:#7FD7FF"},
+        {label:"CASH IN DRAWER", value:fmt(4310), sub:"float AED 500.00",
+         card:{borderRadius:14,padding:14,background:"#fff",border:"1px solid #E5E7EB"}, labelColor:"color:#9CA3AF"},
+        {label:"TICKETS ISSUED", value:"389", sub:"62 timed entry · 74 seated",
+         card:{borderRadius:14,padding:14,background:"#fff",border:"1px solid #E5E7EB"}, labelColor:"color:#9CA3AF"},
+        {label:"AVG BASKET", value:fmt(129.7), sub:"+8.4% vs yesterday",
+         card:{borderRadius:14,padding:14,background:"#fff",border:"1px solid #E5E7EB"}, labelColor:"color:#9CA3AF"}],
+      staff: [["JD","John Doe","EMP-2041","Cashier","POS-01 · Gate 3","11:00 – 19:00",fmt(6120),"On duty"],
+        ["SA","Sara Aziz","EMP-2088","Cashier","POS-02 · Gate 3","09:00 – 17:00",fmt(5240),"On duty"],
+        ["MR","Marco Ruiz","EMP-1902","Supervisor","Floor · Zone B","09:00 – 18:00",fmt(0),"On duty"],
+        ["LN","Lena Novak","EMP-2130","Guide","Tours desk","10:00 – 16:00",fmt(2180),"On tour"],
+        ["AK","Amir Khan","EMP-2201","Cashier","POS-04 · Food court","12:00 – 20:00",fmt(3760),"Break"],
+        ["TB","Tara Bell","EMP-2255","Host","Dome Theatre","13:00 – 21:00",fmt(1120),"Scheduled"]].map(s => {
+        const tone = s[7]==="On duty" ? ["#EAF2FF",BLUE] : s[7]==="Break" ? ["#FFF1E8","#C2761B"] : s[7]==="On tour" ? ["#E6FBF9","#00806F"] : ["#F1F4F9","#9CA3AF"];
+        return {initials:s[0],name:s[1],id:s[2],role:s[3],terminal:s[4],shift:s[5],sales:s[6],status:s[7],
+          avatar:{width:32,height:32,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,
+            background:"linear-gradient(135deg,#EAF2FF,#E6FBF9)",color:BLUE},
+          badge:{fontSize:10.5,fontWeight:700,padding:"3px 10px",borderRadius:20,background:tone[0],color:tone[1]}};
+      }),
+      floatRows: [["200",1,"200.00"],["100",1,"100.00"],["50",2,"100.00"],["20",2,"40.00"],["10",1,"10.00"],["5",2,"10.00"],["Coins",4,"40.00"]]
+        .map(f => ({denom:f[0], pieces:f[1], amount:f[2]})),
+      activity: [{time:"11:03",text:"John Doe opened shift with AED 500.00 float"},
+        {time:"11:41",text:"Cash drop AED 2,000 to safe · verified by Marco Ruiz"},
+        {time:"12:15",text:"Refund AED 120.00 · order TP-40188 · supervisor approved"},
+        {time:"13:02",text:"Amir Khan started break — POS-04 locked"}]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,12 +1,18 @@
-# Delivery
+# Active
 
-> **Purpose:** Waves, gates, sequencing  
+> **Purpose:** What is in flight now  
 > **Owner:** Chinmay  
-> **Status:** Stub
+> **Status:** Living
 
-| Page | Covers |
+Current wave, current context, open blockers, this week's gates.
+
+| Page | |
 |---|---|
-| [waves](waves.md) | Context order and rationale |
-| [context-loop](context-loop.md) | The eight stages, week by week |
-| [gates](gates.md) | What each gate checks and who signs |
-| [environments](environments.md) | Local, CI, canary cell, pilot venue |
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

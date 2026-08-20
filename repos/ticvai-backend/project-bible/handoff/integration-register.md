@@ -4,7 +4,7 @@
 since 30 July and never itemised against the contracts until 14 August.
 
 Tested by searching every contract for each named system. A "no trace" result means nothing in
-642 operations, no enum value, and no adaptor mentions it.
+689 operations, no enum value, and no adaptor mentions it.
 
 ## Software — 19
 
@@ -25,8 +25,8 @@ Tested by searching every contract for each named system. A "no trace" result me
 | 13 | **SIEM** | — | 🔴 **No trace.** Security event forwarding |
 | 14 | Application Monitoring | `subscription` | Covered — cell health, capacity |
 | 15 | **Al Hosn App** | — | 🔴 **No trace.** UAE health pass |
-| 16 | Apple ID | `identity` | Covered — guest social login |
-| 17 | Google ID | `identity` | Covered — guest social login |
+| 16 | Apple ID | `identity` | Covered — guest-app social login |
+| 17 | Google ID | `identity` | Covered — guest-app social login |
 | 18 | **NI Payment Gateway** | — | 🔴 **No trace.** Network International |
 | 19 | **NI Payment Device** | — | 🔴 **No trace** |
 
@@ -41,7 +41,7 @@ named vendor is a driver behind a stable shape, not a core change.
 `turnstileController` · `wristbandEncoder` · `signaturePad` · `scale` · `camera`
 
 Boca maps to `ticketPrinter`, Zebra Bluetooth to `labelPrinter`, Chainway to a handheld running
-the scanner app, Emirates ID to `idReader`, facial readers to `biometricReader`.
+the venue-scanner app, Emirates ID to `idReader`, facial readers to `biometricReader`.
 
 ---
 

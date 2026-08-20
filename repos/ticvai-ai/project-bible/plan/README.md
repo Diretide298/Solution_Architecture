@@ -1,12 +1,18 @@
-# Plan
+# Active
 
-> **Purpose:** How work becomes code  
+> **Purpose:** What is in flight now  
 > **Owner:** Chinmay  
-> **Status:** Stub
+> **Status:** Living
 
-| Page | Covers |
+Current wave, current context, open blockers, this week's gates.
+
+| Page | |
 |---|---|
-| [user-story-to-spec](user-story-to-spec.md) | Requirement → capability → contract → build |
-| [pm-and-tickets](pm-and-tickets.md) | Ticket shape, traceability, estimation |
-| [ai-in-requirements](ai-in-requirements.md) | Using AI on the 3,184-requirement matrix |
-| [ai-phasing](ai-phasing.md) | Phase 1 AI scope and why the rest waits |
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

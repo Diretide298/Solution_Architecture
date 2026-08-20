@@ -5,6 +5,8 @@
 entity: Shift
 contract: shift
 enum: ShiftStatus
+enumKind: named
+enumSchema: ShiftStatus
 owner: shift
 initial:
 - pendingApproval
@@ -12,9 +14,6 @@ initial:
 terminal:
 - closed
 - autoClosed
-offlineReachable:
-- open
-- suspended
 transitions:
 - from: pendingApproval
   to: open
@@ -73,3 +72,6 @@ transitions:
   requiresApproval: true
 notes: '`autoClosed` is deliberately distinct from `closed`. A shift nobody counted must not appear
   in reconciliation as one that was.'
+offlineReachable:
+- open
+- suspended

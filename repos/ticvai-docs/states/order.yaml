@@ -5,6 +5,8 @@
 entity: Order
 contract: orders
 enum: OrderStatus
+enumKind: named
+enumSchema: OrderStatus
 owner: orders
 initial:
 - pending
@@ -13,10 +15,6 @@ terminal:
 - voided
 - refunded
 - failed
-offlineReachable:
-- pending
-- held
-- paid
 transitions:
 - from: pending
   to: held
@@ -109,3 +107,7 @@ transitions:
   requiresApproval: true
 notes: '**held → refunded is not a transition.** A parked sale was never paid, so there is nothing to
   return. The enum permits it and the business does not, which is the defect this file exists to catch.'
+offlineReachable:
+- pending
+- held
+- paid

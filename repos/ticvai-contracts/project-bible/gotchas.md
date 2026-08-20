@@ -13,7 +13,7 @@ Append as found. Symptom first, then cause.
 
 `ENABLE ROW LEVEL SECURITY` alone does not apply to the table **owner**. If the application role owns the table, every policy is bypassed — and it reviews clean.
 
-**Always `ALTER TABLE ... FORCE ROW LEVEL SECURITY`.** Asserted monthly in [runbooks/restore-drill](runbooks/restore-drill.md) step 6.
+**Always `ALTER TABLE ... FORCE ROW LEVEL SECURITY`.** Asserted monthly in runbooks/restore-drill step 6.
 
 ### Money silently truncates in Oman
 
@@ -43,7 +43,7 @@ Frontend spelled the permission `ORDERS.REFUND.APPROVE`, backend enforces `ORDER
 
 ### A valid ticket is refused at the gate
 
-Sold at the front gate, guest walks 20 metres, scans. Validation read a lagging replica.
+Sold at the front gate, guest-app walks 20 metres, scans. Validation read a lagging replica.
 
 **Access validation reads the primary unconditionally.** Everything else carries `X-Consistency-Token`.
 

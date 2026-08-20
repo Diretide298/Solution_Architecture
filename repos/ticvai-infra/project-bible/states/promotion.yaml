@@ -5,6 +5,8 @@
 entity: Promotion
 contract: promotions
 enum: PromotionStatus
+enumKind: named
+enumSchema: PromotionStatus
 owner: promotions
 initial:
 - draft

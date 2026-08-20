@@ -48,4 +48,9 @@ consumers:
   isCritical: false
 retention: 30 days after publication
 notes: '**The access consumer is why this is critical.** An entitlement that never reaches the offline
-  bundle is a guest refused at a gate holding a valid ticket, and the terminal cannot tell them why.'
+  bundle is a guest refused at a gate holding a valid ticket, and the terminal cannot tell them why.
+
+
+  No state model emits this: an entitlement is **created** already issued, by the order that bought
+  it. There is no from-state, so no transition can carry the emit — the event fires on creation. `states/entitlement.yaml`
+  starts at `issued` for the same reason.'

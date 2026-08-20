@@ -1,0 +1,136 @@
+# F24 — A guest asks the assistant and ends up with a person
+#
+# The flow CF-99 exists for. 22.8.5 requires seamless handover, and seamless means the guest
+# does not repeat themselves — which is why the whole thread and the assistant's own summary
+# travel with it.
+#
+# Validated by tools/check-flows.py.
+#
+# Moved to Wave 2 (CF-101). **The kiosk assistant is Wave 2 and the handover destination moved to Wave 2 with it.** The concierge does not ship before the surface it runs on.
+
+id: F24
+name: A guest asks the assistant and ends up with a person
+actor: guest
+wave: 2
+frequency: constant
+criticality: operational
+platforms:
+- P05 Guest Kiosk
+- P02 Guest App
+- P12 Venue Support
+offlineBehaviour: '**Not available offline at all.** Retrieval needs the index and a handover needs
+  an agent who is reachable. A kiosk that loses connectivity falls back to `KSK-013 Call staff`, which
+  summons somebody in the building rather than somebody at a desk.'
+trigger:
+  description: A guest at a kiosk asks the assistant something it is not allowed to answer.
+  entryScreen: KSK-015
+  entryPoints:
+  - Kiosk assistant
+  - Guest app AI concierge
+  - Web chat
+  - WhatsApp
+steps:
+- step: 1
+  screen: KSK-015
+  action: Asks a question
+  operations:
+  - sendAiMessage
+  outcome: Answered where it is inside `guestCapabilityScope` — ticket selection, promotions, FAQs,
+    recommendations, checkout
+- step: 2
+  screen: KSK-015
+  action: Asks something outside that scope
+  operations:
+  - handoverToAgent
+  outcome: '**The assistant does not attempt it.** Bounded capability is the whole reason the cost and
+    the safety posture are tractable'
+- step: 3
+  screen: SUP-004
+  action: The conversation appears in the queue
+  operations:
+  - listConversations
+  - claimConversation
+  outcome: With the assistant’s own summary, so the agent opens with context
+- step: 4
+  screen: SUP-005
+  action: The agent answers
+  operations:
+  - getConversation
+  - sendConversationMessage
+  outcome: '**The guest has not repeated themselves.** The whole thread came with the handover'
+- step: 5
+  screen: SUP-005
+  action: Resolves it, or raises a case
+  operations:
+  - closeConversation
+  - escalateCase
+  outcome: Closed with an outcome that distinguishes resolved from a case raised
+branches:
+- at: 2
+  condition: No agent is available
+  behaviour: '**Says so and offers a case**, rather than queuing a guest for somebody who is not there.
+    The worst outcome here is a guest waiting in silence for a queue with nobody in it.'
+  severity: requiresStaff
+  resolvedBy: Guest
+- at: 2
+  condition: The guest is at a kiosk and there is no chat agent
+  behaviour: Falls back to `KSK-013 Call staff` and `startKioskAssist` — **the person is in the building.**
+    A guest standing at a machine does not want a chat queue.
+  severity: recoverable
+  resolvedBy: Venue staff
+- at: 3
+  condition: Two agents claim it at once
+  behaviour: '`claimConversation` refuses the second. **Two agents answering one guest reads as chaos**
+    from the guest’s side and is common on a busy queue.'
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 3
+  condition: Nobody claims it before the guest gives up
+  behaviour: '`abandoned` from `queued` — **the number to watch.** A guest who asked for a person and
+    left before getting one is a staffing failure, and it looks identical to a resolved conversation
+    in any report that does not separate them.'
+  severity: abandonsFlow
+  resolvedBy: Venue manager
+- at: 4
+  condition: The agent needs to take over the kiosk
+  behaviour: '`startKioskAssist`. Acts on the kiosk session **under their own permission** — a cashier
+    completing a guest’s checkout remotely is a staff action on a guest cart, recorded as theirs. The
+    guest sees who is helping and can end it.'
+  severity: recoverable
+  resolvedBy: Agent
+- at: 4
+  condition: The conversation needs another team
+  behaviour: '`transferConversation`. **The context travels again** — a guest transferred twice should
+    still not have repeated themselves.'
+  severity: recoverable
+  resolvedBy: Agent
+- at: 1
+  condition: The AI ceiling has been reached
+  behaviour: '**The assistant keeps answering** and the venue manager has been warned (CF-14). A cap
+    that stops mid-visit turns a cost control into a guest-facing outage.'
+  severity: recoverable
+  resolvedBy: Venue manager
+- at: 5
+  condition: The guest stops replying
+  behaviour: '`timedOut`, not `abandoned` — **the guest may simply have been satisfied**, and calling
+    that abandonment misreports the service level in the wrong direction.'
+  severity: recoverable
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Resolved by an agent
+- state: deferred
+  description: A case was raised; the conversation ended and the problem did not
+- state: abandoned
+  description: The guest left while queued — the failure worth counting
+- state: escalated
+  description: Handed to a kiosk assist session in person
+openQuestions:
+- Whether the assistant may take a conversation back when no agent comes. The state model allows it
+  and no venue has said whether they want it.
+- Agent hours. **A handover path with nobody on the other end after 18:00 is a queue that never empties**,
+  and 22.8.5 does not say what the hours are.
+primaryContract: marketing-crm
+contracts:
+- marketing-crm
+- ai

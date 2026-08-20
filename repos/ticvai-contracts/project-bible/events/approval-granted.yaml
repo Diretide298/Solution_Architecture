@@ -1,0 +1,73 @@
+# approval.granted v1 — published by approvals
+# Checked by tools/check-states.py.
+
+name: approval.granted
+version: 1
+publisher: approvals
+description: An approval request was granted at its final level.
+aggregate: approvalRequest
+emittedWhen: ApprovalStatus pending or escalated to approved
+payload:
+- field: requestId
+  type: string
+- field: kind
+  type: string
+- field: subjectContract
+  type: string
+  notes: '**Which contract must now act.** The consumer is the owner of the thing approved'
+- field: subjectType
+  type: string
+- field: subjectId
+  type: string
+- field: scopePath
+  type: string
+- field: amount
+  type: Money
+- field: approvedByPrincipalId
+  type: uuid
+  notes: The final approver, who is also the principal the action executes under
+- field: levels
+  type: integer
+- field: grantedAt
+  type: timestamp
+consumers:
+- context: orders
+  purpose: Release a held refund or discount
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: shift
+  purpose: Accept a variance
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: platform-ops
+  purpose: Promote a release
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: ai
+  purpose: Mark a proposed action approved
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Approval analytics
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+- context: cache
+  purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
+    invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
+    venue’s behalf, which is worse than a slow one
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: Retained with the request. This is an audit record, not an operational message
+notes: '**The event that replaces four bespoke callbacks.** Each owning contract consumed its own approval
+  signal before this existed; now there is one, and adding a fifth approval kind means adding a consumer
+  rather than a mechanism.
+
+
+  Critical for the three that release money or ship code. A granted approval nobody acted on is a refund
+  a guest was promised and never received.'

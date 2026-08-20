@@ -117,3 +117,44 @@ Keyword classification over 3,297 requirements. A requirement mentioning "report
 necessarily a report requirement, and 188 hits for "call" turned out to be call centre. The
 counts are indicative; **the two findings above were verified by reading the requirements
 themselves**, and they are the ones worth acting on.
+
+## Position, 17 August
+
+**12 of 15 classes closed. 1,848 of 2,072 requirements have an artefact — 89%.**
+
+| Class | Reqs | Artefact |
+|---|---|---|
+| report | 347 | `report-register.md` — 20 engine capabilities, 113 definitions to seed |
+| permission / role | 290 | 110 permissions; every operation declares one or an auth model |
+| configuration | 273 | 321 levels decided, ADR-0018, `check-config-scope` |
+| **audit** | 206 | **`audit-register.md`** — 431 write operations, and the subset needing more than the default |
+| **notification** | 193 | **`notification-catalogue.md`** — event to audience to channel to consent |
+| integration | 171 | `integration-register.md` — 35 named systems |
+| state model | 117 | 41 models, every status enum covered |
+| **validation rule** | 94 | **`validation-rules.md`** — 194 refusals + 327 guards = 521 testable rules |
+| event / async | 53 | 26 events with consumers and idempotency keys |
+| **test / acceptance** | 40 | **`test-and-acceptance.md`** — four layers, all derivable |
+| **localisation** | 38 | **`localisation.md`** — 3,088 keys derivable today |
+| **accessibility** | 26 | **`accessibility.md`** — WCAG 2.2 AA, per surface, with an audit plan |
+
+### The three left, and all three are blocked
+
+| Class | Reqs | Blocked by |
+|---|---|---|
+| **device / hardware** | 105 | **Workshop** — Device Management (CF-21) |
+| **retention / archive** | 89 | **Client** — CF-64. Two periods stated of 89 |
+| **performance / SLA** | 30 | **Client** — no targets given, so there is nothing to assert |
+
+**224 requirements, none of them ours.**
+
+### What closing six of them actually took
+
+Almost none of it was design. **The audit register found that every write is auditable and the
+question was what beyond the default.** The validation rules were already written — in 409
+descriptions — and had never been listed. Localisation's 3,088 keys were sitting in the screens
+and the enums.
+
+**The exception is notification**, which needed a real decision: event to audience to channel to
+consent, and three events that deliberately notify nobody. A catalogue that only lists what
+sends cannot be reviewed, because a reader cannot tell absent-by-decision from forgotten.
+

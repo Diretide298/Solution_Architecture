@@ -1,23 +1,18 @@
-# ticvai-docs
+# Active
 
-Project knowledge base. Sixth repository alongside contracts, backend, frontend, ai and infra.
+> **Purpose:** What is in flight now  
+> **Owner:** Chinmay  
+> **Status:** Living
 
-**Start at [Home](Home.md).** Structure and placement rules: [STRUCTURE](STRUCTURE.md).
+Current wave, current context, open blockers, this week's gates.
 
-## Why a separate repo
-
-Standards apply to all five code repos. Putting them inside any one of them makes them
-invisible from the other four. This repo is small, has no build, and can be published as a
-wiki or static site without touching code CI.
-
-## Status
-
-37 pages. Real content on 12; the rest are stubs carrying purpose, owner, status and a
-"done when" — they are a backlog, not placeholders.
-
-| Status | Meaning |
+| Page | |
 |---|---|
-| **Blocking** | Something is waiting on this page |
-| **Week N** | Scheduled |
-| Living | Updated continuously; never "finished" |
-| Stub | Needed, not yet scheduled |
+| [sprint-1](sprint-1.md) | Current sprint board |
+| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+
+Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
+than an empty one.
+
+**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
+cross-jurisdiction entitlement decision · pilot venue.

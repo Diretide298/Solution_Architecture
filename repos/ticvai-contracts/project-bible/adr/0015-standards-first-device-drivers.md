@@ -24,7 +24,7 @@ correct implementation, and the vendor's own device already speaks it.
 
 ### Point-of-sale peripherals — a genuine vendor-neutral standard exists
 
-<cite index="32-1">UnifiedPOS (UPOS) is a vendor- and retailer-driven open standard under the National Retail Federation's Association for Retail Technology Standards, providing vendor-neutral APIs for thirty-six point-of-sale peripherals — printer, cash drawer, magnetic stripe reader, barcode scanner, line displays. The goal is to give retailers freedom of choice in peripheral selection through standardised connectivity, with appendices covering .NET and Java implementation.</cite>
+<cite index="32-1">UnifiedPOS (UPOS) is a vendor- and retailer-driven open standard under the National Retail Federation's Association for Retail Technology Standards, providing vendor-neutral APIs for thirty-six point-of-sale peripherals — printer, cash drawer, magnetic stripe reader, barcode venue-scanner, line displays. The goal is to give retailers freedom of choice in peripheral selection through standardised connectivity, with appendices covering .NET and Java implementation.</cite>
 
 Beneath it, the command layer is equally settled:
 
@@ -67,7 +67,7 @@ The vendor's device already speaks it. When the model list arrives, the driver w
 | Receipt printer | **ESC/POS** | De facto universal; mature libraries for .NET and TypeScript |
 | Cash drawer | **ESC/POS kick pulse** | Not a separate driver |
 | Customer / line display | **ESC/POS + UnifiedPOS** | |
-| Barcode scanner | **HID keyboard-wedge / serial** | Trivially abstracted |
+| Barcode venue-scanner | **HID keyboard-wedge / serial** | Trivially abstracted |
 | Magnetic stripe reader | **UnifiedPOS MSR** | |
 | POS peripheral abstraction | **UnifiedPOS / UPOS** | Thirty-six device classes, ARTS-managed |
 | Ticket printer | **Boca FGL** | Vendor command language, publicly documented and stable |
@@ -167,7 +167,7 @@ implementation**, which is what was blocked.
 |---|---|---|
 | 1 | Define the access-control driver interface **modelled on OSDP's command set** | Chinmay |
 | 2 | Define the POS peripheral interface **modelled on UnifiedPOS** | Chinmay |
-| 3 | Implement Tier A drivers — ESC/POS printing, drawer kick, display, scanner, MSR | Backend |
+| 3 | Implement Tier A drivers — ESC/POS printing, drawer kick, display, venue-scanner, MSR | Backend |
 | 4 | **Request payment gateway sandbox credentials** — Stripe and N-Genius | Allam |
 | 5 | Mock adaptors for every Tier C class, conforming to our interface | Backend |
 | 6 | Device simulator suite in CI, per class | Backend |

@@ -26,6 +26,19 @@
     </header>
 
     <main class="admin-main reviews-main">
+      <!-- Above the numbers, because it is addressed to you personally and
+           everything below it is about everybody. Absent entirely when nobody
+           has named you, rather than an empty box saying so. -->
+      <section class="admin-panel mentions-panel" id="mentions-panel" hidden>
+        <h2 class="admin-heading">
+          Where you were named <span class="admin-count" id="mentions-note"></span>
+          <button class="chip mentions-read" id="mentions-seen" type="button">
+            Mark all read
+          </button>
+        </h2>
+        <div id="mentions"></div>
+      </section>
+
       <!-- The four numbers worth knowing before any filter is touched. -->
       <section class="stat-strip" id="headline"></section>
 
@@ -58,6 +71,9 @@
           <!-- Which side has to act, and whether anybody has. These two are the
                reason the list is a table: they are the columns a delivery
                meeting sorts by. -->
+          <!-- Whose review: the team's or the client's. Two reviews of one
+               package, kept apart so a count says approved by whom. -->
+          <div class="seg" id="f-audience"></div>
           <div class="seg" id="f-tag"></div>
           <div class="seg" id="f-done"></div>
           <div class="seg" id="f-verdict"></div>

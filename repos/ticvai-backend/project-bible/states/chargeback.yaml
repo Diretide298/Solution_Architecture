@@ -1,0 +1,56 @@
+# Chargeback — state model
+# Contract: orders.Chargeback.status
+
+entity: Chargeback
+contract: orders
+enum: Chargeback.status
+enumKind: inline
+enumSchema: Chargeback
+enumProperty: status
+owner: orders
+initial:
+- received
+terminal:
+- won
+- lost
+- accepted
+- expired
+transitions:
+- from: received
+  to: underReview
+  operation: listChargebacks
+  trigger: operation
+  guard: Being worked. **The money is already gone** — this is an argument, not a reversal
+- from: underReview
+  to: evidenceSubmitted
+  operation: respondToChargeback
+  trigger: operation
+  guard: Representment filed with the scheme
+- from: underReview
+  to: accepted
+  operation: respondToChargeback
+  trigger: operation
+  guard: '**Conceded deliberately.** A 40 AED case with a 30 AED fee is one to give up on purpose rather
+    than by forgetting'
+- from: evidenceSubmitted
+  to: won
+  trigger: timer
+  guard: The scheme found for the venue
+- from: evidenceSubmitted
+  to: lost
+  trigger: timer
+  guard: The scheme found for the cardholder
+- from: received
+  to: expired
+  trigger: timer
+  guard: '**`evidenceDueBy` passed with nothing filed.** A case lost on merit nobody read'
+- from: underReview
+  to: expired
+  trigger: timer
+  guard: Same, and worse — somebody had it open
+notes: '**`expired` is the state this whole model exists to prevent.** A deadline missed is a case lost
+  regardless of merit, which is why `listChargebacks` sorts by `evidenceDueBy` rather than by date received.
+
+
+  **`accepted` is a legitimate outcome and is separated from `lost`** — one is a decision and the other
+  is an outcome, and a venue conceding small cases on purpose should not look like a venue losing them.'

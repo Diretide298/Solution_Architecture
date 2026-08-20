@@ -22,9 +22,13 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 FLOWS = ROOT / "flows"
 SCREENS = ROOT / "screens"
-CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
+# The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
+# outside the package, so every validator passed for whoever had that repo checked out and read
+# nothing for anyone working from the zip — which is the worst failure a checker can have, because
+# it is silent and it looks like success.
+CONTRACTS = ROOT / "contracts"
 if not CONTRACTS.exists():
-    CONTRACTS = ROOT.parent / "ticvai-contracts" / "openapi"
+    CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
@@ -37,7 +41,7 @@ def load_screens() -> tuple[set[str], dict[str, set[str]], set[tuple[str, str]],
     edges: set[tuple[str, str]] = set()
     inferred: set[str] = set()
     for f in SCREENS.glob("P*.yaml"):
-        for s in yaml.safe_load(f.read_text())["screens"]:
+        for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
             sid = s["id"]
             ids.add(sid)
             apis[sid] = {a["operationId"] for a in (s.get("apis") or [])
@@ -58,7 +62,7 @@ def load_operations() -> set[str]:
         return ops
     for f in CONTRACTS.rglob("*.yaml"):
         try:
-            doc = yaml.safe_load(f.read_text())
+            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         except Exception:
             continue
         for item in (doc.get("paths") or {}).values():
@@ -70,7 +74,14 @@ def load_operations() -> set[str]:
     return ops
 
 
+SCREEN_WAVE: dict[str, int] = {}
+
+
 def main() -> int:
+    global SCREEN_WAVE
+    for f in SCREENS.glob("P*.yaml"):
+        for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
+            SCREEN_WAVE[s["id"]] = s.get("wave")
     files = sorted(FLOWS.glob("F*.yaml"))
     if not files:
         print("no flows found", file=sys.stderr)
@@ -83,7 +94,7 @@ def main() -> int:
           f"and {len(ops)} operations\n")
 
     for f in files:
-        doc = yaml.safe_load(f.read_text())
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         name = f.name
         steps = doc.get("steps", [])
         branches = doc.get("branches", [])
@@ -106,10 +117,25 @@ def main() -> int:
                         f"{name}: step {st.get('step')} calls '{oid}' from {sid}, "
                         f"but {sid} does not declare it")
 
+        flow_wave = doc.get("wave")
+        for st in steps:
+            sid = st.get("screen")
+            if not sid or flow_wave is None:
+                continue
+            sw = SCREEN_WAVE.get(sid)
+            if sw is not None and sw > flow_wave:
+                # An error, not a warning. CF-101 recorded this as enforced on 17 August while it
+                # appended to WARNINGS and the run exited 0 — a claim of enforcement that enforced
+                # nothing, which is worse than no rule because the register says it is covered.
+                ERRORS.append(f"{name}: step {sid} is wave {sw} and this flow is wave {flow_wave} — "
+                                "the journey cannot run until the later screen exists")
+
         for b in branches:
-            if (r := b.get("resolvedBy")):
-                if r not in screen_ids and (ops and r not in ops):
-                    WARNINGS.append(f"{name}: branch resolvedBy '{r}' is neither a screen nor an operation")
+            # resolvedBy names *who* resolves it — a role, or "Automatic". It was checked against
+            # screens and operations, which is the wrong vocabulary: "Duty manager" is the correct
+            # answer and produced a warning on every branch that had one.
+            if not b.get("resolvedBy"):
+                WARNINGS.append(f"{name}: a branch says nothing about who resolves it")
             if b.get("at") and not any(s.get("step") == b["at"] for s in steps):
                 ERRORS.append(f"{name}: branch at step {b['at']}, which does not exist")
 

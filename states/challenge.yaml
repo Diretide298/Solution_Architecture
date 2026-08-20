@@ -1,0 +1,51 @@
+# Challenge — state model
+# Contract: marketing-crm.Challenge.status
+
+entity: Challenge
+contract: marketing-crm
+enum: Challenge.status
+enumKind: inline
+enumSchema: Challenge
+enumProperty: status
+owner: marketing-crm
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: active
+  trigger: operation
+  guard: Published to guests
+- from: active
+  to: paused
+  trigger: operation
+  guard: '**Entrants keep their progress.** A challenge paused mid-streak that resets it is worse than
+    one that never ran'
+- from: paused
+  to: active
+  trigger: operation
+  guard: Resumed
+  isReversal: true
+- from: active
+  to: ended
+  trigger: timer
+  guard: Past `endsAt`. **Progress is frozen and rewards already earned stand**
+- from: ended
+  to: archived
+  trigger: operation
+  guard: Hidden from the app
+- from: paused
+  to: ended
+  trigger: operation
+  guard: Ended while paused
+- from: draft
+  to: archived
+  trigger: operation
+  guard: Abandoned
+notes: '**Pausing preserves progress** — a guest two visits from a reward who loses that on a pause
+  will not trust the next challenge.
+
+
+  **Rewards already earned survive `ended`.** Reclaiming a badge because a campaign finished is worse
+  than never awarding it.'

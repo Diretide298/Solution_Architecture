@@ -1,0 +1,34 @@
+# Ticket transfer — state model
+# Contract: orders.TicketTransfer.status
+# Checked by tools/check-states.py.
+
+entity: Ticket transfer
+contract: orders
+enum: TicketTransfer.status
+enumKind: inline
+enumSchema: TicketTransfer
+enumProperty: status
+owner: orders
+initial:
+- offered
+terminal:
+- claimed
+- expired
+- cancelled
+transitions:
+- from: offered
+  to: claimed
+  operation: claimTicketTransfer
+  trigger: operation
+  guard: '**The entitlement moves and the original holder loses it.** One ticket, one holder'
+- from: offered
+  to: expired
+  trigger: timer
+  guard: Unclaimed. **Returns to the sender rather than voiding** — nobody did anything wrong
+- from: offered
+  to: cancelled
+  operation: transferOrderTickets
+  trigger: operation
+  guard: Withdrawn by the sender before it was claimed
+notes: A transfer that expires returns the ticket. **The failure mode to avoid is a ticket in limbo**
+  — neither party holds it and the performance happens.

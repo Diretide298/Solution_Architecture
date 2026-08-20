@@ -1,0 +1,187 @@
+# F27 — A developer integrates
+#
+# **The `public-api` contract had no flow.** Twenty-two operations, eight screens, and no
+# end-to-end story — so nobody could say what a third party actually does between finding the
+# documentation and appearing in the marketplace.
+#
+# The flow that shows why D2 mattered: **a sandbox with synthetic data lets step 3 happen without
+# any of the questions a sandbox with production data would raise.**
+
+$schema: ./_schema.yaml
+id: F27
+name: A developer integrates
+actor: partner
+capability: Public API and developer access
+wave: 3
+# **Wave 3, not 2.** Steps 1 to 6 are wave 2 and step 7 reaches `DEV-007`, which is wave 3 — and
+# the flow checker refused the mismatch. **A journey is only as early as its latest screen**, and
+# claiming wave 2 would have promised a marketplace that does not exist yet.
+frequency: rare
+criticality: operational
+primaryContract: public-api
+contracts: [public-api, identity, marketing-crm]
+platforms: [P14]
+
+trigger:
+  description: >
+    A CRM vendor wants to sync a venue's guest data. They have found the documentation and have no
+    account, no credential and no relationship with Softlabs.
+  entryScreen: DEV-001
+
+offlineBehaviour: >
+  **Not offline-capable, and it should not be.** A developer portal is used at a desk with a
+  connection, and pretending otherwise would add machinery nobody needs.
+
+steps:
+  - step: 1
+    screen: DEV-001
+    action: The developer reads the reference and tries an operation.
+    operations: [listApiVersions]
+    outcome: >
+      **Try-it runs against the sandbox, never production**, and the button says so. A try-it that
+      quietly hits production is how somebody refunds a real order while reading the docs.
+
+  - step: 2
+    screen: DEV-002
+    action: They register their organisation.
+    operations: [registerDeveloper]
+    outcome: >
+      Pending verification. **Nothing is provisioned yet** — an unverified account with live
+      credentials is an open door.
+
+  - step: 3
+    screen: DEV-003
+    action: They create a sandbox client and take the secret.
+    operations: [createApiClient]
+    outcome: >
+      **`issueApiToken` is not on this screen and should not be** — a token exchange is a call
+      their code makes, not a button somebody presses. The flow named it here and the checker was
+      right to refuse.
+
+      **The secret is returned once and never again.** A system that can show you a secret later is
+      a system that stores one.
+
+      **The client is bound to one environment**, stated on the object rather than by a naming
+      convention — a key that works in both is a key somebody will use in the wrong one.
+
+  - step: 4
+    screen: DEV-004
+    action: They provision a sandbox and build against it.
+    operations: [createSandbox, resetSandbox]
+    outcome: >
+      Synthetic data, generated rather than sampled. **No production data is cloned or masked**,
+      which is what removes the PDPL and DESC exposure entirely — and why this step needs no legal
+      review at all.
+
+  - step: 5
+    screen: DEV-005
+    action: They subscribe to the events they need and watch the deliveries.
+    operations: [createWebhookSubscription, listWebhookDeliveries]
+    outcome: >
+      The endpoint is verified before the first delivery. **An unverified endpoint is somebody
+      else's server being sent a venue's ticket sales.**
+
+  - step: 6
+    screen: DEV-006
+    action: They go live, and watch whether it is healthy.
+    operations: [getApiUsage]
+    outcome: >
+      **Client errors and server errors on separate series.** A 4xx is theirs and a 5xx is ours, and
+      one combined rate lets both sides blame the other.
+
+  - step: 7
+    screen: DEV-007
+    action: They submit the integration for certification and listing.
+    operations: [submitIntegrationListing]
+    outcome: >
+      Submitted for review. **Certification is a Softlabs act on `DEV-008`, not something the
+      developer does** — the flow named both on one screen and the checker refused, correctly.
+
+      Listed once certified. **A listing, not an installation** — the integration runs on their own
+      infrastructure, and third-party code does not execute inside TICVAI.
+
+branches:
+  - at: 2
+    condition: Verification fails.
+    behaviour: >
+      Rejected with a reason they can act on. **Nothing was provisioned, so nothing needs cleaning
+      up** — which is the whole point of verifying before provisioning rather than alongside it.
+    severity: abandonsFlow
+
+  - at: 3
+    condition: They request a scope their target tenant has not licensed.
+    behaviour: >
+      **No token is issued, and the refusal happens at issue rather than at call time.** An
+      integrator whose tenant has not licensed the F&B API finds out once, in testing, rather than
+      at 3am against a 403 on one endpoint.
+    severity: requiresStaff
+    resolvedBy: setApiLicensing
+
+  - at: 4
+    condition: The sandbox expires mid-build.
+    behaviour: >
+      **Data goes and the record stays.** A developer whose sandbox vanished entirely cannot tell
+      it from one that never existed, and the expiry was counted in days on the screen before it
+      happened.
+    severity: recoverable
+    resolvedBy: createSandbox
+
+  - at: 5
+    condition: Their endpoint fails repeatedly.
+    behaviour: >
+      `failing` before `disabled`, so **they are told before it stops rather than after**. And
+      disabling is safe because `replayEvents` is the recovery path — nothing is lost, it is just
+      not being pushed.
+    severity: recoverable
+    resolvedBy: replayEvents
+
+  - at: 6
+    condition: They exceed their quota.
+    behaviour: >
+      Throttled by default rather than rejected, and the 429 carries `Retry-After`. **A limit with
+      no guidance produces a client that retries immediately and makes it worse.**
+    severity: recoverable
+    resolvedBy: setApiQuota
+
+  - at: 7
+    condition: Certification is refused.
+    behaviour: >
+      **API access is unaffected.** Certification gates the listing, not the calling — a developer
+      who thinks they need certifying to make a request will not make one.
+    severity: recoverable
+
+  - at: 7
+    condition: The API version they built against is deprecated.
+    behaviour: >
+      Twelve months' notice, and **the notification names the operations they actually call**. A
+      generic *"v1 is retiring"* to somebody using three of two hundred endpoints is a message they
+      will ignore.
+    severity: recoverable
+    resolvedBy: deprecateApiVersion
+
+exitStates:
+  - state: live
+    description: Integrated, calling production, within quota.
+  - state: listed
+    description: Live and certified, appearing in the marketplace.
+  - state: abandoned
+    description: >
+      Registered and never called. **Worth counting** — a developer programme where most
+      registrations never make a request has a documentation problem, not a demand problem.
+  - state: revoked
+    description: Credentials revoked for abuse or a security finding. Listings delist with them.
+
+notes: >
+  **Step 4 is the one D2 bought.** With synthetic data there is no data-residency question, no
+  masking to review, no tenant-isolation dependency and no legal sign-off — **there is no
+  production data to isolate.** With cloned data, every one of those would sit between a developer
+  and their first working call.
+
+  **CF-135c is still open and does not block this flow.** The commercial rates are unset; the
+  mechanism that will carry them is `setApiLicensing` at step 3.
+
+openQuestions:
+  - >
+    **Whether a developer may reach production without certification.** The contract allows it and
+    the flow assumes it — certification gates the listing only. A venue may reasonably want the
+    opposite, and that is a commercial decision rather than a design one.
