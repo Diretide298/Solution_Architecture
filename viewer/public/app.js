@@ -643,7 +643,7 @@ const partInFlight = new Map();
 function loadPart(key) {
   if (state[key]) return Promise.resolve(state[key]);
   if (partInFlight.has(key)) return partInFlight.get(key);
-  const request = fetch(`/api/${key}`)
+  const request = auth.apiFetch(`/api/${key}`)
     .then((r) => r.json())
     .catch(() => null)
     .then((data) => {
