@@ -179,6 +179,28 @@ async function resolveToken(token, apiBase) {
  * An API path gets 401 and JSON, because something is reading it. A page gets a
  * redirect to the sign-in door, because somebody is.
  */
+/**
+ * What an embedded preview gets instead of the sign-in page.
+ *
+ * Drawn on white and inline, because the frames it replaces are: this lands
+ * inside a board stage that has no stylesheet of its own and does not inherit
+ * the viewer's theme.
+ */
+const EMBED_REFUSAL =
+  '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+  '<title>Session ended</title><style>' +
+  'html,body{margin:0;background:#fff;height:100%}' +
+  'body{display:flex;align-items:center;justify-content:center;' +
+  'font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1f2937;padding:24px}' +
+  '.box{max-width:32em;text-align:center;line-height:1.5}' +
+  'b{display:block;font-size:15px;margin-bottom:6px}' +
+  'p{margin:0;font-size:13px;color:#6b7280}' +
+  '</style></head><body><div class="box">' +
+  '<b>This preview could not be loaded.</b>' +
+  '<p>The sign-in behind it has ended, so the board it draws from was refused. ' +
+  'Reload the page to sign in again — nothing you were looking at has moved.</p>' +
+  '</div></body></html>';
+
 export async function gate(req, res, url, apiBase) {
   if (isPublic(url.pathname)) return { answered: false, role: null };
 
@@ -198,6 +220,26 @@ export async function gate(req, res, url, apiBase) {
     res.end(JSON.stringify({ error: 'not signed in' }));
     return { answered: true, role: null };
   }
+
+  // An <iframe> handed a 302 to the sign-in page renders the sign-in page —
+  // scaled down, inside a preview box, under a caption saying "from the
+  // platform board". It reads as the viewer having loaded the wrong file, and
+  // it is the most confusing possible way to say "your session ended": the SPA
+  // shell keeps working off data it already fetched, so the *only* symptom is
+  // a wireframe panel showing somebody a login form. The board previews load
+  // lazily, which means this can surface an hour after the page did.
+  //
+  // `Sec-Fetch-Dest` separates the two cases and every browser that can render
+  // an iframe sends it. Somebody opening a board full size in a new tab is
+  // `document` and still wants the door. An embed wants to be told, in the box,
+  // what actually happened.
+  const dest = req.headers['sec-fetch-dest'];
+  if (dest === 'iframe' || dest === 'frame' || dest === 'embed' || dest === 'object') {
+    res.writeHead(401, { ...headers, 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(EMBED_REFUSAL);
+    return { answered: true, role: null };
+  }
+
   res.writeHead(302, { ...headers, Location: '/login.html' });
   res.end();
   return { answered: true, role: null };

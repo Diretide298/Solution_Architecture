@@ -5,16 +5,24 @@
 #   sudo ./deploy/deploy.sh --admin you@softlabsgroup.com     # first time
 #   git pull && sudo ./deploy/deploy.sh                       # every time after
 #
-# Two services on two ports, kept alive by PM2. No nginx.
+# Two services on two ports, kept alive by PM2.
 #
 #   :4173  node      the delivery package, and the sign-in gate in front of it
 #   :8787  uvicorn   accounts, invites, verdicts, mentions, and /docs
 #
-# nginx was only ever putting both halves on one origin. `server.mjs` now
-# forwards everything the accounts service owns, so the browser talks to :4173
-# and nothing else, and there is no third process to install, configure or
-# reload. :8787 stays open because /docs lives there and because talking to the
-# API directly is useful — but no page depends on it being reachable.
+# In front of them, nginx terminates TLS for two names and decides which process
+# each request belongs to. This script does not install or reload it — the two
+# server blocks are kept in deploy/nginx/ and put in place by hand, because a
+# deploy that can take the certificates down is a worse trade than a deploy that
+# leaves them alone.
+#
+#   atlas.ainfinite.ai      -> :4173, all of it
+#   atlasapi.ainfinite.ai   -> :8787, except the thirteen package routes the
+#                              node process owns, which go to :4173
+#
+# Two names means one site rather than two only if the session cookie is scoped
+# to the parent both sit under, which is what COOKIE_DOMAIN below is for, and
+# which the checks at the end assert rather than assume.
 #
 # PM2 does the job systemd units were doing: start both, restart on crash,
 # come back after a reboot, keep the logs. One tool, one command to look at
@@ -221,10 +229,17 @@ module.exports = {
 CONFIG
 chown "$APP_USER:$APP_USER" "$APP_DIR/ecosystem.config.cjs"
 
-# --update-env so a changed port or path in the config actually takes effect;
-# without it pm2 reuses the environment a process was first started with.
+# startOrRestart, not start. `pm2 start` on an app that is already online is a
+# no-op — it says "already launched" and returns 0 — so a redeploy would copy
+# every new file into place and then leave the old processes running against
+# them. The failure is silent and reads as "the deploy did nothing", which is
+# exactly what it did: new code on disk, old code in memory, and an environment
+# variable added to the config that never reaches the process.
+#
+# --update-env as well, because even on a restart pm2 otherwise reuses the
+# environment a process was first started with.
 sudo -u "$APP_USER" HOME="/home/$APP_USER" \
-  pm2 start "$APP_DIR/ecosystem.config.cjs" --update-env >/dev/null
+  pm2 startOrRestart "$APP_DIR/ecosystem.config.cjs" --update-env >/dev/null
 sudo -u "$APP_USER" HOME="/home/$APP_USER" pm2 save >/dev/null
 
 # Survive a reboot. pm2 startup prints a command to run as root rather than
@@ -282,6 +297,31 @@ note "the gate holds — /api/index answers 401 without a session"
 CODE="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$VIEWER_PORT/api/health")"
 [[ "$CODE" == "200" ]] || die "the viewer is not forwarding to the accounts service (got $CODE)"
 note "the viewer forwards /api/* to the accounts service"
+
+# The session cookie's domain, asserted for the same reason as the gate: it is
+# invisible when it is wrong. A cookie missing its Domain is host-only to the
+# name that issued it, so on a two-name deployment the reading server's gate
+# never sees one — and the symptom is not an error anywhere but a sign-in that
+# succeeds and returns you to the sign-in page, over and over, which reads to
+# everyone involved as "the login page keeps refreshing".
+#
+# Checked against the running process rather than the config file, because the
+# thing that goes wrong is precisely a config the process never picked up.
+# /api/auth/logout sets the cookie's deletion with the same attributes it is
+# created with, and needs no credentials to answer.
+if [[ -n "$COOKIE_DOMAIN" ]]; then
+  SET_COOKIE="$(curl -s -i -X POST "http://127.0.0.1:$API_PORT/api/auth/logout" | grep -i '^set-cookie' || true)"
+  case "$SET_COOKIE" in
+    *"Domain=$COOKIE_DOMAIN"*)
+      note "the session cookie carries Domain=$COOKIE_DOMAIN" ;;
+    *)
+      die "the accounts service is not setting Domain=$COOKIE_DOMAIN on the session cookie.
+       It answered: ${SET_COOKIE:-<no set-cookie at all>}
+       The process is running without TICVAI_COOKIE_DOMAIN. Signing in will loop
+       back to the sign-in page for anybody whose browser does not already hold
+       a cookie for the front end's own name." ;;
+  esac
+fi
 
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 say "Done"
