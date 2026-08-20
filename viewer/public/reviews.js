@@ -12,6 +12,7 @@
  * dependency in the frontend, for four charts.
  */
 import * as auth from '/validation.js';
+import { hue } from '/core.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -35,7 +36,8 @@ const VERDICTS = auth.VERDICTS.map(([k]) => k);
 // Labels come from one place so the page and the form can never disagree about
 // what a value is called.
 const LABEL = Object.fromEntries(auth.VERDICTS);
-const COLOUR = { approved: '#4ade80', 'needs-work': '#fbbf24', rejected: '#f87171' };
+const VERDICT_TOKENS = { approved: 'ok', 'needs-work': 'warning', rejected: 'error' };
+const colour = (k) => hue(VERDICT_TOKENS[k] ?? 'text-faint');
 
 // How the team answered — the tracker's "Our verdict" column, in the tracker's
 // own colours: green for the two that mean the thing exists now, slate for a
@@ -225,7 +227,7 @@ function renderPace(rows) {
       const bar = svgEl('rect', {
         x: PAD + i * bw + bw * 0.14, y,
         width: Math.max(1.5, bw * 0.72), height: h,
-        fill: COLOUR[k], rx: Math.min(2, bw * 0.2),
+        fill: colour(k), rx: Math.min(2, bw * 0.2),
       });
       // append() returns undefined, so the title has to be built before it is
       // attached — chaining off it throws, and the throw takes every panel
@@ -266,7 +268,7 @@ function legend() {
   for (const k of VERDICTS) {
     const item = el('span', 'signoff-legend-item');
     const dot = el('span', 'verdict-dot');
-    dot.style.background = COLOUR[k];
+    dot.style.background = colour(k);
     item.append(dot, el('span', null, LABEL[k]));
     box.append(item);
   }
@@ -393,7 +395,7 @@ function renderPeople(rows) {
       if (!s.counts[k]) continue;
       const seg = el('span', 'people-mix-seg');
       seg.style.width = `${(s.counts[k] / s.total) * 100}%`;
-      seg.style.background = COLOUR[k];
+      seg.style.background = colour(k);
       seg.title = `${s.counts[k]} ${LABEL[k].toLowerCase()}`;
       mix.append(seg);
     }

@@ -5,15 +5,15 @@
   "operator": "guest",
   "counts": {
    "screens": 35,
-   "operations": 82,
+   "operations": 84,
    "contracts": 11,
    "modules": 12,
    "undrawn": 6,
    "operationsWithNoScreen": 21
   },
   "waves": {
-   "wave1": 20,
-   "wave2": 11,
+   "wave1": 21,
+   "wave2": 10,
    "wave3": 4
   }
  },
@@ -45,7 +45,7 @@
    "contracts": 11,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 138
+   "operationsWithNoScreen": 139
   },
   "waves": {
    "wave1": 7,
@@ -78,7 +78,7 @@
    "contracts": 14,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 147
+   "operationsWithNoScreen": 148
   },
   "waves": {
    "wave1": 25,
@@ -96,7 +96,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 50
+   "operationsWithNoScreen": 51
   },
   "waves": {
    "wave1": 11
@@ -112,7 +112,7 @@
    "contracts": 23,
    "modules": 8,
    "undrawn": 35,
-   "operationsWithNoScreen": 239
+   "operationsWithNoScreen": 240
   },
   "waves": {
    "wave1": 54,
@@ -198,7 +198,7 @@
    "contracts": 8,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 115
+   "operationsWithNoScreen": 116
   },
   "waves": {
    "wave2": 20

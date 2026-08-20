@@ -8,6 +8,7 @@
  */
 import {
   $, el, state, escapeHtml, inlineMarkdown, renderBoxLegend, deliveryTip,
+  hue, markdownBlock,
 } from './core.js';
 import { tip, tipFor } from './tips.js';
 // The router. A layer may reach the router; the router may not reach into a
@@ -218,14 +219,14 @@ Not ours to close.`
     const seg = el('div', 'routing-seg', String(gap.requirements));
     seg.style.flexGrow = '1';
     seg.style.background = {
-      missing: '#f87171',
-      partial: '#fbbf24',
+      missing: hue('error'),
+      partial: hue('warning'),
       // blocked is not the same as absent: the work cannot start until a
       // workshop happens or the client answers, so colouring it red would put
       // somebody else's decision on our side of the ledger.
-      blocked: '#60a5fa',
-      covered: '#34d399',
-    }[gap.state] ?? '#34d399';
+      blocked: hue('info'),
+      covered: hue('ok'),
+    }[gap.state] ?? hue('ok');
     bar.append(seg);
     line.append(bar);
     line.append(el('span', 'routing-total', gap.state));
@@ -236,8 +237,8 @@ Not ours to close.`
   const legend = el('div', 'inline-legend');
   body.append(legend);
   renderBoxLegend(legend,
-    [['#f87171', 'nothing behind it'], ['#fbbf24', 'partial'],
-     ['#60a5fa', 'blocked — waiting on someone else'], ['#34d399', 'covered']],
+    [[hue('error'), 'nothing behind it'], [hue('warning'), 'partial'],
+     [hue('info'), 'blocked — waiting on someone else'], [hue('ok'), 'covered']],
     'bar length is the number of requirements that need an artefact of this class');
 }
 
@@ -888,100 +889,3 @@ function addDecisionLinks(host, label, items) {
 }
 
 
-/**
- * `inlineMarkdown` plus links, which an ADR uses constantly and which were
- * rendering as raw `[ADR-0014](0014-cell-per-region.md)` in the body.
- *
- * A link to a sibling ADR becomes a real link into this view; anything else
- * keeps its text and drops the URL, because a relative path to a file the
- * viewer does not serve is a dead link wearing a live one's clothes.
- */
-function docMarkdown(text) {
-  // Italics after inlineMarkdown has taken the double asterisks, so a single
-  // `*` is unambiguous by the time this runs — `*Cell = Tenant x Region*` was
-  // rendering with its asterisks showing.
-  const marked = inlineMarkdown(text).replace(/\*([^*\n]+)\*/g, '<i>$1</i>');
-  return marked.replace(/\[([^\]]*)\]\(([^)]*)\)/g, (whole, label, href) => {
-    const adr = /(\d{4})-/.exec(href) ?? /ADR-(\d{3,4})/.exec(label);
-    if (adr) return `<a class="md-adr" data-adr="${adr[1].padStart(4, '0')}" href="#">${label}</a>`;
-    return label;
-  });
-}
-
-/**
- * Enough markdown for an ADR, and no more.
- *
- * Headings, paragraphs, lists, block quotes and fenced code — which is what
- * these files use. Deliberately not a markdown library: this is the first
- * dependency the frontend would take, for four kinds of block.
- */
-function markdownBlock(text) {
-  const host = el('div', 'md');
-  const lines = String(text).split(/\r?\n/);
-  let list = null;
-  let fence = null;
-  let para = [];
-
-  const closeList = () => { if (list) { host.append(list); list = null; } };
-  const closePara = () => {
-    if (!para.length) return;
-    const p = el('p', 'md-p');
-    p.innerHTML = docMarkdown(para.join(' '));
-    host.append(p);
-    para = [];
-  };
-
-  for (const raw of lines) {
-    if (fence !== null) {
-      if (/^```/.test(raw)) { host.append(fence); fence = null; continue; }
-      fence.textContent += `${raw}\n`;
-      continue;
-    }
-    if (/^```/.test(raw)) { closeList(); closePara(); fence = el('pre', 'md-code'); continue; }
-
-    if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(raw)) {
-      closeList(); closePara();
-      host.append(el('hr', 'md-rule'));
-      continue;
-    }
-
-    const head = /^(#{1,6})\s+(.*)$/.exec(raw);
-    if (head) {
-      closeList();
-      closePara();
-      const h = el(`h${Math.min(head[1].length + 1, 6)}`, 'md-head');
-      h.innerHTML = docMarkdown(head[2]);
-      host.append(h);
-      continue;
-    }
-    const item = /^\s*[-*+]\s+(.*)$/.exec(raw);
-    if (item) {
-      closePara();
-      if (!list) list = el('ul', 'md-list');
-      const li = el('li');
-      li.innerHTML = docMarkdown(item[1]);
-      list.append(li);
-      continue;
-    }
-    const quote = /^>\s?(.*)$/.exec(raw);
-    if (quote) {
-      closeList();
-      closePara();
-      const q = el('blockquote', 'md-quote');
-      q.innerHTML = docMarkdown(quote[1]);
-      host.append(q);
-      continue;
-    }
-    if (!raw.trim()) { closeList(); closePara(); continue; }
-    closeList();
-    // A paragraph runs until a blank line. These files are hard-wrapped at
-    // about 100 columns, so treating each line as its own paragraph broke
-    // every sentence in the middle — "…which are history rather than" and
-    // "decision." as two paragraphs.
-    para.push(raw.trim());
-  }
-  closeList();
-  closePara();
-  if (fence) host.append(fence);
-  return host;
-}

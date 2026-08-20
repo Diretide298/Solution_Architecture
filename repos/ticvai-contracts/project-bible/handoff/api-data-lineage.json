@@ -22039,5 +22039,96 @@
    "guest",
    "anonymous"
   ]
+ },
+ "getPaymentLink": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/payment-links/{token}",
+  "reads": [
+   "orders.order_line",
+   "orders.payment_link",
+   "orders.reservation",
+   "orders.sales_order",
+   "platform.scope_node"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "",
+  "source": "hand-mapped",
+  "service": "OrdersService",
+  "stores": [
+   "postgres"
+  ],
+  "audience": [
+   "guest",
+   "anonymous"
+  ]
+ },
+ "payByLink": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/payment-links/{token}/pay",
+  "reads": [
+   "cache:idempotency",
+   "orders.payment_link",
+   "orders.payment_provider",
+   "orders.reservation",
+   "orders.sales_order"
+  ],
+  "writes": [
+   "access.entitlement",
+   "cache:idempotency",
+   "orders.payment",
+   "orders.payment_link",
+   "orders.reservation",
+   "orders.sales_order"
+  ],
+  "routing": "",
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "",
+  "source": "hand-mapped",
+  "service": "OrdersService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "audience": [
+   "guest",
+   "anonymous"
+  ]
+ },
+ "resendPaymentLink": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/payment-links/{linkId}/resend",
+  "reads": [
+   "cache:idempotency",
+   "orders.payment_link",
+   "pii.subject"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_dispatch",
+   "orders.payment_link"
+  ],
+  "routing": "",
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "",
+  "source": "hand-mapped",
+  "service": "OrdersService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "audience": [
+   "staff"
+  ]
  }
 }

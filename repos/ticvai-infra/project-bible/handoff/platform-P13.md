@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 115 |
+| Operations with no screen | 116 |
 | Waves | wave2 20 |
 
 ## Gaps
 
-### 115 operations with no screen here
+### 116 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `createSegment` | marketing-crm | POST | Create a segment |
 | `createUrlRedirect` | marketing-crm | POST | 301, 302 and custom redirects |
 | `getJourneyPerformance` | marketing-crm | GET | Entrants, completions, goals reached |
-| … | | | 75 more |
+| … | | | 76 more |
 
 ## Modules
 

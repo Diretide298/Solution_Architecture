@@ -38,6 +38,8 @@
  * The prose is typed and says only things that stay true when the counts move.
  */
 
+import '/theme.js';   // the saved day/night choice, before anything paints
+
 const $ = (id) => document.getElementById(id);
 
 const el = (tag, className, text) => {

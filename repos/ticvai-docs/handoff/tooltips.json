@@ -1685,6 +1685,10 @@
   "access.entitlement": {
    "columns": 24,
    "tip": "**What a guest actually holds** \u2014 found missing 18 August. The package sold products, defined EntitlementTemplate, recorded ScanEvent.ticketId, transferred ticket_ids and issued wallet passes against entitlementId: **five artefacts referring to a thing that did not exist.** validateAccess read the t"
+  },
+  "orders.payment_link": {
+   "columns": 13,
+   "tip": "A link a guest opens to pay for a booking taken at a till (BL-072). **The link is the credential** \u2014 a guest holding one is anonymous, and a phone booking is exactly the case where they have not registered. **The expiry releases the hold, not just the link.**"
   }
  },
  "platforms": {

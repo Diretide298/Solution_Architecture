@@ -9,12 +9,12 @@
 | Contracts | 23 |
 | Modules | 8 |
 | Undrawn | 35 |
-| Operations with no screen | 239 |
+| Operations with no screen | 240 |
 | Waves | wave1 54 · wave2 50 · wave3 4 |
 
 ## Gaps
 
-### 239 operations with no screen here
+### 240 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getUnifiedReconciliation` | finance | GET | Every money source against the ledger, in one view |
 | `recordDeposit` | finance | POST | Money taken before the sale is complete |
-| … | | | 199 more |
+| … | | | 200 more |
 
 ### 8 modules split across waves
 

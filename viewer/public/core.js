@@ -11,6 +11,7 @@
  * the split from being a rename: a layer imports from core, never the reverse.
  */
 import { tip, GLOSSARY } from './tips.js';
+import './theme.js';   // stamps the saved theme before anything paints
 
 export const LAYERS = [
   {
@@ -420,6 +421,179 @@ export const inlineMarkdown = (text) =>
  * The dot-and-label key under a diagram. Five layers draw one, so it lives
  * here rather than in whichever layer happened to need it first.
  */
+/**
+ * A palette token, resolved to a colour string.
+ *
+ * The legends, tree dots and canvas fills used to name their colours as literal
+ * hexes, which meant every one of them was a dark-theme value that stayed a
+ * dark-theme value on a white page. They name a token now. Inline styles could
+ * have taken `var(--ok)` directly, but a canvas cannot — `fillStyle` wants a
+ * real colour — so both go through here and get the same answer.
+ *
+ * Read live rather than cached: the theme toggle repaints everything that uses
+ * this, and a lookup on the root element is cheap next to the repaint itself.
+ */
+export const hue = (token) =>
+  getComputedStyle(document.documentElement).getPropertyValue('--' + token).trim() || '#8b8b93';
+
+/**
+ * `inlineMarkdown` plus links, which the prose in these files uses constantly
+ * and which were rendering as raw `[ADR-0014](0014-cell-per-region.md)`.
+ *
+ * A link to a sibling ADR becomes a real link into the decisions view, but only
+ * where something is listening for one — `adrLinks` is off in the reader, which
+ * has no such handler and would otherwise show a dead link wearing a live one's
+ * clothes. Anything else keeps its text and drops the URL, for the same reason.
+ */
+export function docMarkdown(text, { adrLinks = true } = {}) {
+  // Italics after inlineMarkdown has taken the double asterisks, so a single
+  // `*` is unambiguous by the time this runs — `*Cell = Tenant x Region*` was
+  // rendering with its asterisks showing.
+  const marked = inlineMarkdown(text).replace(/\*([^*\n]+)\*/g, '<i>$1</i>');
+  return marked.replace(/\[([^\]]*)\]\(([^)]*)\)/g, (whole, label, href) => {
+    if (!adrLinks) return label;
+    const adr = /(\d{4})-/.exec(href) ?? /ADR-(\d{3,4})/.exec(label);
+    if (adr) return `<a class="md-adr" data-adr="${adr[1].padStart(4, '0')}" href="#">${label}</a>`;
+    return label;
+  });
+}
+
+const TABLE_ROW = /^\s*\|(.*)\|\s*$/;
+const TABLE_RULE = /^\s*\|[\s:|-]+\|\s*$/;
+
+/** `| a | b |` → ['a', 'b'], with the empty edges the outer pipes leave. */
+const cellsOf = (line) =>
+  TABLE_ROW.exec(line)[1].split('|').map((c) => c.trim());
+
+/**
+ * Enough markdown for the prose in a contract or an ADR, and no more.
+ *
+ * Headings, paragraphs, lists, block quotes, fenced code, rules and tables —
+ * which is what these files use. Deliberately not a markdown library: that
+ * would be the first dependency the frontend takes, for six kinds of block.
+ *
+ * Tables are here because every contract's header is one. Without them the
+ * reader was showing `| |---|---| | **Tier** | spine |` as a run-on sentence in
+ * the middle of the description, which is the single worst thing on that page.
+ */
+export function markdownBlock(text, { adrLinks = true } = {}) {
+  const host = el('div', 'md');
+  const lines = String(text).split(/\r?\n/);
+  const inline = (t) => docMarkdown(t, { adrLinks });
+  let list = null;
+  let para = [];
+
+  const closeList = () => { if (list) { host.append(list); list = null; } };
+  const closePara = () => {
+    if (!para.length) return;
+    const p = el('p', 'md-p');
+    p.innerHTML = inline(para.join(' '));
+    host.append(p);
+    para = [];
+  };
+  const close = () => { closeList(); closePara(); };
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const raw = lines[i];
+
+    if (/^```/.test(raw)) {
+      close();
+      const fence = el('pre', 'md-code');
+      i += 1;
+      while (i < lines.length && !/^```/.test(lines[i])) {
+        fence.textContent += `${lines[i]}\n`;
+        i += 1;
+      }
+      host.append(fence);
+      continue;
+    }
+
+    // A table is a row followed by the dashed rule; anything else starting with
+    // a pipe is just a line that starts with a pipe.
+    if (TABLE_ROW.test(raw) && i + 1 < lines.length && TABLE_RULE.test(lines[i + 1])) {
+      close();
+      const header = cellsOf(raw);
+      const table = el('table', 'md-table');
+      // Contract headers open with `| | |` — an empty header row that exists to
+      // satisfy the syntax. Rendering it leaves a blank band above the table,
+      // so a header with nothing in it is dropped and the table is all body.
+      if (header.some((c) => c)) {
+        const thead = el('thead');
+        const tr = el('tr');
+        for (const cell of header) {
+          const th = el('th');
+          th.innerHTML = inline(cell);
+          tr.append(th);
+        }
+        thead.append(tr);
+        table.append(thead);
+      }
+      const tbody = el('tbody');
+      i += 2;
+      while (i < lines.length && TABLE_ROW.test(lines[i])) {
+        const tr = el('tr');
+        for (const cell of cellsOf(lines[i])) {
+          const td = el('td');
+          td.innerHTML = inline(cell);
+          tr.append(td);
+        }
+        tbody.append(tr);
+        i += 1;
+      }
+      i -= 1;
+      table.append(tbody);
+      const scroller = el('div', 'md-table-wrap');
+      scroller.append(table);
+      host.append(scroller);
+      continue;
+    }
+
+    if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(raw)) {
+      close();
+      host.append(el('hr', 'md-rule'));
+      continue;
+    }
+
+    const head = /^(#{1,6})\s+(.*)$/.exec(raw);
+    if (head) {
+      close();
+      const h = el(`h${Math.min(head[1].length + 1, 6)}`, `md-head md-h${head[1].length}`);
+      h.innerHTML = inline(head[2]);
+      host.append(h);
+      continue;
+    }
+
+    const item = /^\s*[-*+]\s+(.*)$/.exec(raw);
+    if (item) {
+      closePara();
+      if (!list) list = el('ul', 'md-list');
+      const li = el('li');
+      li.innerHTML = inline(item[1]);
+      list.append(li);
+      continue;
+    }
+
+    const quote = /^>\s?(.*)$/.exec(raw);
+    if (quote) {
+      close();
+      const q = el('blockquote', 'md-quote');
+      q.innerHTML = inline(quote[1]);
+      host.append(q);
+      continue;
+    }
+
+    if (!raw.trim()) { close(); continue; }
+    closeList();
+    // A paragraph runs until a blank line. These files are hard-wrapped at
+    // about 100 columns, so treating each line as its own paragraph broke every
+    // sentence in the middle — "…which are history rather than" and "decision."
+    // as two paragraphs.
+    para.push(raw.trim());
+  }
+  close();
+  return host;
+}
+
 export function renderBoxLegend(container, entries, note) {
   container.innerHTML = '';
   for (const [color, label] of entries) {

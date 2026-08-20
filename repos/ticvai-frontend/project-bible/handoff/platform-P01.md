@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Screens | 35 |
-| Operations | 82 |
+| Operations | 84 |
 | Contracts | 11 |
 | Modules | 12 |
 | Undrawn | 6 |
 | Operations with no screen | 21 |
-| Waves | wave1 20 · wave2 11 · wave3 4 |
+| Waves | wave1 21 · wave2 10 · wave3 4 |
 
 ## Gaps
 
@@ -42,12 +42,11 @@
 | `transferWalletBalance` | retail | POST | Send balance to another guest |
 | `assignSeats` | seating | POST | Pick and hold the best available seats |
 
-### 5 modules split across waves
+### 4 modules split across waves
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
 - **Booking & Selection** — waves 1, 2, 3
-- **Cart & Checkout** — waves 1, 2
 - **Engagement & Support** — waves 1, 2, 3
 - **Membership, Loyalty & Value** — waves 2, 3
 - **Ticketing** — waves 1, 2
@@ -66,7 +65,7 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Booking & Selection | 5 | 1, 2, 3 |
-| Cart & Checkout | 5 | 1, 2 |
+| Cart & Checkout | 5 | 1 |
 | Account & Self-Service | 5 | 1 |
 | Discovery & Browse | 4 | 1 |
 | Membership, Loyalty & Value | 4 | 2, 3 |
@@ -95,7 +94,7 @@
 | `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 9 | yes |
 | `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 3 | yes |
 | `WEB-013` | Order Confirmation | Cart & Checkout | 1 | 3 | yes |
-| `WEB-014` | Payment Link Landing | Cart & Checkout | 2 | 2 | yes |
+| `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
 | `WEB-015` | Virtual Waiting Room | High-Demand Access | 2 | 3 | yes |
 | `WEB-016` | Login / Register | Account & Self-Service | 1 | 22 | yes |
 | `WEB-017` | My Account Dashboard | Account & Self-Service | 1 | 7 | yes |

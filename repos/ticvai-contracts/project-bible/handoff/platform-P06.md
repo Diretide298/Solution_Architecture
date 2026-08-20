@@ -9,12 +9,12 @@
 | Contracts | 14 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 147 |
+| Operations with no screen | 148 |
 | Waves | wave1 25 · wave2 20 · wave3 1 |
 
 ## Gaps
 
-### 147 operations with no screen here
+### 148 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `completeProductionRun` | fnb | POST | Record what was actually made |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTableReservation` | fnb | POST | Book a table in advance |
-| … | | | 107 more |
+| … | | | 108 more |
 
 ### 1 modules split across waves
 

@@ -50,7 +50,7 @@
    "operations": 3
   },
   {
-   "contract": "white-label",
+   "contract": "fnb",
    "operations": 2
   },
   {
@@ -58,15 +58,15 @@
    "operations": 2
   },
   {
-   "contract": "fnb",
+   "contract": "white-label",
    "operations": 2
   },
   {
-   "contract": "ai",
+   "contract": "promotions",
    "operations": 1
   },
   {
-   "contract": "promotions",
+   "contract": "ai",
    "operations": 1
   }
  ],

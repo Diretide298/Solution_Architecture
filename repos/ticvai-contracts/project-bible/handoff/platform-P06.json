@@ -15,7 +15,7 @@
   "contracts": 14,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 147
+  "operationsWithNoScreen": 148
  },
  "waves": {
   "wave1": 25,
@@ -79,11 +79,11 @@
    "operations": 2
   },
   {
-   "contract": "fnb",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "fnb",
    "operations": 2
   },
   {
@@ -1222,6 +1222,12 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Zero-value reissue of an expired entitlement for a later date"
+   },
+   {
+    "operation": "resendPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": ""
    },
    {
     "operation": "respondToChargeback",

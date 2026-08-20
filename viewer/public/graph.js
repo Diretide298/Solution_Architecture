@@ -5,51 +5,33 @@
 // cools with an alpha decay and parks itself, then only re-heats on interaction.
 
 import { enableTouch } from './touch.js';
+import { hue } from './core.js';
 
-const TYPE_COLORS = {
-  file: '#a78bfa',
-  operation: '#60a5fa',
-  schema: '#34d399',
-  param: '#fbbf24',
-  response: '#fb923c',
-  requestBody: '#fbbf24',
-  securityScheme: '#94a3b8',
-  permission: '#f472b6',
+// Which token paints which kind of node. Named rather than spelled out: there
+// used to be a second copy of this table holding the light-theme hexes, kept in
+// step by hand. The tokens already flip with the theme, so one table does.
+const TYPE_TOKENS = {
+  file: 'accent',
+  operation: 'info',
+  schema: 'ok',
+  param: 'warning',
+  response: 'orange',
+  requestBody: 'warning',
+  securityScheme: 'text-faint',
+  permission: 'permission',
 };
 
-const GROUP_COLORS = {
-  spine: '#60a5fa',
-  satellite: '#34d399',
-  shared: '#fbbf24',
-  permission: '#f472b6',
-};
-
-// Canvas cannot read CSS custom properties, so the light palette is mirrored
-// here. These are the darker, higher-contrast variants used on light grounds.
-const TYPE_COLORS_LIGHT = {
-  file: '#7c3aed',
-  operation: '#2563eb',
-  schema: '#059669',
-  param: '#b45309',
-  response: '#c2410c',
-  requestBody: '#b45309',
-  securityScheme: '#475569',
-  permission: '#db2777',
-};
-
-const GROUP_COLORS_LIGHT = {
-  spine: '#2563eb',
-  satellite: '#059669',
-  shared: '#b45309',
-  permission: '#db2777',
+const GROUP_TOKENS = {
+  spine: 'info',
+  satellite: 'ok',
+  shared: 'warning',
+  permission: 'permission',
 };
 
 export function colorForNode(node, by = 'type') {
-  const light = document.documentElement.dataset.theme === 'light';
-  const types = light ? TYPE_COLORS_LIGHT : TYPE_COLORS;
-  const groups = light ? GROUP_COLORS_LIGHT : GROUP_COLORS;
-  if (by === 'group') return groups[node.group] ?? types[node.type] ?? '#8b8b93';
-  return types[node.type] ?? '#8b8b93';
+  const token = (by === 'group' ? GROUP_TOKENS[node.group] : null)
+    ?? TYPE_TOKENS[node.type];
+  return hue(token ?? 'text-faint');
 }
 
 export class Graph {
@@ -438,7 +420,7 @@ export class Graph {
     const styles = getComputedStyle(document.documentElement);
     const dim = styles.getPropertyValue('--text-dim').trim() || '#9a9aa6';
     const text = styles.getPropertyValue('--text').trim() || '#dcdde3';
-    const isLight = document.documentElement.dataset.theme === 'light';
+    const isLight = document.documentElement.dataset.theme !== 'dark';
 
     ctx.clearRect(0, 0, this.width, this.height);
     if (!this.nodes.length) {

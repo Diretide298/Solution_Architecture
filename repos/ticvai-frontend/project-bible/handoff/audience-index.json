@@ -90,7 +90,7 @@
   }
  },
  "totals": {
-  "operations": 932,
+  "operations": 935,
   "screens": 392,
   "flows": 27
  },
@@ -99,10 +99,12 @@
    "platforms": [],
    "operations": [
     "completeSsoAuthorization",
+    "getPaymentLink",
     "guestSocialLogin",
     "guestUaePassLogin",
     "listSsoProviders",
     "login",
+    "payByLink",
     "registerGuest",
     "registerPartner",
     "requestGuestOtp",
@@ -117,9 +119,11 @@
    ],
    "contracts": [
     "identity",
+    "orders",
     "subscription"
    ],
    "tables": [
+    "access.entitlement",
     "approvals.request",
     "cache:idempotency",
     "control.partner_agreement",
@@ -132,16 +136,23 @@
     "identity.session",
     "identity.sso_provider",
     "marketing.message_dispatch",
+    "orders.order_line",
+    "orders.payment",
+    "orders.payment_link",
+    "orders.payment_provider",
+    "orders.reservation",
+    "orders.sales_order",
     "pii.subject",
     "pii.subject_contact",
-    "pii.subject_document"
+    "pii.subject_document",
+    "platform.scope_node"
    ],
    "counts": {
-    "operations": 11,
+    "operations": 13,
     "screens": 0,
     "flows": 2,
-    "contracts": 2,
-    "tables": 15
+    "contracts": 3,
+    "tables": 23
    }
   },
   "device": {
@@ -268,6 +279,7 @@
     "getMyChallenges",
     "getMyMemberships",
     "getOrder",
+    "getPaymentLink",
     "getPerformance",
     "getProduct",
     "getPromotion",
@@ -322,6 +334,7 @@
     "listWalletTransactions",
     "lookupMerchandise",
     "lookupShopAndDrop",
+    "payByLink",
     "quoteUpgrade",
     "recommendSeats",
     "recordConsent",
@@ -572,6 +585,7 @@
     "orders.cart_line",
     "orders.order_line",
     "orders.payment",
+    "orders.payment_link",
     "orders.payment_provider",
     "orders.payment_token",
     "orders.refund",
@@ -626,11 +640,11 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 133,
+    "operations": 135,
     "screens": 111,
     "flows": 11,
     "contracts": 16,
-    "tables": 127
+    "tables": 128
    }
   },
   "partner": {
@@ -1671,6 +1685,7 @@
     "requestBill",
     "requestShiftSwap",
     "rescheduleOrder",
+    "resendPaymentLink",
     "reserveMerchandise",
     "resetSandbox",
     "resolveInvoiceDispute",
@@ -2361,6 +2376,7 @@
     "orders.no_sale_event",
     "orders.order_line",
     "orders.payment",
+    "orders.payment_link",
     "orders.payment_provider",
     "orders.payment_routing",
     "orders.payment_token",
@@ -2463,11 +2479,11 @@
     "workforce.shift_swap"
    ],
    "counts": {
-    "operations": 846,
+    "operations": 847,
     "screens": 234,
     "flows": 22,
     "contracts": 28,
-    "tables": 301
+    "tables": 302
    }
   }
  }

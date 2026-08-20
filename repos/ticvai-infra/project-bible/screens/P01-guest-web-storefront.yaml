@@ -904,56 +904,78 @@ screens:
       from: WEB-012
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
 - id: WEB-014
-  name: Payment Link Landing
+  name: Pay for a Booking
   module: Cart & Checkout
-  purpose: Take the money, and be unambiguous about whether it worked.
-  wave: 2
+  purpose: Pay for a booking somebody else took, without an account.
+  wave: 1
   layout:
-    template: detail
+    template: form
     regions:
     - name: contentBody
       components:
       - kind: detailPanel
+        bindsTo: PaymentLink
+        notes: Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked
+          by phone may not recognise a reference number.
+      - kind: banner
+        notes: The deadline, counted in time remaining rather than as a timestamp. **Expires in 46 minutes**
+          is actionable; **expires at 14:32** needs arithmetic.
+      - kind: textField
+        label: Email for your tickets (optional)
+        notes: '**Optional, and only to send the ticket.** Requiring an account before taking money
+          is how a paid booking becomes an abandoned one.'
+      - kind: primaryButton
+        label: Pay now
   states:
-    loading: Resolving the payment link
-    emptyFirstRun: —
-    error: '**Link expired, already paid, or cancelled — each says which.** A guest following a link
-      from an email needs to know whether they are late or whether it worked'
+    loading: The lines and the total, with the deadline counting down.
+    emptyFirstRun: '**Not reachable empty** — a link always names an order. An empty state here means
+      the token did not resolve, which is the error state.'
+    emptyNoAccess: '**The token is the credential, so there is no permission case** — either it resolves
+      or it has gone.'
+    error: Could not load the booking. **The hold is unaffected** — a failed page load must not release
+      inventory.
+    expired: '**The hold was released and the booking is gone.** Says so plainly, with what was held
+      and a link to book it again. The commonest non-happy path on this screen by a wide margin.'
+    alreadyPaid: '**Paid, with the order number and the tickets.** A guest clicking twice is normal
+      — the second click should show their tickets, not a payment form.'
+    superseded: '**A newer link was sent.** Names the channel it went to, because *this link no longer
+      works* with no explanation sends them to the phone.'
   wireframe:
     status: drafted
     board: wireframes/P01 Guest Web.dc.html#web-014
     designReference: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
   capability: C04
   apis:
-  - operationId: getCart
+  - operationId: getPaymentLink
     contract: orders
-    purpose: The cart, priced and checked, right now
+    purpose: What is owed and until when
     trigger: onLoad
-  - operationId: checkoutCart
+  - operationId: payByLink
     contract: orders
-    purpose: Turn the cart into an order
+    purpose: Take the money and convert the reservation
     trigger: onAction
   implementation:
     app: guest-web
-    route: /cart-and-checkout/payment-link-landing
-    component: apps/guest-web/src/routes/cart-and-checkout/PaymentLinkLandingDetail.tsx
+    route: /pay/:token
+    component: apps/guest-web/src/routes/cart-and-checkout/PayByLinkForm.tsx
     status: notStarted
   navigation:
-    entryFrom:
-    - WEB-001
-    inferred: true
     exitTo:
-    - WEB-001
-    - WEB-010
-    - WEB-011
-    - WEB-012
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    - WEB-013
+  notes: BL-072, rebuilt 20 August. **Declared `getCart` and `checkoutCart` until then, and `createPaymentLink`
+    takes an `orderId`** — the screen was looking for a cart that was never created, and its entryState
+    said `cartId` came from the session when **a guest arriving from an email has no session.** Wired
+    by name-matching rather than by following the journey.
   density: compact
   entryState:
     params:
-    - name: cartId
-      from: session
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    - name: token
+      from: deepLink
+    coldEntry: '**Cold is the only way in.** The guest arrives from an email, an SMS or a WhatsApp message
+      with no session and quite possibly no account. **A link opened three days late is the ordinary
+      case, not an edge** — the screen says the hold was released and offers to book again. Expired,
+      already paid and superseded are three different messages, and **404 is never one of them**: telling
+      somebody their booking does not exist when it expired is how a support call starts.'
 - id: WEB-015
   name: Virtual Waiting Room
   module: High-Demand Access

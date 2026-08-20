@@ -518,6 +518,7 @@ marketing.message_dispatch,campaign_id,marketing.campaign,reference,declared,,ye
 marketing.message_dispatch,subject_id,pii.subject,reference,declared,yes,yes
 marketing.message_dispatch,via broadcastToGuests,workforce.announcement,ambient,lineage,yes,
 marketing.message_dispatch,via createPaymentLink,orders.sales_order,ambient,lineage,yes,
+marketing.message_dispatch,via resendPaymentLink,orders.payment_link,ambient,lineage,yes,
 marketing.message_template,tenant_id,platform.tenant,reference,declared,yes,yes
 marketing.referral,referee_subject_id,pii.subject,reference,convention,yes,yes
 marketing.referral,referrer_subject_id,pii.subject,reference,convention,yes,yes
@@ -599,6 +600,8 @@ orders.order_line,via voidOrder,orders.payment,ambient,lineage,,
 orders.order_line,via voidOrder,orders.sales_order,ambient,lineage,,
 orders.order_media_link,order_id,orders.sales_order,reference,declared,,yes
 orders.payment,order_id,orders.sales_order,reference,declared,,yes
+orders.payment_link,issued_by_principal_id,identity.principal,reference,convention,yes,
+orders.payment_link,reservation_id,retail.reservation,reference,convention,yes,
 orders.payment_provider,via setPaymentProvider,orders.payment_routing,ambient,lineage,,
 orders.payment_routing,fallback_provider_id,ai.provider,reference,convention,yes,yes
 orders.payment_routing,provider_id,ai.provider,reference,declared,yes,yes

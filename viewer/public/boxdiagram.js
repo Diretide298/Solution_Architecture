@@ -9,6 +9,7 @@
 // the initial arrangement. Re-picking the scope restores the tidy layout.
 
 import { enableTouch } from './touch.js';
+import { hue } from './core.js';
 
 const HEADER_H = 26;
 const ROW_H = 17;
@@ -483,10 +484,10 @@ export class BoxDiagram {
     const text = styles.getPropertyValue('--text').trim() || '#dcdde3';
     const dim = styles.getPropertyValue('--text-dim').trim() || '#9a9aa6';
     const faint = styles.getPropertyValue('--text-faint').trim() || '#6b6b78';
-    const panel = styles.getPropertyValue('--bg-panel').trim() || '#1a1a21';
+    const panel = styles.getPropertyValue('--node-fill').trim() || '#1b2360';
     const border = styles.getPropertyValue('--border').trim() || '#2c2c36';
-    const accent = styles.getPropertyValue('--accent').trim() || '#a78bfa';
-    const light = document.documentElement.dataset.theme === 'light';
+    const accent = styles.getPropertyValue('--accent').trim() || hue('accent');
+    const light = document.documentElement.dataset.theme !== 'dark';
 
     ctx.clearRect(0, 0, this.width, this.height);
     if (!this.nodes.length) {

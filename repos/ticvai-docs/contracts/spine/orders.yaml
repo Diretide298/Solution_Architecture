@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 48
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales"
   x-ticvai-requirements: 343
@@ -155,6 +155,166 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Cart' }
+
+  /payment-links/{token}:
+    parameters:
+      - name: token
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPaymentLink
+      x-ticvai-consumed-by:
+        - "P01 WEB-014 Pay for a Booking"
+      summary: What a guest holding a link is being asked to pay for
+      description: >
+        BL-072. **The operation the link needed and did not have.** `createPaymentLink` was
+        contracted and nothing could open one.
+
+        **The caller is anonymous.** No session, no account, and quite possibly no intention of
+        creating one — a guest who booked by phone is the case where they have not registered.
+        **The token is the credential**, scoped to one order.
+
+        Returns the lines, the total and the deadline. **Never the guest's other orders**, never
+        their profile, and never enough to identify them beyond what they already know.
+      tags: [orders]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest, anonymous]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: What is owed, and until when
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link: { $ref: '#/components/schemas/PaymentLink' }
+                  lines:
+                    type: array
+                    items: { $ref: '#/components/schemas/OrderLine' }
+                  amountDue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                  venueName: { type: string }
+                  expiresInSeconds: { type: integer }
+        '410':
+          description: >
+            **Expired, paid or superseded — and it says which.** A guest opening an email three days
+            late is the ordinary case, not an edge: *expired, the hold is released, book again* is a
+            different message from *already paid* and from *we sent you a newer link*.
+
+            **404 is never returned for a real token.** Telling somebody their booking does not
+            exist when it expired is how a support call starts.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /payment-links/{token}/pay:
+    parameters:
+      - name: token
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: payByLink
+      x-ticvai-consumed-by:
+        - "P01 WEB-014 Pay for a Booking"
+      summary: Pay for a booking taken at a till
+      description: >
+        BL-072. **Payment against the link, by somebody with no account.**
+
+        **Converts on success, and that is a decision rather than a mechanism** (ADR-0027). The
+        reservation becomes an order the moment the money lands, because there is no staff member
+        present at 11pm to press a button — **and a paid reservation that is still a reservation is
+        inventory the venue thinks it can sell.**
+
+        **The card never reaches the platform.** Tokenised at the gateway like every other payment
+        (CF-131), and the link carries no card data at any point.
+      tags: [orders]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest, anonymous]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [providerToken]
+              properties:
+                providerToken: { type: string, format: password }
+                email:
+                  type: string
+                  format: email
+                  nullable: true
+                  description: >
+                    **Optional, and only to send the ticket.** Requiring an account before taking
+                    money is how a paid booking becomes an abandoned one.
+      responses:
+        '200':
+          description: Paid, and the reservation converted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId: { type: string, format: uuid }
+                  entitlementIds: { type: array, items: { type: string } }
+        '409':
+          description: >
+            **The hold went while they were paying.** Rare and real — a link near its expiry and a
+            guest reading slowly. The response names what is no longer available rather than
+            failing the whole basket, because **part of a booking is usually still worth having.**
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /payment-links/{linkId}/resend:
+    parameters:
+      - name: linkId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: resendPaymentLink
+      summary: Send it again, and retire the old one
+      description: >
+        **A resend supersedes.** Two live links against one order is two guests paying for one
+        booking, and the second payment is a refund somebody has to make.
+
+        The old token stops working immediately and answers `410 superseded` — **not 404**, because
+        a guest with the first email needs to know why it stopped rather than whether it was real.
+      tags: [orders]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channel: { type: string, enum: [email, sms, whatsapp] }
+                extendExpiryHours: { type: integer, nullable: true }
+      responses:
+        '200':
+          description: Resent
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentLink' }
 
   /orders/{orderId}/convert-to-term:
     parameters:
@@ -1051,7 +1211,6 @@ paths:
       operationId: getCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
-        - "P01 WEB-014 Payment Link Landing"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
@@ -1320,7 +1479,6 @@ paths:
       operationId: checkoutCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
-        - "P01 WEB-014 Payment Link Landing"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
@@ -3285,6 +3443,66 @@ components:
           items: { type: string }
         reason: { type: string, maxLength: 500 }
         recordedAt: { type: string, format: date-time }
+
+    PaymentLink:
+      type: object
+      x-ticvai-persistence: "orders.payment_link"
+      description: >
+        BL-072. **A booking taken at POS could not be paid later by the guest**, so a phone booking
+        either took a card over the phone or was not taken.
+
+        `createPaymentLink` was contracted on 18 August with no schema behind it and no guest-facing
+        path. **The link existed and nobody could open it** — found on 20 August by walking the
+        journey rather than the contract.
+
+        **The link is the credential.** A guest holding one is anonymous: not signed in, and quite
+        possibly without an account, because a phone booking is exactly the case where they have
+        not registered. The token grants read of one order and payment against it, and nothing else.
+      required: [id, orderId, token, status, expiresAt]
+      properties:
+        id: { type: string, format: uuid }
+        orderId: { type: string, format: uuid }
+        reservationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where the link was issued against a reservation rather than an order. **A reservation
+            holds inventory and carries no money**, which is the whole reason a link is needed.
+        token:
+          type: string
+          format: password
+          description: >
+            **Write-only, single purpose, and it is the only thing the guest presents.** Long enough
+            not to be guessed and scoped to one order — **a token that can read a second order is a
+            token that read somebody else's booking.**
+        status: { type: string, enum: [issued, viewed, paid, expired, cancelled, superseded] }
+        channel: { type: string, enum: [email, sms, whatsapp, printed] }
+        sentTo:
+          type: string
+          nullable: true
+          description: >
+            Masked. **The address it went to is how an operator answers *I never got it*** — and it
+            is personal data, so it is masked here and resolved from `pii` when somebody with
+            permission asks.
+        expiresAt:
+          type: string
+          format: date-time
+          description: >
+            **The expiry releases the hold, not just the link.** An unpaid link holding inventory is
+            inventory nobody can sell, and a link that outlives its hold sells a seat twice.
+        releaseHoldOnExpiry: { type: boolean, default: true }
+        viewedAt: { type: string, format: date-time, nullable: true }
+        paidAt: { type: string, format: date-time, nullable: true }
+        resendCount:
+          type: integer
+          default: 0
+          description: >
+            **A resend supersedes rather than duplicates.** Two live links against one order is two
+            guests paying for the same booking, and the second payment is a refund somebody has to
+            make.
+        issuedByPrincipalId: { type: string, format: uuid }
+
 
     PerformanceTarget:
       type: object

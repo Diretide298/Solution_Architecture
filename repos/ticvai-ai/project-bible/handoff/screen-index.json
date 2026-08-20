@@ -562,19 +562,19 @@
   ]
  },
  "WEB-014": {
-  "name": "Payment Link Landing",
+  "name": "Pay for a Booking",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
   "app": "guest-web",
-  "route": "/cart-and-checkout/payment-link-landing",
+  "route": "/pay/:token",
   "board": "wireframes/P01 Guest Web.dc.html#web-014",
   "operations": [
-   "getCart",
-   "checkoutCart"
+   "getPaymentLink",
+   "payByLink"
   ],
   "services": [
-   "OrderService"
+   "OrdersService"
   ],
   "stores": [
    "postgres",
@@ -582,27 +582,27 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
-   "orders.cart",
-   "orders.cart_line",
-   "promotions.promotion"
+   "orders.order_line",
+   "orders.payment_link",
+   "orders.payment_provider",
+   "orders.reservation",
+   "orders.sales_order",
+   "platform.scope_node"
   ],
   "writes": [
+   "access.entitlement",
    "cache:idempotency",
-   "orders.cart",
-   "orders.order_line",
+   "orders.payment",
+   "orders.payment_link",
+   "orders.reservation",
    "orders.sales_order"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
-   "WEB-001",
-   "WEB-010",
-   "WEB-011",
-   "WEB-012"
+   "WEB-013"
   ]
  },
  "WEB-015": {

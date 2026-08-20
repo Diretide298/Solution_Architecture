@@ -3,14 +3,14 @@
  "generated": "2026-08-20",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 932,
+  "operations": 935,
   "contracts": 28,
-  "tables": 358,
-  "relationships": 854,
+  "tables": 359,
+  "relationships": 857,
   "states": 112,
   "events": 29,
   "flows": 27,
-  "adrs": 26,
+  "adrs": 27,
   "screens": 392,
   "platforms": 13,
   "apps": 11
@@ -19,15 +19,15 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 932,
-    "total": 932,
+    "done": 935,
+    "total": 935,
     "percent": 100,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 932,
-    "total": 932,
+    "done": 935,
+    "total": 935,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -62,14 +62,14 @@
    {
     "name": "State models",
     "done": 112,
-    "total": 112,
-    "percent": 100,
+    "total": 113,
+    "percent": 99,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 337,
-    "total": 358,
+    "done": 338,
+    "total": 359,
     "percent": 94,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
@@ -96,8 +96,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 651,
-    "total": 932,
+    "done": 653,
+    "total": 935,
     "percent": 70,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -120,7 +120,7 @@
    {
     "name": "Tables written",
     "done": 0,
-    "total": 358,
+    "total": 359,
     "percent": 0,
     "note": "DDL is generated when the design stops moving (ADR-0024)."
    },
@@ -169,8 +169,8 @@
   "build": 0
  },
  "waves": {
-  "wave1": 148,
-  "wave2": 184,
+  "wave1": 149,
+  "wave2": 183,
   "wave3": 60
  },
  "platformBreakdown": [

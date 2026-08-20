@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 50 |
+| Operations with no screen | 51 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 50 operations with no screen here
+### 51 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -59,8 +59,8 @@
 | `pushWalletPassUpdate` | orders | POST | Push a change to every device holding it |
 | `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
 | `reissueEntitlement` | orders | POST | Zero-value reissue of an expired entitlement for a later date |
-| `respondToChargeback` | orders | POST | Submit evidence, or accept the loss |
-| … | | | 10 more |
+| `resendPaymentLink` | orders | POST |  |
+| … | | | 11 more |
 
 ## Modules
 

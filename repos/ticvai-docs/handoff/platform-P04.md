@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 138 |
+| Operations with no screen | 139 |
 | Waves | wave1 7 · wave2 3 |
 
 ## Gaps
 
-### 138 operations with no screen here
+### 139 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `createCart` | orders | POST | Start a cart |
 | `createPaymentLink` | orders | POST | Send a guest a link to pay later |
-| … | | | 98 more |
+| … | | | 99 more |
 
 ### 2 modules split across waves
 

@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**932 operations · 358 tables · 392 screens · 112 state models · 29 events · 27 flows · 26 ADRs**
+**935 operations · 359 tables · 392 screens · 112 state models · 29 events · 27 flows · 27 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -20,7 +20,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | **`wireframes/TICVAI Wireframe Boards.dc.html`** | 12 boards, 392 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | 358 tables, 2,025 columns, nine sheets |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | 359 tables, 2,025 columns, nine sheets |
 | **`handoff/ai-index.md`** | Where every AI artefact lives |
 | **`docs/active/workshop-packs.md`** | The three blocked domains, prepared |
 
@@ -28,13 +28,13 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| `contracts/` | **932 operations** across 25 files — 267 spine, 470 satellite |
+| `contracts/` | **935 operations** across 25 files — 267 spine, 470 satellite |
 | `screens/` | 364 definitions across 13 platforms, all specified |
 | `frontend/` | 10 app manifests, with build readiness |
 | `states/` · `events/` | 112 state models · 29 events, cross-checked |
 | `flows/` | 23 user journeys with 137 unhappy paths |
 | `handoff/` | Registers, indexes and the schema workbook |
-| `docs/` | Architecture, 26 ADRs, the conflict register |
+| `docs/` | Architecture, 27 ADRs, the conflict register |
 | `tools/` | **7 validators** and two generators |
 | `wireframes/` | 12 boards from Claude Code, linked to every definition |
 | `sources/` | The matrix, the minutes, the client design references |
@@ -52,7 +52,7 @@ fixed**, and they are under-specified rather than wrong.
 
 ## What this is
 
-A design package. **932 operations, 358 tables and 392 screens are specified and none of it
+A design package. **935 operations, 359 tables and 392 screens are specified and none of it
 has been executed** — no SQL is written, no code is built, and every number above is an
 assertion until something runs.
 

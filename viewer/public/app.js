@@ -16,6 +16,7 @@ import {
   LAYERS, MODE_TIPS, layerOf, VIEWS, state, groupBy, setDrawer, syncLinksToggle,
   $, el, TYPE_LABEL, escapeHtml, vocabularyTip, deliveryTip, permissionTip,
   inlineMarkdown, renderBoxLegend,
+  hue, markdownBlock,
 } from './core.js';
 // ── boot ─────────────────────────────────────────────────────────────
 let graph;
@@ -237,6 +238,49 @@ function visibleModes(layer) {
   return layer.modes.filter(([key]) => set.has(key));
 }
 
+/**
+ * How much each layer holds, for the count inside its pill.
+ *
+ * Which layer is the big one is a thing worth knowing *before* you open it —
+ * the tray used to be five equal words, and "Decisions" reading the same
+ * weight as "Contracts" when one is 18 documents and the other 364 operations
+ * is the tray failing to say the only thing it is well placed to say.
+ *
+ * Everything here is already loaded by the time the tray is drawn; a layer
+ * whose payload has not arrived yet simply carries no count rather than a
+ * zero, because zero is a claim and "not yet" is not.
+ */
+function layerCount(key) {
+  const nodes = state.index?.nodes ?? [];
+  switch (key) {
+    case 'frontend': return state.journeys?.screens?.length ?? null;
+    case 'contracts': return nodes.filter((n) => n.type === 'operation').length || null;
+    case 'domain': return state.domain?.machines?.length ?? null;
+    case 'backend': return state.backend?.tables?.length ?? null;
+    case 'decisions': return state.decisions?.adrs?.length ?? null;
+    default: return null;
+  }
+}
+
+/**
+ * Fill the counts back in as their payloads arrive.
+ *
+ * Each layer fetches its own data the first time it is opened, so at boot only
+ * the layer you land on can answer for itself. Rather than draw a zero — which
+ * is a claim, where "not yet" is not — the pill starts bare and gains its count
+ * the moment the number becomes true. Updated in place so the tray never
+ * reflows under the pointer.
+ */
+function refreshLayerCounts() {
+  for (const button of $('layers').querySelectorAll('button')) {
+    const count = layerCount(button.dataset.layer);
+    const span = button.querySelector('.layer-count');
+    if (count == null) { span?.remove(); continue; }
+    if (span) span.textContent = String(count);
+    else button.append(el('span', 'layer-count', String(count)));
+  }
+}
+
 function renderLayers() {
   const bar = $('layers');
   bar.innerHTML = '';
@@ -246,12 +290,22 @@ function renderLayers() {
     button.dataset.layer = layer.key;
     button.title = layer.hint;
     tip(button, layer.label, layer.tip ?? layer.hint);
+    const count = layerCount(layer.key);
+    if (count != null) button.append(el('span', 'layer-count', String(count)));
     button.classList.toggle('active', layer.key === state.layer);
     button.onclick = () => setLayer(layer.key);
     bar.append(button);
   }
   renderModes();
 }
+
+/** The single-key shortcut each view already answers to. */
+const MODE_KEYS = {
+  screen: 'W', journey: 'J', apps: 'P', waves: 'V', audit: 'A',
+  graph: 'G', structure: 'S', er: 'E', lineage: 'L', reader: 'R',
+  states: 'T', events: 'N', data: 'D', migrations: 'M', routing: 'O',
+  timeline: 'I', supersession: 'U', register: 'K', decisions: 'X',
+};
 
 function renderModes() {
   const bar = $('modes');
@@ -262,6 +316,10 @@ function renderModes() {
     button.classList.toggle('active', key === state.mode);
     const about = MODE_TIPS[key];
     if (about) tip(button, about.title, about.body);
+    // The shortcut is already bound; printing it on the tab is what turns it
+    // from a thing in the manual into a thing people use.
+    const hint = MODE_KEYS[key];
+    if (hint) button.append(el('kbd', 'mode-key', hint));
     if (key === 'audit') {
       const badge = el('span', 'audit-count');
       badge.id = 'audit-count';
@@ -271,6 +329,44 @@ function renderModes() {
     bar.append(button);
   }
   updateAuditBadge();
+  renderLayerSummary();
+}
+
+/**
+ * The one-line count of what this layer holds, in the second chrome row.
+ *
+ * The left column already spells this out in its advisory note, but that note
+ * is below the fold on a short window and is about a caveat rather than a
+ * size. This answers "how much is here" before anybody scrolls to find out.
+ */
+function renderLayerSummary() {
+  const out = $('layer-summary');
+  if (!out) return;
+  const parts = [];
+  if (state.layer === 'frontend') {
+    const screens = state.journeys?.screens?.length ?? 0;
+    const platforms = state.journeys?.allPlatforms?.length ?? 0;
+    if (screens) parts.push(`${screens} screens`);
+    if (platforms) parts.push(`${platforms} platforms`);
+  } else if (state.layer === 'contracts') {
+    const nodes = state.index?.nodes ?? [];
+    const files = nodes.filter((n) => n.type === 'file').length;
+    const ops = nodes.filter((n) => n.type === 'operation').length;
+    if (files) parts.push(`${files} contracts`);
+    if (ops) parts.push(`${ops} operations`);
+  } else if (state.layer === 'domain') {
+    const machines = state.domain?.machines?.length ?? 0;
+    const events = state.domain?.events?.length ?? 0;
+    if (machines) parts.push(`${machines} state models`);
+    if (events) parts.push(`${events} events`);
+  } else if (state.layer === 'backend') {
+    const tables = state.backend?.tables?.length ?? 0;
+    if (tables) parts.push(`${tables} tables`);
+  } else if (state.layer === 'decisions') {
+    const adrs = state.decisions?.adrs?.length ?? 0;
+    if (adrs) parts.push(`${adrs} decisions`);
+  }
+  out.textContent = parts.join(' · ');
 }
 
 function setLayer(key) {
@@ -703,6 +799,9 @@ export function setMode(mode) {
     button.classList.toggle('active', button.dataset.mode === mode);
   }
   revealActive($('modes'));
+  // by the time a view has been asked for, its layer's payload is either here
+  // or on its way; either way the tray and the summary want re-reading
+  queueMicrotask(() => { refreshLayerCounts(); renderLayerSummary(); });
   if (mode === 'graph') {
     // the canvas measures 0x0 while hidden, so re-measure now that it is laid out
     graph.resize();
@@ -946,7 +1045,7 @@ function renderDecisionsTree() {
   };
 
   if (groupBy() === 'decisions') {
-    const { group, badge } = section('Decisions', 'docs/adr/', '#a78bfa');
+    const { group, badge } = section('Decisions', 'docs/adr/', hue('accent'));
     let shown = 0;
     for (const adr of decisions.adrs) {
       if (!hit(adr.title) && !hit(adr.id) && !hit(adr.closes)) continue;
@@ -975,11 +1074,11 @@ const row = el('div', 'tree-file');
     box.append(group);
   } else {
     for (const [key, label, sub, color] of [
-      ['register', 'Registers', 'docs/registers/', '#34d399'],
-      ['handoff', 'Handoff', 'handoff/', '#60a5fa'],
-      ['architecture', 'Architecture', 'docs/architecture/', '#fbbf24'],
-      ['active', 'In flight', 'docs/active/', '#f472b6'],
-      ['guide', 'Guides', 'docs/', '#94a3b8'],
+      ['register', 'Registers', 'docs/registers/', hue('ok')],
+      ['handoff', 'Handoff', 'handoff/', hue('info')],
+      ['architecture', 'Architecture', 'docs/architecture/', hue('warning')],
+      ['active', 'In flight', 'docs/active/', hue('permission')],
+      ['guide', 'Guides', 'docs/', hue('text-faint')],
     ]) {
       const list = decisions.documents.filter(
         (d) => d.group === key && (hit(d.title) || hit(d.id) || hit(d.lead))
@@ -1073,7 +1172,7 @@ function renderContractTree() {
 }
 
 // ── sidebar: frontend layer ──────────────────────────────────────────
-const PLATFORM_COLOR = ['#38bdf8', '#34d399', '#c084fc', '#fbbf24', '#f472b6', '#60a5fa'];
+const PLATFORM_TOKENS = ['layer-frontend', 'ok', 'patch', 'warning', 'permission', 'info'];
 
 function renderScreenTree() {
   const box = $('tree');
@@ -1104,7 +1203,7 @@ function renderScreenTree() {
     const section = el('div', 'tree-group');
     const head = el('div', 'tree-group-head');
     const dot = el('span', 'tree-group-dot');
-    dot.style.background = PLATFORM_COLOR[index++ % PLATFORM_COLOR.length];
+    dot.style.background = hue(PLATFORM_TOKENS[index++ % PLATFORM_TOKENS.length]);
     head.append(dot, el('span', null, label || group));
     head.append(el('span', 'tree-group-count', String(list.length)));
     section.append(head);
@@ -1134,7 +1233,7 @@ function renderScreenTree() {
     const section = el('div', 'tree-group');
     const head = el('div', 'tree-group-head');
     const dot = el('span', 'tree-group-dot');
-    dot.style.background = '#f0abfc';
+    dot.style.background = hue('boards');
     head.append(dot, el('span', null, 'DESIGN BOARDS'));
     head.append(el('span', 'tree-group-count', String(shown.length)));
     section.append(head);
@@ -1214,7 +1313,7 @@ function renderTableTree() {
     const head = el('div', 'tree-group-head');
     const dot = el('span', 'tree-group-dot');
     // green where the SQL exists, amber where the table is still only planned
-    dot.style.background = written ? '#34d399' : '#fbbf24';
+    dot.style.background = written ? hue('ok') : hue('warning');
     head.append(dot, el('span', null, group));
     head.append(el('span', 'tree-group-count', String(list.length)));
     // The 14 August workbook added "What it is" and "Why it is separate" — the
@@ -1562,7 +1661,7 @@ function renderSpine() {
     };
   });
 
-  const light = document.documentElement.dataset.theme === 'light';
+  const light = document.documentElement.dataset.theme !== 'dark';
   const viewEdges = [
     ...sharedEdges.map((edge) => ({
       ...edge,
@@ -1632,8 +1731,8 @@ function renderLegend() {
       row.append(dot, el('span', null, label));
     }
     for (const [color, label] of [
-      ['#fbbf24', 'an event with a critical consumer'],
-      ['#60a5fa', 'an event — the arrow runs publisher → consumer'],
+      [hue('warning'), 'an event with a critical consumer'],
+      [hue('info'), 'an event — the arrow runs publisher → consumer'],
     ]) {
       const row = el('div', 'legend-row');
       const dot = el('span', 'legend-dot');
@@ -1907,8 +2006,8 @@ function renderSideNote() {
 }
 
 // ── ER diagram ───────────────────────────────────────────────────────
-const METHOD_COLORS = {
-  GET: '#60a5fa', POST: '#34d399', PUT: '#fbbf24', DELETE: '#f87171', PATCH: '#c084fc',
+const METHOD_TOKENS = {
+  GET: 'info', POST: 'ok', PUT: 'warning', DELETE: 'error', PATCH: 'patch',
 };
 
 /** Contracts, for the ER / Flow scope pickers. */
@@ -1969,7 +2068,7 @@ function buildER(file) {
       id: schema.id,
       title: schema.name,
       badge: external ? schema.file.split('/').pop().replace(/\.ya?ml$/, '') : `${rows.length}`,
-      color: external ? '#fbbf24' : schema.enumValues ? '#c084fc' : '#34d399',
+      color: external ? hue('warning') : schema.enumValues ? hue('patch') : hue('ok'),
       rows,
       external,
     };
@@ -2018,9 +2117,9 @@ function renderER({ focus } = {}) {
   $('er-hint').textContent =
     `${ownCount} entities · ${nodes.length - ownCount} referenced from other contracts · ${edges.length} relationships`;
   renderBoxLegend($('er-legend'), [
-    ['#34d399', 'entity in this contract'],
-    ['#c084fc', 'enum'],
-    ['#fbbf24', 'entity from another contract'],
+    [hue('ok'), 'entity in this contract'],
+    [hue('patch'), 'enum'],
+    [hue('warning'), 'entity from another contract'],
   ], 'click a field to follow its $ref · drag a box to pin it');
   if (focus) er.onSettle = () => { er.onSettle = null; if (!er.userAdjusted) er.focus(focus, { zoom: 1 }); };
 }
@@ -3298,11 +3397,11 @@ function renderStates() {
 
 function renderStateLegend(m) {
   const entries = [
-    ['#34d399', 'initial'],
-    ['#a78bfa', 'terminal'],
-    ['#60a5fa', 'operation moves it'],
-    ['#34d399', 'timer or job — dashed, because no operation causes it'],
-    ['#fbbf24', 'reversal — value moving backwards'],
+    [hue('ok'), 'initial'],
+    [hue('accent'), 'terminal'],
+    [hue('info'), 'operation moves it'],
+    [hue('ok'), 'timer or job — dashed, because no operation causes it'],
+    [hue('warning'), 'reversal — value moving backwards'],
   ];
   if (m.stats.approvals) entries.push(['transparent', '✓ on a label means it needs approval']);
   if (m.stats.offline) entries.push(['transparent', `${m.stats.offline} states reachable offline`]);
@@ -3752,7 +3851,7 @@ function renderDomainTree() {
   const models = el('div', 'tree-group');
   const head = el('div', 'tree-group-head');
   const dot = el('span', 'tree-group-dot');
-  dot.style.background = '#60a5fa';
+  dot.style.background = hue('info');
   head.append(dot, el('span', null, 'State models'));
   head.append(el('span', 'tree-group-count', String(machines().length)));
   models.append(head);
@@ -3792,7 +3891,7 @@ const row = el('div', 'tree-file machine-row');
   const catalogue = el('div', 'tree-group');
   const ehead = el('div', 'tree-group-head');
   const edot = el('span', 'tree-group-dot');
-  edot.style.background = '#f472b6';
+  edot.style.background = hue('permission');
   ehead.append(edot, el('span', null, 'Events'));
   ehead.append(el('span', 'tree-group-count', String(domainEvents().length)));
   catalogue.append(ehead);
@@ -3835,7 +3934,7 @@ const row = el('div', 'tree-file event-row');
     const gap = el('div', 'tree-group');
     const ghead = el('div', 'tree-group-head');
     const gdot = el('span', 'tree-group-dot');
-    gdot.style.background = '#fbbf24';
+    gdot.style.background = hue('warning');
     ghead.append(gdot, el('span', null, 'Enums with no model'));
     ghead.append(el('span', 'tree-group-count', String(unmodelled.length)));
     gap.append(ghead);
@@ -3991,7 +4090,7 @@ function buildSchemaMap() {
       title: module.name,
       badge: state_ === 'none' ? `${module.tables}t` : `${built.written}/${built.total}t`,
       // green written · blue part-written · amber derivable but not written
-      color: { written: '#34d399', part: '#60a5fa', none: '#fbbf24' }[state_],
+      color: { written: hue('ok'), part: hue('info'), none: hue('warning') }[state_],
       rows: out.map(([target, info]) => ({
         label: `→ ${target}`,
         value: `${info.count}`,
@@ -4113,7 +4212,7 @@ function buildData(module, { inferred = true, ambient = false } = {}) {
   // by colour. Green already means "created by a migration" in this legend and
   // amber means "from another schema" — giving green a second meaning above
   // the box would make the legend say two things at once.
-  const CAPTION = '#a78bfa';
+  const CAPTION = hue('accent');
 
   const captionOf = (table) => {
     // Root beats parent: a schema root is the parent of everything below it,
@@ -4134,7 +4233,7 @@ function buildData(module, { inferred = true, ambient = false } = {}) {
       badge: own ? (table.ddl ? `${columns.length} · sql` : String(columns.length)) : table.module,
       // green means the migration exists and this table is really there;
       // blue means it is derived from the contracts and still only planned
-      color: !own ? '#fbbf24' : table.ddl ? '#34d399' : '#60a5fa',
+      color: !own ? hue('warning') : table.ddl ? hue('ok') : hue('info'),
       caption,
       captionColor,
       rows: columns.map((column) => {
@@ -4313,7 +4412,7 @@ function renderData({ focus } = {}) {
       + ` · across ${schemas} schema${schemas === 1 ? '' : 's'}`
       + (roots ? ` · ${roots} schema root${roots === 1 ? '' : 's'}` : '');
     renderBoxLegend($('data-legend'), [
-      ['#a78bfa', `anchored on ${state.dataAnchor}`],
+      [hue('accent'), `anchored on ${state.dataAnchor}`],
     ], 'an anchor is where a table’s own outbound keys stop · '
        + '“anchored only on scope_node” is “purely tenancy-scoped”'
        + ' · PARENT above a box = something on screen hangs off it'
@@ -4326,9 +4425,9 @@ function renderData({ focus } = {}) {
       `${edges.length} schema-to-schema relationships across ${crossings} columns · ` +
       `click a row to open that schema`;
     renderBoxLegend($('data-legend'), [
-      ['#34d399', 'every table written'],
-      ['#60a5fa', 'part written'],
-      ['#fbbf24', 'derivable, none written'],
+      [hue('ok'), 'every table written'],
+      [hue('info'), 'part written'],
+      [hue('warning'), 'derivable, none written'],
     ], 'one box per schema · the badge counts tables that exist as SQL · the number on a line is how many columns cross it');
   } else {
     const module = backend.modules.find((m) => m.name === state.dataModule);
@@ -4352,9 +4451,9 @@ function renderData({ focus } = {}) {
         ? ' · no row on the Modules sheet — counted from the tables that name it'
         : module ? ` · migration ${module.migration ?? '—'} (${module.status ?? 'unknown'})` : '');
     renderBoxLegend($('data-legend'), [
-      ['#34d399', 'created by a migration'],
-      ['#60a5fa', 'derived from the contracts, not written yet'],
-      ['#fbbf24', 'table from another schema'],
+      [hue('ok'), 'created by a migration'],
+      [hue('info'), 'derived from the contracts, not written yet'],
+      [hue('warning'), 'table from another schema'],
     ], (built.stated
       ? 'thick = child (belongs to) · plain = reference · solid = declared, dashed = inferred' +
         (built.hiddenAmbient
@@ -4540,10 +4639,10 @@ function renderRouting() {
   body.append(el('div', 'journey-section-label', 'operations by routing target'));
 
   const KINDS = [
-    ['writes', 'primary (write)', '#f87171'],
-    ['primaryReads', 'primary (read)', '#fbbf24'],
-    ['replicaReads', 'replica', '#34d399'],
-    ['analyticalReads', 'analytical', '#c084fc'],
+    ['writes', 'primary (write)', hue('error')],
+    ['primaryReads', 'primary (read)', hue('warning')],
+    ['replicaReads', 'replica', hue('ok')],
+    ['analyticalReads', 'analytical', hue('patch')],
   ];
 
   const sumOf = (r) => r.writes + r.primaryReads + r.replicaReads + r.analyticalReads;
@@ -4593,10 +4692,10 @@ function renderRouting() {
 // how much of itself is guesswork. That candour is the design constraint here:
 // an unresolved operation is drawn, not dropped.
 
-const ROUTING_COLOR = {
-  primary: '#f87171',
-  replica: '#34d399',
-  analytical: '#c084fc',
+const ROUTING_TOKENS = {
+  primary: 'error',
+  replica: 'ok',
+  analytical: 'patch',
 };
 
 /** A table name that opens the table in the Backend layer, if it exists there. */
@@ -4759,7 +4858,7 @@ function appendLineageRows(section, ops, from = 0) {
     if (op.path) meta.append(el('span', 'lineage-path', op.path));
     if (op.routing) {
       const chip = el('span', `lineage-routing${op.routingFrom === 'workbook' ? ' from-workbook' : ''}`, op.routing);
-      chip.style.borderColor = ROUTING_COLOR[op.routing] ?? 'currentColor';
+      chip.style.borderColor = ROUTING_TOKENS[op.routing] ? hue(ROUTING_TOKENS[op.routing]) : 'currentColor';
       const ROUTING_WHY = {
         replica: 'A read that may be served from a replica. ADR-0016 — the write path and the read path are separated deliberately.',
         analytical: 'Served from the analytical store. Never on a transaction path.',
@@ -4877,8 +4976,8 @@ function renderLineageByTable(body, hit) {
     const bar = el('div', 'routing-bar');
     bar.style.width = `${((entry.reads.length + entry.writes.length) / max) * 100}%`;
     for (const [count, label, color] of [
-      [entry.writes.length, 'written by', '#f87171'],
-      [entry.reads.length, 'read by', '#34d399'],
+      [entry.writes.length, 'written by', hue('error')],
+      [entry.reads.length, 'read by', hue('ok')],
     ]) {
       if (!count) continue;
       const seg = el('div', 'routing-seg', String(count));
@@ -4895,7 +4994,7 @@ function renderLineageByTable(body, hit) {
 
   const legend = el('div', 'inline-legend');
   body.append(legend);
-  renderBoxLegend(legend, [['#f87171', 'written by'], ['#34d399', 'read by']],
+  renderBoxLegend(legend, [[hue('error'), 'written by'], [hue('ok'), 'read by']],
     'only the 165 tables some operation reaches — the other 65 are written by nothing the lineage resolved');
 }
 
@@ -5064,7 +5163,7 @@ function renderWaves() {
   body.append(legend);
   renderBoxLegend(
     legend,
-    [['var(--accent)', 'reaches a table'], ['var(--text-dim)', 'names an operation'], ['#f87171', 'names none']],
+    [['var(--accent)', 'reaches a table'], ['var(--text-dim)', 'names an operation'], [hue('error'), 'names none']],
     'wave and operations both from handoff/screen-index.json; the tables from the lineage behind it'
   );
 }
@@ -5508,7 +5607,7 @@ function renderTableLinks() {
   if (table.derivedFrom) {
     const row = el('div', 'link-item');
     const dot = el('span', 'type-dot');
-    dot.style.background = '#34d399';
+    dot.style.background = hue('ok');
     row.append(dot, el('span', 'link-name', table.derivedFrom));
     row.append(el('span', 'link-file', table.schemaFile?.split('/').pop().replace(/\.ya?ml$/, '') ?? 'not found'));
     row.onclick = () => {
@@ -5650,7 +5749,7 @@ function renderLinksPane(node) {
           const known = (state.backend?.tables ?? []).some((t) => t.name === name);
           const row = el('div', `link-item${write ? ' writes-table' : ''}`);
           const dot = el('span', 'type-dot');
-          dot.style.background = write ? '#f87171' : '#34d399';
+          dot.style.background = write ? hue('error') : hue('ok');
           row.append(dot, el('span', 'link-name', name));
           row.append(el('span', 'link-file', name.split('.')[0]));
           row.onclick = () => {
@@ -5823,7 +5922,7 @@ function traceSchema(box, node) {
     const dot = el('span', 'type-dot');
     // green for what exists in SQL, blue for what is still only planned — the
     // same two colours the Backend layer uses for the same distinction
-    dot.style.background = table.migration ? '#34d399' : '#60a5fa';
+    dot.style.background = table.migration ? hue('ok') : hue('info');
     row.append(dot, el('span', 'link-name', table.name));
     row.append(el('span', 'link-weight', `${table.columns} columns`));
     row.append(
@@ -5922,7 +6021,14 @@ async function renderReader(node, { scroll = true } = {}) {
 
   if (node.type === 'operation') head.append(el('div', 'reader-path', `${node.method} ${node.path}`));
   if (node.description) {
-    head.append(el('div', 'reader-desc', node.description.trim()));
+    // The description is markdown — headings, a table of tiers and consumers,
+    // bold labels, fenced examples. It was being set as text content inside a
+    // `white-space: pre-wrap` block, so every `##`, every `**` and the whole
+    // header table rendered as literal syntax in one undifferentiated slab.
+    // ADR links are off: this view has no handler for them.
+    const desc = markdownBlock(node.description.trim(), { adrLinks: false });
+    desc.classList.add('reader-desc');
+    head.append(desc);
   }
 
   // Where it lands in the database — drawn before the verdict, because it is
@@ -7083,7 +7189,7 @@ function bindUI() {
   $('palette').onclick = (e) => { if (e.target === $('palette')) closePalette(); };
 
   $('theme-toggle').onclick = () => {
-    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    const next = document.documentElement.dataset.theme !== 'dark' ? 'dark' : 'light';
     document.documentElement.dataset.theme = next;
     localStorage.setItem('ticvai-theme', next);
     // colour dots are inline styles, so anything already painted must repaint
@@ -7098,8 +7204,9 @@ function bindUI() {
     data.draw();
   };
 
-  const saved = localStorage.getItem('ticvai-theme');
-  if (saved) document.documentElement.dataset.theme = saved;
+  // Restoring the saved theme lives in core.js now, so the standalone pages —
+  // reviews, domains, platforms — get it too. They never imported this file,
+  // which is why the toggle only ever held on the main view.
 
   window.addEventListener('keydown', (e) => {
     const inPalette = !$('palette').hidden;

@@ -15,7 +15,7 @@
   "contracts": 23,
   "modules": 8,
   "undrawn": 35,
-  "operationsWithNoScreen": 239
+  "operationsWithNoScreen": 240
  },
  "waves": {
   "wave1": 54,
@@ -145,11 +145,11 @@
    "operations": 11
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
    "operations": 10
   },
   {
-   "contract": "venue-map",
+   "contract": "tenancy",
    "operations": 10
   },
   {
@@ -157,11 +157,11 @@
    "operations": 9
   },
   {
-   "contract": "retail",
+   "contract": "reporting",
    "operations": 8
   },
   {
-   "contract": "reporting",
+   "contract": "retail",
    "operations": 8
   },
   {
@@ -1988,6 +1988,12 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Zero-value reissue of an expired entitlement for a later date"
+   },
+   {
+    "operation": "resendPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": ""
    },
    {
     "operation": "respondToChargeback",

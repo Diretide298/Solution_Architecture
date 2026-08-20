@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TICVAI Contract Graph</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
     <link
@@ -13,55 +19,65 @@
   </head>
   <body>
     <div id="app" class="app">
-      <!-- ── top bar ─────────────────────────────────────────────── -->
-      <header class="topbar">
-        <!-- Both rails become off-canvas drawers on a phone, so each needs a
-             way back. Rendered at every width and hidden by CSS above the
-             phone breakpoint, so nothing has to build them conditionally. -->
-        <button
-          id="drawer-left-toggle"
-          class="drawer-toggle"
-          type="button"
-          aria-label="Show the file tree"
-          aria-expanded="false"
-          aria-controls="sidebar-left"
-        >
-          <span class="icon-menu" aria-hidden="true"></span>
-        </button>
-
-        <div class="brand">
-          <span class="brand-mark"></span>
-          <span class="brand-name">TICVAI</span>
-          <span class="brand-sub">contract graph</span>
-        </div>
-
-        <!-- which layer of the system is on screen. Contracts are the middle
-             one deliberately: the API is the join between the other two. -->
-        <div class="seg seg-layer" id="layers"></div>
-
-        <button id="search-trigger" class="search-trigger" type="button" aria-label="Search">
-          <span class="icon-search" aria-hidden="true"></span>
-          <span class="search-trigger-text">Search…</span>
-          <kbd>Ctrl K</kbd>
-        </button>
-
-        <nav class="modes" id="modes"></nav>
-
-        <div class="topbar-right">
-          <span id="live-dot" class="live-dot" title="Watching contracts for changes"></span>
-          <!-- hidden until the links pane actually holds something: on the
-               Decisions layer, and before anything is selected, it never does -->
+      <!-- ── chrome ──────────────────────────────────────────────
+           Two rows, dark in both themes. Row one is who and where — the brand,
+           which layer of the system is open, and you. Row two is what you are
+           looking at within that layer. They are separate rows because they
+           answer different questions and a single bar made the layer switch and
+           the view tabs read as one list of nine things. -->
+      <header class="chrome">
+        <div class="chrome-row chrome-row-1">
+          <!-- Both rails become off-canvas drawers on a phone, so each needs a
+               way back. Rendered at every width and hidden by CSS above the
+               phone breakpoint, so nothing has to build them conditionally. -->
           <button
-            id="drawer-right-toggle"
+            id="drawer-left-toggle"
             class="drawer-toggle"
             type="button"
-            aria-label="Show links to the selection"
+            aria-label="Show the file tree"
             aria-expanded="false"
-            aria-controls="sidebar-right"
-            hidden
+            aria-controls="sidebar-left"
           >
-            <span class="icon-links" aria-hidden="true"></span>
+            <span class="icon-menu" aria-hidden="true"></span>
           </button>
+
+          <a class="brand" href="/" aria-label="TICVAI — AI project planner">
+            <img class="brand-logo" src="/softlabs-logo.webp" alt="Softlabs Group" />
+            <span class="brand-lockup">
+              <span class="brand-name">TICVAI</span>
+              <span class="brand-sub">AI Project Planner</span>
+            </span>
+          </a>
+
+          <span class="chrome-divider" aria-hidden="true"></span>
+
+          <!-- which layer of the system is on screen. Contracts are the middle
+               one deliberately: the API is the join between the other two. -->
+          <div class="layer-tray" id="layers" role="tablist" aria-label="Layer"></div>
+
+          <div class="chrome-spacer"></div>
+
+          <button id="search-trigger" class="search-trigger" type="button" aria-label="Search">
+            <span class="icon-search" aria-hidden="true"></span>
+            <span class="search-trigger-text">Search operations…</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+
+          <div class="chrome-right">
+            <span id="live-dot" class="live-dot" title="Watching contracts for changes"></span>
+            <!-- hidden until the links pane actually holds something: on the
+                 Decisions layer, and before anything is selected, it never does -->
+            <button
+              id="drawer-right-toggle"
+              class="drawer-toggle"
+              type="button"
+              aria-label="Show links to the selection"
+              aria-expanded="false"
+              aria-controls="sidebar-right"
+              hidden
+            >
+              <span class="icon-links" aria-hidden="true"></span>
+            </button>
           <!-- Notes that named you. Its own control rather than a mark on the
                account button: being mentioned is a thing that happened to you,
                not a fact about who you are signed in as, and the two want
@@ -87,6 +103,18 @@
             <span id="account-initials" class="account-initials">·</span>
           </button>
           <button id="theme-toggle" class="icon-btn" title="Toggle theme" type="button">◐</button>
+          </div>
+        </div>
+
+        <div class="chrome-row chrome-row-2">
+          <nav class="view-tabs" id="modes" aria-label="View"></nav>
+          <div class="chrome-spacer"></div>
+          <!-- What this layer holds, in one line. The same count the left
+               column's note spells out, said once at the top so it is answered
+               before anybody goes looking. -->
+          <span class="layer-summary" id="layer-summary"></span>
+          <span class="chrome-divider chrome-divider-sm" aria-hidden="true"></span>
+          <div class="view-toggles" id="view-toggles"></div>
         </div>
       </header>
 
@@ -108,6 +136,15 @@
         <div class="filter-row lens-filters" id="lens-filters" hidden></div>
         <div class="side-note" id="side-note" hidden></div>
         <div class="tree" id="tree"></div>
+        <div class="powered">
+          <span class="powered-mark" aria-hidden="true">
+            <span class="powered-ring"></span><span class="powered-ring"></span>
+          </span>
+          <span class="powered-text">
+            <span class="powered-label">Powered by</span>
+            <span class="powered-name">Ainfinite<b>Core</b></span>
+          </span>
+        </div>
       </aside>
 
       <!-- ── main ────────────────────────────────────────────────── -->

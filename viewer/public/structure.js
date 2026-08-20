@@ -6,21 +6,16 @@
 // it to its header with a count of what is hidden.
 
 import { enableTouch } from './touch.js';
+import { hue } from './core.js';
 
-const KIND_COLORS = {
-  map: '#60a5fa',
-  seq: '#fbbf24',
-  scalar: '#34d399',
-  ref: '#a78bfa',
-  alias: '#f472b6',
-};
-
-const KIND_COLORS_LIGHT = {
-  map: '#2563eb',
-  seq: '#b45309',
-  scalar: '#059669',
-  ref: '#7c3aed',
-  alias: '#db2777',
+// One table, resolved at draw time — the tokens carry the theme, so the
+// hand-maintained light-theme duplicate this used to keep is gone.
+const KIND_TOKENS = {
+  map: 'info',
+  seq: 'warning',
+  scalar: 'ok',
+  ref: 'accent',
+  alias: 'permission',
 };
 
 const ROW_H = 21;      // a scalar / folded block
@@ -40,8 +35,7 @@ const V_GAP = 8;
 const LEVEL_W = 250;
 
 export function kindColor(kind) {
-  const light = document.documentElement.dataset.theme === 'light';
-  return (light ? KIND_COLORS_LIGHT : KIND_COLORS)[kind] ?? '#8b8b93';
+  return hue(KIND_TOKENS[kind] ?? 'text-faint');
 }
 
 export class StructureTree {
@@ -491,8 +485,8 @@ export class StructureTree {
     const text = styles.getPropertyValue('--text').trim() || '#dcdde3';
     const dim = styles.getPropertyValue('--text-dim').trim() || '#9a9aa6';
     const faint = styles.getPropertyValue('--text-faint').trim() || '#6b6b78';
-    const accent = styles.getPropertyValue('--accent').trim() || '#a78bfa';
-    const light = document.documentElement.dataset.theme === 'light';
+    const accent = styles.getPropertyValue('--accent').trim() || hue('accent');
+    const light = document.documentElement.dataset.theme !== 'dark';
 
     ctx.clearRect(0, 0, this.width, this.height);
     if (!this.visible.length) {
@@ -681,7 +675,7 @@ export class StructureTree {
 
   /** Top-down tree: links from a parent's underside to each child's top. */
   _drawTree({ ctx, k, text, dim, faint, accent, light }) {
-    const panel = getComputedStyle(document.documentElement).getPropertyValue('--bg-panel').trim() || '#1a1a21';
+    const panel = getComputedStyle(document.documentElement).getPropertyValue('--node-fill').trim() || '#1b2360';
     const border = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#2c2c36';
 
     // ── parent → child links, left edge to right edge ──

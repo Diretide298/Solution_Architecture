@@ -15,7 +15,7 @@
   "contracts": 11,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 138
+  "operationsWithNoScreen": 139
  },
  "waves": {
   "wave1": 7,
@@ -91,11 +91,11 @@
    "operations": 1
   },
   {
-   "contract": "approvals",
+   "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "approvals",
    "operations": 1
   }
  ],
@@ -516,6 +516,12 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Zero-value reissue of an expired entitlement for a later date"
+   },
+   {
+    "operation": "resendPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": ""
    },
    {
     "operation": "respondToChargeback",
