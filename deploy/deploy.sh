@@ -55,10 +55,18 @@ ADMIN_EMAIL=""
 # SECURE_COOKIE   1 once there is a certificate. Set it before there is one and
 #                 the cookie is never sent at all.
 #
-# Empty is the workstation default: host-only cookie, no extra origin, no Secure.
-PUBLIC_ORIGIN="${PUBLIC_ORIGIN:-https://atlas.ainfinite.ai}"
-COOKIE_DOMAIN="${COOKIE_DOMAIN:-.ainfinite.ai}"
-SECURE_COOKIE="${SECURE_COOKIE:-1}"
+# The defaults are this deployment, because this script only ever runs on it and
+# a default that is wrong for the only caller is not a default, it is a trap.
+# Another one overrides them from the environment, and empty is the no-op in all
+# three cases — no extra origin, a host-only cookie, and no Secure:
+#
+#   PUBLIC_ORIGIN=https://viewer.example.com COOKIE_DOMAIN=.example.com \
+#     sudo -E ./deploy/deploy.sh
+#
+# sudo -E, or sudo drops them and you silently get the defaults below.
+PUBLIC_ORIGIN="${PUBLIC_ORIGIN-https://atlas.ainfinite.ai}"
+COOKIE_DOMAIN="${COOKIE_DOMAIN-.ainfinite.ai}"
+SECURE_COOKIE="${SECURE_COOKIE-1}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -182,6 +190,13 @@ module.exports = {
         TICVAI_DB: '$DB',
         PYTHONPATH: '$APP_DIR/viewer',
         PYTHONUNBUFFERED: '1',
+        // The three that make two deployed names behave as one site. Set at the
+        // top of deploy.sh, and written from there rather than added to this
+        // file by hand — this file is regenerated on every deploy, so a
+        // hand-edit survives exactly until the next one.
+        TICVAI_ORIGINS: '$PUBLIC_ORIGIN',
+        TICVAI_COOKIE_DOMAIN: '$COOKIE_DOMAIN',
+        TICVAI_SECURE_COOKIE: '$SECURE_COOKIE',
       },
       autorestart: true,
       max_restarts: 20,
