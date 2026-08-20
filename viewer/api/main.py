@@ -45,14 +45,14 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:4173", "http://127.0.0.1:4173",
         "http://localhost:8787", "http://127.0.0.1:8787",
-        "https://atlas.ainfinite.ai","https://atlasapi.ainfinite.ai"
+        
     ] + _extra,
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["Content-Type"],
 )
 
-SESSION_COOKIE = "ticvai_se ssion"
+SESSION_COOKIE = "ticvai_session"
 
 # Who the session cookie belongs to.
 #
