@@ -3,6 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // The saved day/night choice, before the stylesheets resolve. `theme.js`
+      // owns this key; this is only here because a module cannot run early
+      // enough to beat the first paint.
+      try {
+        if (localStorage.getItem('ticvai-theme') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
     <title>Atlas — accounts</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,10 +26,14 @@
   </head>
   <body class="admin-page">
     <header class="admin-bar">
+      <!-- The same lockup the viewer chrome carries, so a reader who
+           followed a link off the main view lands somewhere that looks
+           like where they came from. Two cuts because this bar is a light
+           surface in day and a dark one at night, and the white-ink lockup
+           is invisible on the first. -->
       <div class="brand">
-        <img class="brand-mark brand-mark-day" src="/brand/atlas-mark-light.svg" alt="" />
-        <img class="brand-mark brand-mark-night" src="/brand/atlas-mark-night.svg" alt="" aria-hidden="true" />
-        <span class="brand-name">Atlas</span>
+        <img class="brand-lockup brand-lockup-day" src="/brand/atlast_blackfont.png" alt="Atlas" />
+        <img class="brand-lockup brand-lockup-night" src="/brand/atlas-lockup.png" alt="" aria-hidden="true" />
         <span class="brand-sub">accounts</span>
       </div>
       <div class="admin-bar-right">

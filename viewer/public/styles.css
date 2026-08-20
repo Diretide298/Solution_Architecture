@@ -376,10 +376,18 @@ body { overflow-x: auto; }
 .brand-name { font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
 .brand-sub { color: var(--text-faint); font-size: 11px; }
 
-/* One lockup, both themes. The chrome is dark either way, so the white-ink cut
-   is correct in both and there is nothing for the toggle to swap. */
+/* The chrome is dark in both themes, so the white-ink cut is correct in both
+   and its lockup has nothing to swap — it ships the one image, unclassed.
+
+   The page bars below (accounts, sign-off, reviews, domains, platforms) are a
+   different surface: they take the page's own background, which is pale in day.
+   The white lockup vanishes on that, so those carry both cuts and CSS picks
+   one, exactly as the small mark used to. */
 .chrome .brand { gap: 0; }
 .brand-lockup { height: 46px; width: auto; display: block; }
+.brand-lockup-night { display: none; }
+:root[data-theme="dark"] .brand-lockup-day { display: none; }
+:root[data-theme="dark"] .brand-lockup-night { display: block; }
 
 /* ── the layer switch ──────────────────────────────────────────────
    A tray one step darker than the bar, so the pills sit *in* the chrome rather
