@@ -6811,6 +6811,18 @@ async function showMentionCount() {
   const link = $('mentions-link');
   if (!bell) return;
 
+  // Shown for anyone signed in, whether or not anything is waiting — and
+  // before the fetch, so a slow or unreachable accounts service does not take
+  // the control with it.
+  //
+  // It used to appear only once somebody had named you, which turned a thing
+  // you are meant to *check* into one that materialises out of the chrome.
+  // Nothing is where you last saw it, so its absence reads as breakage rather
+  // than as quiet — and there is no way to confirm you have nothing waiting,
+  // because the control that would tell you is the one that is missing. Empty
+  // is a state a bell can say out loud. Gone is not.
+  bell.hidden = false;
+
   let payload = null;
   try {
     payload = await auth.myMentions();
@@ -6820,14 +6832,16 @@ async function showMentionCount() {
   mentionCache = payload.mentions ?? [];
   const unseen = payload.unseen ?? 0;
 
-  // Shown once there is anything at all, read or unread — a bell that
-  // disappears the moment you read the last note takes the history with it,
-  // and "what did that say again" is a question people ask an hour later.
-  bell.hidden = mentionCache.length === 0;
+  // Only the *unread* mark comes and goes. The bell itself stays put, and it
+  // keeps the history: "what did that say again" is a question people ask an
+  // hour after reading something, and a control that empties itself on the
+  // last read takes the answer with it.
   bell.classList.toggle('has-mentions', unseen > 0);
   bell.title = unseen
     ? `${unseen} note${unseen === 1 ? '' : 's'} named you`
-    : 'Where you were named';
+    : mentionCache.length
+      ? 'Where you were named'
+      : 'No notifications';
 
   const count = $('bell-count');
   count.textContent = unseen > 9 ? '9+' : String(unseen);
@@ -6839,6 +6853,20 @@ async function showMentionCount() {
   }
 }
 
+/** The other half of `showMentionCount`: the bell persists across having
+ *  nothing to say, but not across having nobody to say it to. Signed out there
+ *  is no "you" for a note to have named, so the control goes with the session
+ *  rather than sitting there offering to show a stranger somebody's mail. */
+function hideBell() {
+  const bell = $('bell-toggle');
+  if (!bell) return;
+  mentionCache = [];
+  bell.hidden = true;
+  bell.classList.remove('has-mentions');
+  $('bell-count').hidden = true;
+  if (!$('bell-panel').hidden) closeBellPanel();
+}
+
 /** The panel behind the bell. Drawn from what the count already fetched, so
  *  opening it costs nothing and never shows a spinner over three rows. */
 function renderBellPanel() {
@@ -6847,8 +6875,21 @@ function renderBellPanel() {
   const unseen = mentionCache.filter((m) => !m.seen_at).length;
   $('bell-note').textContent = mentionCache.length
     ? (unseen ? `${unseen} unread of ${mentionCache.length}` : `${mentionCache.length}, all read`)
-    : 'Nobody has named you yet.';
+    : 'No notifications';
   $('bell-seen').hidden = unseen === 0;
+
+  // Said in the list rather than only in the line above it, because the empty
+  // list is the thing the eye lands on and a blank box is ambiguous between
+  // "nothing here" and "did not load". It also says what would put something
+  // here, which is the question anyone reading an empty inbox actually has.
+  if (!mentionCache.length) {
+    const empty = el('p', 'bell-empty');
+    empty.append('Nobody has named you yet. When someone writes ');
+    empty.append(el('span', 'bell-empty-handle', `@${auth.account()?.email ?? 'your address'}`));
+    empty.append(' in a note on a contract, a screen or a table, it will show up here.');
+    list.append(empty);
+    return;
+  }
 
   // Everything, not the newest eight. The list scrolls, so a cap here bought
   // nothing and cost the reader the difference between "that is all of them"
@@ -7003,6 +7044,7 @@ function bindAccountUI() {
     // one control whose job is to tell you something unprompted only appeared
     // once you had gone looking — exactly the failure it exists to fix.
     if (auth.account()) showMentionCount();
+    else hideBell();
     if (!$('account-panel').hidden) renderAccountPanel();
   });
   auth.refreshSession();
