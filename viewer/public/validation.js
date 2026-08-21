@@ -253,6 +253,19 @@ export const checkInvite = (token) => call(`/api/invites/check/${encodeURICompon
 export const redeemInvite = (token, name, password) =>
   call('/api/auth/redeem', { method: 'POST', body: { token, name, password } });
 
+/**
+ * A link that lets one person set a new password, made by an admin.
+ *
+ * `makeReset` returns a path rather than a whole address, and the admin page
+ * joins it to its own origin — the service is reachable on more than one name
+ * and only the browser knows which one the person on the other end has to use.
+ * The admin never sees the password that results; they hand over the link.
+ */
+export const makeReset = (id) => call(`/api/accounts/${id}/reset`, { method: 'POST' });
+export const checkReset = (token) => call(`/api/reset/check/${encodeURIComponent(token)}`);
+export const useReset = (token, password) =>
+  call('/api/auth/reset', { method: 'POST', body: { token, password } });
+
 export const verdictHistory = (kind, id) =>
   call(`/api/validation/${kind}/${encodeURIComponent(id)}`);
 // The layer the reviewer is standing in. Sent with every verdict so the review

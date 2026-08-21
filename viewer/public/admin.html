@@ -193,6 +193,7 @@
       import {
         authState, listAccounts, setAccountActive, setAccountRole,
         createInvite, listInvites, revokeInvite, changePassword, logoutAccount,
+        makeReset,
       } from '/validation.js';
       import '/theme.js';                      // the saved day/night choice
       import { hideLoader } from '/loader.js'; // and the curtain over the wait
@@ -378,6 +379,7 @@
           // would carry on looking signed in while every call from it failed.
           // Signing yourself out everywhere lives in the account panel in the
           // viewer, which knows to go to the door afterwards.
+          row.append(resetControl(person, row));
           row.append(person.id === me.id ? el('span') : endSessionsControl(person, row));
           box.append(row);
         }
@@ -396,6 +398,73 @@
        * "they had none open" are different answers and the difference is
        * usually the thing being checked.
        */
+      /**
+       * A link that lets one person set a new password.
+       *
+       * The admin makes the link and passes it on; the password itself is
+       * chosen behind it, by them, and is never seen here. An admin who could
+       * type somebody's password could sign in as them and leave verdicts under
+       * their name, and the review is only worth what its authorship is worth.
+       *
+       * Shown for every row including your own — losing your own password is
+       * the ordinary case, and a second admin making you a link is exactly the
+       * route the sign-in page tells people to ask for.
+       *
+       * The link is joined to this page's own origin rather than sent whole by
+       * the service, which is reachable on more than one name and cannot know
+       * which of them the person on the other end has to use.
+       */
+      function resetControl(person, row) {
+        const cell = el('span', 'account-reset');
+        const make = el('button', 'chip', 'Reset password');
+        make.type = 'button';
+        make.title = 'Make a link that lets them set a new password.';
+        cell.append(make);
+
+        make.onclick = async () => {
+          make.disabled = true;
+          $('account-error').hidden = true;
+          try {
+            const reset = await makeReset(person.id);
+            const url = `${location.origin}${reset.link}`;
+
+            const box = el('div', 'account-reset-link');
+            const field = el('input', 'auth-input');
+            field.readOnly = true;
+            field.value = url;
+            const copy = el('button', 'chip', 'Copy');
+            copy.type = 'button';
+            copy.onclick = async () => {
+              field.select();
+              try {
+                await navigator.clipboard.writeText(url);
+                copy.textContent = 'Copied';
+              } catch {
+                // clipboard access is refused outright in some browsers, and
+                // the field is already selected, so say what to press instead
+                copy.textContent = 'Press Ctrl+C';
+              }
+              setTimeout(() => { copy.textContent = 'Copy'; }, 1600);
+            };
+
+            box.append(field, copy);
+            box.append(el('p', 'auth-note auth-fine',
+              `Send this to ${person.email} however you already talk to them. It works `
+              + 'once, expires in a day, and ends every session they have open when '
+              + 'they use it. Making another link withdraws this one.'));
+            // Appended to the row, not the cell: it spans every column, the way
+            // the End sessions confirm below does.
+            row.append(box);
+            make.remove();
+          } catch (error) {
+            $('account-error').textContent = error.message;
+            $('account-error').hidden = false;
+            make.disabled = false;
+          }
+        };
+        return cell;
+      }
+
       function endSessionsControl(person, row) {
         const cell = el('span', 'account-sessions');
         const open = el('button', 'chip', 'End sessions');

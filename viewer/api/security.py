@@ -50,6 +50,14 @@ WRITERS = ("admin", "reviewer")
 # a forwarded or leaked link is worth.
 CLIENT_INVITE_DAYS = 3
 
+# A reset link is shorter still, and for a sharper reason than an invite. An
+# invite is worth an account that does not exist yet; a reset link is worth an
+# account that does — one already carrying somebody's verdicts and whatever
+# their role can reach. It is made on request, used within the hour it is
+# handed over, and expiring quickly is what keeps a link left in a chat log
+# from being a way in a week later.
+RESET_DAYS = 1
+
 # Deliberately not a full RFC 5322 parser. It rejects the shapes that are not
 # addresses; the invite, not the regex, is what establishes the address is real.
 _EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -149,4 +157,8 @@ def session_expiry() -> str:
 
 
 def invite_expiry(days: int = INVITE_DAYS) -> str:
+    return stamp(now() + timedelta(days=days))
+
+
+def reset_expiry(days: int = RESET_DAYS) -> str:
     return stamp(now() + timedelta(days=days))

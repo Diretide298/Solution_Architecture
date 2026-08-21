@@ -113,6 +113,11 @@ class Credentials(BaseModel):
     password: str
 
 
+class PasswordReset(BaseModel):
+    token: str
+    password: str
+
+
 class Redemption(BaseModel):
     token: str
     name: str = ""
@@ -661,6 +666,128 @@ def redeem(body: Redemption, response: Response, request: Request):
     )
     _set_session_cookie(response, token)
     return {"ok": True, "email": invite["email"], "role": invite["role"]}
+
+
+# ── resetting a password ─────────────────────────────────────────────
+#
+# There is no self-service reset and this is not one. This package holds a hash
+# of a password and no mailer, so there is nothing that can prove an address to
+# a stranger who has forgotten theirs — which is what the sign-in page says
+# plainly rather than offering a link it cannot honour.
+#
+# What it can do is let an admin, who already decides who holds an account at
+# all, hand out a link. The trust is the same trust an invite runs on: somebody
+# who can vouch for the person is the person who made the link, and the link
+# goes to them through whatever channel they already use.
+#
+# Three things this is careful about:
+#
+#   1. The admin never learns the new password. They mint a link; the person
+#      chooses the password behind it. An admin who set passwords directly
+#      would be an admin who could sign in as anybody and leave verdicts under
+#      their name, and the audit trail's whole value is that it cannot.
+#   2. One live link per account. Making a second withdraws the first, so a
+#      re-send cannot leave two ways in.
+#   3. Using it ends every session that account had. A reset is what somebody
+#      reaches for when they have lost control of an account, and one that left
+#      the old sessions running would be a reset in name only.
+
+
+def _live_reset(token: str):
+    row = db.one(
+        """SELECT r.id, r.account_id, r.expires_at, r.used_at, r.revoked_at,
+                  a.email, a.name, a.active
+             FROM reset r JOIN account a ON a.id = r.account_id
+            WHERE r.token_hash = ?""",
+        (security.token_hash(token),),
+    )
+    if not row:
+        raise HTTPException(404, "That reset link is not valid.")
+    if row["used_at"]:
+        raise HTTPException(409, "That reset link has already been used.")
+    if row["revoked_at"]:
+        raise HTTPException(409, "That reset link was replaced by a newer one.")
+    if security.expired(row["expires_at"]):
+        raise HTTPException(409, "That reset link has expired. Ask for another.")
+    if not row["active"]:
+        raise HTTPException(409, "That account is disabled.")
+    return row
+
+
+@app.post("/api/accounts/{account_id}/reset")
+def make_reset(account_id: int, admin: dict = Depends(require_admin)):
+    """Mints a link that lets one person set a new password."""
+    person = db.one("SELECT id, email, name, active FROM account WHERE id = ?", (account_id,))
+    if not person:
+        raise HTTPException(404, "No such account.")
+    if not person["active"]:
+        raise HTTPException(409, "That account is disabled. Enable it first.")
+
+    # A second link supersedes the first, so a resend cannot leave two live.
+    db.change(
+        "UPDATE reset SET revoked_at = ? WHERE account_id = ? AND used_at IS NULL AND revoked_at IS NULL",
+        (security.stamp(), account_id),
+    )
+
+    token = security.new_token()
+    expires = security.reset_expiry()
+    db.write(
+        """INSERT INTO reset (account_id, token_hash, created_by, created_at, expires_at)
+           VALUES (?, ?, ?, ?, ?)""",
+        (account_id, security.token_hash(token), admin["id"], security.stamp(), expires),
+    )
+    # The path only. The admin's browser knows which address it reached this
+    # page on, and it is the one the person being sent the link has to use.
+    #
+    # The token rides in the fragment for the same reason an invite's does: a
+    # fragment is never sent to the server in a request line, so it cannot land
+    # in an access log, a proxy trace or a Referer header on the way past.
+    return {
+        "ok": True,
+        "link": f"/invite.html#reset={token}",
+        "email": person["email"],
+        "name": person["name"],
+        "expires_at": expires,
+    }
+
+
+@app.get("/api/reset/check/{token}")
+def check_reset(token: str):
+    """What the reset page asks before drawing a form. Says who the link is for
+    so nobody sets a password on an account they did not mean to."""
+    row = _live_reset(token)
+    return {"ok": True, "email": row["email"], "name": row["name"]}
+
+
+@app.post("/api/auth/reset")
+def use_reset(body: PasswordReset, response: Response, request: Request):
+    """Sets the new password, ends every old session, and signs them in here."""
+    row = _live_reset(body.token)
+    try:
+        security.check_password(body.password)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+    db.write(
+        "UPDATE account SET password_hash = ? WHERE id = ?",
+        (security.hash_password(body.password), row["account_id"]),
+    )
+    db.write("UPDATE reset SET used_at = ? WHERE id = ?", (security.stamp(), row["id"]))
+
+    # Every session, including any the old password left open somewhere else.
+    dropped = db.change("DELETE FROM session WHERE account_id = ?", (row["account_id"],))
+
+    token = security.new_token()
+    db.write(
+        """INSERT INTO session (token_hash, account_id, created_at, expires_at, user_agent)
+           VALUES (?, ?, ?, ?, ?)""",
+        (
+            security.token_hash(token), row["account_id"], security.stamp(),
+            security.session_expiry(), request.headers.get("user-agent", "")[:200],
+        ),
+    )
+    _set_session_cookie(response, token)
+    return {"ok": True, "email": row["email"], "dropped": dropped}
 
 
 # ── mentions ────────────────────────────────────────────

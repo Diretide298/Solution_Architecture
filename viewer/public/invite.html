@@ -105,6 +105,40 @@
         </p>
       </section>
 
+      <!-- The same link shape, opened by somebody who already has an account
+           and has lost the way into it. No name field: they chose that when
+           the account was made, and a reset is not a second chance to become
+           somebody else. -->
+      <section id="reset-form" class="auth-state" hidden>
+        <h1 class="auth-title">Set a new password</h1>
+        <p class="auth-note">
+          For <b id="reset-email"></b>. Choosing one here replaces the old
+          password and signs you out of every other browser you were still
+          signed in on.
+        </p>
+
+        <div class="auth-field-row">
+          <label class="auth-label" for="reset-password">New password</label>
+          <input id="reset-password" class="auth-input" type="password"
+                 autocomplete="new-password" placeholder="At least 12 characters" />
+        </div>
+
+        <div class="auth-field-row">
+          <label class="auth-label" for="reset-confirm">Password again</label>
+          <input id="reset-confirm" class="auth-input" type="password" autocomplete="new-password" />
+        </div>
+
+        <p class="auth-error" id="reset-error" hidden></p>
+
+        <button id="reset-submit" class="auth-button" type="button">Set my password</button>
+        <p class="auth-note auth-fine">
+          Nobody else sees this, now or later — only a hash of it is kept, and
+          whoever made you this link never learns what you chose. Long beats
+          complicated: three or four unrelated words are easier to remember and
+          harder to guess than <code>Passw0rd!</code>
+        </p>
+      </section>
+
       <section id="done" class="auth-state" hidden>
         <h1 class="auth-title">You are in</h1>
         <p class="auth-note">
@@ -132,22 +166,37 @@
       import { startAuthBackground } from '/auth-bg.js';
       startAuthBackground(document.getElementById('invite-field'));
 
-      import { checkInvite, redeemInvite } from '/validation.js';
+      import { checkInvite, redeemInvite, checkReset, useReset } from '/validation.js';
 
       const $ = (id) => document.getElementById(id);
       const show = (which) => {
-        for (const id of ['checking', 'refused', 'form', 'done']) {
+        for (const id of ['checking', 'refused', 'form', 'reset-form', 'done']) {
           $(id).hidden = id !== which;
         }
       };
 
       // The token rides in the fragment, not the query, so it is never sent to
       // the server in a request line and never lands in an access log.
-      const token = decodeURIComponent(location.hash.slice(1));
+      // One page, two links. A reset says so in the fragment; anything else is
+      // an invite, which is the shape this page had before resets existed and
+      // the shape every link already sent out still has.
+      const raw = location.hash.slice(1);
+      const isReset = raw.startsWith('reset=');
+      const token = decodeURIComponent(isReset ? raw.slice('reset='.length) : raw);
 
       if (!token) {
         $('refused-why').textContent = 'This link has no invite in it.';
         show('refused');
+      } else if (isReset) {
+        try {
+          const who = await checkReset(token);
+          $('reset-email').textContent = who.email;
+          show('reset-form');
+          $('reset-password').focus();
+        } catch (error) {
+          $('refused-why').textContent = error.message;
+          show('refused');
+        }
       } else {
         try {
           const invite = await checkInvite(token);
@@ -188,6 +237,39 @@
       $('submit').onclick = submit;
       for (const id of ['name', 'password', 'confirm']) {
         $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+      }
+
+      const resetFail = (message) => {
+        $('reset-error').textContent = message;
+        $('reset-error').hidden = false;
+      };
+
+      const submitReset = async () => {
+        $('reset-error').hidden = true;
+        const password = $('reset-password').value;
+        if (password !== $('reset-confirm').value) {
+          return resetFail('Those two passwords are not the same.');
+        }
+        if (password.length < 12) {
+          return resetFail('A password needs at least 12 characters.');
+        }
+
+        $('reset-submit').disabled = true;
+        $('reset-submit').textContent = 'Setting…';
+        try {
+          const result = await useReset(token, password);
+          $('done-email').textContent = result.email;
+          show('done');
+        } catch (error) {
+          resetFail(error.message);
+          $('reset-submit').disabled = false;
+          $('reset-submit').textContent = 'Set my password';
+        }
+      };
+
+      $('reset-submit').onclick = submitReset;
+      for (const id of ['reset-password', 'reset-confirm']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submitReset(); });
       }
     </script>
   </body>

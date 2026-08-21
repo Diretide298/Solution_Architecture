@@ -82,7 +82,7 @@ const API_META = API_PUBLIC
  * `session` was in here and is the reason /api/session was 404ing.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|reset|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
 
 /**
  * Hand a request to the accounts service and give its answer back unchanged.

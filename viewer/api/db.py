@@ -37,6 +37,21 @@ CREATE TABLE IF NOT EXISTS account (
   last_seen_at  TEXT
 );
 
+CREATE TABLE IF NOT EXISTS reset (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  -- Bound to the account, not to an address. An invite fixes an address that
+  -- has no account yet; this one starts from the account that already exists,
+  -- so nothing about who it is for can be argued over later — and changing
+  -- somebody's address does not strand a live reset link on the old one.
+  account_id   INTEGER NOT NULL REFERENCES account(id),
+  token_hash   TEXT    NOT NULL UNIQUE,
+  created_by   INTEGER REFERENCES account(id),
+  created_at   TEXT    NOT NULL,
+  expires_at   TEXT    NOT NULL,
+  used_at      TEXT,
+  revoked_at   TEXT
+);
+
 CREATE TABLE IF NOT EXISTS invite (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   -- The address is fixed when the invite is made, not chosen by whoever opens
