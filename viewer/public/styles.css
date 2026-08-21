@@ -152,6 +152,14 @@
   --chrome-2-h: 52px;
   --topbar-h: 116px;
 
+  /* The brand bar, which every page has exactly one of — the first chrome row
+     on the viewer, the whole bar on the six standalone pages. It was 64px with
+     a 46px lockup here and 48px with a 28px lockup there, so moving between
+     them shifted the mark and moved every line below it. One height and one
+     lockup, named once, because the two numbers only look right together. */
+  --brand-bar-h: var(--chrome-1-h);
+  --brand-lockup-h: 46px;
+
   --radius: 10px;
   --radius-lg: 15px;
 
@@ -384,10 +392,147 @@ body { overflow-x: auto; }
    The white lockup vanishes on that, so those carry both cuts and CSS picks
    one, exactly as the small mark used to. */
 .chrome .brand { gap: 0; }
-.brand-lockup { height: 46px; width: auto; display: block; }
+/* The lockup goes home, on every page that has one.
+ *
+ * It was a bare <img> on the five standalone pages while the main view wrapped
+ * its own in an <a>, so the mark was clickable in the one place a reader was
+ * already home and inert everywhere they might want to leave. Nothing about a
+ * wordmark in the top-left says "not a link", so the click was being spent and
+ * swallowed rather than not attempted.
+ *
+ * The page's own name beside it stays outside the link: it is a label for where
+ * you are, and a label that navigates is a second, quieter surprise. */
+.brand-home {
+  display: block;
+  flex: none;
+  border-radius: 6px;
+  text-decoration: none;
+  /* the lockup carries its own weight; the link only has to not dim it */
+  opacity: 1;
+  transition: opacity 0.12s ease;
+}
+.brand-home:hover { opacity: 0.75; }
+.brand-home:focus-visible {
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: 3px;
+}
+
+.brand-lockup { height: var(--brand-lockup-h); width: auto; display: block; }
 .brand-lockup-night { display: none; }
 :root[data-theme="dark"] .brand-lockup-day { display: none; }
 :root[data-theme="dark"] .brand-lockup-night { display: block; }
+
+
+/* ── the loading curtain ─────────────────────────────────────────────
+   Every page opens behind this. The markup is inline in each of them so it is
+   painted by the first frame rather than by the first module; `loader.js` only
+   takes it down. See that file for why `window.load` is not what ends it.
+
+   The mark is drawn rather than served here — the two brand files are <img>
+   sources and CSS cannot reach inside one. This is the same geometry, lifted
+   from `brand/atlas-mark-light.svg`, with the ink as tokens so one copy serves
+   both themes.
+
+   The animation is a sweep, not a spin: the logo is a network on a sphere, so
+   it lights up round its own ring rather than rotating like a spinner. Each
+   element carries `--i`, its slot on that ring — computed from its angle round
+   the centre, not its order in the file, so the inner nodes join the same
+   rotation instead of reading as a second animation. */
+
+:root {
+  --loader-ink: #152B31;   /* the A, on a pale ground */
+  --loader-veil: #ffffff;
+}
+:root[data-theme="dark"] {
+  --loader-ink: #ffffff;
+  --loader-veil: #0f1113;
+}
+
+.atlas-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 400;             /* over the chrome, the rails and every dialog */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: var(--bg, var(--loader-veil));
+  opacity: 1;
+  transition: opacity 0.42s ease;
+}
+.atlas-loader.is-done { opacity: 0; pointer-events: none; }
+
+.al-mark { width: 92px; height: 92px; display: block; overflow: visible; }
+
+/* One period for everything, so the ring reads as a single pass rather than
+   as several things each doing their own thing at their own rate. */
+.al-link, .al-node {
+  /* The slot is quantised to 24ths of a turn; the delay is negative so every
+     element starts already at its own phase and the first frame drawn is a
+     sweep in progress, not twenty-nine things waiting to begin. */
+  animation-delay: calc(var(--i) * -0.0667s);
+  animation-duration: 1.6s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.al-link {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: none;
+  animation-name: al-link-sweep;
+}
+@keyframes al-link-sweep {
+  0%, 100% { opacity: 0.16; }
+  22%      { opacity: 0.8; }
+}
+
+.al-node {
+  fill: var(--accent-bright);
+  animation-name: al-node-sweep;
+}
+@keyframes al-node-sweep {
+  0%, 100% { opacity: 0.3; transform: scale(0.82); }
+  22%      { opacity: 1;   transform: scale(1.18); }
+}
+
+/* The identity, which does not animate. A wordmark that pulses is a wordmark
+   somebody has to wait for to read. */
+.al-glyph { fill: var(--loader-ink); }
+.al-stand {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.al-text {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-faint);
+  text-align: center;
+  max-width: 30ch;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Held at the top of the sweep rather than paused mid-fade: the mark is
+     still the mark, and this is the one frame of it worth showing. */
+  .al-link, .al-node { animation: none; opacity: 0.75; transform: none; }
+  .al-node { opacity: 1; }
+  .atlas-loader { transition: none; }
+}
+
+@media (max-width: 520px) {
+  .al-mark { width: 72px; height: 72px; }
+}
 
 /* ── the layer switch ──────────────────────────────────────────────
    A tray one step darker than the bar, so the pills sit *in* the chrome rather

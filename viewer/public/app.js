@@ -4,6 +4,7 @@ import { BoxDiagram } from './boxdiagram.js';
 import { StateMachine } from './statemachine.js';
 import { installTips, tip, tipFor } from './tips.js';
 import * as auth from './validation.js';
+import { hideLoader, loaderSays } from './loader.js';
 import {
   renderDecisions, openDoc, renderTimeline, renderSupersession, renderRegister,
   renderDecision, openDecision,
@@ -111,8 +112,12 @@ async function boot() {
   // something about it — carrying where they were headed, so a link into a
   // particular node still lands there afterwards.
   const signedIn = await auth.requireSignIn();
-  if (!signedIn) return;
+  // The curtain comes down either way. Signed out, requireSignIn is already
+  // navigating to the door, and a redirect that leaves a loading screen up
+  // behind it looks like the redirect is what stalled.
+  if (!signedIn) { hideLoader(); return; }
 
+  loaderSays('Reading the contracts, screens and state models…');
   await loadIndex();
   renderLayers();
   bindUI();
@@ -145,6 +150,9 @@ async function boot() {
   // The layer the app opens on never went through setLayer, so nothing has
   // asked for its parts yet.
   hydrateLayer();
+
+  // Last, and only here: everything above it is what the curtain was covering.
+  hideLoader();
 }
 
 /**
@@ -285,7 +293,7 @@ function renderLayers() {
   const bar = $('layers');
   bar.innerHTML = '';
   document.body.dataset.layer = state.layer;
-  for (const layer of visibleLayers()) {
+  visibleLayers().forEach((layer, index) => {
     const button = el('button', null, layer.label);
     button.dataset.layer = layer.key;
     button.title = layer.hint;
@@ -295,31 +303,50 @@ function renderLayers() {
     button.classList.toggle('active', layer.key === state.layer);
     button.onclick = () => setLayer(layer.key);
     bar.append(button);
-  }
+  });
   renderModes();
 }
 
-/** The single-key shortcut each view already answers to. */
-const MODE_KEYS = {
-  screen: 'W', journey: 'J', apps: 'P', waves: 'V', audit: 'A',
-  graph: 'G', structure: 'S', er: 'E', lineage: 'L', reader: 'R',
-  states: 'T', events: 'N', data: 'D', migrations: 'M', routing: 'O',
-  timeline: 'I', supersession: 'U', register: 'K', decisions: 'X',
-};
+/**
+ * The keys the view tabs answer to: the top row, left to right, matched to the
+ * tabs left to right.
+ *
+ * Positional rather than mnemonic, and the trade is deliberate. A mnemonic set
+ * has to be unique across every view in the package, so it drifts away from the
+ * word it stands for as the list grows — Waves was V, Migrations was M until
+ * Modules wanted M, and Screen was W because S had gone to Structure. A reader
+ * cannot guess any of those. This set is guessable from the shape of the tab
+ * bar alone: fourth tab, fourth key.
+ *
+ * They are read against the current layer, so the same key means the fourth tab
+ * of whatever page you are on. Ten is well past the six the longest layer has;
+ * the surplus is headroom, not a plan.
+ */
+const MODE_ROW = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
+
+/**
+ * The layer bar answers to 1, 2, 3 in the order it draws them, and says so
+ * nowhere. That row is the first thing anybody sees and the one place the
+ * package should look like a document rather than a tool — a digit in a box
+ * beside every name is five pieces of furniture bought to solve a problem the
+ * view tabs already solve, since anyone who has met Q there will try 1 here.
+ */
 
 function renderModes() {
   const bar = $('modes');
   bar.innerHTML = '';
-  for (const [key, label] of visibleModes(layerOf(state.layer))) {
+  visibleModes(layerOf(state.layer)).forEach(([key, label], index) => {
     const button = el('button', 'mode', label);
     button.dataset.mode = key;
     button.classList.toggle('active', key === state.mode);
     const about = MODE_TIPS[key];
     if (about) tip(button, about.title, about.body);
     // The shortcut is already bound; printing it on the tab is what turns it
-    // from a thing in the manual into a thing people use.
-    const hint = MODE_KEYS[key];
-    if (hint) button.append(el('kbd', 'mode-key', hint));
+    // from a thing in the manual into a thing people use. Taken from the
+    // position rather than the name, so the printed key and the bound key
+    // cannot disagree — they are the same index into the same row.
+    const hint = MODE_ROW[index];
+    if (hint) button.append(el('kbd', 'mode-key', hint.toUpperCase()));
     if (key === 'audit') {
       const badge = el('span', 'audit-count');
       badge.id = 'audit-count';
@@ -327,7 +354,7 @@ function renderModes() {
     }
     button.onclick = () => setMode(key);
     bar.append(button);
-  }
+  });
   updateAuditBadge();
   renderLayerSummary();
 }
@@ -6999,7 +7026,13 @@ function bindAccountUI() {
 
   $('signout').onclick = async () => {
     await auth.signOut();
-    closeAccountPanel();
+    // Same landing as Sign out everywhere below, and for the same reason: the
+    // session behind this panel is gone, so closing the panel would leave a
+    // fully drawn viewer — the tree, the graph, somebody's verdicts — sitting
+    // there looking signed in. Every next click would 401 and bounce, which
+    // reads as the app breaking rather than as the sign-out having worked.
+    // Arriving at the door is also how somebody knows it did.
+    location.replace('/login.html');
   };
 
   // Two presses, and the second one is a different button under a paragraph
@@ -7349,10 +7382,28 @@ function bindUI() {
       target.isContentEditable
     ) return;
 
-    // 1 / 2 / 3 pick the layer, in the order they appear in the bar
+    // 1 2 3 pick the layer, in the order the bar draws them. visibleLayers()
+    // rather than LAYERS, because a client is not shown Decisions and the
+    // digits have to match the bar in front of *this* reader, not the full set.
+    const shown = visibleLayers();
     const layerIndex = Number(e.key) - 1;
-    if (layerIndex >= 0 && layerIndex < LAYERS.length) {
-      setLayer(LAYERS[layerIndex].key);
+    if (Number.isInteger(layerIndex) && layerIndex >= 0 && layerIndex < shown.length) {
+      setLayer(shown[layerIndex].key);
+      return;
+    }
+
+    // q w e r t y pick the view, matched to the tabs left to right. Read
+    // against the current layer every time, so the fourth key is the fourth tab
+    // of the page you are on rather than a fixed view somewhere else — which is
+    // also why none of these jump layers any more. Moving between pages is what
+    // the digits are for, and a key that silently changed both was the thing
+    // that made the old set hard to trust.
+    const slot = MODE_ROW.indexOf(e.key.toLowerCase());
+    if (slot >= 0) {
+      const modes = visibleModes(layerOf(state.layer));
+      // A key past the end of this layer's tabs does nothing, deliberately: the
+      // alternative is falling through to whatever else that letter once meant.
+      if (slot < modes.length) setMode(modes[slot][0]);
       return;
     }
 
@@ -7365,18 +7416,7 @@ function bindUI() {
       }
       renderSideNote();
       renderTree();
-    } else if (e.key === 'g') setMode('graph');
-    else if (e.key === 's') setMode('structure');
-    else if (e.key === 'e') setMode('er');
-    else if (e.key === 'j') setMode('journey');
-    else if (e.key === 'w') setMode('screen');
-    else if (e.key === 'p') setMode('apps');
-    else if (e.key === 'd') setMode('data');
-    else if (e.key === 'v') setMode('migrations');
-    else if (e.key === 'o') setMode('routing');
-    else if (e.key === 'r') setMode('reader');
-    else if (e.key === 'a') setMode('audit');
-    else if (e.key === 'l' && state.selectedId) {
+    } else if (e.key === 'l' && state.selectedId) {
       state.graphScope = 'local';
       for (const b of $('graph-scope').querySelectorAll('button')) {
         b.classList.toggle('active', b.dataset.scope === 'local');
@@ -7387,4 +7427,7 @@ function bindUI() {
   });
 }
 
-boot();
+// A throw anywhere in boot() would otherwise leave the curtain up for the full
+// twelve seconds of the head guard, turning a page that failed fast into one
+// that looks like it hung. The error still reaches the console.
+boot().catch((error) => { hideLoader(); throw error; });

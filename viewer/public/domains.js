@@ -39,6 +39,7 @@
  */
 
 import '/theme.js';   // the saved day/night choice, before anything paints
+import { hideLoader } from '/loader.js';
 import * as auth from '/validation.js';
 
 const $ = (id) => document.getElementById(id);
@@ -896,10 +897,12 @@ function fail(message) {
     state.ctx = buildContext({ index, journeys, lineage, domain });
     await loadProse(state.lens, state.ctx);
   } catch (error) {
+    hideLoader();
     return fail(`Could not read the package: ${error.message}`);
   }
 
   draw();
+  hideLoader();
 
   window.addEventListener('hashchange', () => {
     const key = location.hash.slice(1);

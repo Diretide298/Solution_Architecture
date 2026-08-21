@@ -13,6 +13,7 @@
  */
 import * as auth from '/validation.js';
 import { hue } from '/core.js';
+import { hideLoader } from '/loader.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -1005,7 +1006,7 @@ function redraw() {
 }
 
 (async () => {
-  if (!(await auth.requireSignIn())) return;
+  if (!(await auth.requireSignIn())) return hideLoader();
   const me = auth.account();
   $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
   try {
@@ -1019,4 +1020,5 @@ function redraw() {
   renderControls();
   redraw();
   renderMentions();
+  hideLoader();
 })();

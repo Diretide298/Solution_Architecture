@@ -28,11 +28,32 @@ const API_DEPLOYED = 'https://atlasapi.ainfinite.ai';
 // check harnesses set, and the meta tag is there for a second deployment on
 // some other pair of names.
 const workstation = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-const API = workstation
+
+/** `ticvai-api` in localStorage is what the check harnesses set; the meta tag is
+ *  there for a deployment on some other pair of names. Neither is consulted on a
+ *  server — see above. An empty string is a deliberate value, not an absence:
+ *  it means "this origin", which is what a one-origin deployment wants. */
+const OVERRIDE = workstation
   ? (localStorage.getItem('ticvai-api')
-     ?? document.querySelector('meta[name="ticvai-api"]')?.content?.trim()
-     ?? 'http://localhost:8787')
-  : API_DEPLOYED;
+     ?? document.querySelector('meta[name="ticvai-api"]')?.content?.trim())
+  : null;
+
+const API = workstation ? (OVERRIDE ?? 'http://localhost:8787') : API_DEPLOYED;
+
+/**
+ * And where the *package* is, which is a different question with a different
+ * answer on a workstation.
+ *
+ * The two are one address on the server — both names resolve to the API host,
+ * which forwards the thirteen package paths to the reading server. They are two
+ * on a workstation: the accounts service is a separate process on :8787 and has
+ * never had /api/index, /api/session, /api/tooltips or /api/domains, so sending
+ * the package there is four 404s and a viewer that draws nothing.
+ *
+ * The reading server is the origin this page was served from, so '' is both the
+ * shortest way to say it and the only one that stays right when the port moves.
+ */
+const PKG = workstation ? (OVERRIDE ?? '') : API_DEPLOYED;
 
 // This is only ever the *accounts* service — auth, invites, verdicts, mentions.
 // The reading server owns /api/index, /api/session, /api/tooltips, /api/domains
@@ -94,8 +115,8 @@ export const asksForWork = (verdict) => ASKS_FOR_WORK.has(verdict);
  * apiUrl() is the same join without the fetch, for the two places that cannot
  * use one: an EventSource, and an anchor the reader clicks.
  */
-export const apiUrl = (path) => `${API}${path}`;
-export const apiFetch = (path, init) => fetch(`${API}${path}`, { credentials: 'include', ...init });
+export const apiUrl = (path) => `${PKG}${path}`;
+export const apiFetch = (path, init) => fetch(`${PKG}${path}`, { credentials: 'include', ...init });
 
 /** Cached so every verdict block on a page does not ask again. */
 let session = { signedIn: false, account: null, reachable: true };

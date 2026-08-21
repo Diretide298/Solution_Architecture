@@ -1406,11 +1406,25 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
    different job from reading contracts, and it wants room for a table. */
 
 .admin-page { background: var(--bg); }
+/* Same height as the viewer's first chrome row, and the same lockup inside it,
+   so the mark does not jump when a reader follows a link off the main view. The
+   height is set rather than left to the padding: the bar's contents differ page
+   to page and a bar measured by whatever is tallest inside it is a bar that
+   changes height for reasons nobody can see. */
 .admin-bar {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 14px; padding: 10px 18px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-panel);
+  gap: 14px;
+  height: var(--brand-bar-h);
+  padding: 0 18px;
+  /* The viewer's chrome is dark in both themes on purpose — it is where the app
+     talks about itself, and it should not move when you change how you are
+     reading. These bars were following the theme instead, so the same strip of
+     screen was charcoal on one page and near-white on the next. Same tokens
+     now, which is also why the text below is named rather than inherited: on a
+     surface that does not follow the theme, neither can the ink. */
+  background: var(--chrome-1);
+  border-bottom: 1px solid var(--chrome-border);
+  color: var(--chrome-text);
   position: sticky; top: 0; z-index: 5;
 }
 .admin-bar-right { display: flex; align-items: center; gap: 12px; }
@@ -1421,24 +1435,47 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
    that reading as a subtitle to the brand rather than a second label floating
    next to it. */
 .admin-bar .brand { gap: 10px; }
-.admin-bar .brand-lockup { height: 28px; }
+
+/* The bar is dark in both themes now, so the day cut — which is the wordmark in
+   black ink, for a light surface — has nothing to sit on. It would be invisible
+   rather than merely wrong. The white-ink cut is correct on this bar in both
+   themes, the same way the viewer's chrome ships one image and no pair. */
+.admin-bar .brand-lockup-day { display: none; }
+.admin-bar .brand-lockup-night { display: block; }
+
 .admin-bar .brand-sub {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: var(--text-faint);
+  color: var(--chrome-muted);
   padding-left: 10px;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid color-mix(in srgb, var(--chrome-text) 20%, transparent);
   line-height: 1.7;
 }
 
 @media (max-width: 640px) {
   /* The subtitle is the first thing to go: the page's own heading says the
      same thing one line further down. */
-  .admin-bar .brand-lockup { height: 24px; }
+  /* Both shrink together, so the proportion the bar was designed at holds. */
+  .admin-bar { height: 52px; }
+  .admin-bar .brand-lockup { height: 34px; }
   .admin-bar .brand-sub { display: none; }
 }
-.admin-who { font-size: 12px; color: var(--text-faint); }
+.admin-who { font-size: 12px; color: var(--chrome-muted); }
+
+/* Chips live on the chrome here, not on a panel, so they take the chrome's ink
+   rather than the page's — the base .chip is drawn for a surface that follows
+   the theme and goes to near-black text on charcoal in day. */
+.admin-bar .chip {
+  background: color-mix(in srgb, var(--chrome-text) 8%, transparent);
+  border-color: color-mix(in srgb, var(--chrome-text) 22%, transparent);
+  color: var(--chrome-muted);
+}
+.admin-bar .chip:hover {
+  background: color-mix(in srgb, var(--chrome-text) 15%, transparent);
+  border-color: color-mix(in srgb, var(--chrome-text) 40%, transparent);
+  color: var(--chrome-text);
+}
 .admin-main { max-width: 940px; margin: 0 auto; padding: 22px 18px 60px; }
 
 /* ── review activity ────────────────────────────────────────────────── */
