@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Inventory &amp; Procurement · Board 3 — Transfers &amp; Counts <span style="font-weight:600;color:#6B7280">(10 screens)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>staff · inventory control</div>
+      <div>1280 × 700 · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Counting is how the ledger earns its authority. These screens move stock between locations, count what is actually there, and reconcile the difference with a reason rather than a rounding.</p>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="inv-3a" data-screen-label="INV-3A" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3A</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Inventory Control Command Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">accuracy 96.4%</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Count accuracy, open variance and transfers in flight, with the locations that are drifting fastest.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">22 locations<br>14 open var</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Inventory Control Command Center</div><div style="font-size:10px;color:#9AA5B6">All locations · period to date · 24 Aug</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All locations<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Count calendar</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Start count</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(6,1fr);gap:10px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Count accuracy</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#A81E1E">96.4%</span><span style="font-size:10px;color:#A81E1E;font-weight:600">target 98%</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Open variance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">14</span><span style="font-size:10px;color:#8A4708;font-weight:600">AED 42.8k</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Transfers in flight</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">18</span><span style="font-size:10px;color:#6B7280;font-weight:600">4 disputed</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Counts due</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">6</span><span style="font-size:10px;color:#A81E1E;font-weight:600">2 overdue</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Shrinkage</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">1.2%</span><span style="font-size:10px;color:#8A4708;font-weight:600">AED 58k</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Adjustments</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">86</span><span style="font-size:10px;color:#6B7280;font-weight:600">12 need approval</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.3fr 1fr;gap:12px;min-height:0">
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;height:180px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Accuracy against target</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">8 weeks · target 98%</span></div>
+                  <svg viewBox="0 0 420 88" width="100%" height="88" style="display:block;flex:1;min-height:0">
+                    <line x1="0" y1="24" x2="420" y2="24" stroke="#CBE8DA" stroke-width="1" stroke-dasharray="4 4"></line>
+                    <polyline points="10,34 68,38 126,36 184,44 242,48 300,52 358,58 412,62" fill="none" stroke="#DC2626" stroke-width="2.4" stroke-linejoin="round"></polyline>
+                    <circle cx="412" cy="62" r="3.6" fill="#DC2626"></circle>
+                    <line x1="0" y1="87" x2="420" y2="87" stroke="#EDF1F6" stroke-width="1"></line>
+                  </svg>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">98.2% → 96.4% over eight weeks · the drift is steady, not a single event</div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Locations by accuracy</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">worst first</span></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr .8fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Location</div><div style="text-align:right">Accuracy</div><div style="text-align:right">Variance</div><div style="text-align:right">Last count</div><div style="text-align:right">Open</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#A81E1E">Beach Kiosk</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">88.2%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">12.4k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">18 Aug</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Food Truck 01</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">91.4%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6.2k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">20 Aug</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Wave Restaurant</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">95.6%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8.4k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">22 Aug</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Central DC</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">97.2%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11.6k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">24 Aug</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Main Restaurant</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">98.8%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">4.2k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">24 Aug</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2</div></div>
+                  <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">5 of 22 locations · 14 open variances · AED 42.8k</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">All locations</span></div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;height:180px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Variance by cause</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">AED 42.8k open</span></div>
+                  <div style="display:flex;height:12px;border-radius:6px;overflow:hidden"><div style="width:36%;background:#DC2626"></div><div style="width:24%;background:#B4530A"></div><div style="width:22%;background:#0D6EFD"></div><div style="width:18%;background:#C7D3E4"></div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#DC2626"></span>Unexplained</span><span style="font-family:'IBM Plex Mono',monospace">15.4k</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#B4530A"></span>Unreasoned moves</span><span style="font-family:'IBM Plex Mono',monospace">10.3k</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#0D6EFD"></span>Transfer shorts</span><span style="font-family:'IBM Plex Mono',monospace">9.4k</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#C7D3E4"></span>UoM errors</span><span style="font-family:'IBM Plex Mono',monospace">7.7k</span></div>
+                  </div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                  <div style="padding:12px 14px 9px;font-size:12.5px;font-weight:800;letter-spacing:-.01em">Needs action</div>
+                  <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Beach Kiosk at 88.2% accuracy</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Count overdue 6 days · four variances still open</div></div><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E;height:18px">Count</span></div>
+                  <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">AED 15.4k unexplained</div><div style="font-size:10px;color:#8494A8;margin-top:1px">36% of open variance has no assigned cause</div></div><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E;height:18px">Variance</span></div>
+                  <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#B4530A;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">4 transfers disputed</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Stock sits with the sender until each is resolved</div></div><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708;height:18px">Transfer</span></div>
+                  <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#B4530A;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">12 adjustments awaiting approval</div><div style="font-size:10px;color:#8494A8;margin-top:1px">AED 18.6k · oldest raised 3 days ago</div></div><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708;height:18px">Approval</span></div>
+                  <div style="display:flex;gap:9px;padding:9px 14px"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Count Beach Kiosk daily</div><div style="font-size:10px;color:#8494A8;margin-top:1px">22 high-value lines · 12 minutes per pass</div></div><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#EDF3FF;color:#0A4FB8;height:18px">AI</span></div>
+                  <div style="margin-top:auto;flex:none;padding:10px 14px;border-top:1px solid #EDF1F6;display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">5 open · 2 urgent</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Review all</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getInventoryControlOverview · getCountAccuracy · listOpenVariances · listControlExceptions</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · partialData · countOverdue · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←session · locationId←filter · period←filter</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3b">INV-3B</a> · Board 2 · INV-2J</div>
+      </div>
+    </div>
+
+    <div id="inv-3b" data-screen-label="INV-3B" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3B</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Inventory Transfer Management</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">2 lines short</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">A transfer request is a claim on someone else's stock. Each line shows what the sending location gives up, so the approver is deciding between two locations rather than filling a form.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">TRQ-0884<br>pending</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Transfer request TRQ-0884</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">Central DC → Beach Kiosk · needed 25 Aug 06:00 · raised by outlet manager</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #F5C9C9;border-radius:8px;background:#FDECEC;font-size:11px;font-weight:700;color:#A81E1E">Reject</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Approve partial</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Approve &amp; create transfer</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.65fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="flex:none;display:flex;gap:7px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6;align-items:center">
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:10.5px;font-weight:700">All 8 lines</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #F5C9C9;border-radius:8px;background:#FDECEC;font-size:10.5px;font-weight:700;color:#A81E1E">Cannot fill 2</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Fillable 6</div>
+                <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">AED 6,842 requested</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;padding:10px 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Item</div><div style="text-align:right">Asked</div><div style="text-align:right">Approve</div><div style="text-align:right">Sender left</div><div style="text-align:right">Sender cover</div><div>Effect on sender</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Fresh Sea Bass</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-1180 · kg</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">16.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">4.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">0.0 d</div><div style="font-size:10.5px;color:#A81E1E">Sender goes to zero</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Wagyu Beef Patty</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-1044 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">36</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">0.0 d</div><div style="font-size:10.5px;color:#A81E1E">Sender has none · on PO</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Brioche Bun</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-2201 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">348</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">2.4 d</div><div style="font-size:10.5px;color:#5A6577">Above par after</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Beef Patty 150g</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-1042 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">180</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">180</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">462</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">2.8 d</div><div style="font-size:10.5px;color:#5A6577">Above par after</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">French Fries</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-1420 · kg</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">184.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">3.6 d</div><div style="font-size:10.5px;color:#5A6577">Above par after</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Cheddar Slice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-1188 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1,286</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">4.2 d</div><div style="font-size:10.5px;color:#5A6577">Above par after</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Mineral Water · 1L</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-7712 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">360</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">360</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2,840</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">6.8 d</div><div style="font-size:10.5px;color:#5A6577">Above par after</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .7fr .8fr 1fr;align-items:center;padding:7px 14px;font-size:11.5px"><div><div style="font-weight:600">Packaging · set</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">ITM-9004 · set</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">500</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">500</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4,180</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">9.4 d</div><div style="font-size:10.5px;color:#5A6577">Above par after</div></div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">8 lines · 6 fillable · AED 4,286 approvable</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Fill from another location</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two lines cannot be filled</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">Decide</span></div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Sea bass would take the sender to zero on the day it also sells 6.2 kg. Wagyu is already at zero and on an open PO arriving 26 Aug.</div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;background:#F4F8FF;border:1px solid #BBD6FF"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8;font-weight:600">1</span><div style="flex:1"><div style="font-size:11px;font-weight:600">Approve 4 kg sea bass, defer wagyu</div><div style="font-size:9.5px;color:#5A6577">both keep one service · wagyu ships 26 Aug</div></div></div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;border:1px solid #E3E8F0"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8;font-weight:600">2</span><div style="flex:1"><div style="font-size:11px;font-weight:600">Source sea bass from Wave Restaurant</div><div style="font-size:9.5px;color:#5A6577">14 kg on hand · 40 min drive</div></div></div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;border:1px solid #E3E8F0"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8;font-weight:600">3</span><div style="flex:1"><div style="font-size:11px;font-weight:600">Reject both · kiosk 86s two dishes</div><div style="font-size:9.5px;color:#5A6577">AED 2,140 of forecast sales lost</div></div></div>
+                </div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11.5px;font-weight:700;color:#5A6577">Later</div><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Apply option 1</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Why this was raised</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Source</span><span style="font-weight:600">Auto from par gap</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Requester</span><span style="font-weight:600">Beach Kiosk manager</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Items below par</span><span style="font-family:'IBM Plex Mono',monospace">7 of 8</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Forecast uplift</span><span style="font-family:'IBM Plex Mono',monospace">+22% Fri</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Requests in queue</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">TRQ-0884 · Beach Kiosk</span><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8">reviewing</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">TRQ-0883 · Pool Bar</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">pending</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">TRQ-0881 · Wave Rest.</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">approved</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">TRQ-0879 · Food Truck</span><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E">rejected</span></div>
+                <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.5">An approved request becomes a transfer with a picking task; nothing moves on approval alone.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getTransferRequest · checkSenderCoverage · approveTransferRequest · rejectTransferRequest · createTransfer</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · pending · cannotFill · partiallyApproved · approvalRequired</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · requestId←queue · locationId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3a">INV-3A</a> · Board 2 · INV-2G</div>
+      </div>
+    </div>
+
+    <div id="inv-3c" data-screen-label="INV-3C" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3C</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Transfer Dispatch, Receipt &amp; Discrepancy Control</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">3 discrepancies</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Stock in transit belongs to nobody until it is received. Each line is dispatched, received and reconciled, and a difference must be owned before the transfer can close.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">TRF-0918<br>receiving</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Receive TRF-0918</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">Central DC → Beach Kiosk · dispatched 04:20 · arrived 05:48 · driver R. Ali</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Print GRN</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Receive all matched</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Close transfer</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.62fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="flex:none;display:flex;gap:7px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6;align-items:center">
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:10.5px;font-weight:700">All 8</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Matched 5</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #F5C9C9;border-radius:8px;background:#FDECEC;font-size:10.5px;font-weight:700;color:#A81E1E">Short 2</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Rejected 1</div>
+                <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">reefer 3.2 °C on arrival</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;padding:10px 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Item</div><div style="text-align:right">Sent</div><div style="text-align:right">Received</div><div style="text-align:right">Diff</div><div>Batch · expiry</div><div style="text-align:right">State</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Fresh Sea Bass</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">kg</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">2.6</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−1.4</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">GS-8841 · 26 Aug</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Short</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Brioche Bun</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">216</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−24</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">BK-0918 · 26 Aug</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Short</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFCF5"><div><div style="font-weight:600">Milk · full fat</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">L</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">48</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">−48</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A4708">crate at 9 °C</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Rejected</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Beef Patty 150g</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">180</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">180</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">0</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">BC-2210 · 30 Aug</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Matched</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">French Fries</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">kg</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40.0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">0</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">FZ-1180 · 14 Feb</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Matched</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Cheddar Slice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">0</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">DY-4402 · 08 Sep</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Matched</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Mineral Water · 1L</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">360</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">360</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">0</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">AM-7712 · 01 Jun</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Matched</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .6fr .7fr .6fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px"><div><div style="font-weight:600">Packaging · set</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">set</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">500</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">500</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">0</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">PK-1102 · n/a</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Matched</span></div></div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">8 lines · 5 matched · AED 1,268 in dispute</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Raise claim</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">In-transit chain</div>
+                <div style="display:flex;align-items:center;gap:0">
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;width:56px"><span style="width:13px;height:13px;border-radius:50%;background:#0E9F6E;box-shadow:0 0 0 3px #E8F6F0"></span><span style="font-size:9.5px;font-weight:700">Picked</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#8494A8">03:40</span></div>
+                  <div style="flex:1;height:3px;background:#0E9F6E;border-radius:2px"></div>
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;width:56px"><span style="width:13px;height:13px;border-radius:50%;background:#0E9F6E;box-shadow:0 0 0 3px #E8F6F0"></span><span style="font-size:9.5px;font-weight:700">Dispatched</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#8494A8">04:20</span></div>
+                  <div style="flex:1;height:3px;background:#0E9F6E;border-radius:2px"></div>
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;width:56px"><span style="width:13px;height:13px;border-radius:50%;background:#0E9F6E;box-shadow:0 0 0 3px #E8F6F0"></span><span style="font-size:9.5px;font-weight:700">Arrived</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#8494A8">05:48</span></div>
+                  <div style="flex:1;height:3px;background:#0D6EFD;border-radius:2px"></div>
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;width:56px"><span style="width:13px;height:13px;border-radius:50%;background:#0D6EFD;box-shadow:0 0 0 3px #EDF3FF"></span><span style="font-size:9.5px;font-weight:700;color:#0D6EFD">Receiving</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#0D6EFD">now</span></div>
+                </div>
+                <div style="padding:8px 10px;border-radius:9px;background:#F4F8FF;border:1px solid #BBD6FF;font-size:10.5px;color:#0A4FB8;line-height:1.5">Stock stays on the sender's books until this receipt is confirmed, so neither location can sell the disputed 1.4 kg.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Assign the difference</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">AED 1,268</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span>Sea bass 1.4 kg</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">182</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span>Brioche 24 pc</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">50</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span>Milk 48 L rejected</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">368</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:600"><span>Pallet damage claim</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">668</span></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Owner</span><div style="height:32px;display:flex;align-items:center;justify-content:space-between;border:1px solid #E3E8F0;border-radius:9px;padding:0 11px;font-size:11.5px;font-weight:600">Central DC · carrier claim<span style="color:#9AA5B6">▾</span></div></div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11.5px;font-weight:700;color:#5A6577">Accept short</div><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Raise claim</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Transfers in flight</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">TRF-0918 · Beach Kiosk</span><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8">receiving</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">TRF-0917 · Pool Bar</span><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8">in transit</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">TRF-0915 · Wave Rest.</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">disputed</span></div>
+                <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.5">Four of the 18 transfers in flight are disputed, which is where AED 9.4k of the open variance sits.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getTransfer · receiveTransferLine · rejectTransferLine · assignDiscrepancy · closeTransfer</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · receiving · discrepancy · coldChainBreach · closed</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · transferId←<a href="#inv-3b">INV-3B</a> · locationId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3g">INV-3G</a> · <a href="#inv-3a">INV-3A</a></div>
+      </div>
+    </div>
+
+    <div id="inv-3d" data-screen-label="INV-3D" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3D</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Stock Count Planning &amp; Scheduling</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">2 overdue</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Count frequency follows value and volatility, not the calendar. The schedule shows which items earn a daily pass and which are counted once a quarter.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">6 due<br>2 overdue</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Stock Count Planning &amp; Scheduling</div><div style="font-size:10px;color:#9AA5B6">All locations · week 35 · 6 counts due</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Week 35<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Edit ABC rules</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Schedule count</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;height:184px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Count calendar · week 35</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">rows are locations · shaded cells are scheduled passes</span></div>
+              <div style="flex:1;display:grid;grid-template-columns:118px repeat(7,1fr);grid-template-rows:auto repeat(4,1fr);gap:4px;min-height:0">
+                <div></div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4;text-align:center">Mon</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4;text-align:center">Tue</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4;text-align:center">Wed</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4;text-align:center">Thu</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4;text-align:center">Fri</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4;text-align:center">Sat</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4;text-align:center">Sun</div>
+
+                <div style="font-size:10.5px;font-weight:600;display:flex;align-items:center">Central DC</div>
+                <div style="border-radius:5px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff">A</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff">A</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff">A</div>
+                <div style="border-radius:5px;background:#DCE8FD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#0A4FB8">B</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+
+                <div style="font-size:10.5px;font-weight:600;display:flex;align-items:center;color:#A81E1E">Beach Kiosk</div>
+                <div style="border-radius:5px;background:#FDECEC;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#A81E1E">!</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff">A</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+
+                <div style="font-size:10.5px;font-weight:600;display:flex;align-items:center">Main Restaurant</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff">A</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#DCE8FD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#0A4FB8">B</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#EEF2F7;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#5A6577">C</div>
+
+                <div style="font-size:10.5px;font-weight:600;display:flex;align-items:center;color:#A81E1E">Food Truck 01</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#FDECEC;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#A81E1E">!</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#DCE8FD;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#0A4FB8">B</div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+                <div style="border-radius:5px;background:#F1F4F9"></div>
+              </div>
+              <div style="display:flex;gap:12px;font-size:10px;color:#6B7280"><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#0D6EFD"></span>A class · daily</span><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#DCE8FD"></span>B · weekly</span><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#EEF2F7"></span>C · monthly</span><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:#FDECEC"></span>missed</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.4fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">ABC classification</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">by value and volatility</span></div>
+                <div style="display:grid;grid-template-columns:.6fr .8fr .8fr .9fr .9fr .9fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Class</div><div style="text-align:right">Items</div><div style="text-align:right">Value share</div><div style="text-align:right">Frequency</div><div style="text-align:right">Tolerance</div><div style="text-align:right">Accuracy</div></div>
+                <div style="display:grid;grid-template-columns:.6fr .8fr .8fr .9fr .9fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:700">A</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">186</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">72%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">Daily</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0.5%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">98.4%</div></div>
+                <div style="display:grid;grid-template-columns:.6fr .8fr .8fr .9fr .9fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:700">B</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">642</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">22%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">Weekly</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1.5%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">95.8%</div></div>
+                <div style="display:grid;grid-template-columns:.6fr .8fr .8fr .9fr .9fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:700">C</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2,486</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">Monthly</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3.0%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">92.1%</div></div>
+                <div style="display:grid;grid-template-columns:.6fr .8fr .8fr .9fr .9fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:700;color:#8A4708">V</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">42</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">Every shift</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">99.6%</div></div>
+                <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">V class is controlled stock · counted every shift regardless of value</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Rules</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two counts missed</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FFF3E0;color:#8A4708">Reschedule</span></div>
+                  <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">Beach Kiosk and Food Truck 01 both missed their A-class pass. Both are the two worst locations on accuracy, so the schedule is being skipped exactly where it matters most.</div>
+                  <div style="display:flex;gap:6px"><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11px;font-weight:700;color:#5A6577">Defer</div><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Count today</div></div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Effort against value</div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:74px;color:#5A6577">A · 72% value</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:34%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:44px;text-align:right">34% time</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:74px;color:#5A6577">B · 22%</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:28%;height:7px;border-radius:4px;background:#00B8FF"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:44px;text-align:right">28%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:74px;color:#5A6577">C · 6%</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:38%;height:7px;border-radius:4px;background:#B4530A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:44px;text-align:right">38%</span></div>
+                  <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.5">C class takes more counting hours than A while holding 6% of the value — the case for moving it to quarterly sampling.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getCountSchedule · setAbcRules · scheduleCount · rescheduleCount · getCountEffort</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · countOverdue · draft · conflict · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · locationId←filter · week←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3e">INV-3E</a> · <a href="#inv-3a">INV-3A</a></div>
+      </div>
+    </div>
+
+    <div id="inv-3e" data-screen-label="INV-3E" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3E</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Physical &amp; Cycle Count Execution</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">blind · 62 of 128</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Blind count: the system quantity stays hidden until the counter commits a number. Anything outside the item's tolerance goes to recount before it can be posted.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">CNT-0248<br>62 of 128</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Count CNT-0248 · Central DC</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">cycle count · started 06:10 · counter M. Idris · zone 3 of 6</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Pause</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Print sheet</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Post count</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Progress</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">62 / 128</span><span style="font-size:10px;color:#6B7280;font-weight:600">48% counted</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Within tolerance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B7A55">51</span><span style="font-size:10px;color:#6B7280;font-weight:600">82% of counted</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Needs recount</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#A81E1E">11</span><span style="font-size:10px;color:#A81E1E;font-weight:600">over tolerance</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Net variance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">−3,142</span><span style="font-size:10px;color:#A81E1E;font-weight:600">so far</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Elapsed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">48m</span><span style="font-size:10px;color:#6B7280;font-weight:600">est 52m left</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.55fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="flex:none;display:flex;gap:7px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6;align-items:center">
+                  <div style="height:29px;display:flex;align-items:center;gap:6px;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Zone 3 · pick face<span style="color:#9AA5B6">▾</span></div>
+                  <div style="height:29px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#EDF3FF;border:1px solid #BBD6FF;font-size:10.5px;font-weight:700;color:#0A4FB8">Blind count on</div>
+                  <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">system qty revealed after entry</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;padding:10px 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Item · bin</div><div style="text-align:right">Counted</div><div style="text-align:right">System</div><div style="text-align:right">Diff</div><div style="text-align:right">Value</div><div style="text-align:right">State</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F4F8FF"><div><div style="font-weight:700;color:#0D6EFD">Fresh Sea Bass</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">A-04-12 · kg</div></div><div style="display:flex;justify-content:flex-end"><div style="height:26px;width:58px;display:flex;align-items:center;justify-content:flex-end;border:1.5px solid #0D6EFD;border-radius:7px;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;background:#fff">10.8</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#C7D3E4">hidden</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#C7D3E4">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#C7D3E4">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#EDF3FF;color:#0A4FB8">Entering</span></div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Wagyu Beef Patty</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">A-04-08 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">36</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−6</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−216</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Recount</span></div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Lobster Tail</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">A-05-02 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">14</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−288</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Recount</span></div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Beef Patty 150g</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">A-03-14 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">182</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">186</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">−4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">−26</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Accepted</span></div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Cheddar Slice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">B-01-06 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">408</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">420</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">−12</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">−16</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Accepted</span></div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Brioche Bun</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">B-02-04 · pc</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">282</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">288</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">−6</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">−13</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Accepted</span></div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Burger Sauce</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">B-03-08 · kg</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4.4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4.2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">+0.2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">+6</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Accepted</span></div></div>
+                <div style="display:grid;grid-template-columns:1.3fr .7fr .7fr .6fr .7fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px"><div><div style="font-weight:600">Tomato</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">C-01-02 · kg</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18.2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18.4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">−0.2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">−2</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Accepted</span></div></div>
+                <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">8 of 62 counted · tolerance applied per ABC class</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Next zone</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Zone progress</div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:88px;color:#5A6577">Dry store</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:100%;height:7px;border-radius:4px;background:#0E9F6E"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:38px;text-align:right">28/28</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:88px;color:#5A6577">Freezer</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:100%;height:7px;border-radius:4px;background:#0E9F6E"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:38px;text-align:right">18/18</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:88px;color:#5A6577">Pick face</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:48%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:38px;text-align:right">16/34</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:88px;color:#5A6577">Bulk</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:0%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:38px;text-align:right">0/24</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:88px;color:#5A6577">Quarantine</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:0%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:38px;text-align:right">0/24</span></div>
+                </div>
+                <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Recount required</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">11 items</span></div>
+                  <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Wagyu is short by 6 and lobster by 4 — the same quantities that were short on TRF-0918 this morning. Recount, then reconcile against the transfer rather than posting a loss.</div>
+                  <div style="display:flex;gap:6px"><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11px;font-weight:700;color:#5A6577">View transfer</div><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Recount 11</div></div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;min-height:0">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Count history</div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">21 Aug</span><span style="font-family:'IBM Plex Mono',monospace">−1.8%</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">14 Aug</span><span style="font-family:'IBM Plex Mono',monospace">−2.1%</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">07 Aug</span><span style="font-family:'IBM Plex Mono',monospace">−1.4%</span></div>
+                  <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.5">Variance is consistently negative, which points at a process rather than counting error.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · startStockCount · enterCountLine · requestRecount · postStockCount · getCountHistory</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · counting · recountRequired · <span style="color:#8A6D00">offline</span> · posted</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · countId←<a href="#inv-3d">INV-3D</a> · zoneId←tab</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3f">INV-3F</a> · <a href="#inv-3c">INV-3C</a></div>
+      </div>
+    </div>
+
+    <div id="inv-3f" data-screen-label="INV-3F" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3F</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Variance Investigation &amp; Root-Cause Management</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">36% unexplained</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">A variance is not closed by adjusting it. Each one is traced to a movement, a document or a person, and only then written off.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">14 open<br>AED 42.8k</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Variance Investigation</div><div style="font-size:10px;color:#9AA5B6">All locations · 14 open · AED 42.8k · 5 traced today</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All locations<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Assign cause</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.5fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="flex:none;display:flex;gap:7px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6;align-items:center">
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:10.5px;font-weight:700">All 14</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #F5C9C9;border-radius:8px;background:#FDECEC;font-size:10.5px;font-weight:700;color:#A81E1E">Unexplained 5</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Traced 9</div>
+                <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">AED 15.4k without a cause</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;padding:10px 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Item · location</div><div style="text-align:right">Variance</div><div style="text-align:right">Value</div><div style="text-align:right">Age</div><div>Traced to</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F4F8FF"><div><div style="font-weight:700;color:#0D6EFD">Wagyu Beef Patty</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Central DC</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−6 pc</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">216</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2h</div><div style="font-size:10.5px;color:#0A4FB8;font-weight:600">TRF-0918 short line</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Lobster Tail</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Central DC</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−4 pc</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">288</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2h</div><div style="font-size:10.5px;color:#5A6577">TRF-0918 short line</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Cheddar Slice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Beach Kiosk</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−138 pc</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">186</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">6 d</div><div style="font-size:10.5px;color:#A81E1E">No cause assigned</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600">Beef Patty 150g</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Beach Kiosk</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−72 pc</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">461</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">6 d</div><div style="font-size:10.5px;color:#A81E1E">No cause assigned</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Fresh Sea Bass</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Main Restaurant</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">−11.2 kg</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1,456</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 d</div><div style="font-size:10.5px;color:#5A6577">Trim yield 60% vs 68%</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Milk · full fat</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Wave Restaurant</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">−48 L</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">368</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 d</div><div style="font-size:10.5px;color:#5A6577">Cold chain rejection</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Brioche Bun</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Central DC</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">−104 pc</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">218</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 d</div><div style="font-size:10.5px;color:#5A6577">Breakage in transit</div></div>
+              <div style="display:grid;grid-template-columns:1.2fr .8fr .6fr .7fr 1.2fr;align-items:center;padding:7px 14px;font-size:11.5px"><div><div style="font-weight:600">Mixed · 14 bins</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Central DC</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">642 u</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">10,340</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">3 d</div><div style="font-size:10.5px;color:#A81E1E">Moves without a reason code</div></div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">8 of 14 open · 9 traced · 5 without a cause</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Bulk assign</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Trace · Wagyu Beef Patty</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">−6 pc</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:38px;flex:none">03:40</span><span style="flex:1">Picked 36 for TRF-0918</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">36</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:38px;flex:none">04:20</span><span style="flex:1">Dispatched · seal intact</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">36</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:#A81E1E"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;width:38px;flex:none">05:48</span><span style="flex:1">Received at kiosk</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">30</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:38px;flex:none">06:52</span><span style="flex:1">Counted at DC</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px">30</span></div>
+                </div>
+                <div style="padding:8px 10px;border-radius:9px;background:#F4F8FF;border:1px solid #BBD6FF;font-size:10.5px;color:#0A4FB8;line-height:1.5">The loss happened between dispatch and receipt, so it belongs to the carrier claim rather than to either location's shrinkage.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11.5px;font-weight:700;color:#5A6577">Write off</div><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Link to claim</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Pattern found</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EDF3FF;color:#0A4FB8">AI</span></div>
+                <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:11.5px;font-weight:600">Both Beach Kiosk variances are 6 days old</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">647</span></div><div style="font-size:10px;color:#8494A8;line-height:1.5">They date from the last completed count. Nothing has been counted since, so the drift is unmeasured rather than unexplained.</div></div>
+                <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:11.5px;font-weight:600">642 units moved without a reason</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">10,340</span></div><div style="font-size:10px;color:#8494A8;line-height:1.5">Six of the eight came from one handheld running a stale rule set — a device fix, not a stock loss.</div></div>
+                <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.5">Two causes account for AED 11k of the 15.4k currently unexplained.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listVariances · traceVariance · assignVarianceCause · linkToClaim · getVariancePatterns</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · unexplained · traced · linked · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · varianceId←<a href="#inv-3e">INV-3E</a> · locationId←filter</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3g">INV-3G</a> · <a href="#inv-3c">INV-3C</a></div>
+      </div>
+    </div>
+
+    <div id="inv-3g" data-screen-label="INV-3G" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3G</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Inventory Adjustment &amp; Write-Off Management</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">12 awaiting approval</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">An adjustment changes the ledger, so it needs a reason, an owner and an approval band. Value decides who signs, not who raised it.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">12 pending<br>AED 18.6k</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Adjustment &amp; Write-Off Management</div><div style="font-size:10px;color:#9AA5B6">All locations · 86 this period · 12 awaiting approval</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">This period<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Approval bands</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">New adjustment</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.55fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="flex:none;display:flex;gap:7px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6;align-items:center">
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:10.5px;font-weight:700">Pending 12</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Approved 68</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Rejected 6</div>
+                <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">AED 18.6k pending</div>
+              </div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;padding:10px 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Ref</div><div>Item · location</div><div>Reason</div><div style="text-align:right">Value</div><div>Approver</div><div style="text-align:right">State</div></div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F4F8FF"><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0D6EFD">ADJ-1184</div><div><div style="font-weight:600">Mixed · 14 bins</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Central DC</div></div><div style="color:#5A6577">Unreasoned</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">10,340</div><div style="color:#5A6577">Finance</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Pending</span></div></div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">ADJ-1183</div><div><div style="font-weight:600">Fresh Sea Bass</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Main Restaurant</div></div><div style="color:#5A6577">Trim yield</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1,456</div><div style="color:#5A6577">Head chef</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Pending</span></div></div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">ADJ-1182</div><div><div style="font-weight:600">Beef Patty 150g</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Beach Kiosk</div></div><div style="color:#5A6577">Count variance</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">461</div><div style="color:#5A6577">Supervisor</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Pending</span></div></div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">ADJ-1181</div><div><div style="font-weight:600">Milk · full fat</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Wave Restaurant</div></div><div style="color:#5A6577">Cold chain</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">368</div><div style="color:#5A6577">Supervisor</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Approved</span></div></div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">ADJ-1180</div><div><div style="font-weight:600">Brioche Bun</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Central DC</div></div><div style="color:#5A6577">Breakage</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">218</div><div style="color:#5A6577">Supervisor</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Approved</span></div></div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">ADJ-1178</div><div><div style="font-weight:600">Cheddar Slice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Beach Kiosk</div></div><div style="color:#5A6577">Count variance</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">186</div><div style="color:#5A6577">Supervisor</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Approved</span></div></div>
+              <div style="display:grid;grid-template-columns:.8fr 1.2fr .8fr .7fr .9fr .9fr;align-items:center;padding:7px 14px;font-size:11.5px"><div style="font-family:'IBM Plex Mono',monospace">ADJ-1176</div><div><div style="font-weight:600">Lettuce</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">Food Truck 01</div></div><div style="color:#5A6577">Spoilage</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">92</div><div style="color:#8494A8">Auto</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Approved</span></div></div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">7 of 86 this period · AED 13.1k shown</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Approve selected</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">ADJ-1184 · review</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FFF3E0;color:#8A4708">Finance band</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Units</span><span style="font-family:'IBM Plex Mono',monospace">642 across 14 bins</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Value</span><span style="font-family:'IBM Plex Mono',monospace">10,340</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Raised by</span><span style="font-weight:600">Inventory control</span></div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">Six of the eight moves came from one handheld running a stale rule set. Fixing the device recovers the stock without a write-off; approving this posts a loss that never happened.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11.5px;font-weight:700;color:#5A6577">Approve</div><div style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Send back</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Approval bands</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Under 100</span><span style="font-weight:600">Auto-approved</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">100 – 500</span><span style="font-weight:600">Supervisor</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">500 – 2,000</span><span style="font-weight:600">Head chef</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Above 2,000</span><span style="font-weight:600">Finance</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Adjustments by reason</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">86 · AED 58k</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:80px;color:#5A6577">Count variance</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:100%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:32px;text-align:right">32</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:80px;color:#5A6577">Spoilage</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:66%;height:7px;border-radius:4px;background:#B4530A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:32px;text-align:right">21</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:80px;color:#5A6577">Damage</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:44%;height:7px;border-radius:4px;background:#00B8FF"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:32px;text-align:right">14</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:80px;color:#5A6577">Unreasoned</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:38%;height:7px;border-radius:4px;background:#DC2626"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:32px;text-align:right">12</span></div>
+                <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.5">Unreasoned adjustments are 14% by count but 24% by value, which is why they carry the highest band.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listAdjustments · createAdjustment · approveAdjustment · rejectAdjustment · getApprovalBands</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · pending · approvalRequired · rejected · posted</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · varianceId←<a href="#inv-3f">INV-3F</a> · adjustmentId←selection</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3h">INV-3H</a> · <a href="#inv-3f">INV-3F</a></div>
+      </div>
+    </div>
+
+    <div id="inv-3h" data-screen-label="INV-3H" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3H</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Inventory Reconciliation &amp; Ledger Control</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">AED 1,268 unreconciled</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Opening plus receipts less issues must equal closing. Where it does not, the gap is named and carried rather than absorbed into cost of sales.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">period 08<br>open</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Reconciliation · period 08</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">01–24 Aug · all locations · GL account 1400 inventory</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export to GL</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Recalculate</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Close period</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.4fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Stock reconciliation</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">AED · period 08</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Opening stock · 01 Aug</span><span style="font-family:'IBM Plex Mono',monospace">462,840</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Receipts from suppliers</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">+1,284,620</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Transfers in</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">+186,420</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Transfers out</span><span style="font-family:'IBM Plex Mono',monospace">−186,420</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Issued to production &amp; sales</span><span style="font-family:'IBM Plex Mono',monospace">−1,142,860</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Waste &amp; write-offs</span><span style="font-family:'IBM Plex Mono',monospace">−118,240</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Count adjustments</span><span style="font-family:'IBM Plex Mono',monospace">−58,120</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;padding-top:6px;border-top:1px solid #EDF1F6"><span>Expected closing</span><span style="font-family:'IBM Plex Mono',monospace">429,240</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:800"><span>Counted closing</span><span style="font-family:'IBM Plex Mono',monospace">427,972</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;color:#A81E1E;padding-top:6px;border-top:1px solid #EDF1F6"><span>Unreconciled</span><span style="font-family:'IBM Plex Mono',monospace">−1,268</span></div>
+                </div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:0">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Unreconciled by location</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">AED 1,268</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:96px;color:#5A6577">Beach Kiosk</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:100%;height:7px;border-radius:4px;background:#DC2626"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:38px;text-align:right">−668</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:96px;color:#5A6577">Wave Restaurant</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:55%;height:7px;border-radius:4px;background:#B4530A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:38px;text-align:right">−368</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:96px;color:#5A6577">Central DC</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:34%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:38px;text-align:right">−232</span></div>
+                <div style="margin-top:auto;padding:8px 10px;border-radius:9px;background:#FFF6EA;border:1px solid #F3DFC0;font-size:10.5px;color:#7A3F06;line-height:1.5">All three trace to TRF-0918. Until the carrier claim settles, the gap is carried as a receivable rather than expensed.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">GL posting summary</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">1400 Inventory</span><span style="font-family:'IBM Plex Mono',monospace">427,972</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">5100 Cost of sales</span><span style="font-family:'IBM Plex Mono',monospace">1,142,860</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">5200 Waste</span><span style="font-family:'IBM Plex Mono',monospace">118,240</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">5210 Shrinkage</span><span style="font-family:'IBM Plex Mono',monospace">58,120</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">1450 Claims receivable</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">1,268</span></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Period close checklist</div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:11.5px"><span style="width:15px;height:15px;border-radius:4px;background:#0E9F6E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"><path d="m5 13 4 4L19 7"></path></svg></span><span style="flex:1">All counts posted</span></div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:11.5px"><span style="width:15px;height:15px;border-radius:4px;background:#0E9F6E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"><path d="m5 13 4 4L19 7"></path></svg></span><span style="flex:1">Receipts matched to PO</span></div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:11.5px"><span style="width:15px;height:15px;border-radius:4px;border:2px solid #B4530A;flex:none"></span><span style="flex:1;color:#8A4708;font-weight:600">12 adjustments awaiting approval</span></div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:11.5px"><span style="width:15px;height:15px;border-radius:4px;border:2px solid #B4530A;flex:none"></span><span style="flex:1;color:#8A4708;font-weight:600">4 transfers disputed</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Prior periods</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Period 07 · Jul</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">reconciled</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Period 06 · Jun</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">reconciled</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Period 05 · May</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">−842 carried</span></div>
+                <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.5">A period cannot close with adjustments pending, so the checklist gates the button above.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getReconciliation · getGlSummary · getCloseChecklist · closePeriod · exportToGl</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · open · unreconciled · blockedByChecklist · closed</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · period←picker · locationId←filter</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3j">INV-3J</a> · <a href="#inv-3g">INV-3G</a></div>
+      </div>
+    </div>
+
+    <div id="inv-3j" data-screen-label="INV-3J" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3J</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Shrinkage, Loss &amp; Inventory Accuracy Control</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">1.2% of sales</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Shrinkage split by whether it was preventable, and accuracy plotted against count frequency — the two questions that decide where control effort goes.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">AED 58k<br>1.2% sales</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Shrinkage, Loss &amp; Accuracy Control</div><div style="font-size:10px;color:#9AA5B6">All locations · period 08 · AED 58k · 1.2% of sales</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Period 08<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Benchmark</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Export</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Shrinkage</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">58k</span><span style="font-size:10px;color:#A81E1E;font-weight:600">1.2% · target 0.8%</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Preventable</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#A81E1E">62%</span><span style="font-size:10px;color:#A81E1E;font-weight:600">AED 36k</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Accuracy</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">96.4%</span><span style="font-size:10px;color:#A81E1E;font-weight:600">−1.8 pts vs Jun</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Recovered</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B7A55">8.4k</span><span style="font-size:10px;color:#6B7280;font-weight:600">carrier claims</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Worst location</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">3.4%</span><span style="font-size:10px;color:#A81E1E;font-weight:600">Beach Kiosk</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.15fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Accuracy against count frequency</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">bubble = stock value</span></div>
+                <div style="flex:1;position:relative;min-height:0">
+                  <svg viewBox="0 0 400 220" width="100%" height="100%" preserveAspectRatio="none" style="display:block">
+                    <line x1="34" y1="110" x2="392" y2="110" stroke="#EDF1F6" stroke-width="1" stroke-dasharray="4 4"></line>
+                    <line x1="210" y1="8" x2="210" y2="208" stroke="#EDF1F6" stroke-width="1" stroke-dasharray="4 4"></line>
+                    <line x1="34" y1="208" x2="392" y2="208" stroke="#D7DEE8" stroke-width="1.5"></line>
+                    <line x1="34" y1="8" x2="34" y2="208" stroke="#D7DEE8" stroke-width="1.5"></line>
+                    <circle cx="318" cy="36" r="26" fill="#0E9F6E" fill-opacity=".5"></circle>
+                    <circle cx="268" cy="58" r="16" fill="#0E9F6E" fill-opacity=".5"></circle>
+                    <circle cx="222" cy="86" r="13" fill="#0D6EFD" fill-opacity=".5"></circle>
+                    <circle cx="152" cy="124" r="14" fill="#0D6EFD" fill-opacity=".5"></circle>
+                    <circle cx="96" cy="166" r="15" fill="#B4530A" fill-opacity=".55"></circle>
+                    <circle cx="62" cy="188" r="11" fill="#DC2626" fill-opacity=".5"></circle>
+                  </svg>
+                  <div style="position:absolute;right:4%;top:2%;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#0B7A55">counted often · accurate</div>
+                  <div style="position:absolute;left:11%;bottom:4%;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#A81E1E">rarely counted · drifting</div>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">← fewer counts · higher accuracy ↑ · the relationship is close to linear</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Preventable or not</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">AED 58k</span></div>
+                  <div style="display:flex;height:12px;border-radius:6px;overflow:hidden"><div style="width:26%;background:#DC2626"></div><div style="width:22%;background:#B4530A"></div><div style="width:14%;background:#00B8FF"></div><div style="width:24%;background:#C7D3E4"></div><div style="width:14%;background:#0E9F6E"></div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#DC2626"></span>Process failure</span><span style="font-family:'IBM Plex Mono',monospace">15.1k</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#B4530A"></span>Handling damage</span><span style="font-family:'IBM Plex Mono',monospace">12.8k</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#00B8FF"></span>Over-ordering</span><span style="font-family:'IBM Plex Mono',monospace">8.1k</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#C7D3E4"></span>Natural spoilage</span><span style="font-family:'IBM Plex Mono',monospace">14.0k</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#0E9F6E"></span>Recovered</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">8.4k</span></div>
+                  </div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Shrinkage by location</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">% of sales</span></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .9fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Location</div><div style="text-align:right">Value</div><div style="text-align:right">% sales</div><div style="text-align:right">Preventable</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Beach Kiosk</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">9.7k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">3.4%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">78%</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Food Truck 01</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3.4k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">2.7%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">64%</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Wave Restaurant</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">14.2k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">1.6%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">58%</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Central DC</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18.4k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1.1%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">52%</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Main Restaurant</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12.3k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">0.9%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">41%</div></div>
+                  <div style="margin-top:auto;flex:none;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#6B7280;line-height:1.5">Beach Kiosk is worst on both rate and preventability — and is the location skipping its counts.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getShrinkage · getPreventableSplit · getAccuracyVsFrequency · getLocationShrinkage</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · partialData · insufficientCounts · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · period←filter · locationId←filter</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3k">INV-3K</a> · <a href="#inv-3d">INV-3D</a></div>
+      </div>
+    </div>
+
+    <div id="inv-3k" data-screen-label="INV-3K" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-3K</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">AI Inventory Control &amp; Exception Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">14 exceptions</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Every control exception with the process it blocks, and the root-cause view showing that one skipped schedule explains most of them.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Transfers &amp; Counts</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Procurement</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; PO</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">14 open<br>4 critical</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">AI Inventory Control &amp; Exception Center</div><div style="font-size:10px;color:#9AA5B6">All locations · 14 open · 4 critical · updated 11:42</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Rules</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Snooze all</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Apply fixes</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.35fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="flex:none;display:flex;gap:7px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6">
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:10.5px;font-weight:700">All 14</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #F5C9C9;border-radius:8px;background:#FDECEC;font-size:10.5px;font-weight:700;color:#A81E1E">Critical 4</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Warning 7</div>
+                <div style="height:29px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Info 3</div>
+              </div>
+              <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Period 08 cannot close</div><div style="font-size:10px;color:#8494A8;margin-top:1px">12 adjustments pending · 4 transfers disputed</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Close</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border-radius:7px;background:#0D6EFD;color:#fff;font-size:10px;font-weight:700">Open</span></div></div>
+              <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Beach Kiosk accuracy 88.2%</div><div style="font-size:10px;color:#8494A8;margin-top:1px">A-class count missed · 6 days since last pass</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Count</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border-radius:7px;background:#0D6EFD;color:#fff;font-size:10px;font-weight:700">Schedule</span></div></div>
+              <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">AED 15.4k without a cause</div><div style="font-size:10px;color:#8494A8;margin-top:1px">36% of open variance · 5 items over 3 days old</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Variance</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border-radius:7px;background:#0D6EFD;color:#fff;font-size:10px;font-weight:700">Trace</span></div></div>
+              <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">TRF-0918 unresolved after 6 hours</div><div style="font-size:10px;color:#8494A8;margin-top:1px">AED 1,268 sits on neither location's books</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Transfer</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border-radius:7px;background:#0D6EFD;color:#fff;font-size:10px;font-weight:700">Claim</span></div></div>
+              <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#B4530A;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">642 units moved without a reason code</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Six of eight from handheld HH-04 · stale rule set</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Device</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border:1px solid #E3E8F0;border-radius:7px;font-size:10px;font-weight:700;color:#5A6577">Push</span></div></div>
+              <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#B4530A;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Sea bass yield 8 pts below recipe</div><div style="font-size:10px;color:#8494A8;margin-top:1px">AED 1,456 of period variance from one spec</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Yield</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border:1px solid #E3E8F0;border-radius:7px;font-size:10px;font-weight:700;color:#5A6577">Test</span></div></div>
+              <div style="display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#B4530A;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">C class takes 38% of counting hours</div><div style="font-size:10px;color:#8494A8;margin-top:1px">For 6% of stock value · A class gets 34%</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Effort</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border:1px solid #E3E8F0;border-radius:7px;font-size:10px;font-weight:700;color:#5A6577">Rules</span></div></div>
+              <div style="display:flex;gap:9px;padding:9px 14px"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Accuracy down 1.8 pts over 8 weeks</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Steady drift, not an event · tracks count skips</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#EDF3FF;color:#0A4FB8">Trend</span><span style="height:24px;display:flex;align-items:center;padding:0 8px;border:1px solid #E3E8F0;border-radius:7px;font-size:10px;font-weight:700;color:#5A6577">Review</span></div></div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">8 of 14 shown</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Configure rules</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Root cause</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EDF3FF;color:#0A4FB8">AI</span></div>
+                <div style="padding:9px 11px;border-radius:9px;background:#F4F8FF;border:1px solid #BBD6FF;display:flex;flex-direction:column;gap:5px">
+                  <div style="font-size:11.5px;font-weight:600;color:#0A4FB8">Counts are being skipped where accuracy is worst</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Beach Kiosk and Food Truck 01 hold the two lowest accuracy scores and are the only two locations that missed an A-class pass. Six of the 14 exceptions resolve if the schedule is honoured.</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Exceptions explained</span><span style="font-family:'IBM Plex Mono',monospace">6 of 14</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Variance explained</span><span style="font-family:'IBM Plex Mono',monospace">AED 11k of 15.4k</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Optimisations</div>
+                <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:11.5px;font-weight:600">Enforce A-class daily counts</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">+3.4 pts</span></div><div style="font-size:10px;color:#8494A8;line-height:1.5">22 high-value lines at the two worst locations · 12 minutes per pass.</div></div>
+                <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:11.5px;font-weight:600">Move C class to quarterly sampling</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">−38% hours</span></div><div style="font-size:10px;color:#8494A8;line-height:1.5">Releases the counting time that the A-class change needs, so the fix is cost-neutral.</div></div>
+                <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:11.5px;font-weight:600">Block moves without a reason code</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">−AED 10k</span></div><div style="font-size:10px;color:#8494A8;line-height:1.5">Push the current rule set to HH-04 and make the field mandatory at entry.</div></div>
+                <div style="margin-top:auto;padding-top:8px;border-top:1px solid #F1F4F9;display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">3 open · confidence 84–94%</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Review</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listControlExceptions · getRootCause · listOptimisations · applyOptimisation · setControlRules</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · live · insufficientData · snoozed · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←session · severity←filter</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-3d">INV-3D</a> · <a href="#inv-3f">INV-3F</a> · <a href="#inv-3a">INV-3A</a></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;padding:16px 18px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;font-size:12px;color:#5A6577;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></div>
+      <div><b style="color:#0B1324">Board 3 complete — 10 screens.</b> Control overview, transfer request, dispatch and receipt, count planning, count execution, variance investigation, adjustments, ledger reconciliation, shrinkage and the exception centre. The board follows one shortfall from TRF-0918 through to the period it stops from closing.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

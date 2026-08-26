@@ -13,6 +13,7 @@ python3 tools/derive-schema-roots.py
 python3 tools/derive-frontend.py
 python3 tools/derive-board-panel-map.py
 python3 tools/derive-diagrams.py
+python3 tools/build-schema-workbook.py
 python3 tools/build-services-workbook.py 2>/dev/null || true
 python3 tools/derive-wireframes.py
 python3 tools/link-screens-contracts.py
@@ -52,6 +53,7 @@ python3 tools/build-backlog-index.py
 python3 tools/build-cluster-index.py
 python3 tools/sync-project-bible.py
 python3 tools/derive-platform.py
+python3 tools/derive-platform-deployment.py
 python3 tools/build-audience.py
 python3 tools/build-status.py
 

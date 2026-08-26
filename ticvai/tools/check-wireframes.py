@@ -200,8 +200,33 @@ def main() -> int:
             _b = (_s.get("wireframe") or {}).get("board")
             if _b:
                 referenced.add(_b.split("#")[0].split("/")[-1])
+    # **`boardFrames` is a reference too, and this check only counted `wireframe.board`.**
+    # `FnB Board 1`, `3`, `6` and `POS Board 6` were reported as orphans while 35 of their frames
+    # were claimed by screens through `boardFrames` — the join existed in one direction and the
+    # check read the other. **Same shape as `access.validated`**, where three transitions emitted an
+    # event and none declared it.
+    #
+    # A screen owning a frame is pointing at the board that frame lives on, whether or not it also
+    # renders from it.
+    _frame_prefix = {}
+    for _bf in sorted(BOARDS.glob("*.dc.html")):
+        for _id in set(re.findall(r'id="([^"]+)"', _bf.read_text(encoding="utf-8"))):
+            _frame_prefix.setdefault(_id.lower(), _bf.name)
+    for _f2 in sorted(SCREENS.glob("P*.yaml")):
+        for _s2 in (yaml.safe_load(_f2.read_text(encoding="utf-8")).get("screens") or []):
+            for _fr in (_s2.get("boardFrames") or []):
+                _owner = _frame_prefix.get(str(_fr).lower())
+                if _owner:
+                    referenced.add(_owner)
+
     for _f in sorted(BOARDS.glob("*.dc.html")):
-        if _f.name not in referenced and "Index" not in _f.name:
+        # **An index points at boards and nothing points at it — that is what an index is.**
+        # Exempting by filename missed `TICVAI Wireframe Boards.dc.html`, which is the generated
+        # index and carries no frames of its own. **The role is the test, not the name**: a file
+        # with links out and no anchors in is a contents page.
+        _txt = _f.read_text(encoding="utf-8")
+        _is_index = not set(re.findall(r'id="([^"]+)"', _txt)) and 'href=' in _txt
+        if _f.name not in referenced and "Index" not in _f.name and not _is_index:
             WARNINGS.append(f"{_f.name}: on disk and nothing points at it. Either a screen "
                             "declares it or it should not ship")
 

@@ -15,7 +15,10 @@
 //
 // Counts are deliberately not written here. They were, and they rotted: this
 // comment said 654 operations and 347 screens against a package that had moved
-// to 776 and 376. A number in a comment is a claim nothing checks.
+// to 776 and 376. A number in a comment is a claim nothing checks — and the
+// paragraph below proved it twice, having rotted again to 1,023 and 492 while
+// this very warning sat nine lines above it. The viewer now reads its counts
+// off the payload at hover; see the `{token}` substitution in public/tips.js.
 //
 // wireframes/LINKAGE.md draws the whole chain in one line, and it is worth
 // keeping in view because every hop is a different file:
@@ -24,9 +27,11 @@
 //
 // ---- what `unresolved` means, and what it does not --------------------------
 //
-// 336 of the 654 resolve to a table: 299 derived from `x-ticvai-persistence`
-// markers, 37 projections mapped by hand. The other 318 carry
-// `"source": "unresolved"`.
+// Every operation the file carries resolves to a table, by one of two routes:
+// derived from an `x-ticvai-persistence` marker, or a projection mapped by
+// hand. An operation that resolves to nothing carries `"source": "unresolved"`
+// — a state the current file happens to have none of, which is not the same as
+// a state that cannot happen.
 //
 // That is NOT a defect list, and drawing it as one would be the easy mistake.
 // The sheet's own footnote says why: "Grey rows resolve to no table — most

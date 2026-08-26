@@ -85,19 +85,19 @@
    "operations": 5
   },
   {
-   "contract": "queue",
-   "operations": 4
-  },
-  {
    "contract": "retail",
    "operations": 4
   },
   {
-   "contract": "white-label",
-   "operations": 3
+   "contract": "queue",
+   "operations": 4
   },
   {
    "contract": "seating",
+   "operations": 3
+  },
+  {
+   "contract": "white-label",
    "operations": 3
   },
   {
@@ -109,11 +109,11 @@
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "games",
    "operations": 1
   }
  ],

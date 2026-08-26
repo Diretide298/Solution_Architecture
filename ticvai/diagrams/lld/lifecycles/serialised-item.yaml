@@ -1,0 +1,134 @@
+id: LLD-SerialisedItem
+title: SerialisedItem — 15 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/serialised-item.yaml
+entity: SerialisedItem
+contract: inventory
+enum: SerialisedItem.status
+enumKind: inline
+enumSchema: SerialisedItem
+enumProperty: status
+owner: InventoryService
+description: 'One physically identifiable item — a serial number, an RFID tag — tracked individually
+  rather than as a quantity.
+
+
+  **Serialisation exists for traceability**: a warranty claim, a recall, a theft. Every state here is
+  a question somebody asks about one specific object.'
+initial:
+- inStock
+terminal:
+- sold
+- lost
+states:
+- name: inStock
+  description: Held and available.
+- name: reserved
+  description: Committed to an order and not yet handed over. **Distinct from sold** — a reservation
+    releases on cart expiry and a sale does not.
+- name: sold
+  description: Handed to a guest. **Terminal, and the traceability continues** — a warranty or a return
+    reads this row rather than reopening it.
+- name: returned
+  description: 'Came back. **Not `inStock`**: a returned item has a history and may need inspection
+    before it is sellable again, and collapsing the two loses that.'
+- name: damaged
+  description: Unsellable. **A separate state from lost** because it is physically present and has a
+    value to write off.
+- name: lost
+  description: Not physically present and not accounted for. **Terminal** — an item that turns up is
+    a new receipt, not a reversal, because the count that found it missing was correct at the time.
+- name: inTransit
+  description: Moving between locations. **The state that stops a transfer being invisible** — an item
+    in neither stockroom is an item somebody will count as missing.
+- name: warranty
+  description: With the supplier or a repairer. **Off the shelf and not lost**, which is exactly the
+    distinction a count needs.
+transitions:
+- from: inStock
+  to: reserved
+  trigger: reserve
+  operation: listSerialisedItems
+  guard: Committed to a specific order.
+- from: reserved
+  to: inStock
+  trigger: release
+  operation: listSerialisedItems
+  guard: '**The cart expired or the order was cancelled.** Reservation is not a sale.'
+- from: reserved
+  to: sold
+  trigger: sell
+  operation: createRetailSale
+  guard: Handed over.
+- from: inStock
+  to: sold
+  trigger: sell
+  operation: createRetailSale
+  guard: '**Sold straight from stock** — the counter case, where nothing was reserved first.'
+- from: sold
+  to: returned
+  trigger: return
+  operation: createRetailReturn
+  guard: '**Terminal to non-terminal, and deliberately so.** A sold item coming back is the one case
+    where a terminal state is left, because the alternative is a second row for the same physical object.'
+- from: returned
+  to: inStock
+  trigger: restock
+  operation: listSerialisedItems
+  guard: '**Inspected and sellable again.** The inspection is the guard.'
+- from: returned
+  to: damaged
+  trigger: writeOff
+  operation: listSerialisedItems
+  guard: Came back unsellable.
+- from: inStock
+  to: damaged
+  trigger: writeOff
+  operation: listSerialisedItems
+  guard: Found damaged in stock.
+- from: inStock
+  to: inTransit
+  trigger: transfer
+  operation: createStockTransfer
+  guard: Moving between locations.
+- from: inTransit
+  to: inStock
+  trigger: receive
+  operation: receiveStockTransfer
+  guard: Arrived.
+- from: inTransit
+  to: lost
+  trigger: lose
+  operation: listSerialisedItems
+  guard: '**Never arrived.** The most common way an item becomes lost, and the reason `inTransit` earns
+    a state.'
+- from: inStock
+  to: lost
+  trigger: lose
+  operation: listSerialisedItems
+  guard: Missing at a count.
+- from: damaged
+  to: warranty
+  trigger: claim
+  operation: listSerialisedItems
+  guard: Sent to the supplier.
+- from: warranty
+  to: inStock
+  trigger: returnFromWarranty
+  operation: listSerialisedItems
+  guard: Repaired and back.
+- from: warranty
+  to: lost
+  trigger: lose
+  operation: listSerialisedItems
+  guard: '**The supplier did not return it and the claim closed.** Rare and real.'
+openQuestions: '**`sold -> returned` leaves a terminal state.** It is the only such transition in 113
+  models and it is correct — the alternative is a second row for one physical object — but `terminal`
+  may be the wrong word for `sold` rather than the transition being wrong.'
+notes: '**Eight states because eight questions get asked**: where is it, can I sell it, was it returned,
+  is it broken, is it with the supplier, is it moving, is it gone.
+
+
+  **`lost` is terminal and an item that turns up is a new receipt.** Reversing it would rewrite a count
+  that was correct when it was taken.'

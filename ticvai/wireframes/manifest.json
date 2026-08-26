@@ -1,0 +1,27 @@
+{
+ "generatedBy": "tools/derive-wireframes.py",
+ "entryPoint": "wireframes/index.html",
+ "note": "Boards this package generates. **Anything in `wireframes/` not listed here and not a client pack is a leftover** — most often a board renamed on one side of a dump, since a copy never deletes.",
+ "generated": [
+  "P01 Guest Web.dc.html",
+  "P02 Guest App.dc.html",
+  "P04 Venue POS.dc.html",
+  "P05 Guest Kiosk.dc.html",
+  "P06 Venue Staff App.dc.html",
+  "P07 Venue Scanner.dc.html",
+  "P08 Venue Management.dc.html",
+  "P09 TICVAI Web.dc.html",
+  "P10 Partner Web.dc.html",
+  "P11 Accreditation Web.dc.html",
+  "P12 Venue Support.dc.html",
+  "P13 Venue CMS.dc.html",
+  "P14 Developer.dc.html",
+  "P15 Kitchen Display.dc.html",
+  "P16 Venue Analytics.dc.html"
+ ],
+ "indexes": [
+  "index.html",
+  "TICVAI Wireframe Boards.dc.html",
+  "TICVAI All Boards Index.dc.html"
+ ]
+}

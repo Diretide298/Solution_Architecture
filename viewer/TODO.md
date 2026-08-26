@@ -1,86 +1,98 @@
 # Viewer — work index
 
-**35 items — V-01 to V-35.**
+**Rewritten 26 August from the source, not from the previous index.**
 
-Generated from `PLAN.md`, which holds the reasoning and the anchors. This is the
-index: one line per item, so anything's state can be checked without reading it.
+Every open row below was checked against the code or the package on the day it
+was written. Ten did not survive that: four described work already finished, two
+quoted counts that had grown by 40-80%, and **every line-number anchor in the
+file pointed at unrelated code** — `app.js:4157` had become 5172, `5409` had
+become 9683, and V-29's three anchors matched nothing at all.
+
+So the rules changed with the rewrite:
+
+**No line numbers.** A function name survives an edit; a line number is wrong by
+the next one, and it is worse than nothing because it reads as precision.
+
+**No counts that live somewhere else.** If a number can be derived, say where
+from and let the reader run it. Quoting it here is the same bug the viewer's own
+tooltips had — see V-29, which was exactly this, one level down.
+
+**Ids resolve here and nowhere else.** The old header called this file
+*generated from `PLAN.md`*. There is no generator, and `PLAN.md` contains no
+V-numbers — it is organised by prose sections. The two cannot be
+cross-referenced, so read `PLAN.md` for reasoning and treat these ids as local
+labels.
 
 | State | Count |
 |---|---|
-| BLOCKED — needs your decision | **5** |
-| IN FLIGHT — agents running | **2** |
-| OPEN — verified bugs | **3** |
-| OPEN — missing views | **2** |
+| BLOCKED — needs your decision | **3** |
+| OPEN — with the package side | **3** |
 | OPEN — reviewer experience | **3** |
-| OPEN — polish | **6** |
-| DONE | **19** |
+| OPEN — correctness | **2** |
+| OPEN — polish | **5** |
+| DONE | **27** |
 
-**Nothing is blocking.** The gate, the guest role and the role-filtered
-payloads all landed on 18 August, so an outside address can now hold an account.
+**Nothing is blocking.**
 
 ---
 
-## Blocked — needs a decision from you — 5
+## Blocked — needs a decision from you — 3
 
 | ID | Item | Why it is stuck |
 |---|---|---|
-| **V-01** | Commit + push everything | Asked four times. The set is now large: the promoted package, ten deleted manifests, the domain lens, the ADR and state-model parser fixes, the reviews dashboard, `/api/verdicts`, three harnesses, `PLAN.md`, this file |
-| **V-02** | Split commit `d664719` | Needs a force-push to an already-pushed commit |
-| **V-03** | Name the reviewer checklist criteria | I can build it; I cannot invent what it should ask |
-| **V-04** | Change your password from `the-first-administrator` | Only you can. It is in a public repo |
-| **V-25** | `tools/build-wireframes.py` and `tools/check-migrations.py` are at root and **not in your dump** — keep or delete? | A missing build tool reads like an export gap, not a decision |
+| **V-03** | Name the reviewer checklist criteria | I can build it; I cannot invent what it should ask. Gates the wording half of V-15 |
+| **V-04** | Change the first administrator's password | Only you can. It was committed to a public repo. **Separately**: `harness.admin@softlabsgroup.com` / `a-long-enough-passphrase` is now public in `checks/*.mjs`. It does *not* authenticate against the live instance, so it is inert — but do not create that account there |
+| **V-24** | Stop the second accounts API on 8788 | `python -m uvicorn api.main:app --port 8788`, pid 13208, started 11:43 on 26 August. A **full second copy of the accounts API** — same routes, same 401 on a bogus login — and its command line sets no `TICVAI_DB`, so it defaults to the real `api/ticvai.db`. `demo.db` no longer exists, so that half of the old row is already done. Stopping a process is denied to me: `Stop-Process -Id 13208 -Force` |
 
-## In flight — agents running — 2
+## Open — with the package side — 3
 
-| ID | Item | State |
-|---|---|---|
-| **V-27** | `tools/check-package.py` UTF-8 + `check-flows.py` warning→error and branch walk | check-flows done, check-package still running |
-| **V-28** | The **Domains** lens page — `domains.html` / `.js` / `.css` | not yet written |
-
-## Open — verified bugs — 3
-
-| ID | Item | Anchor |
-|---|---|---|
-| **V-10** | Backend › Data draws every schema amber — `module.written` reads a Modules-sheet column the workbook does not have. Count DDL per module instead; needs three states, not two | `public/app.js:4157` |
-| **V-11** | The LINKS rail leaks the previous layer on every layer without a dispatch line — Contracts *and* Decisions. Clear before the dispatch, keep `pane-empty` | `public/app.js:5409` |
-| **V-29** | Stale hardcoded counts in viewer prose — `decisions.mjs:5` "18 ADRs" (24), `app.js:171` "The 18 ADRs", `lineage.mjs:12` "654 operations" (776) | three files |
-
-## Open — missing views — 2
+Raised from the viewer, fixed in the package. Listed here so they are not lost.
 
 | ID | Item |
 |---|---|
-| **V-30** | **No dashboard pages.** The package declares six — Platform, Cross-Tenant Health, Security & Compliance, Partner, Agent, My Account — across P01/P02/P04/P08/P09/P10/P12, and the viewer has no overview surface for any of them. Assumed to mean viewer-side; say if you meant the package's own screens |
-| **V-31** | Domain lenses beyond AI — `finance`, `identity`, `access` are a one-line seed each once V-28 lands |
+| **V-36** | **The workbook's `Scaling` sheet lost every contract row.** Commit `d200412` carried 25 contracts and 776 routed operations; the 26 August dump has one row reading `TOTAL 0 0 0 0`. Backend › Routing therefore draws nothing, and `pages-check` is 52/1 because of it. The routing data itself is intact — the lineage still carries the replica/primary/analytical split — so this is the sheet's generator, not the source. **No package validator reads this sheet**, which is why all ten still pass |
+| **V-27** | **The UTF-8 stdout guard is missing from 27 of 33 tools**, not the single file the old row named. The failure lands *after* the work: output is written, then the summary line dies on `UnicodeEncodeError` and a correct run exits 1. It only shows on a cp1252 console, so a piped or CI run never sees it. `derive-wireframes.py` and the two tools added on 26 August carry the guard; nothing was retrofitted. Ready-to-run, dry-run first: `scratchpad/apply-utf8-guard.py` |
+| **V-30 / V-33** | Dashboards, and `relationships.csv` columns — **taken by the package side.** Both rows were stale here: six dashboards is eight, and 143-of-514 is 185-of-914 |
 
 ## Open — reviewer experience — 3
 
 | ID | Item |
 |---|---|
-| **V-15** | Verdict dot per tree row, progress per group, `All / Untouched / Needs work / Mine` filter. The biggest single gap — 376 identical-looking rows |
-| **V-16** | Keyboard navigation — `]` `[`, `n` for next unreviewed, `1` `2` `3` in a verdict form, `Ctrl+Enter` |
-| **V-17** | Pin the verdict bar to the foot of the reader; rethink the LINKS rail |
+| **V-15** | Verdict dot per tree row, progress per group, `All / Untouched / Needs work / Mine` filter. **The biggest single gap** — the tree draws every reviewable artefact as an identical row, so a reviewer cannot see their own progress. Only the checklist wording waits on V-03; the dots and the filter do not |
+| **V-16** | Keyboard navigation for the review loop — `]` `[`, `n` for next unreviewed, `1` `2` `3` in a verdict form, `Ctrl+Enter`. Cheap once V-15 gives a row a state to show. Arrow-key panning and `+`/`-` on the diagrams already landed |
+| **V-17** | Pin the verdict bar to the foot of the reader. The LINKS rail half of this row is partly answered by V-11 — re-scope before starting |
 
-## Open — polish — 6
+## Open — correctness — 2
 
 | ID | Item |
 |---|---|
-| **V-18** | Journey: a fade or chevron on the right edge. There is no Fit to fix — the sideways track is designed |
+| **V-37** | **Eight harnesses hardcode `4173`/`8787`** and ignore `TICVAI_VIEWER`/`TICVAI_API`: `ai-tables`, `contract-trace`, `lens`, `scroll`, `signoff`, `tree-fold`, `verdict-submit`, `_shot`. They can only run against the instance backed by the real account database. **`signoff-check` is the one that matters** — its own README says it records real verdicts. `pages-check`, `paging-check`, `links-rail-check` and `tip-facts-check` are parameterised and are the pattern to copy |
+| **V-38** | `paging-check` fails 2 against the current package — *"the reader shows prose the index no longer carries — proposeTranslations"*, and the Lineage view drawing no group to page through. Both surfaced once the harness could run at all. Neither is diagnosed |
+
+## Open — polish — 5
+
+| ID | Item |
+|---|---|
+| **V-18** | Journey: a fade or chevron on the right edge. There is no Fit to add — the sideways track is deliberate |
 | **V-20** | Structure: the empty state draws a legend for a diagram that is not there |
 | **V-21** | Unexplained tree counts, `status` as a chip, no breadcrumb, orphaned history notes, permanent sidebar note |
-| **V-23** | The States zoom cap is a judgement, not a bug — `1.1` is deliberate and commented |
+| **V-31** | Domain lenses beyond AI — `finance`, `identity`, `access`. `domains.html`/`.js`/`.css` and `lib/domains.mjs` all exist and render, so this is a seed each rather than a build |
 | **V-32** | ER: legibility floor, toolbar reserve, edge cardinality, fold in the hint text |
-| **V-33** | **Package gap, not a viewer one — and not AI-specific.** `handoff/relationships.csv` states 514 relationships, and **143 of them name a column that no row on the Columns sheet defines** — `orders` 17, `identity` 16, `marketing` 16, `ai` 14. The two sheets are generated from different sources and were never reconciled. 76 of the 287 tables have no columns at all, which is why the AI schema draws thirteen empty boxes: all 13 are declared storage-only. Ask which sheet is authoritative |
 
-## Housekeeping — 1
+**Dropped rather than done.** `V-23` was never a bug — the States zoom cap of `1.1` is deliberate and commented. `V-25` asked whether two root tools should be kept or deleted; both now live in `ticvai/tools/`, so the question answered itself. `V-02` wanted a commit split that a fresh history made moot.
 
-| ID | Item |
-|---|---|
-| **V-24** | Stop the demo API on 8788 and remove `demo.db` |
-
-## Done — 19
+## Done — 27
 
 | ID | Item |
 |---|---|
+| **V-01** | Commit and push everything. `atlas` initialised, 6,917 files, **no database staged** — `.gitignore` excludes `api/*.db` and it was verified before the push, not after. Both remotes force-pushed to `d200412` |
+| **V-28** | The Domains lens page — `domains.html`, `.js`, `.css`, all present and rendering. **The row was stale, not the work** |
+| **V-39** | Backend › Routing now says *which* emptiness it is. A missing sheet and a present-but-empty sheet read identically before, and the old message sent a reader looking for a sheet that was there. `lib/backend.mjs` exports `scalingSheet` |
+| **V-D10** | `checks/tip-facts-check.mjs` and `checks/links-rail-check.mjs` — new. The second fails 2 on the pre-fix code, which is the only reason to trust it |
+| **V-D11** | `checks/paging-check.mjs` — could only ever run against the live pair; now honours the environment, opens the project the registry names instead of the bare door, and reports an empty Lineage view rather than throwing from inside puppeteer |
+| **V-29** | Stale hardcoded counts in viewer prose. Bigger than the three files named: **25 sites across 8 files**, and four separate figures — 654 operations (live **1,023**), 22 services (**16**), 18 ADRs (**30**), "318 of the 654 resolve to no table" against a lineage where **nothing is unresolved**, and Waves' "347 screens / twelve platforms / 192 name no operation" (**492 / 15 / 14**). Fixed as a class, not a list: tips write `{operations}` and `public/tips.js` substitutes at hover, so the count comes off the payload. `checks/tip-facts-check.mjs` holds it — 14 passed. `pages-check` still 53/53 |
+| **V-11** | The LINKS rail leaked the previous layer. The earlier fix moved the clear ahead of the dispatch and gave each layer its own empty sentence, but left the half that carries content: `state.selectedId` is written only by `select()`, which only resolves contract artefacts, so the tail of the dispatch put **the last contract's REFERENCED BY / REFERENCES on the Decisions layer**. Reproduced in a browser, then scoped the read to Contracts rather than clearing the selection — the reader keeps their place. The theme toggle had the same leak through a second door and now re-renders through the dispatch. `checks/links-rail-check.mjs` holds it — 13 passed, and it fails 2 on the old code |
+| **V-10** | Backend › Data drew every schema amber. **Already fixed before this session; the row was stale** — the anchor read `app.js:4157` and the code is at 5172. It counts `table.ddl` per module instead of reading `module.written` off a Status column the workbook does not have, and it draws three states. Verified against the package: **1 written (pii 4/4), 7 part-written, 23 with nothing** — not all amber |
 | **V-D1** | Verdict submit button reads plain `Submit`. Harness 14/14 |
 | **V-D2** | All 20 layer × view combinations screenshotted and reviewed |
 | **V-D3** | `PLAN.md` — reviewer UX, every view, the guest role |
@@ -119,7 +131,19 @@ now reads 776. V-26 is closed by the dump, not by me.
 
 ## Integrity
 
-- **Numbering:** V-01 to V-35; done items keep their original id or carry V-D
-- **Reasoning** lives in `PLAN.md`; this file holds no argument, only state
-- **Anchors** were checked against the source by a second reader. Re-verify any
-  that is more than a few commits old — this package moves daily
+- **Numbering:** V-01 to V-39; done items keep their original id or carry V-D.
+  Ids are local to this file — `PLAN.md` has none, so there is nothing to look
+  an id up in
+- **Reasoning** lives in `PLAN.md`, by prose section rather than by id. This
+  file holds state, not argument
+- **Anchors** are function and file names, never line numbers. The previous
+  edition anchored by line and **every one of them had drifted** — which is how
+  a row survived three sessions telling a reader to fix something already fixed
+- **Counts** are not quoted here unless the row says where to derive them. Two
+  rows in the previous edition had grown 40-80% while still stating the old
+  figure. The rule the viewer's tooltips now follow applies to its work index
+  too: a number written into a sentence has no reason to change when the thing
+  it describes does
+- **Re-verify anything more than a few commits old.** This package moves daily,
+  and that warning was in the previous edition as well — it was correct, and it
+  was not enough on its own

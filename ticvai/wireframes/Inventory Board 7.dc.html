@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Inventory &amp; Procurement · Board 7 — Planning, Analytics &amp; AI <span style="font-weight:600;color:#6B7280">(10 screens · closes the module)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>staff · planning, analysis &amp; control</div>
+      <div>1280 × 700 · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Boards 1 to 6 ran the cycle. This board decides what the next one should be. Every screen here has to carry the same discipline: a forecast is shown against what actually happened, a saving is only a saving against a stated benchmark, and every number a director sees can be traced to the transaction underneath it.</p>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="inv-7a" data-screen-label="INV-7A" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7A</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Executive Command Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">£2.4 m stock · 4 sites</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The director's view. Four numbers that matter, each with the direction of travel and the one thing driving it — a dashboard that cannot answer "why" is a dashboard nobody returns to.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">Aug 2026<br>period 5</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Inventory &amp; Procurement · August</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">4 sites · period 5 · closed to 24 Aug · refreshed 09:12</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Period 5<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Board pack</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Compare sites</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Stock on hand</span><span style="font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600">£2.41 m</span><span style="font-size:10.5px;color:#8A4708">+£184 k on July · slower turns at Riverside</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Stock turns</span><span style="font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600">7.2×</span><span style="font-size:10.5px;color:#0B7A55">target 7.0 · third month above</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Waste</span><span style="font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;color:#7A3F06">2.8%</span><span style="font-size:10.5px;color:#8A4708">target 2.0 · fresh produce is all of it</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Savings realised</span><span style="font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;color:#0B5B41">£61 400</span><span style="font-size:10.5px;color:#0B7A55">against last year's prices · 68% of plan</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.4fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:11px;min-height:0">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Stock value and turns · 12 months</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">bars £ · line turns</span></div>
+                <div style="flex:1;display:flex;gap:9px;min-height:0">
+                  <div style="flex:none;width:34px;display:flex;flex-direction:column;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6;text-align:right;padding-bottom:16px"><span>3.0m</span><span>2.0m</span><span>1.0m</span><span>0</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+                    <div style="flex:1;position:relative;border-left:1px solid #EDF1F6;border-bottom:1px solid #E3E8F0;min-height:0">
+                      <div style="position:absolute;left:0;right:0;top:33.3%;border-top:1px dashed #EDF1F6"></div>
+                      <div style="position:absolute;left:0;right:0;top:66.6%;border-top:1px dashed #EDF1F6"></div>
+                      <div style="position:absolute;inset:0;display:flex;align-items:flex-end;gap:6px;padding:0 8px">
+                        <div style="flex:1;height:61%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:64%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:69%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:66%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:71%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:74%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:70%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:73%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:76%;border-radius:4px 4px 0 0;background:#A9C8F0"></div>
+                        <div style="flex:1;height:74%;border-radius:4px 4px 0 0;background:#A9C8F0"></div>
+                        <div style="flex:1;height:75%;border-radius:4px 4px 0 0;background:#A9C8F0"></div>
+                        <div style="flex:1;height:80%;border-radius:4px 4px 0 0;background:#0D6EFD"></div>
+                      </div>
+                      <div style="position:absolute;left:8px;right:8px;top:0;bottom:0"><div style="position:absolute;left:0;right:0;top:46%;border-top:2px solid #00B8FF;opacity:.85"></div><div style="position:absolute;right:0;top:46%;transform:translate(4px,-50%);width:8px;height:8px;border-radius:50%;background:#00B8FF"></div></div>
+                    </div>
+                    <div style="flex:none;display:flex;gap:6px;padding:5px 8px 0;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#9AA5B6"><span style="flex:1;text-align:center">S</span><span style="flex:1;text-align:center">O</span><span style="flex:1;text-align:center">N</span><span style="flex:1;text-align:center">D</span><span style="flex:1;text-align:center">J</span><span style="flex:1;text-align:center">F</span><span style="flex:1;text-align:center">M</span><span style="flex:1;text-align:center">A</span><span style="flex:1;text-align:center">M</span><span style="flex:1;text-align:center">J</span><span style="flex:1;text-align:center">J</span><span style="flex:1;text-align:center">A</span></div>
+                  </div>
+                </div>
+                <div style="flex:none;padding:9px 11px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3;font-size:10.5px;color:#5A6577;line-height:1.5">Stock has risen for four months while turns held steady, which means the extra value is buying growth rather than sitting still. Riverside is the exception and accounts for £112 k of the £184 k.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                  <div style="padding:11px 14px 9px;display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">By site</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">turns · waste</span></div>
+                  <div style="display:grid;grid-template-columns:1.4fr .8fr .8fr .9fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Site</div><div style="text-align:right">Stock</div><div style="text-align:right">Turns</div><div style="text-align:right">Waste</div></div>
+                  <div style="display:grid;grid-template-columns:1.4fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£880 k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">8.1×</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1.9%</div></div>
+                  <div style="display:grid;grid-template-columns:1.4fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Riverside Hall</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£612 k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">4.6×</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">5.1%</div></div>
+                  <div style="display:grid;grid-template-columns:1.4fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Studio</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£394 k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">7.4×</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2.2%</div></div>
+                  <div style="display:grid;grid-template-columns:1.4fr .8fr .8fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Park Stage</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£524 k</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">7.9×</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2.4%</div></div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Riverside is the whole problem</div>
+                  <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Turns of 4.6 against a group average of 7.2, and waste at 5.1%. It holds a quarter of the group's stock and generates half its waste.</div>
+                  <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Open Riverside</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getInventoryKpis · getStockValueHistory · getStockTurns · getWasteRate · getRealisedSavings · getSiteComparison</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">periodOpen — figures marked provisional until the period closes</b> · siteDataMissing · benchmarkUnset · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · period←picker · siteFilter←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-7d">stock health</a> · <a href="#inv-7e">spend analytics</a> · <a href="#inv-7g">warehouse analytics</a></div>
+      </div>
+    </div>
+
+    <div id="inv-7b" data-screen-label="INV-7B" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7B</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Demand Forecasting &amp; Consumption Planning</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">forecast vs actual</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">A forecast that is never scored is a guess with a chart. Last period's line is drawn against what happened, and the events driving next week sit next to it, because a sold-out Saturday is the reason demand moves.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">accuracy 88%<br>4 weeks out</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Demand · Main Arena · food &amp; beverage</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">next 4 weeks · driven by 42 sessions · accuracy 88% over 12 weeks</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Food &amp; beverage<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Adjust an assumption</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Send to replenishment</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                <div style="display:flex;align-items:center;gap:10px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Forecast against actual</div><div style="margin-left:auto;display:flex;gap:11px"><span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#5A6577"><span style="width:12px;height:2.5px;background:#0D6EFD"></span>forecast</span><span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#5A6577"><span style="width:12px;height:2.5px;background:#0B1324"></span>actual</span><span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#5A6577"><span style="width:9px;height:9px;border-radius:2px;background:#DCE9FB"></span>range</span></div></div>
+                <div style="flex:1;display:flex;gap:9px;min-height:0">
+                  <div style="flex:none;width:38px;display:flex;flex-direction:column;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6;text-align:right;padding-bottom:16px"><span>£40k</span><span>£30k</span><span>£20k</span><span>£10k</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+                    <div style="flex:1;position:relative;border-left:1px solid #EDF1F6;border-bottom:1px solid #E3E8F0;min-height:0">
+                      <div style="position:absolute;left:0;right:0;top:33.3%;border-top:1px dashed #EDF1F6"></div>
+                      <div style="position:absolute;left:0;right:0;top:66.6%;border-top:1px dashed #EDF1F6"></div>
+                      <div style="position:absolute;left:50%;top:0;bottom:0;border-left:1.5px dashed #C7D3E4"></div>
+                      <div style="position:absolute;left:50%;top:6px;transform:translateX(6px);font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">today</div>
+                      <div style="position:absolute;left:50%;right:0;top:22%;bottom:44%;background:#DCE9FB;border-radius:6px;opacity:.75"></div>
+                      <div style="position:absolute;left:0;right:50%;top:40%;height:2.5px;background:#0B1324"></div>
+                      <div style="position:absolute;left:0;right:50%;top:44%;height:2.5px;background:#0D6EFD;opacity:.75"></div>
+                      <div style="position:absolute;left:50%;right:0;top:33%;height:2.5px;background:#0D6EFD"></div>
+                      <div style="position:absolute;left:calc(50% - 4px);top:40%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;background:#0B1324"></div>
+                    </div>
+                    <div style="flex:none;display:flex;gap:6px;padding:5px 0 0;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#9AA5B6"><span style="flex:1;text-align:center">w−4</span><span style="flex:1;text-align:center">w−3</span><span style="flex:1;text-align:center">w−2</span><span style="flex:1;text-align:center">w−1</span><span style="flex:1;text-align:center">w+1</span><span style="flex:1;text-align:center">w+2</span><span style="flex:1;text-align:center">w+3</span><span style="flex:1;text-align:center">w+4</span></div>
+                  </div>
+                </div>
+                <div style="flex:none;padding:9px 11px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3;font-size:10.5px;color:#5A6577;line-height:1.5">The last four weeks ran 4% above forecast, consistently, which is a bias rather than noise. The next four weeks have been lifted to match and the range widened for the festival week.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:11px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What drives the next four weeks</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">from the session calendar</span></div>
+                <div style="display:grid;grid-template-columns:.8fr 1fr .9fr 1fr 1.3fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Week</div><div style="text-align:right">Sessions</div><div style="text-align:right">Expected guests</div><div style="text-align:right">Forecast spend</div><div>Driver</div></div>
+                <div style="display:grid;grid-template-columns:.8fr 1fr .9fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">w+1</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">42</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11 800</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£28 400</div><div style="font-size:10.5px;color:#5A6577">normal week</div></div>
+                <div style="display:grid;grid-template-columns:.8fr 1fr .9fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F4F8FF"><div style="font-weight:700;color:#0A4FB8">w+2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">54</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">16 200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600;color:#0A4FB8">£39 100</div><div style="font-size:10.5px;font-weight:600;color:#0A4FB8">festival · 12 extra sessions</div></div>
+                <div style="display:grid;grid-template-columns:.8fr 1fr .9fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">w+3</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">38</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">10 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£24 800</div><div style="font-size:10.5px;color:#5A6577">school term starts</div></div>
+                <div style="display:grid;grid-template-columns:.8fr 1fr .9fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">w+4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">36</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">9 400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£23 200</div><div style="font-size:10.5px;color:#8A4708">16 Sep closed · 4 sessions lost</div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">How the forecast has scored</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Accuracy · 12 weeks</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">88%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Bias</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">under by 4%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Worst week</span><span style="font-family:'IBM Plex Mono',monospace">−19% · rain</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">The model does not read weather. Outdoor sessions at Park Stage are where it fails, and that is a known limit rather than a bug.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">Festival week needs ordering now</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">£39 100 of demand against a normal £28 400. Two suppliers have 5-day lead times, so the order has to be raised by Friday to land in time.</div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Build the festival order</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Assumptions in this forecast</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Spend per guest</span><span style="font-family:'IBM Plex Mono',monospace">£2.41</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Attendance vs sold</span><span style="font-family:'IBM Plex Mono',monospace">94%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Price changes applied</span><span style="font-family:'IBM Plex Mono',monospace">yes · 1 Sep</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getDemandForecast · getForecastAccuracy · getDemandDrivers · setForecastAssumption · pushForecastToReplenishment · listSessionsForPeriod</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">insufficientHistory — fewer than 8 weeks, forecast shown as a range only</b> · biasDetected · assumptionOverridden · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · siteId←context · category←picker · horizon←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-7c">replenishment</a> · <a href="#inv-7d">stock health</a></div>
+      </div>
+    </div>
+
+    <div id="inv-7c" data-screen-label="INV-7C" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7C</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Replenishment &amp; Procurement Planning</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">31 lines · 4 need a person</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Forecast minus stock minus what is already on order equals what to buy. The arithmetic is shown rather than hidden behind a suggested quantity, so a planner can see which of the four numbers is wrong when the answer looks strange.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">31 lines<br>£18 900</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Replenishment run · Main Arena · week 36</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">31 lines · £18 900 proposed · 4 outside the rules · would become 6 POs</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Change the rules</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Raise 27 clean lines</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The arithmetic, line by line</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">need − on hand − on order = buy</span></div>
+              <div style="flex:none;display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Item</div><div style="text-align:right">Need</div><div style="text-align:right">On hand</div><div style="text-align:right">On order</div><div style="text-align:right">Buy</div><div>Note</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Chicken breast · 5 kg</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">64</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">46</div><div style="font-size:10.5px;color:#0B7A55">within the rules</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Beef mince · 2 kg</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">88</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">24</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">34</div><div style="font-size:10.5px;color:#0B7A55">within the rules</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Salmon side</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">40</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">38</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">lead time 6 d · too late</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Butter · 10 kg</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">26</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">15</div><div style="font-size:10.5px;color:#0B7A55">within the rules</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Draught lager · keg</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">48</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">9</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">12</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#7A3F06">36</div><div style="font-size:10.5px;color:#8A4708">over the £5 k line</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Coffee beans · 1 kg</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">72</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">24</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">8</div><div style="font-size:10.5px;color:#0B7A55">within the rules</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Basil · 100 g</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">30</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">on order but undelivered</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Sourdough loaf</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">210</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">210</div><div style="font-size:10.5px;color:#5A6577">daily · standing order</div></div>
+              <div style="display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr .8fr 1.2fr;align-items:center;padding:8px 14px;font-size:11.5px;font-weight:700;background:#FBFCFE"><div>27 clean lines</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£14 600</div><div style="font-size:10.5px;color:#5A6577">6 POs</div></div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">8 of 31 shown · 4 held back for a decision</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Show only the exceptions</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Salmon cannot arrive in time</div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Needed for the festival Saturday; the contracted supplier quotes six days. A second supplier can do three at 14% more.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Buy at +14%</div><div style="flex:1;height:30px;border-radius:9px;border:1px solid #E3E8F0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#5A6577">Change the menu</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Rules this run applied</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Cover</span><span style="font-family:'IBM Plex Mono',monospace">10 days</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Safety stock</span><span style="font-family:'IBM Plex Mono',monospace">2 days</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Round to</span><span style="font-family:'IBM Plex Mono',monospace">case size</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Auto-raise below</span><span style="font-family:'IBM Plex Mono',monospace">£5 000</span></div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Basil is counted twice</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Thirty are on order and thirty are needed, so the run proposes nothing — but the thirty on order never arrived and the PO line is still open. Until <a href="Inventory%20Board%206.dc.html#inv-6c">receiving</a> cancels it, the planner cannot see the gap.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · runReplenishment · getReplenishmentLine · setReplenishmentRules · raisePurchaseOrders · overrideReplenishmentLine · findAlternativeSupplier</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · proposed · <b style="color:#8A6D00">leadTimeUnachievable — the line is held back rather than raised late</b> · aboveAutoRaiseLimit · phantomOnOrder · raised · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · siteId←context · week←picker · forecastId←<a href="#inv-7b">demand</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · purchase orders · <a href="#inv-7h">approval</a> · <a href="#inv-7d">stock health</a></div>
+      </div>
+    </div>
+
+    <div id="inv-7d" data-screen-label="INV-7D" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7D</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Inventory Optimization &amp; Stock Health</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">£214 k slow-moving</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Stock sorted by how well it is behaving rather than by value. The excess and the shortage are shown together, because a warehouse usually has both at once and fixing one funds the other.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">£2.41 m held<br>9% at risk</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Stock health · all sites</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">£2.41 m held · £214 k slow-moving · £46 k expiring in 14 days</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All sites<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Set reorder points</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Act on 11 items</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Where the £2.41 m sits</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">by how fast it moves</span></div>
+                <div style="display:flex;height:34px;border-radius:9px;overflow:hidden">
+                  <div style="width:52%;background:#0E9F6E;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff">Fast · £1.25 m</div>
+                  <div style="width:29%;background:#00B8FF;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#04364C">Steady · £700 k</div>
+                  <div style="width:13%;background:#F0B429;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#5A3800">Slow · £214 k</div>
+                  <div style="width:6%;background:#DC2626;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff">Dead</div>
+                </div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">fast · under 14 days cover</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">slow · 60 days or more</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">dead · no movement in 90 days · £147 k</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Worth acting on</div><div style="margin-left:auto;display:flex;gap:6px"><span style="height:26px;display:flex;align-items:center;padding:0 9px;border-radius:7px;background:#0D6EFD;color:#fff;font-size:10px;font-weight:700">All 11</span><span style="height:26px;display:flex;align-items:center;padding:0 9px;border:1px solid #F3DFC0;background:#FFF6EA;border-radius:7px;font-size:10px;font-weight:700;color:#8A4708">Excess 6</span><span style="height:26px;display:flex;align-items:center;padding:0 9px;border:1px solid #F5C9C9;background:#FDECEC;border-radius:7px;font-size:10px;font-weight:700;color:#A81E1E">Short 5</span></div></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.8fr 1fr .9fr .9fr 1.4fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Item · site</div><div style="text-align:right">Value</div><div style="text-align:right">Cover</div><div style="text-align:right">Expires</div><div>Suggested</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr .9fr .9fr 1.4fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Craft ale · Riverside</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£38 400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">210 d</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">11 d</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">move to Main Arena</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr .9fr .9fr 1.4fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Branded glassware · Riverside</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">£26 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">400 d</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;color:#8A4708">stop reordering</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr .9fr .9fr 1.4fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Christmas menu stock · Studio</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">£19 800</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">seasonal</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">Jan</div><div style="font-size:10.5px;color:#8A4708">hold · in season Nov</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr .9fr .9fr 1.4fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Salmon side · Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£248</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">0.4 d</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">buy now · festival</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr .9fr .9fr 1.4fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Cleaning chemicals · Park</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£11 200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">140 d</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;color:#5A6577">reduce reorder point</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr .9fr .9fr 1.4fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Sourdough · Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">out</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">daily order missed</div></div>
+                <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">6 of 11 shown · £95 750 addressable</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Accept every suggestion</span></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">£38 400 of ale expires in 11 days</div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Riverside sells 40 a week; there are 1 200 on hand. Main Arena sells 380 a week and is ordering the same product from the same supplier.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Transfer 900</div><div style="flex:none;padding:0 11px;height:30px;border-radius:9px;border:1px solid #E3E8F0;display:flex;align-items:center;font-size:11px;font-weight:700;color:#5A6577">Discount</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">If every suggestion is taken</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Stock released</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">£71 400</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Waste avoided</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">£38 400</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Transfers created</span><span style="font-family:'IBM Plex Mono',monospace">3</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Turns would move to</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">7.6×</span></div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Why Riverside holds so much</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Its reorder points were set when it ran 60 sessions a month. It now runs 22, and nobody changed the numbers. That is a settings problem wearing the costume of a stock problem.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getStockHealth · getMovementBands · listExcessStock · listShortages · suggestStockActions · createStockTransfer · setReorderPoint</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">noMovementHistory — a new item is not called dead stock</b> · excessDetected · expiryImminent · shortage · actionsApplied · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · siteFilter←picker · band←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · stock transfer · <a href="#inv-7c">replenishment</a> · <a href="#inv-7g">warehouse analytics</a></div>
+      </div>
+    </div>
+
+    <div id="inv-7e" data-screen-label="INV-7E" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7E</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Procurement Spend, Savings &amp; Commercial Analytics</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">£1.42 m · 34 suppliers</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Where the money goes, and what the savings claim rests on. Each saving names its benchmark — last year's price, the tendered price, or the list price — because the three give very different numbers for the same purchase.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">YTD £1.42 m<br>saved £61 400</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Spend &amp; savings · year to date</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">£1.42 m across 34 suppliers · 11% off contract · savings £61 400</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Year to date<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Change the benchmark</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Savings report</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Spend by category</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">£1.42 m · 6 categories</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Food</span><div style="flex:1;height:14px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:44%;background:#0D6EFD"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;width:56px;text-align:right">£625 k</span></div>
+                  <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Drink</span><div style="flex:1;height:14px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:27%;background:#00B8FF"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;width:56px;text-align:right">£384 k</span></div>
+                  <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Cleaning</span><div style="flex:1;height:14px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:11%;background:#7BE0B8"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;width:56px;text-align:right">£156 k</span></div>
+                  <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Disposables</span><div style="flex:1;height:14px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:9%;background:#C9DCF6"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;width:56px;text-align:right">£128 k</span></div>
+                  <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Maintenance</span><div style="flex:1;height:14px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:6%;background:#F0B429"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;width:56px;text-align:right">£82 k</span></div>
+                  <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Uniform &amp; other</span><div style="flex:1;height:14px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:3%;background:#C7D3E4"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;width:56px;text-align:right">£45 k</span></div>
+                </div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Savings, and what each one is measured against</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">£61 400 total</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.9fr 1fr 1.2fr .9fr 1.1fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Initiative</div><div style="text-align:right">Saving</div><div>Benchmark</div><div style="text-align:right">Verified</div><div>Owner</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1fr 1.2fr .9fr 1.1fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Retendered drinks contract</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£24 800</div><div style="font-size:10.5px;color:#5A6577">tendered price</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">yes</div><div style="font-size:10.5px;color:#5A6577">S. Okonjo</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1fr 1.2fr .9fr 1.1fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Consolidated produce to one supplier</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£16 200</div><div style="font-size:10.5px;color:#5A6577">last year's price</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">yes</div><div style="font-size:10.5px;color:#5A6577">A. Whitfield</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1fr 1.2fr .9fr 1.1fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Early-payment discounts taken</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£9 100</div><div style="font-size:10.5px;color:#5A6577">invoice face value</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">yes</div><div style="font-size:10.5px;color:#5A6577">Finance</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1fr 1.2fr .9fr 1.1fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Switched cleaning supplier</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">£7 400</div><div style="font-size:10.5px;color:#8A4708">list price</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#8A4708">no</div><div style="font-size:10.5px;color:#8A4708">unassigned</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1fr 1.2fr .9fr 1.1fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Waste reduction at Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£3 900</div><div style="font-size:10.5px;color:#5A6577">prior 12-week waste</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">yes</div><div style="font-size:10.5px;color:#5A6577">Ops</div></div>
+                <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">5 initiatives · £54 000 verified · £7 400 unverified</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">See the calculation</span></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">£7 400 is measured against list price</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">Nobody paid list price for cleaning products last year. Against what we actually paid, the switch saved £1 900. The larger figure should not go in the board pack.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Restate at £1 900</div><div style="flex:none;padding:0 11px;height:30px;border-radius:9px;border:1px solid #E3E8F0;display:flex;align-items:center;font-size:11px;font-weight:700;color:#5A6577">Keep</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Against plan</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Savings target</span><span style="font-family:'IBM Plex Mono',monospace">£90 000</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Claimed</span><span style="font-family:'IBM Plex Mono',monospace">£61 400</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Verified only</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">£54 000</span></div>
+                <div style="height:7px;border-radius:4px;background:#EEF2F7;overflow:hidden;display:flex"><span style="width:60%;background:#0E9F6E"></span><span style="width:8%;background:#F0B429"></span></div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">60% verified · 8% claimed but not verified</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Spend off contract</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Off contract</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">£156 000 · 11%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Biggest single item</span><span style="font-family:'IBM Plex Mono',monospace">£38 k · maintenance</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Off-contract spend is where the next tender comes from. Eleven per cent is high enough to be worth a category review and low enough not to be an emergency.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getSpendByCategory · listSavingsInitiatives · getSavingsBenchmark · restateSaving · getOffContractSpend · exportSavingsReport</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">benchmarkUnset — a saving with no benchmark is shown as unverified, never as a number</b> · unverifiedSavings · restated · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · period←picker · category←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-7f">supplier risk</a> · category review · <a href="#inv-7a">executive view</a></div>
+      </div>
+    </div>
+
+    <div id="inv-7f" data-screen-label="INV-7F" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7F</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Supplier Performance &amp; Risk Analytics</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">1 single point of failure</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Performance and dependency on the same chart. A supplier can be excellent and still be a risk, and the one that is neither excellent nor replaceable is the one that needs a decision this quarter.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">34 suppliers<br>3 at risk</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Supplier performance &amp; risk</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">34 suppliers · rolling 90 days · 3 flagged · 1 renewal in 67 days</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Scorecard weights</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Start a second-source review</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.15fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0">
+              <div style="flex:none;display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Performance against dependency</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">bubble = spend</span></div>
+              <div style="flex:1;position:relative;min-height:0;border-left:1px solid #E3E8F0;border-bottom:1px solid #E3E8F0">
+                <div style="position:absolute;left:0;right:0;top:50%;border-top:1px dashed #EDF1F6"></div>
+                <div style="position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed #EDF1F6"></div>
+                <div style="position:absolute;left:8px;top:8px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">good · replaceable</div>
+                <div style="position:absolute;right:8px;top:8px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">good · hard to replace</div>
+                <div style="position:absolute;left:8px;bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">poor · replaceable</div>
+                <div style="position:absolute;right:8px;bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;color:#A81E1E">poor · hard to replace</div>
+
+                <div style="position:absolute;left:22%;top:22%;width:34px;height:34px;border-radius:50%;background:rgba(14,159,110,.25);border:1.5px solid #0E9F6E;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#0B5B41">KP</div>
+                <div style="position:absolute;left:34%;top:34%;width:26px;height:26px;border-radius:50%;background:rgba(14,159,110,.22);border:1.5px solid #0E9F6E;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#0B5B41">MC</div>
+                <div style="position:absolute;left:19%;top:40%;width:24px;height:24px;border-radius:50%;background:rgba(0,184,255,.22);border:1.5px solid #00B8FF;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#04364C">TL</div>
+                <div style="position:absolute;left:64%;top:30%;width:28px;height:28px;border-radius:50%;background:rgba(0,184,255,.22);border:1.5px solid #00B8FF;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#04364C">WD</div>
+                <div style="position:absolute;left:38%;top:62%;width:26px;height:26px;border-radius:50%;background:rgba(240,180,41,.25);border:1.5px solid #F0B429;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#5A3800">AG</div>
+                <div style="position:absolute;left:56%;top:70%;width:30px;height:30px;border-radius:50%;background:rgba(240,180,41,.25);border:1.5px solid #F0B429;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#5A3800">ND</div>
+                <div style="position:absolute;left:74%;top:74%;width:52px;height:52px;border-radius:50%;background:rgba(220,38,38,.22);border:2px solid #DC2626;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#8A2020">BC</div>
+              </div>
+              <div style="flex:none;display:flex;gap:14px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577"><span>KP Kent Produce</span><span>MC Midland Coffee</span><span>TL Thames Linen</span><span>WD Wine Direct</span><span>AG Alpine Glass</span><span>ND Nordic Drinks</span><span style="color:#8A2020;font-weight:600">BC Brakes Catering</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Brakes Catering</div><span style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">single source</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                  <div style="padding:8px 9px;border-radius:9px;background:#FDF5F5;border:1px solid #F5C9C9;display:flex;flex-direction:column;gap:2px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A81E1E">Spend YTD</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#8A2020">£128 900</span></div>
+                  <div style="padding:8px 9px;border-radius:9px;background:#FDF5F5;border:1px solid #F5C9C9;display:flex;flex-direction:column;gap:2px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A81E1E">Scorecard</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#8A2020">54 / 100</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Nine per cent of total spend, on time half the time, 39% of invoices need a person, and the only supplier for 22 lines. They have already stopped deliveries once over a £678 dispute.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Find a second source</div><div style="flex:none;padding:0 11px;height:30px;border-radius:9px;border:1px solid #E3E8F0;display:flex;align-items:center;font-size:11px;font-weight:700;color:#5A6577">Renewal pack</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What the scorecard weighs</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">On time, in full</span><span style="font-family:'IBM Plex Mono',monospace">40%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Quality acceptance</span><span style="font-family:'IBM Plex Mono',monospace">25%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Invoice accuracy</span><span style="font-family:'IBM Plex Mono',monospace">20%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Price against contract</span><span style="font-family:'IBM Plex Mono',monospace">15%</span></div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Other flags</div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#FFF6EA;border:1px solid #F3DFC0"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#7A3F06">Nordic Drinks · 60% on time</div><div style="font-size:10px;color:#8A4708">two alternatives already approved</div></div></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#FFF6EA;border:1px solid #F3DFC0"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#7A3F06">Alpine Glass · 83% quality</div><div style="font-size:10px;color:#8A4708">all failures on one carrier</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getSupplierScorecard · getSupplierRiskMatrix · getSupplierDependency · setScorecardWeights · startSecondSourceReview · getContractRenewalDates</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">insufficientVolume — fewer than 5 deliveries, supplier shown unscored</b> · singleSourceRisk · renewalDue · reviewStarted · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · category←picker · window←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · sourcing event · <a href="Inventory%20Board%206.dc.html#inv-6h">disputes</a> · contract renewal</div>
+      </div>
+    </div>
+
+    <div id="inv-7g" data-screen-label="INV-7G" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7G</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Warehouse &amp; Inventory Performance Analytics</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">stock accuracy 96.4%</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">How well the warehouse keeps its promises: pick accuracy, put-away time, and the gap between what the system says is on the shelf and what is on the shelf. Accuracy is reported by count, not by value, because one missing keg matters as much as one missing lemon to the person picking it.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">96.4% accurate<br>target 98%</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Warehouse performance · Central Depot</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">rolling 30 days · 11 400 picks · 96.4% stock accuracy · target 98%</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Central Depot<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Schedule a cycle count</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A4708">Stock accuracy</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#7A3F06">96.4%</span><span style="font-size:10.5px;color:#8A4708">1.6 pts below target</span></div>
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">Pick accuracy</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B5B41">99.7%</span><span style="font-size:10.5px;color:#0B7A55">34 errors in 11 400</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Put-away time</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">42 min</span><span style="font-size:10.5px;color:#5A6577">from bay to bin, median</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Lines per hour</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">38</span><span style="font-size:10.5px;color:#0B7A55">up from 34 in July</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.3fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Where the count goes wrong</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">last 12 cycle counts</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.5fr 1fr .9fr .9fr 1.2fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Zone</div><div style="text-align:right">Lines counted</div><div style="text-align:right">Wrong</div><div style="text-align:right">Accuracy</div><div>Most common cause</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr .9fr .9fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Chilled · zone C</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">840</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">61</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">92.7%</div><div style="font-size:10.5px;color:#A81E1E">picked, not scanned</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr .9fr .9fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Ambient · zone A</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 140</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">44</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">97.9%</div><div style="font-size:10.5px;color:#5A6577">wrong bin</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr .9fr .9fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Ambient · zone B</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 980</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">31</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">98.4%</div><div style="font-size:10.5px;color:#5A6577">wrong bin</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr .9fr .9fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Frozen · zone F</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">610</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">7</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">98.9%</div><div style="font-size:10.5px;color:#5A6577">damage not logged</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr .9fr .9fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Bar store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">99.0%</div><div style="font-size:10.5px;color:#5A6577">wrong bin</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr .9fr .9fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;font-weight:700;background:#FBFCFE"><div>All zones</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6 810</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">155</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">97.7%</div><div></div></div>
+                <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">chilled is 12% of lines and 39% of the errors</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Count zone C weekly</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Chilled picking is not being scanned</div>
+                  <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Sixty-one of 155 errors are stock the system still shows on the shelf. Staff report the handheld does not read reliably below 5 °C with gloves on.</div>
+                  <div style="display:flex;gap:6px"><div style="flex:1;height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Raise it as a device issue</div></div>
+                </div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Put-away time by hour</div>
+                  <div style="display:flex;align-items:flex-end;gap:5px;height:74px">
+                    <div style="flex:1;height:38%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                    <div style="flex:1;height:52%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                    <div style="flex:1;height:64%;border-radius:4px 4px 0 0;background:#A9C8F0"></div>
+                    <div style="flex:1;height:96%;border-radius:4px 4px 0 0;background:#DC2626"></div>
+                    <div style="flex:1;height:88%;border-radius:4px 4px 0 0;background:#E9A3A3"></div>
+                    <div style="flex:1;height:47%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                    <div style="flex:1;height:34%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                    <div style="flex:1;height:29%;border-radius:4px 4px 0 0;background:#C9DCF6"></div>
+                  </div>
+                  <div style="display:flex;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#9AA5B6"><span style="flex:1;text-align:center">07</span><span style="flex:1;text-align:center">08</span><span style="flex:1;text-align:center">09</span><span style="flex:1;text-align:center">10</span><span style="flex:1;text-align:center">11</span><span style="flex:1;text-align:center">12</span><span style="flex:1;text-align:center">13</span><span style="flex:1;text-align:center">14</span></div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Put-away peaks at 78 minutes between 10:00 and 12:00 — the same window where both bays are full. Spreading the bay bookings would fix a warehouse problem from the schedule.</div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getWarehouseKpis · getStockAccuracyByZone · getPickAccuracy · getPutAwayTimes · scheduleCycleCount · raiseDeviceIssue</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">noCountsInWindow — accuracy shown as unknown rather than 100%</b> · belowTarget · zoneOutlier · countScheduled · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · siteId←context · window←picker · zone←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · cycle count · <a href="Inventory%20Board%206.dc.html#inv-6b">bay schedule</a> · device support</div>
+      </div>
+    </div>
+
+    <div id="inv-7h" data-screen-label="INV-7H" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7H</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Approval &amp; Control Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">7 waiting · 2 over 3 days</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">One queue for everything that needs a signature, with the limit that caught it and who else could sign. An approval queue that does not show the delegate is an approval queue that stops when someone takes leave.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">7 waiting<br>£64 300</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Approvals · S. Okonjo</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">7 items · £64 300 · limit £25 000 per order · 2 waiting over 3 days</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Delegate while away</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Approval limits</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Approve 4 selected</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Waiting on you</div><div style="margin-left:auto;display:flex;gap:6px"><span style="height:26px;display:flex;align-items:center;padding:0 9px;border-radius:7px;background:#0D6EFD;color:#fff;font-size:10px;font-weight:700">All 7</span><span style="height:26px;display:flex;align-items:center;padding:0 9px;border:1px solid #F5C9C9;background:#FDECEC;border-radius:7px;font-size:10px;font-weight:700;color:#A81E1E">Overdue 2</span></div></div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA;background:#FDF5F5">
+                <span style="flex:none;width:15px;height:15px;border-radius:4px;background:#0D6EFD;margin-top:2px"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#8A2020">PO-4492 · Brakes Catering · £31 400</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">4 days</span></div><div style="font-size:10.5px;color:#8A2020;margin-top:2px;line-height:1.5">Over the £25 000 limit. Festival week food. Supplier is on stop over an unrelated £678 dispute, so approving this does not release the delivery on its own.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center">Open</span>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA;background:#FDF5F5">
+                <span style="flex:none;width:15px;height:15px;border-radius:4px;background:#0D6EFD;margin-top:2px"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#8A2020">Write-off · Riverside ale · £38 400</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">3 days</span></div><div style="font-size:10.5px;color:#8A2020;margin-top:2px;line-height:1.5">Expires in 11 days. A transfer to Main Arena would avoid the write-off entirely and has been proposed on stock health.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center">Open</span>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA;background:#F4F8FF">
+                <span style="flex:none;width:15px;height:15px;border-radius:4px;background:#0D6EFD;margin-top:2px"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#0A4FB8">Price override · salmon +14%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">today</span></div><div style="font-size:10.5px;color:#0A4FB8;margin-top:2px;line-height:1.5">Second supplier, 3-day lead time instead of 6. £248 of extra cost against a festival Saturday.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center">Open</span>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA;background:#F4F8FF">
+                <span style="flex:none;width:15px;height:15px;border-radius:4px;background:#0D6EFD;margin-top:2px"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#0A4FB8">Part payment · INV-88412 · £11 704</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">today</span></div><div style="font-size:10.5px;color:#0A4FB8;margin-top:2px;line-height:1.5">Pays the four clean lines and leaves £678 in dispute. Ends the delivery stop.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center">Open</span>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA">
+                <span style="flex:none;width:15px;height:15px;border-radius:4px;background:#fff;border:1.5px solid #C7D3E4;margin-top:2px"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">New supplier · Fresh Fish Co</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">2 days</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">Onboarding pack complete except the insurance certificate.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#5A6577;align-self:center">Open</span>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px">
+                <span style="flex:none;width:15px;height:15px;border-radius:4px;background:#fff;border:1.5px solid #C7D3E4;margin-top:2px"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">Reorder point change · 14 items</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">1 day</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">Riverside, reduced to match 22 sessions a month instead of 60.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#5A6577;align-self:center">Open</span>
+              </div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">6 of 7 shown · 4 selected · £81 600</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Approve with a note</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">Two of these cancel each other out</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">Approving the £38 400 write-off and the transfer proposal on stock health are alternatives, not both. The transfer avoids the loss; the write-off accepts it.</div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Compare the two</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Your limits</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Per order</span><span style="font-family:'IBM Plex Mono',monospace">£25 000</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Write-off</span><span style="font-family:'IBM Plex Mono',monospace">£10 000</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Price override</span><span style="font-family:'IBM Plex Mono',monospace">15%</span></div>
+                <div style="padding:8px 10px;border-radius:9px;background:#FFF6EA;border:1px solid #F3DFC0;font-size:10.5px;color:#7A3F06;line-height:1.5">Two items here are above your limit and need the finance director as well. They are shown so you can endorse them, not sign them alone.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Who else can sign</div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:34px;flex:none">FD</span><span style="flex:1;font-size:11px;color:#5A6577">M. Devlin · no limit</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:34px;flex:none">Ops</span><span style="flex:1;font-size:11px;color:#5A6577">A. Whitfield · to £10 000</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listPendingApprovals · getApprovalDetail · approveItem · rejectItem · getApprovalLimits · delegateApproval · listAlternateApprovers</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">emptyQueue — stated as clear, with the last approval time</b> · aboveOwnLimit · overdue · conflictingItems · approved · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · approverId←login · queueFilter←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-7c">replenishment</a> · <a href="Inventory%20Board%206.dc.html#inv-6g">matching</a> · <a href="#inv-7d">stock health</a></div>
+      </div>
+    </div>
+
+    <div id="inv-7i" data-screen-label="INV-7I" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7I</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Integration, API &amp; Automation Control Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">1 feed stale 14 h</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Every number on this board arrives from somewhere. When a feed stops, the figures do not go blank — they go quietly out of date, which is worse. This screen states the age of each feed and what depends on it.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">9 feeds<br>1 stale</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Integrations &amp; automation</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">9 feeds · 8 healthy · 1 stale 14 h · 4 automations running</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Event log</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Add a feed</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Retry the supplier feed</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Feeds, and what breaks without them</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">age against expected interval</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Feed</div><div style="text-align:right">Every</div><div style="text-align:right">Last</div><div style="text-align:right">State</div><div>Depends on it</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Brakes price file</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">daily</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">14 h</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#A81E1E">stale</div><div style="font-size:10.5px;color:#A81E1E">matching tolerance · savings</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Session calendar</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">15 min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4 min</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">ok</div><div style="font-size:10.5px;color:#5A6577">demand forecast</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Till sales</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">5 min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 min</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">ok</div><div style="font-size:10.5px;color:#5A6577">consumption · stock health</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Warehouse handhelds</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">live</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">now</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">ok</div><div style="font-size:10.5px;color:#5A6577">stock accuracy · put-away</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Invoice mailbox</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">5 min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 min</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">ok</div><div style="font-size:10.5px;color:#5A6577">invoice capture</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Finance ledger</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">nightly</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">7 h</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">ok</div><div style="font-size:10.5px;color:#5A6577">payment run · spend</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr .9fr .9fr .9fr 1.6fr;align-items:center;padding:9px 14px;font-size:11.5px"><div style="font-weight:600">Kent Produce catalogue</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">weekly</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 d</div><div style="text-align:right;font-size:10.5px;font-weight:700;color:#0B7A55">ok</div><div style="font-size:10.5px;color:#5A6577">item master · prices</div></div>
+                <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">7 of 9 shown · staleness measured against each feed's own interval</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Open the event log</span></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Automations running</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="width:7px;height:7px;border-radius:50%;background:#0E9F6E;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">Auto-raise POs under £5 000</div><div style="font-size:10px;color:#8494A8">27 last week</div></div></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="width:7px;height:7px;border-radius:50%;background:#0E9F6E;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">Match clean invoices</div><div style="font-size:10px;color:#8494A8">83% pass rate</div></div></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="width:7px;height:7px;border-radius:50%;background:#0E9F6E;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">Nightly ledger export</div><div style="font-size:10px;color:#8494A8">last run 02:14</div></div></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#FFF6EA;border:1px solid #F3DFC0"><span style="width:7px;height:7px;border-radius:50%;background:#B4530A;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#7A3F06">Price file import</div><div style="font-size:10px;color:#8A4708">failed 3 times · auth</div></div></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">The stale feed is the disputed one</div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Brakes changed their SFTP credentials on 25 August. Their price file has not landed since, so matching is comparing invoices against a contract price nobody has confirmed is current.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Update credentials</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Last 24 hours</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Messages in</span><span style="font-family:'IBM Plex Mono',monospace">41 800</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Failed and retried</span><span style="font-family:'IBM Plex Mono',monospace">96</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Dead letters</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">3</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Slowest feed</span><span style="font-family:'IBM Plex Mono',monospace">ledger · 9 min</span></div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Why age, not up-or-down</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A feed that answers but returns yesterday's file is "up" by any health check and wrong by every measure that matters. Age against the feed's own interval is the only honest signal.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listIntegrations · getFeedHealth · retryFeed · updateFeedCredentials · listAutomations · getEventLog · listDeadLetters</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · allHealthy · <b style="color:#8A6D00">feedStale — dependent figures are labelled as of the feed's last good run</b> · authFailure · deadLetters · retrying · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · feedFilter←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · event log · <a href="Inventory%20Board%206.dc.html#inv-6g">matching</a> · <a href="#inv-7e">savings</a></div>
+      </div>
+    </div>
+
+    <div id="inv-7j" data-screen-label="INV-7J" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-7J</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">AI Inventory &amp; Procurement Copilot</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">answers cite their source</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">A question box over the same data the rest of the board reads. Every figure in an answer names the screen and the feed it came from, and any action it offers goes through the ordinary approval path rather than around it.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Inventory &amp; Procurement</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Master &amp; Stock</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Warehouse Ops</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Sourcing &amp; POs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Receiving &amp; GRN</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Invoices &amp; Matching</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">ADR-0020<br>proposes only</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Copilot · Inventory &amp; Procurement</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">reads 9 feeds · 1 stale · answers stamped with the data they used</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">What it can see</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">New question</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Send to approvals</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden">
+                <div style="display:flex;justify-content:flex-end"><div style="max-width:70%;padding:10px 13px;border-radius:13px 13px 4px 13px;background:#0D6EFD;color:#fff;font-size:12px;line-height:1.5">Why is Riverside holding so much stock?</div></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="max-width:82%;padding:11px 13px;border-radius:13px 13px 13px 4px;background:#F4F6FA;border:1px solid #E8ECF3;font-size:12px;line-height:1.55;color:#0B1324">Riverside holds £612 k against turns of 4.6, versus 7.2 for the group. Two thirds of the excess is in two lines: craft ale at £38 400 with 210 days of cover, and branded glassware at £26 100 with 400 days.<br><br>Its reorder points were set for 60 sessions a month. It has run 22 a month since March and the points were never changed.</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 8px;border-radius:999px;background:#EDF3FF;color:#0A4FB8">stock health · 09:12</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 8px;border-radius:999px;background:#EDF3FF;color:#0A4FB8">session calendar · 4 min ago</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 8px;border-radius:999px;background:#EDF3FF;color:#0A4FB8">reorder points · unchanged since 14 Feb</span></div>
+                </div>
+                <div style="display:flex;justify-content:flex-end"><div style="max-width:70%;padding:10px 13px;border-radius:13px 13px 4px 13px;background:#0D6EFD;color:#fff;font-size:12px;line-height:1.5">What would fix it this week?</div></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="max-width:82%;padding:11px 13px;border-radius:13px 13px 13px 4px;background:#F4F6FA;border:1px solid #E8ECF3;font-size:12px;line-height:1.55;color:#0B1324">Three things, in order of what they are worth:</div>
+                  <div style="max-width:82%;display:flex;flex-direction:column;gap:7px">
+                    <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:#F4F8FF;border:1.5px solid #BBD6FF"><div style="flex:1"><div style="font-size:11.5px;font-weight:700;color:#0A4FB8">Transfer 900 craft ale to Main Arena</div><div style="font-size:10.5px;color:#0A4FB8;margin-top:1px">avoids £38 400 of waste · needs an ops approval</div></div><span style="font-size:10px;font-weight:700;color:#0D6EFD;flex:none">Propose</span></div>
+                    <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Reduce 14 reorder points to match 22 sessions</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">already in your approval queue · 1 day old</div></div><span style="font-size:10px;font-weight:700;color:#5A6577;flex:none">Open</span></div>
+                    <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Stop reordering branded glassware</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">400 days of cover · no session driving it</div></div><span style="font-size:10px;font-weight:700;color:#5A6577;flex:none">Propose</span></div>
+                  </div>
+                  <div style="max-width:82%;padding:9px 11px;border-radius:10px;background:#FFF6EA;border:1px solid #F3DFC0;font-size:10.5px;color:#7A3F06;line-height:1.5">I have not applied anything. Each of these becomes an item in the approval queue with your name on it.</div>
+                </div>
+                <div style="margin-top:auto;display:flex;gap:8px;align-items:center;padding-top:10px;border-top:1px solid #F4F6FA"><div style="flex:1;height:38px;border:1px solid #D8E0EA;border-radius:10px;display:flex;align-items:center;padding:0 12px;font-size:11.5px;color:#9AA5B6">Ask about stock, spend, suppliers or a purchase order…</div><div style="flex:none;padding:0 15px;height:38px;border-radius:10px;background:#0D6EFD;color:#fff;display:flex;align-items:center;font-size:12px;font-weight:700">Ask</div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">One feed is 14 hours stale</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">Answers about Brakes prices are based on the file from 25 August. Anything about their contract price carries that date rather than reading as current.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What it can see</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Stock &amp; movement</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">yes</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Orders &amp; invoices</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">yes</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Supplier contracts</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">yes</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Staff records</span><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E">no</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Guest data</span><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E">no</span></div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Recent questions</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.5">Which suppliers raised prices without an amendment?</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.5">What did the festival cost us last year?</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.5">Show everything expiring in 14 days.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · askCopilot · getAnswerProvenance · listCopilotProposals · createProposalFromAnswer · getCopilotScope · listRecentQuestions</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · idle · thinking · answered · <b style="color:#8A6D00">staleSource — the answer states which feed is out of date and how old it is</b> · outOfScope · proposalCreated · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · userId←login · question←input · context←current screen, optional</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-7h">approvals</a> · <a href="#inv-7d">stock health</a> · <a href="#inv-7i">integrations</a></div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-size:14px;font-weight:800;letter-spacing:-.01em">Mapping table · Inventory Board 7</div><div style="font-size:11.5px;color:#6B7280;margin-top:3px">Reference pack rows, in the order the client listed them.</div></div>
+      <div style="display:grid;grid-template-columns:.55fr 2fr 1.5fr;border:1px solid #EDF1F6;border-radius:9px;overflow:hidden">
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Frame</div>
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Reference row</div>
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">What the frame decides</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7a</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Inventory &amp; Procurement Executive Command Center</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Which site to look at</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7b</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Demand Forecasting &amp; Consumption Planning</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Whether to trust the forecast</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7c</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Replenishment &amp; Procurement Planning</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">What to buy, and what to hold back</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7d</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Inventory Optimization &amp; Stock Health</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Transfer, discount, or write off</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7e</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Procurement Spend, Savings &amp; Commercial Analytics</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Whether a saving is real</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7f</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Supplier Performance &amp; Risk Analytics</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Which supplier needs a second source</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7g</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Warehouse &amp; Inventory Performance Analytics</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Where to count, and what to fix</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7h</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Inventory &amp; Procurement Approval / Control Center</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Sign, reject, or delegate</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">inv-7i</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Integration, API &amp; Automation Control Center</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Whether the numbers can be trusted today</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;">inv-7j</div>
+        <div style="padding:8px 11px;font-size:11.5px;">TICVAI AI Inventory &amp; Procurement Copilot</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;">Which proposal to send for approval</div>
+      </div>
+      <div style="display:flex;gap:12px;padding:13px 15px;border-radius:10px;background:#DFF3EA;border:1px solid #A9DCC6;font-size:11.5px;color:#0B5B41;line-height:1.6">
+        <div style="width:3px;border-radius:2px;background:#0E9F6E;flex:none"></div>
+        <div><b>70 of 70 — Inventory &amp; Procurement is complete.</b> Seven boards from item master to copilot. Two threads run the length of it and land here: Brakes Catering, the largest supplier and worst performer, renewing on 1 November; and Riverside Hall, holding a quarter of the group's stock on reorder points set for a venue three times busier.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

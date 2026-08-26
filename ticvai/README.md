@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**1023 operations · 379 tables · 492 screens · 113 state models · 29 events · 94 flows · 30 ADRs**
+**1023 operations · 379 tables · 492 screens · 122 state models · 29 events · 94 flows · 30 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -31,7 +31,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | `contracts/` | **1023 operations** across 25 files — 267 spine, 470 satellite |
 | `screens/` | 364 definitions across 15 platforms, all specified |
 | `frontend/` | 10 app manifests, with build readiness |
-| `states/` · `events/` | 113 state models · 29 events, cross-checked |
+| `states/` · `events/` | 122 state models · 29 events, cross-checked |
 | `flows/` | 23 user journeys with 137 unhappy paths |
 | `handoff/` | Registers, indexes and the schema workbook |
 | `docs/` | Architecture, 30 ADRs, the conflict register |

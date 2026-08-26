@@ -10,7 +10,7 @@
  * Nothing in this file reaches back into a layer. That is the rule that keeps
  * the split from being a rename: a layer imports from core, never the reverse.
  */
-import { tip, GLOSSARY } from './tips.js';
+import { tip, GLOSSARY, setFactProvider } from './tips.js';
 import './theme.js';   // stamps the saved theme before anything paints
 
 export const LAYERS = [
@@ -323,14 +323,15 @@ export const MODE_TIPS = {
     body:
       'Which tables each operation actually touches, plus its service and stored procedure — the ' +
       'join between the Contracts layer and the DB layer, which nothing else here can make. ' +
-      '**336 of 654 resolve to a table**; the rest mostly return a computed projection and ' +
-      'correctly resolve to none.',
+      '**{resolved} of {operations} resolve**, across {tables} tables; the rest return a computed ' +
+      'projection and correctly resolve to none.',
   },
   waves: {
     title: 'Waves',
     body:
-      'Delivery sequencing. All 347 screens across three waves and twelve platforms, with the ' +
-      '**192 that name no operation** marked — a screen somebody can draw and nobody can build.',
+      'Delivery sequencing. All {screens} screens across {waves} waves and {platforms} platforms, ' +
+      'with the **{screensNoOperation} that name no operation** marked — a screen somebody can ' +
+      'draw and nobody can build.',
   },
   decisions: {
     title: 'Decisions',
@@ -438,6 +439,37 @@ export const state = {
   fileCache: new Map(),
   drawer: null, // 'left' | 'right' | null — only meaningful below the phone breakpoint
 };
+
+// ── the numbers the prose is allowed to quote ────────────────────────
+//
+// Read off the payload at hover, never typed into a sentence. See the note in
+// tips.js for what this replaced and why it kept being wrong.
+//
+// Everything is optional-chained and every miss returns `undefined`, which
+// leaves the `{token}` visible: a tip opened before its layer has loaded says
+// `{operations}` rather than a confident zero.
+setFactProvider(() => {
+  const lineage = state.lineage?.stats;
+  const journeys = state.journeys?.stats;
+  const screens = lineage?.screens ?? journeys?.screens;
+  const withOps = lineage?.screensWithOperations;
+
+  return {
+    operations: lineage?.operations,
+    resolved: lineage?.resolved,
+    unresolved: lineage?.unresolved,
+    services: lineage?.services,
+    tables: lineage?.tablesTouched,
+    storedProcedures: lineage?.storedProcedures,
+    screens,
+    platforms: journeys?.platforms,
+    waves: journeys?.waves ?? lineage?.waves,
+    // The figure the Waves view exists to show: drawable, unbuildable.
+    screensNoOperation:
+      screens !== undefined && withOps !== undefined ? screens - withOps : undefined,
+    adrs: state.decisions?.adrs?.length,
+  };
+});
 
 export const groupBy = () => state.groupBy[state.layer];
 

@@ -149,6 +149,11 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: cardList
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Product categories
     emptyFirstRun: Nothing on sale today — a real answer, not an error
@@ -161,6 +166,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Catalogue unavailable. KSK-014
     offline: Not available
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - KSK-001
@@ -198,6 +207,11 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: cardList
+        derived: true
+        impliedBy: listProductVariants
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Variants and prices
     emptyFirstRun: No variants for this product
@@ -210,6 +224,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Pricing unavailable
     offline: Not available
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - KSK-001
@@ -259,6 +277,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: acquireLease
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acquireLease
   states:
     loading: Live availability, never cached
     emptyFirstRun: '**Sold out.** Offers the next available session rather than a dead end'
@@ -314,6 +341,16 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: addCartLine
+        label: Add cart line
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addCartLine
   states:
     loading: Promotion evaluation
     emptyFirstRun: Cart empty — returns to KSK-003
@@ -382,6 +419,16 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPayment
+        label: Create payment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPayment
   states:
     loading: Terminal state, shown plainly
     emptyFirstRun: Not applicable
@@ -439,6 +486,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: inquirePaymentStatus
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: inquirePaymentStatus
   states:
     loading: Inquiry in progress
     emptyFirstRun: Not applicable
@@ -498,6 +554,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: transferOrderTickets
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
   states:
     loading: Printing
     emptyFirstRun: Not applicable
@@ -558,6 +623,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: transferOrderTickets
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
   states:
     loading: Sending by email and rendering the QR
     emptyFirstRun: Not applicable
@@ -608,6 +682,11 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: searchField
+        derived: true
+        impliedBy: lookupShopAndDrop
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
   states:
     loading: Reference entry
     emptyFirstRun: Not applicable
@@ -620,6 +699,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Lookup unavailable
     offline: Not available
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - KSK-001
@@ -668,6 +751,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: transferOrderTickets
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
   states:
     loading: Booking detail
     emptyFirstRun: No booking for that reference
@@ -716,6 +808,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: endKioskAssist
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: endKioskAssist
   states:
     loading: Alerting staff
     emptyFirstRun: Not applicable
@@ -801,6 +902,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: sendAiMessage
+        label: Send ai message
+        notes: The act the screen exists for.
+      - kind: cardList
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: sendAiMessage
   apis:
   - operationId: sendAiMessage
     contract: ai
@@ -831,6 +947,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Falls back to Call staff** (KSK-013), not to an error. A guest stuck at a kiosk with a
       broken assistant needs a person, and there is one in the building'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - KSK-001

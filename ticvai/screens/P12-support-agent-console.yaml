@@ -412,6 +412,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addCaseMessage
+        label: Add case message
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCases
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addCaseMessage
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -428,6 +443,10 @@ screens:
       **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P12 Venue Support.dc.html#sup-005

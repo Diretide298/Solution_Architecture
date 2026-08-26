@@ -267,6 +267,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -344,6 +345,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -373,6 +375,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -438,6 +441,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -631,6 +635,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -870,6 +875,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -896,6 +902,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1098,6 +1105,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1146,6 +1154,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false

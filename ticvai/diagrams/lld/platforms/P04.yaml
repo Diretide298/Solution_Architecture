@@ -59,7 +59,7 @@ servicesCalled:
 coverage:
   screens: 24
   inAFlow: 19
-  drawn: 20
+  drawn: 24
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -850,7 +850,7 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-021
   inFlows:
   - F108 A guest orders food at a counter and collects it
 - screen: POS-022
@@ -881,7 +881,7 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-022
   inFlows:
   - F108 A guest orders food at a counter and collects it
 - screen: POS-023
@@ -912,7 +912,7 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-023
   inFlows: null
 - screen: POS-024
   name: Outlet Setup
@@ -942,5 +942,5 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-024
   inFlows: null

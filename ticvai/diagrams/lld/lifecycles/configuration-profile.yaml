@@ -1,0 +1,85 @@
+id: LLD-ConfigurationProfile
+title: ConfigurationProfile — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/configuration-profile.yaml
+entity: ConfigurationProfile
+contract: tenancy
+enum: ConfigurationProfile.status
+enumKind: inline
+enumSchema: ConfigurationProfile
+enumProperty: status
+owner: TenancyService
+description: 'What a workstation is configured to be, between somebody editing it and every till in
+  a venue running it.
+
+
+  **A profile reaches devices.** That is what makes `deploying` a state rather than a moment — a fleet
+  is never uniform for the duration of a rollout.'
+initial:
+- draft
+terminal:
+- superseded
+- rolledBack
+states:
+- name: draft
+  description: Edited and reaching nothing.
+- name: published
+  description: Approved and available to deploy. **Not yet on any device** — publishing and deploying
+    are two acts because a venue approves a change on Monday and rolls it out on Tuesday at 6am.
+- name: deploying
+  description: Reaching devices. **The state where a fleet is split** — some tills on the new profile,
+    some on the old, and both trading.
+- name: deployed
+  description: 'Every reachable device has it. **Reachable is the word that matters**: a till switched
+    off is not a failure, it is a till that will get it when it wakes.'
+- name: superseded
+  description: A later profile replaced it.
+- name: rolledBack
+  description: Withdrawn after deployment. **Terminal, and the profile is kept** — what was rolled back
+    and why is the record that stops it being deployed again by somebody who was not there.
+transitions:
+- from: draft
+  to: published
+  trigger: publish
+  operation: setConfigurationProfile
+  guard: '**Validated against the workstation schema.** A profile that publishes with an unknown key
+    is a till that ignores it silently.'
+- from: published
+  to: deploying
+  trigger: deploy
+  operation: deployConfigurationProfile
+  guard: '**A target set is named** — a venue, a device class, one till. Deploying to everything is
+    a choice, not a default.'
+- from: deploying
+  to: deployed
+  trigger: complete
+  operation: deployConfigurationProfile
+  guard: Every reachable device acknowledged.
+- from: deploying
+  to: rolledBack
+  trigger: rollback
+  operation: deployConfigurationProfile
+  guard: '**Aborted mid-rollout.** The devices that took it are reverted; the ones that did not are
+    left alone.'
+- from: deployed
+  to: rolledBack
+  trigger: rollback
+  operation: deployConfigurationProfile
+  guard: '**Withdrawn after the fact.** The most consequential transition here — every device goes back,
+    and a till mid-sale finishes it first.'
+- from: deployed
+  to: superseded
+  trigger: supersede
+  operation: setConfigurationProfile
+  guard: A newer profile deployed over it.
+- from: published
+  to: superseded
+  trigger: supersede
+  operation: setConfigurationProfile
+  guard: '**Replaced before it ever deployed.** Common and worth allowing without a rollback.'
+openQuestions: '**What happens to a till that was offline for the whole rollout and wakes after a rollback?**
+  It has never had the profile and the rollback does not apply to it. The current model says it takes
+  whatever is current, which is right — but nothing says so explicitly.'
+notes: '**`deploying` is a real state, not a progress bar.** A fleet running two profiles is a venue
+  where two tills disagree about a price, and the state is what makes that visible rather than a percentage.'

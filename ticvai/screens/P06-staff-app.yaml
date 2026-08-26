@@ -61,6 +61,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: login
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listMfaMethods
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: login
   states:
     loading: Biometric prompt, or SSO redirect
     emptyFirstRun: Not applicable
@@ -70,6 +84,10 @@ screens:
     error: Sign-in failed, with the reason
     offline: Signs in against the cached principal list. A technician in a basement still needs their
       tasks
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-002
@@ -135,6 +153,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: selectRole
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listMfaMethods
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: selectRole
   states:
     loading: Roles and venues for this principal
     emptyFirstRun: Only one role — skipped entirely
@@ -147,6 +179,10 @@ screens:
       same terminal is the way through.'
     error: Could not load roles. The last selection is offered
     offline: Cached from the last session
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -214,6 +250,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listIncidents
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acceptShiftVariance
+        label: Accept shift variance
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acceptShiftVariance
   states:
     loading: Tiles skeleton. Shift state renders first
     emptyFirstRun: Nothing on today
@@ -231,6 +282,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Partial — each tile fails independently, so one dead service does not blank the screen
     offline: Last synced view, with its age. The pending count is always current because it is local
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -367,6 +422,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listInspectionTemplates
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: submitInspection
+        label: Submit inspection
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: submitInspection
   states:
     loading: Checklist items from the template
     emptyFirstRun: No checklist configured for this venue — a gap, shown as one
@@ -385,6 +455,10 @@ screens:
     error: Could not load. **The venue may not open on an unread checklist**, so this blocks rather
       than warns
     offline: Works from the cached template. Completions queue
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -435,6 +509,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: closeShift
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCashMovements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: closeShift
   states:
     loading: Closing
     emptyFirstRun: Not applicable
@@ -449,6 +537,10 @@ screens:
     error: Close failed. The shift stays open rather than half-closed
     offline: '**Cannot close.** Closing needs the server total, and a locally computed variance is not
       a variance'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -539,6 +631,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Instant. This screen must never wait
     emptyFirstRun: —
@@ -561,6 +673,10 @@ screens:
     outcomeDenied: '**Give the reason and the next action.**'
     overrideDialog: '**Admit against a failed validation, on the record.** A confirm dialog on `outcomeDenied`
       — an override is a decision taken while looking at the denial.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -625,6 +741,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: Local first, then server
     emptyFirstRun: No match
@@ -643,6 +780,10 @@ screens:
     error: Not found
     offline: Searches the bundle only. A ticket issued after the last sync will not be found, and the
       screen says so
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -739,6 +880,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Party resolution
     emptyFirstRun: Party of one — falls through to a normal scan
@@ -756,6 +917,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not resolve
     offline: Fully offline. Admits what is valid and states the shortfall
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -817,6 +982,31 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: syncScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: dataTable
+        derived: true
+        impliedBy: listSyncRejections
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Sync in progress, with a count
     emptyFirstRun: Nothing to sync
@@ -834,6 +1024,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Sync failed. **The journal is kept** — a failed sync must never discard what it was carrying
     offline: Not applicable; this screen ends the offline period
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -903,6 +1097,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCatalogueBundles
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: reportBundleApplied
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reportBundleApplied
   states:
     loading: Downloading, with size and progress
     emptyFirstRun: —
@@ -919,6 +1127,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Download failed. The previous bundle stays in place
     offline: Cannot refresh. The existing bundle continues and its age is shown
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -973,6 +1185,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listWorkOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acceptWorkOrder
+        label: Accept work order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelWorkOrder
+        label: Cancel work order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acceptWorkOrder
   states:
     loading: List skeleton
     emptyFirstRun: No tasks assigned — offers available work rather than nothing
@@ -990,6 +1223,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Task service unavailable
     offline: Local queue. Tasks completed offline sync on return
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1096,6 +1333,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: startWorkOrder
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelWorkOrder
+        label: Cancel work order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: dataTable
+        derived: true
+        impliedBy: listWorkOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: startWorkOrder
   states:
     loading: Detail skeleton
     emptyFirstRun: Not applicable
@@ -1113,6 +1370,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Task not found — it may have been reassigned
     offline: Editable offline. Findings and photos queue
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1222,6 +1483,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createWorkOrder
+        label: Create work order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelWorkOrder
+        label: Cancel work order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: dataTable
+        derived: true
+        impliedBy: listWorkOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createWorkOrder
   states:
     loading: Form
     emptyFirstRun: Not applicable
@@ -1239,6 +1521,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not raise. The draft is kept
     offline: Queues locally. A task raised in a plant room must not need signal
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1345,6 +1631,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnnouncements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: publishAnnouncement
+        label: Publish announcement
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishAnnouncement
   states:
     loading: Notes load
     emptyFirstRun: No notes from the previous shift
@@ -1358,6 +1659,10 @@ screens:
       same terminal is the way through.'
     error: Could not load
     offline: Editable offline and synced at end of shift
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1418,6 +1723,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listShifts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: suspendShift
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: suspendShift
   states:
     loading: Shift totals
     emptyFirstRun: No shift open
@@ -1431,6 +1750,10 @@ screens:
       same terminal is the way through.'
     error: Could not load
     offline: Local totals, marked as unreconciled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1495,6 +1818,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiConversations
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAiConversation
+        label: Create ai conversation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAiConversation
   states:
     loading: Conversations load
     emptyFirstRun: No history — explains what the assistant can answer
@@ -1511,6 +1849,10 @@ screens:
       commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Assistant unavailable. **Says so rather than answering from nothing**
     offline: '**Not available.** Retrieval needs the index'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1563,6 +1905,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: sendAiMessage
+        label: Send ai message
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiConversations
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: sendAiMessage
   states:
     loading: Streaming the answer
     emptyFirstRun: —
@@ -1579,6 +1936,10 @@ screens:
       commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not answer. **An assistant that fails silently teaches people not to use it**
     offline: Not available
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1635,6 +1996,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listQueues
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: callNextParties
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: callNextParties
   states:
     loading: Queues and waits
     emptyFirstRun: No queues configured
@@ -1652,6 +2027,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Last synced view with its age
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1724,6 +2103,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: setWaitTime
+        label: Save wait time
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listQueueEntries
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setWaitTime
   states:
     loading: —
     emptyFirstRun: —
@@ -1742,6 +2136,10 @@ screens:
     error: Could not submit. The entry is kept and retried
     offline: '**Queues locally.** Manual entry exists because a feed died, so it must not need the network
       the feed lost'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1810,6 +2208,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listEnvelopes
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createEnvelope
+        label: Create envelope
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createEnvelope
   states:
     loading: Capacity by area
     emptyFirstRun: —
@@ -1827,6 +2240,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Last synced, with age
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -1893,6 +2310,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: Products load
     emptyFirstRun: Nothing sellable from this device
@@ -1910,6 +2348,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Selling is blocked
     offline: '**Cash only offline.** Card completes nowhere the acquirer saw it'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2044,6 +2486,16 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPayment
+        label: Create payment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPayment
   states:
     loading: Terminal state
     emptyFirstRun: —
@@ -2121,6 +2573,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: appendEntitlementToMedia
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: appendEntitlementToMedia
   states:
     loading: —
     emptyFirstRun: —
@@ -2197,6 +2658,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnnouncements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acknowledgeAnnouncement
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acknowledgeAnnouncement
   states:
     loading: Notifications load
     emptyFirstRun: Nothing new
@@ -2210,6 +2685,10 @@ screens:
       same terminal is the way through.'
     error: Could not load
     offline: Cached, with age. Acknowledgements queue
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2268,6 +2747,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnnouncements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acknowledgeAnnouncement
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acknowledgeAnnouncement
   states:
     loading: Announcements load
     emptyFirstRun: None
@@ -2282,6 +2775,10 @@ screens:
     error: Could not load
     offline: Cached. **Acknowledgement queues** — an emergency acknowledgement needing a network does
       not arrive when it matters
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2340,6 +2837,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnnouncements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acknowledgeAnnouncement
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acknowledgeAnnouncement
   states:
     loading: Instant. This screen preempts everything
     emptyFirstRun: Not applicable
@@ -2353,6 +2864,10 @@ screens:
       same terminal is the way through.'
     error: Renders from local data only — it must work when nothing else does
     offline: Fully offline by design
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2411,6 +2926,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listIncidents
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: recordAuthorityNotification
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordAuthorityNotification
   states:
     loading: —
     emptyFirstRun: —
@@ -2428,6 +2957,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not restore. Escalates to a duty manager
     offline: '**Works offline by design.** Post-incident restore is exactly when the network is worst'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2489,6 +3022,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listRotaAssignments
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: requestShiftSwap
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: requestShiftSwap
   states:
     loading: Roster loads
     emptyFirstRun: Nobody rostered
@@ -2502,6 +3049,10 @@ screens:
       same terminal is the way through.'
     error: Could not load
     offline: Cached roster with its age
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2555,6 +3106,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listRotaAssignments
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: requestShiftSwap
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: requestShiftSwap
   states:
     loading: My assignments
     emptyFirstRun: Nothing assigned
@@ -2568,6 +3133,10 @@ screens:
       same terminal is the way through.'
     error: Could not load
     offline: Cached
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2621,6 +3190,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: requestShiftSwap
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listRotaAssignments
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: requestShiftSwap
   states:
     loading: —
     emptyFirstRun: —
@@ -2634,6 +3217,10 @@ screens:
       same terminal is the way through.'
     error: Could not submit. The request is kept
     offline: Queues locally
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2687,6 +3274,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: recordAttendance
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAttendance
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordAttendance
   states:
     loading: —
     emptyFirstRun: —
@@ -2701,6 +3302,10 @@ screens:
     error: Out of sequence — a clock-out with no clock-in. **Reported, not silently corrected**
     offline: '**Device time is recorded and both are kept.** A steward clocking in at a gate with no
       signal is not late because the sync was'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2755,6 +3360,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: recordAttendance
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAttendance
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordAttendance
   states:
     loading: —
     emptyFirstRun: —
@@ -2768,6 +3387,10 @@ screens:
       same terminal is the way through.'
     error: Could not record
     offline: Queues locally
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2820,6 +3443,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: reportIncident
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listIncidents
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reportIncident
   states:
     loading: Form
     emptyFirstRun: Not applicable
@@ -2838,6 +3475,10 @@ screens:
     error: Could not submit. **The report is kept and retried** — a safety report lost to a network
       error is the worst outcome on this app
     offline: Queues locally with the highest sync priority
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2902,6 +3543,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: updateIncident
+        label: Save incident
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listIncidents
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateIncident
   states:
     loading: Incident detail
     emptyFirstRun: —
@@ -2919,6 +3575,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached; updates queue
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -2978,6 +3638,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createCase
+        label: Create case
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCases
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createCase
   states:
     loading: Items load
     emptyFirstRun: Nothing logged
@@ -2996,6 +3671,10 @@ screens:
     error: Could not save. The entry is kept
     offline: Queues locally and syncs on reconnect. The pending count is always current because it is
       local
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -3066,6 +3745,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: reportIncident
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCases
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reportIncident
   states:
     loading: —
     emptyFirstRun: —
@@ -3084,6 +3777,10 @@ screens:
     error: Could not raise. **The request is kept and retried**
     offline: Queues locally and syncs on reconnect. The pending count is always current because it is
       local
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -3176,6 +3873,11 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listDiningOutlets
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Map renders
     emptyFirstRun: No map uploaded for this venue — a gap, shown as one
@@ -3192,6 +3894,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Falls back to a zone list
     offline: Cached map. **The zone list always works** because it is text
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -3258,6 +3964,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: publishAnnouncement
+        label: Publish announcement
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnnouncements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishAnnouncement
   states:
     loading: —
     emptyFirstRun: —
@@ -3271,6 +3992,10 @@ screens:
       same terminal is the way through.'
     error: Could not send. **Nothing partially sent**
     offline: Queues, and states that it has not gone yet
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -3329,6 +4054,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: semanticSearch
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: semanticSearch
   states:
     loading: Search results
     emptyFirstRun: No articles match
@@ -3382,6 +4116,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: semanticSearch
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: semanticSearch
   states:
     loading: Modules load
     emptyFirstRun: Nothing assigned
@@ -3435,6 +4178,11 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listMfaMethods
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Profile loads
     emptyFirstRun: —
@@ -3443,6 +4191,10 @@ screens:
       with the wrong question.'
     error: Could not load
     offline: Cached
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -3500,6 +4252,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listDevices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: registerDevice
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: registerDevice
   states:
     loading: Device state
     emptyFirstRun: —
@@ -3517,6 +4283,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not read
     offline: '**Fully offline** — device settings are local by definition'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - EMP-001
@@ -3643,6 +4413,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: logout
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: logout
   states:
     loading: Closing the session
     emptyFirstRun: —
@@ -3685,6 +4464,17 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Journal summary
     emptyFirstRun: Nothing journalled

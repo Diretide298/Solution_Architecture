@@ -66,11 +66,11 @@
    "operations": 4
   },
   {
-   "contract": "cross-cell",
+   "contract": "public-api",
    "operations": 3
   },
   {
-   "contract": "public-api",
+   "contract": "cross-cell",
    "operations": 3
   },
   {

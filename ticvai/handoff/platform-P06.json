@@ -77,19 +77,19 @@
    "operations": 9
   },
   {
-   "contract": "identity",
-   "operations": 8
-  },
-  {
    "contract": "marketing-crm",
    "operations": 8
   },
   {
-   "contract": "access",
-   "operations": 7
+   "contract": "identity",
+   "operations": 8
   },
   {
    "contract": "queue",
+   "operations": 7
+  },
+  {
+   "contract": "access",
    "operations": 7
   },
   {
@@ -97,15 +97,15 @@
    "operations": 4
   },
   {
+   "contract": "reporting",
+   "operations": 2
+  },
+  {
    "contract": "venue-map",
    "operations": 2
   },
   {
    "contract": "retail",
-   "operations": 2
-  },
-  {
-   "contract": "reporting",
    "operations": 2
   },
   {

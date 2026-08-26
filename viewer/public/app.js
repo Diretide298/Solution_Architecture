@@ -3165,7 +3165,7 @@ function screenReach(screen) {
     box.append(
       el('p', 'pane-note board-empty',
         `This screen names no operation, so it reaches nothing. It can be drawn and it cannot be ` +
-        `built — and 192 of the 347 screens are in the same position.`)
+        `built — and {screensNoOperation} of the {screens} screens are in the same position.`)
     );
     return box;
   }
@@ -3193,9 +3193,9 @@ function screenReach(screen) {
   line('services', entry.services.map((name) => {
     const chip = el('span', 'lineage-service', name);
     const ops = state.lineage?.operations?.filter((o) => o.service === name) ?? [];
-    tip(chip, name, `Owns ${ops.length} of the 654 operations.`);
+    tip(chip, name, `Owns ${ops.length} of the {operations} operations.`);
     return chip;
-  }), 'The service that runs the operations this screen calls. 22 across the platform.');
+  }), 'The service that runs the operations this screen calls. {services} across the platform.');
 
   line('writes', entry.writes.map((t) => tableChip(t, { write: true })),
     'Tables this screen causes to change. The ones that make it a risk to get wrong.');
@@ -3236,7 +3236,7 @@ function screenReach(screen) {
       const chip = el('button', 'lineage-table unknown', name);
       tip(chip, name,
         'The lineage carries no reads or writes for this operation, so whatever it touches is not ' +
-        'counted above. 318 of the 654 operations are in that state.');
+        'counted above. {unresolved} of the {operations} operations are in that state.');
       chip.onclick = () => openOperation(name);
       values.append(chip);
     }
@@ -3392,8 +3392,8 @@ function wireframeSection(entry, { label = 'wireframe', height = 520, design = 1
   }
 
   // Two drawings can exist for one screen and they are not equal. The board
-  // frame is the drawn one — the platform board is 347 screens of design intent,
-  // with real field names, states and deny reasons read off the package. The
+  // frame is the drawn one — the platform board is design intent, with real
+  // field names, states and deny reasons read off the package. The
   // standalone file is a structure-only render generated from the screen
   // definition, and says so itself: "Nothing here is a design decision."
   //
@@ -5941,7 +5941,14 @@ function renderRouting() {
   body.innerHTML = '';
 
   if (!rows.length) {
-    body.append(el('p', 'pane-empty', 'No routing sheet in the schema workbook.'));
+    // Say which of the two it is. "No routing sheet" sent a reader looking for
+    // a missing sheet when the sheet was present, carried its header, and held
+    // one row reading `TOTAL 0 0 0 0` — a generator that ran and produced
+    // nothing, which is a different thing to go and fix.
+    body.append(el('p', 'pane-empty', state.backend?.scalingSheet
+      ? 'The workbook’s Scaling sheet is empty — it carries its header and no contract rows, '
+        + 'so nothing here is routed. The sheet is generated, so this is upstream of the viewer.'
+      : 'No routing sheet in the schema workbook.'));
     $('routing-hint').textContent = '';
     return;
   }
@@ -9281,7 +9288,8 @@ function renderLineageByOperation(body, hit) {
     section.append(summary);
 
     // A closed <details> still builds every child it is given, and this view
-    // gave it all 654 operations across 24 contracts — 7,098 elements for a
+    // gave it all of them at once — at the time 654 operations across 24
+    // contracts, 7,098 elements — for a
     // list of which one or two groups are ever open. The rows are built when a
     // group is first opened instead, which is the only moment anyone can see
     // them, and a group opened once keeps what it built.
@@ -9338,8 +9346,8 @@ function appendLineageRows(section, ops, from = 0) {
     if (op.procedure) {
       const chip = el('span', 'lineage-procedure', op.procedure);
       tip(chip, 'Stored procedure',
-        `One of the few operations that runs as a stored procedure. **Services for all 654 ` +
-        `operations, stored procedures for ten** — a procedure per operation would be a second ` +
+        `One of the few operations that runs as a stored procedure. **Services for all {operations} ` +
+        `operations, stored procedures for {storedProcedures}** — a procedure per operation would be a second ` +
         `codebase in a second language, with no type checking against the contracts.`);
       meta.append(chip);
     }
@@ -9353,7 +9361,7 @@ function appendLineageRows(section, ops, from = 0) {
     if (op.offline) meta.append(tipFor(el('span', 'lineage-offline', 'offline'), 'offline'));
     if (op.service) {
       const chip = el('span', 'lineage-service', op.service);
-      tip(chip, op.service, 'The service that owns this operation. 22 services across 654 operations.');
+      tip(chip, op.service, 'The service that owns this operation. {services} services across {operations} operations.');
       meta.append(chip);
     }
     row.append(meta);
@@ -9370,7 +9378,7 @@ function appendLineageRows(section, ops, from = 0) {
         'Marked `unresolved` by the lineage rather than left blank. **Usually correct rather than ' +
         'missing**: an operation returning a computed projection has no persistence marker because ' +
         'there is nothing to mark. Commands with no body, health checks and sync endpoints are ' +
-        'the same. 318 of the 654 are in this state.');
+        'the same. {unresolved} of the {operations} are in this state.');
       none.append(chip);
       row.append(none);
     }
@@ -9483,7 +9491,7 @@ function renderLineageByService(body, hit) {
     const head = el('div', 'lineage-group-head');
     const name = el('span', 'lineage-group-name', service.name);
     tip(name, service.name,
-      `One of the 22 services the 654 operations divide into. It owns ${service.operations.length} ` +
+      `One of the {services} services the {operations} operations divide into. It owns ${service.operations.length} ` +
       `operation${service.operations.length === 1 ? '' : 's'}.`);
     head.append(name);
     head.append(el('span', 'lineage-group-count',
@@ -9665,7 +9673,23 @@ function fillSidePane() {
   if (state.layer === 'domain') {
     return state.mode === 'events' ? renderEventLinks() : renderStateLinks();
   }
-  const node = state.selectedId ? state.nodesById.get(state.selectedId) : null;
+  // The node fall-through belongs to Contracts alone.
+  //
+  // `state.nodesById` holds contract artefacts and nothing else — a schema, an
+  // operation, a file — and `select()` is the only thing that writes
+  // `selectedId`. The Decisions layer never calls it: it tracks its own choice
+  // in `state.adrId`. So reading `selectedId` here meant that on Decisions the
+  // pane showed whichever contract the reader last clicked, under a heading
+  // about decisions. The clear above fixed the *text* left behind on a layer
+  // with no selection; this is the same leak carrying real content, which is
+  // the harder one to notice because it looks like an answer.
+  //
+  // `selectedId` is deliberately not cleared when the layer changes. Clearing
+  // it would cost the reader their place in Contracts on every excursion;
+  // scoping the read keeps it, and coming back restores the pane.
+  const node = state.layer === 'contracts' && state.selectedId
+    ? state.nodesById.get(state.selectedId)
+    : null;
   if (node) return renderLinksPane(node);
 
   // Nothing selected. Say so in this layer's own noun — "Select a table." on
@@ -10233,8 +10257,8 @@ function renderLinksPane(node) {
         pane.append(
           el('p', 'pane-note',
             trace.source === 'unresolved'
-              ? 'The lineage carries no tables for this operation — 318 of the 654 are in that ' +
-                'state. It is not a claim that it touches nothing.'
+              ? 'The lineage carries no tables for this operation — {unresolved} of the {operations} are in ' +
+                'that state. It is not a claim that it touches nothing.'
               : 'The lineage resolved this and found no table, usually a computed projection.')
         );
       }
@@ -10445,7 +10469,7 @@ function traceOperation(box, node) {
       el('div', 'reach-row',
         el('span', 'pane-note',
           entry.source === 'unresolved'
-            ? 'The lineage carries no tables for this operation. 318 of the 654 are in that state: ' +
+            ? 'The lineage carries no tables for this operation. {unresolved} of the {operations} are in that state: ' +
               'the row exists, the reads and writes were never filled in. It is not a claim that ' +
               'this operation touches nothing.'
             : 'The lineage resolved this operation and found no table — usually because it returns ' +
@@ -10456,7 +10480,7 @@ function traceOperation(box, node) {
   box.append(
     el('p', 'pane-note',
       `From handoff/api-data-lineage.json · ${entry.source}. The Lineage view shows the same join ` +
-      'across all 654 operations at once.')
+      'across all {operations} operations at once.')
   );
 }
 
@@ -11225,7 +11249,7 @@ const collapsedSections = new Set();
  *
  * A pane section is a label followed by its content as siblings. A sidebar
  * group is a `.tree-group` whose head is its first child and whose rows are
- * the rest — twelve platforms of 29 screens each, which is the list that made
+ * the rest — fifteen platforms, the largest 143 screens, which is the list that made
  * this worth doing: reaching the kiosk meant scrolling past the whole of Guest
  * Web every time.
  */
@@ -11933,8 +11957,12 @@ function bindUI() {
     // colour dots are inline styles, so anything already painted must repaint
     renderTree();
     renderLegend();
-    const selected = state.selectedId && state.nodesById.get(state.selectedId);
-    if (selected) renderLinksPane(selected);
+    // Re-render the rail through the dispatch rather than calling
+    // `renderLinksPane` on the contract selection directly: that is the
+    // Contracts renderer, and on any other layer a theme flip would repaint the
+    // rail with the last contract's links — the leak fillSidePane exists to
+    // stop, coming back through a repaint.
+    renderSidePane();
     renderStructLegend();
     graph.draw();
     tree.draw();

@@ -626,6 +626,26 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addLicenceAddOn
+        label: Add licence add on
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listTenantCells
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeLicenceAddOn
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addLicenceAddOn
   states:
     loading: Entitlements resolve against the plan
     emptyFirstRun: All modules enabled — the maximum plan
@@ -643,6 +663,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not resolve. **Editing is blocked**, because saving against an unknown current state
       overwrites what nobody read
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-007
@@ -871,6 +895,20 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listSubscriptionInvoices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: generateInvoice
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: generateInvoice
   states:
     loading: Invoices, newest first
     emptyFirstRun: No invoices — a tenant inside its first period
@@ -888,6 +926,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: 'Billing unavailable. **Read-only failure**: no invoice may be issued from a screen that
       cannot list them'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-009
@@ -970,6 +1012,11 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listTenantCells
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Metering aggregates from the analytical replica
     emptyFirstRun: No usage in the period
@@ -986,6 +1033,10 @@ screens:
       **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Metering unavailable. Shows the last complete period rather than nothing
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-010
@@ -1167,6 +1218,20 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: provisionCell
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listTenantCells
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: provisionCell
   states:
     loading: Cell and pool state
     emptyFirstRun: —
@@ -1184,6 +1249,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Provisioning is disabled while the current state is unknown.** A second cell provisioned
       because the first was invisible is the expensive mistake'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-012
@@ -1745,6 +1814,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: setLanguages
+        label: Save languages
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listFaqs
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setLanguages
   states:
     loading: Language packs and completeness
     emptyFirstRun: One language
@@ -1757,6 +1841,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-018
@@ -2369,6 +2457,20 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listMigrations
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: planMigration
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: planMigration
   states:
     loading: Migration plan and per-cell state
     emptyFirstRun: No migrations pending — every cell is at the current schema
@@ -2382,6 +2484,10 @@ screens:
       same terminal is the way through.'
     error: '**Partial state is the normal case mid-rollout.** Cells that could not be reached are listed
       as unknown rather than assumed current'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-027
@@ -2452,6 +2558,20 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listEnvironments
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: registerEnvironment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: registerEnvironment
   states:
     loading: Environments and their cells
     emptyFirstRun: No environments registered
@@ -2464,6 +2584,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-028
@@ -3044,6 +3168,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listSupportNotices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: publishSupportNotice
+        label: Publish support notice
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishSupportNotice
   states:
     loading: Open escalations
     emptyFirstRun: Nothing open
@@ -3056,6 +3195,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-035
@@ -3156,6 +3299,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiProviders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: setAiProvider
+        label: Save ai provider
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setAiProvider
   apis:
   - operationId: listAiProviders
     contract: ai
@@ -3190,6 +3348,10 @@ screens:
       commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked.** A provider saved over an unread one can point a tenant
       at a model in the wrong jurisdiction'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - ADM-001

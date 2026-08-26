@@ -47,19 +47,19 @@
    "operations": 3
   },
   {
-   "contract": "identity",
-   "operations": 1
-  },
-  {
-   "contract": "tenancy",
-   "operations": 1
-  },
-  {
    "contract": "catalogue",
    "operations": 1
   },
   {
    "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "identity",
+   "operations": 1
+  },
+  {
+   "contract": "tenancy",
    "operations": 1
   }
  ],

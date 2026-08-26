@@ -192,13 +192,13 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listProducts</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-004</div>
         </div>
@@ -220,13 +220,13 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getAvailability · listProductVariants</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; productId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003 · KSK-005</div>
         </div>
@@ -248,7 +248,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -276,7 +276,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><b>Add cart line</b><div class="chip cta">Add cart line</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -304,7 +304,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><b>Create payment</b><div class="chip cta">Create payment</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -332,7 +332,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -360,7 +360,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -388,7 +388,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -416,13 +416,13 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; lookupShopAndDrop · getOrder</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003</div>
         </div>
@@ -444,7 +444,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -472,7 +472,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -584,13 +584,13 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Send ai message</b><div class="chip cta">Send ai message</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; sendAiMessage · listProducts · getAvailability · handoverToAgent</div>
-          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; KSK-001</div>
         </div>

@@ -1738,7 +1738,7 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 
 /* ── sign-off overview ──────────────────────────────────────────────── */
 /* Four cards, one per kind of thing a verdict is about. The bar fills from
-   empty rather than showing a percentage, because at 654 operations a single
+   empty rather than showing a percentage, because at a thousand operations a single
    verdict is 0.15% and a number that never moves says less than a bar that
    does. Whatever is left of the bar is what nobody has looked at. */
 .signoff-grid {

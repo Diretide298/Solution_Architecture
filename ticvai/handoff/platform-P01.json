@@ -136,11 +136,11 @@
    "operations": 17
   },
   {
-   "contract": "fnb",
+   "contract": "catalogue",
    "operations": 9
   },
   {
-   "contract": "catalogue",
+   "contract": "fnb",
    "operations": 9
   },
   {
@@ -168,11 +168,11 @@
    "operations": 3
   },
   {
-   "contract": "seating",
+   "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "seating",
    "operations": 2
   },
   {

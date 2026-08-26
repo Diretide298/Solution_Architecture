@@ -561,6 +561,16 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addCartLine
+        label: Add cart line
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addCartLine
   states:
     loading: Upsells resolve after the cart is priced
     emptyFirstRun: No add-ons for this product — the step is skipped entirely rather than shown empty
@@ -621,6 +631,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addToWishlist
+        label: Add to wishlist
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeFromWishlist
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addToWishlist
   states:
     loading: Saved items load
     emptyFirstRun: Nothing saved — explains what the list is for
@@ -1137,6 +1162,15 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: joinQueue
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: joinQueue
   states:
     loading: Position in the queue, updating
     emptyFirstRun: —
@@ -1413,10 +1447,19 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listMyEntitlements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Tickets load
     emptyFirstRun: No tickets — distinguishes never bought from all past
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-018
@@ -1541,11 +1584,30 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: updateMyProfile
+        label: Save my profile
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listConsentPurposes
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateMyProfile
   states:
     loading: Profile and consents
     emptyFirstRun: —
     error: '**Save failed and the form keeps what was typed.** A consent change that silently did not
       save is a compliance failure, so the screen states it rather than showing success'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-020
@@ -1607,6 +1669,11 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listWalletTransactions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Balance and gift cards
     emptyFirstRun: No wallet — offers to top up
@@ -1618,6 +1685,10 @@ screens:
       **Also reached when `retail` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Balance unavailable. **Spending is blocked** rather than attempted against an unknown balance
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-021
@@ -1675,6 +1746,11 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Plans load
     emptyFirstRun: No memberships on sale at this venue
@@ -1686,6 +1762,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-022
@@ -1804,10 +1884,34 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addToWishlist
+        label: Add to wishlist
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listGuestDevices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeFromWishlist
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addToWishlist
   states:
     loading: Points and rewards
     emptyFirstRun: No points yet — explains how they accrue
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-024
@@ -1924,6 +2028,16 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: submitReview
+        label: Submit review
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: submitReview
   states:
     loading: Survey loads
     emptyFirstRun: —
@@ -1965,11 +2079,34 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: recordConsent
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listGuestDevices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeFromWishlist
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordConsent
   states:
     loading: —
     emptyFirstRun: —
     error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
       the guest believes happened and did not is worse than a visible failure
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-027
@@ -2128,6 +2265,15 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: transferOrderTickets
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -2195,6 +2341,21 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: detailPanel
+        derived: true
+        impliedBy: getReservation
+        notes: One record, read-only.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelReservation
+        label: Cancel reservation
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: cancelReservation
   apis:
   - operationId: listReservations
     contract: orders
@@ -2261,6 +2422,19 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: detailPanel
+        derived: true
+        impliedBy: getPromotion
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: evaluatePromotions
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: evaluatePromotions
   apis:
   - operationId: listPromotions
     contract: promotions
@@ -2325,6 +2499,20 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: searchField
+        derived: true
+        impliedBy: lookupMerchandise
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: reserveMerchandise
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reserveMerchandise
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -2396,6 +2584,15 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: raiseMyCase
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: raiseMyCase
   apis:
   - operationId: listMyCases
     contract: marketing-crm

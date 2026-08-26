@@ -152,10 +152,10 @@ const SCENES = [
       ['  "operations": []', 'warn'],
     ],
     out: [
-      ['347 screens', 'ok'],
-      ['12 platforms', 'ok'],
-      ['155 reach an operation', 'ok'],
-      ['192 reach nothing', 'warn'],
+      ['492 screens', 'ok'],
+      ['15 platforms', 'ok'],
+      ['478 reach an operation', 'ok'],
+      ['14 reach nothing', 'warn'],
     ],
   },
 ];

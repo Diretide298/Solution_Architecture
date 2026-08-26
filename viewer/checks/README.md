@@ -19,6 +19,7 @@ on an empty database.
 | `contract-trace-check.mjs` | a schema names the tables it is stored as, an operation names the tables it reaches, and an operation the lineage never resolved says so rather than reading as "touches nothing" |
 | `signoff-check.mjs` | the overview counts against the whole population rather than what was judged, unreviewed artefacts sort first, and a row leads to the artefact — including the three kinds that had no deep link until it needed one |
 | `pages-check.mjs` | every page loads, every layer renders every one of its modes, and **nothing anywhere logs a console error** |
+| `tip-facts-check.mjs` | every count a tip states is the count the payload holds — the tips write `{operations}` and are measured against `/pkg/<project>/lineage`, `journeys` and `decisions` |
 
 `pages-check.mjs` is the cheap one to run after any edit to a module under
 `public/`. `node --check` proves a file parses; it says nothing about whether the
@@ -27,6 +28,22 @@ rendered its static HTML, and threw at module scope — leaving a page with a
 header and nothing under it. A static version of this check was tried and pulled:
 it could not tell a regex literal from a reference and reported eighteen things
 that were fine. The browser either throws or it does not.
+
+`tip-facts-check.mjs` exists because nothing failed when the numbers were wrong.
+The tips stated **654 operations against a live 1,023, 22 services against 16, 18
+ADRs against 30**, and "318 of the 654 resolve to no table" against a lineage in
+which nothing is unresolved — every page rendered, every check passed, and the
+viewer told its readers the wrong size of the thing they were reviewing. The
+counts are read off the payload at hover now; this is what holds that true.
+
+It drives the panel with a dispatched `mouseover` rather than a real hover,
+because most tipped controls sit in a toolbar belonging to a view that is not
+open: `hover()` cannot reach them, fails silently, and leaves the previous tip's
+text in the panel — which reads as a pass for every element after the first. It
+also walks every layer, since a mode button exists only while its own layer does.
+
+It runs against a gated viewer as the others do, or against a throwaway
+`TICVAI_NO_GATE=1` instance with no account at all.
 
 `signoff-check.mjs` **records one real verdict per kind** — six of them now that
 state models and schemas are reviewable — against real artefacts, because checking

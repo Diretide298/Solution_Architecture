@@ -7,7 +7,7 @@
   "contracts": 28,
   "tables": 379,
   "relationships": 914,
-  "states": 113,
+  "states": 122,
   "events": 29,
   "flows": 94,
   "adrs": 30,
@@ -61,9 +61,9 @@
    },
    {
     "name": "State models",
-    "done": 113,
+    "done": 122,
     "total": 122,
-    "percent": 93,
+    "percent": 100,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {

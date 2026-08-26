@@ -248,13 +248,13 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Add case message</b><div class="chip cta">Add case message</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; addCaseMessage · getCase · updateCase · escalateCase +7</div>
-          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; caseId&larr;SUP-004, conversationId&larr;SUP-004</div>
           <div><b>GOES TO</b> &middot; SUP-001 · SUP-002 · SUP-003</div>
         </div>

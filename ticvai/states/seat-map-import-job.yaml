@@ -1,0 +1,112 @@
+entity: SeatMapImportJob
+contract: seating
+enum: SeatMapImportJob.status
+enumKind: inline
+enumSchema: SeatMapImportJob
+enumProperty: status
+owner: CatalogueService
+description: >
+  What happens to a seat map between a venue handing over a printed plan and a person accepting the
+  map that came out of it.
+
+  **Built 25 August, the day after the operations it governs.** `importSeatMap` and
+  `getSeatMapImport` were written against the 21 August decision and shipped with a six-value status
+  enum and no model — **a set of values with no rules about moving between them**, which is exactly
+  what let one operation drive five transitions on `CorrectiveAction`.
+
+initial: [queued]
+terminal: [accepted, rejected, failed]
+
+states:
+  - name: queued
+    description: >
+      The file is uploaded and nothing has read it. **A separate state from `reading` because the
+      wait is visible to a person** — a venue that uploaded a forty-page plan wants to know the
+      difference between *not started* and *taking a while*.
+
+  - name: reading
+    description: >
+      Being interpreted. **The only state that can take minutes**, and the one where a progress
+      indication is worth showing rather than a spinner.
+
+  - name: proposed
+    description: >
+      A draft map exists with a confidence and a list of what could not be read. **Nothing is
+      published and nothing is sellable** (ADR-0020: a suggestion proposes, a person decides).
+
+      **This is the state the whole feature is about.** A seat map wrong by two rows is worse than
+      one that took an afternoon, and the acceptance screen is where that is caught.
+
+  - name: accepted
+    description: >
+      A person took the draft. **The draft becomes an unpublished seat map** — accepting the import
+      and publishing the map are two acts, because a map arriving live is seats on sale nobody
+      checked.
+
+  - name: rejected
+    description: >
+      A person looked and said no. **The draft is kept, not discarded** — a rejected import is the
+      best evidence of what the reader gets wrong, and deleting it discards the only training signal
+      the feature produces.
+
+  - name: failed
+    description: >
+      It could not be read at all. **Distinct from `rejected`**: rejected is a person's judgement,
+      failed is a bad scan or an unsupported file, and they need different next actions.
+
+transitions:
+  - from: queued
+    to: reading
+    trigger: readingStarted
+    operation: getSeatMapImport
+    guard: >
+      **No operation moves this and none should.** The reader picks the job up; a person cannot
+      start it twice and there is nothing for them to decide yet.
+
+  - from: reading
+    to: proposed
+    trigger: draftProduced
+    operation: getSeatMapImport
+    guard: >
+      A draft, a confidence and a list of what was unreadable. **All three, or the state does not
+      advance** — a proposal with no confidence is a proposal a person cannot weigh, and a blank
+      unreadable list with low confidence is a different problem from a named one.
+
+  - from: reading
+    to: failed
+    trigger: readingFailed
+    operation: getSeatMapImport
+    guard: >
+      Nothing legible. **The reason is recorded and named** — *the scan is 90dpi*, *the sheet has no
+      header row* — because a venue that knows why can send a better file.
+
+  - from: proposed
+    to: accepted
+    trigger: accept
+    operation: importSeatMap
+    guard: >
+      **A person accepts. The reader never does.** ADR-0020, and it is the whole point: the import
+      proposes and the acceptance is a human act with a name against it.
+
+  - from: proposed
+    to: rejected
+    trigger: reject
+    operation: importSeatMap
+    guard: >
+      A reason is recorded. **What was wrong is worth more than the fact of rejection** — it is the
+      one signal that improves the next read.
+
+openQuestions: >
+  **Can an accepted import be re-run against a corrected file?** A venue that fixes a scan and
+  re-uploads currently gets a second job with no relationship to the first, and the draft it
+  produces has no way to say *this replaces that*. Worth deciding before the acceptance screen is
+  drawn.
+
+notes: >
+  **`accepted` is not `published`.** The map lands unpublished and `publishSeatMap` is a separate
+  act — the same rule as `copySeatMapSection`, where a section arriving in a live map is seats on
+  sale nobody checked.
+
+  **`rejected` and `failed` are both terminal and both keep the draft.** One is a judgement and one
+  is a defect, and collapsing them would lose the only distinction that tells a venue whether to
+  send a better file or draw the map by hand.

@@ -101,11 +101,11 @@
    "operations": 46
   },
   {
-   "contract": "fnb",
+   "contract": "finance",
    "operations": 43
   },
   {
-   "contract": "finance",
+   "contract": "fnb",
    "operations": 43
   },
   {
@@ -113,11 +113,11 @@
    "operations": 29
   },
   {
-   "contract": "tenancy",
+   "contract": "marketing-crm",
    "operations": 25
   },
   {
-   "contract": "marketing-crm",
+   "contract": "tenancy",
    "operations": 25
   },
   {
@@ -165,11 +165,11 @@
    "operations": 8
   },
   {
-   "contract": "identity",
+   "contract": "ai",
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "identity",
    "operations": 7
   },
   {
@@ -181,11 +181,11 @@
    "operations": 2
   },
   {
-   "contract": "subscription",
+   "contract": "assets",
    "operations": 2
   },
   {
-   "contract": "assets",
+   "contract": "subscription",
    "operations": 2
   },
   {

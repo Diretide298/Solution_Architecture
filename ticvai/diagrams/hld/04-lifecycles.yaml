@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 114
-  drawn: 113
+  files: 123
+  drawn: 122
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 113 state models and 29 events
+title: 122 state models and 29 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -324,6 +324,22 @@ stateModels:
   - respondToChargeback
   guarded: 7
   ref: diagrams/lld/lifecycles/chargeback.yaml
+- entity: ConfigurationProfile
+  contract: tenancy
+  owner: TenancyService
+  service: TenancyService
+  states: 6
+  transitions: 7
+  initial:
+  - draft
+  terminal:
+  - superseded
+  - rolledBack
+  operations:
+  - deployConfigurationProfile
+  - setConfigurationProfile
+  guarded: 7
+  ref: diagrams/lld/lifecycles/configuration-profile.yaml
 - entity: Content block
   contract: white-label
   owner: white-label
@@ -392,6 +408,23 @@ stateModels:
   - signCorrectiveAction
   guarded: 5
   ref: diagrams/lld/lifecycles/corrective-action.yaml
+- entity: CountLine
+  contract: inventory
+  owner: InventoryService
+  service: FnbService
+  states: 5
+  transitions: 6
+  initial:
+  - entered
+  terminal:
+  - accepted
+  - rejected
+  operations:
+  - enterCountLine
+  - requestRecount
+  - submitCountLines
+  guarded: 6
+  ref: diagrams/lld/lifecycles/count-line.yaml
 - entity: Coupon code
   contract: promotions
   owner: promotions
@@ -411,6 +444,23 @@ stateModels:
   - voidCouponCode
   guarded: 8
   ref: diagrams/lld/lifecycles/coupon.yaml
+- entity: CustomDomain
+  contract: white-label
+  owner: WhiteLabelService
+  service: WhiteLabelService
+  states: 8
+  transitions: 12
+  initial:
+  - pending
+  terminal:
+  - revoked
+  operations:
+  - claimCustomDomain
+  - listCustomDomains
+  - releaseCustomDomain
+  - verifyCustomDomain
+  guarded: 12
+  ref: diagrams/lld/lifecycles/custom-domain.yaml
 - entity: Deposit box
   contract: shift
   owner: shift
@@ -954,6 +1004,25 @@ stateModels:
   - updatePartnerAgreement
   guarded: 9
   ref: diagrams/lld/lifecycles/partner-agreement.yaml
+- entity: PaymentLink
+  contract: orders
+  owner: OrderService
+  service: OrderService
+  states: 6
+  transitions: 9
+  initial:
+  - issued
+  terminal:
+  - paid
+  - expired
+  - cancelled
+  - superseded
+  operations:
+  - createPayment
+  - getPaymentLink
+  - resendPaymentLink
+  guarded: 9
+  ref: diagrams/lld/lifecycles/payment-link.yaml
 - entity: Payment
   contract: orders
   owner: orders
@@ -1035,6 +1104,22 @@ stateModels:
   - transitionProductLifecycle
   guarded: 8
   ref: diagrams/lld/lifecycles/product.yaml
+- entity: ProductionPlan
+  contract: fnb
+  owner: FnbService
+  service: FnbService
+  states: 4
+  transitions: 4
+  initial:
+  - draft
+  terminal:
+  - superseded
+  - cancelled
+  operations:
+  - buildProductionPlan
+  - releaseProductionPlan
+  guarded: 4
+  ref: diagrams/lld/lifecycles/production-plan.yaml
 - entity: Production run
   contract: fnb
   owner: fnb
@@ -1051,6 +1136,21 @@ stateModels:
   - planProductionRun
   guarded: 4
   ref: diagrams/lld/lifecycles/production-run.yaml
+- entity: ProfileDeployment
+  contract: tenancy
+  owner: TenancyService
+  service: TenancyService
+  states: 5
+  transitions: 7
+  initial:
+  - queued
+  terminal:
+  - completed
+  - rolledBack
+  operations:
+  - deployConfigurationProfile
+  guarded: 7
+  ref: diagrams/lld/lifecycles/profile-deployment.yaml
 - entity: Promotion
   contract: promotions
   owner: promotions
@@ -1445,6 +1545,23 @@ stateModels:
   - releaseSeatHold
   guarded: 3
   ref: diagrams/lld/lifecycles/seat-hold.yaml
+- entity: SeatMapImportJob
+  contract: seating
+  owner: CatalogueService
+  service: CatalogueService
+  states: 6
+  transitions: 5
+  initial:
+  - queued
+  terminal:
+  - accepted
+  - rejected
+  - failed
+  operations:
+  - getSeatMapImport
+  - importSeatMap
+  guarded: 5
+  ref: diagrams/lld/lifecycles/seat-map-import-job.yaml
 - entity: Seat map
   contract: seating
   owner: seating
@@ -1482,6 +1599,25 @@ stateModels:
   - updateSeats
   guarded: 12
   ref: diagrams/lld/lifecycles/seat.yaml
+- entity: SerialisedItem
+  contract: inventory
+  owner: InventoryService
+  service: RetailService
+  states: 8
+  transitions: 15
+  initial:
+  - inStock
+  terminal:
+  - sold
+  - lost
+  operations:
+  - createRetailReturn
+  - createRetailSale
+  - createStockTransfer
+  - listSerialisedItems
+  - receiveStockTransfer
+  guarded: 15
+  ref: diagrams/lld/lifecycles/serialised-item.yaml
 - entity: Settlement
   contract: finance
   owner: ledger
@@ -1584,6 +1720,22 @@ stateModels:
   - startStockCount
   guarded: 7
   ref: diagrams/lld/lifecycles/stock-count.yaml
+- entity: SubBill
+  contract: fnb
+  owner: FnbService
+  service: OrderService
+  states: 3
+  transitions: 2
+  initial:
+  - open
+  terminal:
+  - paid
+  - voided
+  operations:
+  - createPayment
+  - splitBill
+  guarded: 2
+  ref: diagrams/lld/lifecycles/sub-bill.yaml
 - entity: Tenant subscription
   contract: subscription
   owner: subscription

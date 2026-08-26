@@ -173,6 +173,41 @@ export const GLOSSARY = {
 };
 
 /** A tip whose body is the delivery's own words rather than the glossary's. */
+// ── the counts the tips quote ────────────────────────────────────────
+//
+// Every number these tips stated was typed into the sentence, and every one of
+// them drifted: **654 operations against a live 1,023, 22 services against 16,
+// 18 ADRs against 30**, and "318 of the 654 resolve to no table" against a
+// lineage in which nothing is unresolved at all. `lib/lineage.mjs` had already
+// written the epitaph — *"a number in a comment is a claim nothing checks"* —
+// and the tips were the same claim, on screen, where a reader would believe it.
+//
+// So a tip writes `{operations}` and the count arrives at hover. Substituted
+// in `show`, because that is the one place the two sources meet: a body set by
+// `tip()` and a `data-tip=` written in index.html are the same dataset field by
+// then, and a fix at either call site would have missed the other.
+//
+// The provider is injected rather than imported: core.js imports this module,
+// and a cycle to fetch a number is a poor trade.
+//
+// An unknown token renders as `{token}` rather than disappearing. A visible
+// placeholder is a bug report; a silently dropped one is the drift again.
+let factProvider = () => ({});
+
+/** Called once at boot with something that reads the live payload. */
+export const setFactProvider = (fn) => { factProvider = fn; };
+
+const FACT_TOKEN = /\{([A-Za-z][A-Za-z0-9]*)\}/g;
+
+const withFacts = (text) => {
+  if (!text || !text.includes('{')) return text;
+  const facts = factProvider() ?? {};
+  return text.replace(FACT_TOKEN, (whole, key) => {
+    const value = facts[key];
+    return value === undefined || value === null ? whole : String(value);
+  });
+};
+
 export const tip = (element, title, body, extra) => {
   if (!element || (!title && !body)) return element;
   element.dataset.tipTitle = title ?? '';
@@ -231,9 +266,9 @@ export function installTips(root = document.body) {
   };
 
   const show = (target) => {
-    const title = target.dataset.tipTitle ?? '';
-    const body = target.dataset.tip ?? '';
-    const extra = target.dataset.tipExtra ?? '';
+    const title = withFacts(target.dataset.tipTitle ?? '');
+    const body = withFacts(target.dataset.tip ?? '');
+    const extra = withFacts(target.dataset.tipExtra ?? '');
     panel.innerHTML = '';
     if (title) {
       const head = document.createElement('div');

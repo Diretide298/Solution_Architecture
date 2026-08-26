@@ -75,11 +75,11 @@
    "operations": 10
   },
   {
-   "contract": "tenancy",
+   "contract": "reporting",
    "operations": 7
   },
   {
-   "contract": "reporting",
+   "contract": "tenancy",
    "operations": 7
   },
   {
@@ -91,16 +91,12 @@
    "operations": 5
   },
   {
-   "contract": "approvals",
-   "operations": 3
-  },
-  {
    "contract": "marketing-crm",
    "operations": 3
   },
   {
-   "contract": "access",
-   "operations": 2
+   "contract": "approvals",
+   "operations": 3
   },
   {
    "contract": "workforce",
@@ -115,15 +111,19 @@
    "operations": 2
   },
   {
+   "contract": "access",
+   "operations": 2
+  },
+  {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
    "contract": "inventory",
    "operations": 1
   },
   {
    "contract": "assets",
-   "operations": 1
-  },
-  {
-   "contract": "finance",
    "operations": 1
   }
  ],

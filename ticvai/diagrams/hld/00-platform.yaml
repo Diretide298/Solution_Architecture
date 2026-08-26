@@ -29,7 +29,7 @@ scale:
   apps: 12
   screens: 492
   flows: 94
-  stateModels: 113
+  stateModels: 122
   events: 29
   decisions: 31
   requirements: 3184

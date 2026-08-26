@@ -722,6 +722,21 @@ screens:
       components:
       - kind: detailPanel
         notes: TODO
+      - kind: dataTable
+        derived: true
+        impliedBy: listAccessPoints
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: updateAccessPoint
+        label: Save access point
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateAccessPoint
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -740,6 +755,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P08 Venue Management.dc.html#bo-006
@@ -804,6 +823,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createProduct
+        label: Create product
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createProduct
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -820,6 +854,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -931,6 +969,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listProductVariants
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: setProductAttributes
+        label: Save product attributes
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setProductAttributes
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -947,6 +1000,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1014,6 +1071,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPriceLists
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPriceList
+        label: Create price list
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPriceList
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -1032,6 +1104,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1115,6 +1191,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPromotions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createCouponCampaign
+        label: Create coupon campaign
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidCouponCode
+        label: Void coupon code
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createCouponCampaign
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1131,6 +1228,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1279,6 +1380,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCatalogueBundles
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: publishBundle
+        label: Publish bundle
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishBundle
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1295,6 +1411,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1369,6 +1489,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createEntitlementTemplate
+        label: Create entitlement template
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createEntitlementTemplate
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1385,6 +1520,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1476,6 +1615,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: setChannelAllocations
+        label: Save channel allocations
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listEnvelopes
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setChannelAllocations
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1492,6 +1646,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1590,6 +1748,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createProduct
+        label: Create product
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createProduct
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1606,6 +1779,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1717,6 +1894,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPerformances
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPerformances
+        label: Create performances
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelPerformance
+        label: Cancel performance
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPerformances
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1733,6 +1931,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1822,6 +2024,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPerformances
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPerformances
+        label: Create performances
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelPerformance
+        label: Cancel performance
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPerformances
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -1840,6 +2063,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -1929,6 +2156,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listEnvelopes
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createEnvelope
+        label: Create envelope
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createEnvelope
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -1947,6 +2189,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -2017,6 +2263,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listLeases
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acquireLease
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: releaseLease
+        label: Release lease
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acquireLease
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2033,6 +2299,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -2099,6 +2369,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPerformances
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelPerformance
+        label: Cancel performance
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createEvent
+        label: Create event
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: cancelPerformance
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2115,6 +2406,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -2269,6 +2564,26 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: acceptFnbOrder
+        label: Accept fnb order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelFnbOrder
+        label: Cancel fnb order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: detailPanel
+        derived: true
+        impliedBy: getFnbOrder
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acceptFnbOrder
   navigation:
     entryFrom:
     - BO-104
@@ -2329,6 +2644,19 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: recordOrderHandover
+        notes: The act the screen exists for.
+      - kind: detailPanel
+        derived: true
+        impliedBy: getGuestOrderStatus
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordOrderHandover
   navigation:
     entryFrom:
     - BO-104
@@ -2362,6 +2690,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2378,6 +2727,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -2476,6 +2829,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrderRefunds
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createRefund
+        label: Create refund
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createRefund
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -2493,6 +2867,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -2601,6 +2979,16 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPayment
+        label: Create payment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPayment
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -2695,6 +3083,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listSettlementExceptions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: resolveSettlementException
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: resolveSettlementException
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2707,6 +3109,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -2771,6 +3177,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2787,6 +3214,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -2885,6 +3316,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: appendEntitlementToMedia
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: appendEntitlementToMedia
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -2967,6 +3407,16 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createRefundRequest
+        label: Create refund request
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createRefundRequest
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -3010,6 +3460,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listReports
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createReport
+        label: Create report
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: deleteReport
+        label: Delete report
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3026,6 +3497,10 @@ screens:
       **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3105,6 +3580,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: verifyWorkOrder
+        label: Verify work order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelWorkOrder
+        label: Cancel work order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: dataTable
+        derived: true
+        impliedBy: listWorkOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: verifyWorkOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3121,6 +3617,10 @@ screens:
       **Also reached when `maintenance` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3206,6 +3706,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: updateAsset
+        label: Save asset
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAssets
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupAsset
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateAsset
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -3224,6 +3744,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3297,6 +3821,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAdmissionProfiles
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAdmissionProfile
+        label: Create admission profile
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAdmissionProfile
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -3315,6 +3854,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3371,6 +3914,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listBlacklist
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: addBlacklistEntry
+        label: Add blacklist entry
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeBlacklistEntry
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addBlacklistEntry
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -3389,6 +3952,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3445,6 +4012,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3461,6 +4048,10 @@ screens:
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3524,6 +4115,31 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAuditRecords
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3540,6 +4156,10 @@ screens:
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3607,6 +4227,25 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listDevices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: registerDevice
+        notes: The act the screen exists for.
+      - kind: searchField
+        derived: true
+        impliedBy: searchGuests
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: registerDevice
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3623,6 +4262,10 @@ screens:
       **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3769,6 +4412,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCatalogueBundles
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: publishBundle
+        label: Publish bundle
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishBundle
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3785,6 +4443,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3880,6 +4542,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listQueues
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createQueue
+        label: Create queue
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createQueue
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -3897,6 +4574,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -3977,6 +4658,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listShifts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: openShift
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: openShift
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3989,6 +4684,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -4081,6 +4780,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listShifts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acceptShiftVariance
+        label: Accept shift variance
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acceptShiftVariance
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -4094,6 +4808,10 @@ screens:
       same terminal is the way through.'
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -4188,6 +4906,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCashMovements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createCashMovement
+        label: Create cash movement
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createCashMovement
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -4201,6 +4934,10 @@ screens:
       same terminal is the way through.'
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -4293,6 +5030,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCashMovements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: acceptShiftVariance
+        label: Accept shift variance
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acceptShiftVariance
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -4306,6 +5058,10 @@ screens:
       same terminal is the way through.'
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -4398,6 +5154,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listSettlements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: ingestSettlementFile
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: ingestSettlementFile
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -4411,6 +5181,10 @@ screens:
       same terminal is the way through.'
     error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
       not be reconciled against'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -4483,6 +5257,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOutlets
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOutlet
+        label: Create outlet
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOutlet
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4499,6 +5288,10 @@ screens:
       **Also reached when `fnb` is not licensed.** The tenant has not bought this module, which is a
       commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -4706,6 +5499,20 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: detailPanel
+        derived: true
+        impliedBy: getMenu
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createMenu
+        label: Create menu
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createMenu
   navigation:
     entryFrom:
     - BO-104
@@ -4783,6 +5590,16 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: setKitchenTicketStatus
+        label: Save kitchen ticket status
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setKitchenTicketStatus
   navigation:
     entryFrom:
     - BO-104
@@ -4815,6 +5632,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -4833,6 +5671,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -4931,6 +5773,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listMerchandise
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupMerchandise
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createMerchandise
+        label: Create merchandise
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createMerchandise
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4947,6 +5809,10 @@ screens:
       **Also reached when `retail` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5011,6 +5877,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: setItemAvailability
+        label: Save item availability
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listStockLocations
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setItemAvailability
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -5027,6 +5908,10 @@ screens:
       **Also reached when `inventory` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5173,6 +6058,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5189,6 +6095,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5285,6 +6195,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createGoodsReceipt
+        label: Create goods receipt
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPurchaseOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelPurchaseOrder
+        label: Cancel purchase order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createGoodsReceipt
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5301,6 +6232,10 @@ screens:
       **Also reached when `inventory` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5411,6 +6346,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPrincipals
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPrincipal
+        label: Create principal
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPrincipal
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5422,6 +6372,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5478,6 +6432,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listRoles
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createRole
+        label: Create role
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createRole
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5489,6 +6458,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5532,6 +6505,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listRotaAssignments
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createRotaAssignment
+        label: Create rota assignment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createRotaAssignment
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5544,6 +6532,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5604,6 +6596,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAttendance
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: amendAttendance
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: amendAttendance
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5616,6 +6622,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5672,6 +6682,11 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPrincipals
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -5683,6 +6698,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5722,6 +6741,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listReports
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: runReport
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: deleteReport
+        label: Delete report
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: runReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5738,6 +6777,10 @@ screens:
       **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5836,6 +6879,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listReports
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createReport
+        label: Create report
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: deleteReport
+        label: Delete report
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5852,6 +6916,10 @@ screens:
       **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -5931,6 +6999,37 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: runReport
+        notes: The act the screen exists for.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: deleteReport
+        label: Delete report
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: dataTable
+        derived: true
+        impliedBy: listReports
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: runReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5947,6 +7046,10 @@ screens:
       **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6056,6 +7159,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listReports
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createReport
+        label: Create report
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: deleteReport
+        label: Delete report
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6072,6 +7196,10 @@ screens:
       **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6151,6 +7279,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listDiningOutlets
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: setRefundPolicy
+        label: Save refund policy
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setRefundPolicy
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -6169,6 +7312,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6225,6 +7372,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPerformances
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPerformances
+        label: Create performances
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelPerformance
+        label: Cancel performance
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPerformances
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6241,6 +7409,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6345,6 +7517,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listScopeNodes
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAccessPoint
+        label: Create access point
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAccessPoint
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6361,6 +7548,10 @@ screens:
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6449,6 +7640,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listDiningOutlets
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: setRefundPolicy
+        label: Save refund policy
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setRefundPolicy
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -6467,6 +7673,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6523,6 +7733,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnnouncements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: publishAnnouncement
+        label: Publish announcement
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishAnnouncement
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -6537,6 +7762,10 @@ screens:
       same terminal is the way through.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6636,6 +7865,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAuditRecords
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: resolvePermissions
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: resolvePermissions
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -6648,6 +7891,10 @@ screens:
       **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
       same terminal is the way through.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6700,6 +7947,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAssets
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAsset
+        label: Create asset
+        notes: The act the screen exists for.
+      - kind: searchField
+        derived: true
+        impliedBy: lookupAsset
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAsset
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6716,6 +7983,10 @@ screens:
       **Also reached when `maintenance` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6806,6 +8077,27 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrders
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6822,6 +8114,10 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6918,6 +8214,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listMaintenancePlans
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createMaintenancePlan
+        label: Create maintenance plan
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createMaintenancePlan
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -6934,6 +8245,10 @@ screens:
       **Also reached when `maintenance` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -6991,6 +8306,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listIncidents
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: reportIncident
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reportIncident
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -7007,6 +8336,10 @@ screens:
       **Also reached when `maintenance` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -7071,6 +8404,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listLostItems
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: matchLostItem
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: matchLostItem
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -7087,6 +8434,10 @@ screens:
       **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - BO-001
@@ -8554,6 +9905,16 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: setAiPolicy
+        label: Save ai policy
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setAiPolicy
   apis:
   - operationId: getAiPolicy
     contract: ai
@@ -8633,6 +9994,10 @@ screens:
       **Also reached when `seating` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. The published map is unaffected — this screen edits drafts
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   notes: CF-123. **A venue may have several maps** — a park map and a floor plan per building are different
     maps, not layers of one, because a guest on the second floor should not be shown the ground floor
     toilets.
@@ -8651,6 +10016,25 @@ screens:
   density: compact
   requiresModule: seating
   statesDerived: true
+  layout:
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listVenueMaps
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createVenueMap
+        label: Create venue map
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createVenueMap
 - id: BO-093
   name: Map Import & Labelling
   module: Access & Venue
@@ -8716,6 +10100,20 @@ screens:
       do not hold. Arrives with `mapId`.'
   requiresModule: seating
   statesDerived: true
+  layout:
+    regions:
+    - name: contentBody
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: importVenueGeometry
+        label: Import venue geometry
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: importVenueGeometry
 - id: BO-094
   name: Map Editor & Publish
   module: Access & Venue
@@ -8797,6 +10195,24 @@ screens:
       do not hold. Arrives with `mapId`, `pathId`.'
   requiresModule: seating
   statesDerived: true
+  layout:
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getVenueMap
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: setVenuePoint
+        label: Save venue point
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setVenuePoint
 - id: BO-095
   name: Resources
   module: Access & Venue

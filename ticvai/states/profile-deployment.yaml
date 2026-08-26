@@ -1,0 +1,71 @@
+entity: ProfileDeployment
+contract: tenancy
+enum: ProfileDeployment.status
+enumKind: inline
+enumSchema: ProfileDeployment
+enumProperty: status
+owner: TenancyService
+description: One rollout of one profile to one target set. **`ConfigurationProfile` is what is being
+  deployed; this is the deployment** — and they need separate models because a profile can be deployed
+  twice.
+initial:
+- queued
+terminal:
+- completed
+- rolledBack
+states:
+- name: queued
+  description: Scheduled and not started. **A venue rolling out at 6am queues it the night before.**
+- name: inProgress
+  description: Reaching devices.
+- name: completed
+  description: Every device in the target set acknowledged.
+- name: partiallyFailed
+  description: '**Some devices took it and some did not, and it says which.** Not terminal — a partial
+    failure is retried or rolled back, and treating it as an end state leaves a fleet split with nobody
+    accountable.'
+- name: rolledBack
+  description: Reverted.
+transitions:
+- from: queued
+  to: inProgress
+  trigger: start
+  operation: deployConfigurationProfile
+  guard: The window opened.
+- from: inProgress
+  to: completed
+  trigger: complete
+  operation: deployConfigurationProfile
+  guard: All acknowledged.
+- from: inProgress
+  to: partiallyFailed
+  trigger: partialFail
+  operation: deployConfigurationProfile
+  guard: '**At least one device did not take it.** The unreachable ones are listed by name — a count
+    is not actionable and a list is.'
+- from: partiallyFailed
+  to: inProgress
+  trigger: retry
+  operation: deployConfigurationProfile
+  guard: '**Retried against the failures only.** Re-deploying to devices that already took it is how
+    a rollout becomes two rollouts.'
+- from: partiallyFailed
+  to: rolledBack
+  trigger: rollback
+  operation: deployConfigurationProfile
+  guard: '**Given up on and reverted.** The devices that took it go back; the split closes.'
+- from: inProgress
+  to: rolledBack
+  trigger: rollback
+  operation: deployConfigurationProfile
+  guard: Aborted.
+- from: completed
+  to: rolledBack
+  trigger: rollback
+  operation: deployConfigurationProfile
+  guard: '**Terminal to terminal, and correct** — a completed rollout is exactly the thing somebody
+    rolls back the next morning.'
+openQuestions: null
+notes: '**`partiallyFailed` is not terminal and that is the point.** A fleet where four tills of forty
+  are on an old profile is a venue with four tills charging the wrong price, and a state that ends there
+  is a state that lets it stay.'

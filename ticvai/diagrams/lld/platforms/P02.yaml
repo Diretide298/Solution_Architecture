@@ -614,6 +614,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline

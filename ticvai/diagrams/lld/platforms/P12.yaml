@@ -184,6 +184,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false

@@ -296,6 +296,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPrincipal
+        label: Create principal
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPrincipals
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPrincipal
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -313,6 +328,10 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
       overwrites what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-003
@@ -369,6 +388,16 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: sendTransactionalMessage
+        label: Send transactional message
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: sendTransactionalMessage
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -434,6 +463,27 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: createOrder
+        label: Create order
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listEnvelopes
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -450,6 +500,10 @@ screens:
       **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-005
@@ -888,6 +942,26 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: allocateBlockedSeats
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listSeatBlocks
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: releaseSeatBlock
+        label: Release seat block
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: allocateBlockedSeats
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -904,6 +978,10 @@ screens:
       **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-009
@@ -962,6 +1040,25 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: evaluatePromotions
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listPromotions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeCartLine
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: evaluatePromotions
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -978,6 +1075,10 @@ screens:
       **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-010
@@ -1238,6 +1339,15 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideCreditLimit
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideCreditLimit
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1511,6 +1621,26 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: reprintOrder
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listOrderRefunds
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: voidOrder
+        label: Void order
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reprintOrder
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1527,6 +1657,10 @@ screens:
       **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-016
@@ -1622,6 +1756,11 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listPartnerAgreements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1638,6 +1777,10 @@ screens:
       **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-017
@@ -1897,6 +2040,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: createCase
+        label: Create case
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCases
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createCase
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1913,6 +2071,10 @@ screens:
       **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-021

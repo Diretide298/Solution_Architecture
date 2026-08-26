@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Seat Management — Sessions &amp; Closures <span style="font-weight:600;color:#6B7280">(8 of 15 · frames 2a–2e)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>pack 2 · follows <a href="Seat%20Board%201.dc.html">Board 1</a></div>
+      <div>1280 × 700 · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">The five remaining P08 screens all write to the same calendar, so they share one rule: nothing that affects a sold ticket saves without a decision attached to it. A session template generates sessions, a closure removes them, a queue config changes who gets through the door — the boards show where those collide.</p>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="seat-2a" data-screen-label="SEAT-2A" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEAT-2A · BO-015</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Session Calendar — a week of capacity, not a grid of times</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">9 APIs · wave 1</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">P08 Venue Management · Session Calendar. Every cell answers two questions at once — is it selling, and is it nearly full. The overrides are marked because a session that no longer matches its template is the one that surprises someone.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Venue Management</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Opening Hours</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Session Calendar</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Templates</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Closures</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Queues</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue Maps</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">42 sessions<br>5 overridden</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Session Calendar · Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">7 – 13 Sep 2026 · 42 sessions · 16 632 seats offered · 71% sold</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Week<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Generate from template</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Add session</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 306px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Week of 7 September</div>
+                <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
+                  <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#5A6577"><span style="width:9px;height:9px;border-radius:2px;background:#DFF3EA;border:1px solid #A9DCC6"></span>selling</span>
+                  <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#5A6577"><span style="width:9px;height:9px;border-radius:2px;background:#FFF6EA;border:1px solid #F3DFC0"></span>&gt;90% sold</span>
+                  <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#5A6577"><span style="width:9px;height:9px;border-radius:2px;background:#EEF2F7;border:1px solid #D8E0EA"></span>not on sale</span>
+                  <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:#5A6577"><span style="width:9px;height:9px;border-radius:2px;background:#EDF3FF;border:1px solid #0D6EFD"></span>overridden</span>
+                </div>
+              </div>
+              <div style="flex:none;display:grid;grid-template-columns:52px repeat(7,1fr);border-bottom:1px solid #EDF1F6">
+                <div style="padding:7px 8px"></div>
+                <div style="padding:7px 6px;text-align:center"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Mon</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">07</div></div>
+                <div style="padding:7px 6px;text-align:center"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Tue</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">08</div></div>
+                <div style="padding:7px 6px;text-align:center;background:#FFFBF4"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A4708">Wed</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#7A3F06">09</div></div>
+                <div style="padding:7px 6px;text-align:center"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Thu</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">10</div></div>
+                <div style="padding:7px 6px;text-align:center"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Fri</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">11</div></div>
+                <div style="padding:7px 6px;text-align:center"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Sat</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">12</div></div>
+                <div style="padding:7px 6px;text-align:center"><div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Sun</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">13</div></div>
+              </div>
+
+              <div style="flex:1;display:grid;grid-template-columns:52px repeat(7,1fr);grid-auto-rows:1fr;min-height:0">
+                <div style="display:flex;align-items:flex-start;justify-content:flex-end;padding:6px 8px 0;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;border-right:1px solid #EDF1F6">10:00</div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">10:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">284 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">10:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">201 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">10:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">176 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">10:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">312 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#EEF2F7;border:1px dashed #D8E0EA;padding:5px 6px;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4">opens 14:00</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#FFF6EA;border:1px solid #F3DFC0;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#7A3F06">09:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8A4708">381 / 396</span></div></div>
+                <div style="padding:4px;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">10:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">246 / 396</span></div></div>
+
+                <div style="display:flex;align-items:flex-start;justify-content:flex-end;padding:6px 8px 0;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;border-right:1px solid #EDF1F6">13:00</div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">13:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">298 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#EDF3FF;border:1.5px solid #0D6EFD;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;color:#0A4FB8">13:30</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0A4FB8">340 cap · override</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">13:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">204 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#FFF6EA;border:1px solid #F3DFC0;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#7A3F06">13:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8A4708">372 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">14:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">88 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#FFF6EA;border:1px solid #F3DFC0;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#7A3F06">13:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8A4708">396 / 396</span></div></div>
+                <div style="padding:4px;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">13:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">265 / 396</span></div></div>
+
+                <div style="display:flex;align-items:flex-start;justify-content:flex-end;padding:6px 8px 0;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;border-right:1px solid #EDF1F6">16:00</div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">16:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">190 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">16:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">233 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="height:100%;border-radius:7px;background:#FDECEC;border:1.5px dashed #E9A3A3;padding:5px 6px;display:flex;flex-direction:column;gap:1px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;color:#8A2020">16:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#A81E1E;line-height:1.25">dropped · closes 18:00</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">16:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">255 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">17:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">301 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#EDF3FF;border:1.5px solid #0D6EFD;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;color:#0A4FB8">16:30</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0A4FB8">time moved</span></div></div>
+                <div style="padding:4px;border-bottom:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">16:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">208 / 396</span></div></div>
+
+                <div style="display:flex;align-items:flex-start;justify-content:flex-end;padding:6px 8px 0;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;border-right:1px solid #EDF1F6">19:00</div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#EEF2F7;border:1px dashed #D8E0EA;padding:5px 6px;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4">no session</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">19:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">177 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA;background:#FFFBF4"><div style="height:100%;border-radius:7px;background:#FDECEC;border:1.5px dashed #E9A3A3;padding:5px 6px;display:flex;flex-direction:column;gap:1px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;color:#8A2020">19:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#A81E1E;line-height:1.25">dropped · 61 sold</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#DFF3EA;border:1px solid #A9DCC6;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0B5B41">19:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#0B7A55">262 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#FFF6EA;border:1px solid #F3DFC0;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#7A3F06">20:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8A4708">389 / 396</span></div></div>
+                <div style="padding:4px;border-right:1px solid #F4F6FA"><div style="height:100%;border-radius:7px;background:#FFF6EA;border:1px solid #F3DFC0;padding:5px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#7A3F06">20:00</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8A4708">396 / 396</span></div></div>
+                <div style="padding:4px"><div style="height:100%;border-radius:7px;background:#EEF2F7;border:1px dashed #D8E0EA;padding:5px 6px;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A0B4">no session</span></div></div>
+              </div>
+
+              <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">42 sessions · 5 differ from their template · 2 dropped by the 9 Sep reduced-hours exception</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Compare to template</span></div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Sessions dropped on 9 Sep</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">2</span></div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">The reduced-hours exception closes the venue at 18:00. The 19:00 session had already sold 61 tickets before that exception was set.</div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;background:#FDF5F5;border:1px solid #F5C9C9"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#8A2020">19:00</span><span style="flex:1;font-size:10.5px;color:#8A2020">61 sold</span><span style="font-size:10px;font-weight:700;color:#0D6EFD">Move</span><span style="font-size:10px;font-weight:700;color:#5A6577">Refund</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#5A6577">16:00</span><span style="flex:1;font-size:10.5px;color:#5A6577">nothing sold</span><span style="font-size:10px;font-weight:700;color:#8494A8">Drop quietly</span></div>
+                </div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">This week</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Seats offered</span><span style="font-family:'IBM Plex Mono',monospace">16 632</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Sold</span><span style="font-family:'IBM Plex Mono',monospace">11 809 · 71%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Sessions at capacity</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">2</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Sessions under 30%</span><span style="font-family:'IBM Plex Mono',monospace">1</span></div>
+                <div style="height:7px;border-radius:4px;background:#EEF2F7;overflow:hidden;display:flex;margin-top:2px"><span style="width:71%;background:linear-gradient(90deg,#0D6EFD,#00B8FF)"></span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="padding:12px 14px 9px;display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Differs from template</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EDF3FF;color:#0A4FB8">5</span></div>
+                <div style="display:flex;gap:9px;padding:8px 14px;border-top:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">Tue 13:30 · capacity 340</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Template says 396 · set by A. Whitfield, 2 Sep</div></div></div>
+                <div style="display:flex;gap:9px;padding:8px 14px;border-top:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">Sat 16:30 · moved from 16:00</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Turnaround from the 13:00 matinee</div></div></div>
+                <div style="display:flex;gap:9px;padding:8px 14px;border-top:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">Fri 14:00 · first session late</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Follows the Friday opening hour, not the template</div></div></div>
+                <div style="margin-top:auto;flex:none;padding:9px 14px;border-top:1px solid #EDF1F6;display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">3 of 5 shown</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Reset to template</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listSessions · createSession · updateSession · cancelSession · getSessionOccupancy · generateSessionsFromTemplate · resetSessionToTemplate · listAffectedOrders · getOpeningHours</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">emptyFirstRun — no sessions generated for this range</b> · overridden · sessionsDroppedByException · soldTicketsAffected · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · venueId←context · range←picker · templateId←<a href="#seat-2b">template</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seat-2b">session template</a> · <a href="#seat-2d">closures</a> · reseat decision</div>
+      </div>
+    </div>
+
+    <div id="seat-2b" data-screen-label="SEAT-2B" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEAT-2B · BO-016</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Session Template — the rule, and what it would produce</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">preview before generate</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">P08 Venue Management · Session Templates. A template is a rule that creates rows in a live calendar. The right half is not decoration — it is the count of sessions this rule will create, the ones it will skip, and the ones it would overwrite.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Venue Management</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Opening Hours</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Calendar</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Session Templates</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Closures</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Queues</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue Maps</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">4 templates<br>1 draft</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Standard Weekday · draft</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">Main Arena · edited 12 min ago · not yet generated</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Discard</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Save without generating</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Generate 84 sessions</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1.08fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The rule</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Name</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-size:11.5px;font-weight:600">Standard Weekday</div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Applies to</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-size:11.5px;color:#5A6577">Main Arena<span style="margin-left:auto;color:#9AA5B6">▾</span></div></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Days</span>
+                  <div style="display:flex;gap:5px">
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Mon</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Tue</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Wed</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Thu</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#F4F6FA;border:1px solid #E3E8F0;color:#8494A8;font-size:11px;font-weight:600">Fri</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#F4F6FA;border:1px solid #E3E8F0;color:#8494A8;font-size:11px;font-weight:600">Sat</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#F4F6FA;border:1px solid #E3E8F0;color:#8494A8;font-size:11px;font-weight:600">Sun</span>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">First session</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">10:00</div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Every</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">3 h</div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Last start</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">19:00</div></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Duration</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">150 min</div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Turnaround</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">30 min</div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Capacity</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">396<span style="margin-left:auto;font-size:10px;color:#8494A8">from map</span></div></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Generate for</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-size:11.5px">1 Sep – 30 Nov 2026<span style="margin-left:auto;color:#9AA5B6">▾</span></div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Rules that override this one</div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:70px;flex:none">Opening hrs</span><span style="flex:1;font-size:11px;color:#5A6577">A session cannot start after last entry</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:70px;flex:none">Closures</span><span style="flex:1;font-size:11px;color:#5A6577">Closed dates are skipped, not generated empty</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F4F8FF;border:1.5px solid #BBD6FF"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8;width:70px;flex:none;font-weight:700">Overrides</span><span style="flex:1;font-size:11px;font-weight:600;color:#0A4FB8">Hand-edited sessions are kept unless you say otherwise</span></div>
+                <div style="margin-top:auto;padding:8px 10px;border-radius:9px;background:#F4F8FF;border:1px solid #BBD6FF;font-size:10.5px;color:#0A4FB8;line-height:1.5">Order matters: opening hours cut first, closures remove whole days, then overrides win over anything the template would have written.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:9px">
+                <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Will create</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600">84</span></div>
+                <div style="background:#fff;border:1px solid #F3DFC0;border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A4708">Skipped</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#7A3F06">7</span></div>
+                <div style="background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A81E1E">Would overwrite</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#8A2020">5</span></div>
+                <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Seats added</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600">33 264</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What this would produce</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">first week shown</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Date</div><div style="text-align:right">Starts</div><div style="text-align:right">Ends</div><div style="text-align:right">Capacity</div><div>Result</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Tue 1 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">10:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12:30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">396</div><div style="font-size:10.5px;color:#0B7A55;font-weight:600">create</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Tue 1 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">13:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">15:30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">396</div><div style="font-size:10.5px;color:#0B7A55;font-weight:600">create</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px;border-bottom:1px solid #F4F6FA;background:#F4F8FF"><div style="font-weight:700;color:#0A4FB8">Tue 8 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">13:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">15:30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">396</div><div style="font-size:10.5px;color:#0A4FB8;font-weight:700">keep 13:30 · cap 340</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Wed 9 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">16:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">18:30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">—</div><div style="font-size:10.5px;color:#7A3F06;font-weight:600">skip · closes 18:00</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Wed 9 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">19:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">21:30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">—</div><div style="font-size:10.5px;color:#7A3F06;font-weight:600">skip · closes 18:00</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Thu 10 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">10:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12:30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">396</div><div style="font-size:10.5px;color:#0B7A55;font-weight:600">create</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Wed 16 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">all</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">—</div><div style="font-size:10.5px;color:#8A2020;font-weight:700">skip · closed all day</div></div>
+                <div style="display:grid;grid-template-columns:1.05fr .75fr .75fr .8fr 1.35fr;align-items:center;padding:7px 14px;font-size:11px"><div style="font-weight:600">Mon 21 Sep</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">10:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12:30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">396</div><div style="font-size:10.5px;color:#0B7A55;font-weight:600">create</div></div>
+                <div style="margin-top:auto;flex:none;padding:9px 14px;border-top:1px solid #EDF1F6;display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">8 of 96 rows · 84 create · 7 skip · 5 kept</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Show all 96</span></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Five sessions have been hand-edited</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">choose</span></div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Two of them have tickets sold against the edited time. Overwriting moves 74 guests.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Keep the edits</div><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #F5C9C9;border-radius:9px;background:#FDF5F5;font-size:11px;font-weight:700;color:#8A2020">Overwrite all five</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getSessionTemplate · saveSessionTemplate · previewSessionGeneration · generateSessionsFromTemplate · listSessionOverrides</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · draft · <b style="color:#8A6D00">emptyFirstRun — no template on this venue</b> · previewReady · overridesConflict · soldTicketsAffected · validationError · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · venueId←context · templateId←list · range←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seat-2a">session calendar</a> · <a href="#seat-2d">closures</a></div>
+      </div>
+    </div>
+
+    <div id="seat-2c" data-screen-label="SEAT-2C" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEAT-2C · BO-002</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Queue Configuration — throughput against a real arrival curve</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">wait exceeds target</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">P08 Venue Management · Queues. Lane counts and scan rates are inputs; the only output that matters is the wait at the peak fifteen minutes. The curve is measured from the last four comparable sessions, not assumed flat.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Venue Management</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Opening Hours</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Calendar</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Templates</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Closures</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Queues</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue Maps</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">3 entrances<br>peak wait 18 min</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Queue Configuration · Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">Sat 20:00 session · 396 admits · target wait 10 min · modelled 18 min</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Sat 20:00<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Copy to all sessions</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save configuration</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.25fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;padding:12px 14px 10px;gap:9px;min-height:0">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Arrivals against throughput</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">measured · last 4 Saturdays</span></div>
+                <div style="flex:1;display:flex;gap:9px;min-height:0">
+                  <div style="flex:none;width:34px;display:flex;flex-direction:column;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6;text-align:right;padding-bottom:16px"><span>120</span><span>90</span><span>60</span><span>30</span><span>0</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+                    <div style="flex:1;position:relative;border-left:1px solid #EDF1F6;border-bottom:1px solid #E3E8F0;min-height:0">
+                      <div style="position:absolute;left:0;right:0;top:33.3%;border-top:1px dashed #E8ECF3"></div>
+                      <div style="position:absolute;left:0;right:0;top:66.6%;border-top:1px dashed #E8ECF3"></div>
+                      <div style="position:absolute;left:0;right:0;top:41%;border-top:1.5px solid #0D6EFD"></div>
+                      <div style="position:absolute;left:6px;top:41%;transform:translateY(-100%);font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;color:#0A4FB8;padding-bottom:3px">throughput 71 guests / 5 min</div>
+                      <div style="position:absolute;inset:0;display:flex;align-items:flex-end;gap:4px;padding:0 6px">
+                        <div style="flex:1;height:11%;border-radius:3px 3px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:17%;border-radius:3px 3px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:24%;border-radius:3px 3px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:33%;border-radius:3px 3px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:46%;border-radius:3px 3px 0 0;background:#A9C8F0"></div>
+                        <div style="flex:1;height:63%;border-radius:3px 3px 0 0;background:#E9A3A3"></div>
+                        <div style="flex:1;height:82%;border-radius:3px 3px 0 0;background:#DC2626"></div>
+                        <div style="flex:1;height:94%;border-radius:3px 3px 0 0;background:#DC2626"></div>
+                        <div style="flex:1;height:76%;border-radius:3px 3px 0 0;background:#DC2626"></div>
+                        <div style="flex:1;height:52%;border-radius:3px 3px 0 0;background:#E9A3A3"></div>
+                        <div style="flex:1;height:34%;border-radius:3px 3px 0 0;background:#A9C8F0"></div>
+                        <div style="flex:1;height:21%;border-radius:3px 3px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:13%;border-radius:3px 3px 0 0;background:#C9DCF6"></div>
+                        <div style="flex:1;height:8%;border-radius:3px 3px 0 0;background:#C9DCF6"></div>
+                      </div>
+                    </div>
+                    <div style="flex:none;display:flex;gap:4px;padding:5px 6px 0;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#9AA5B6">
+                      <span style="flex:1;text-align:center">−65</span><span style="flex:1;text-align:center">−60</span><span style="flex:1;text-align:center">−55</span><span style="flex:1;text-align:center">−50</span><span style="flex:1;text-align:center">−45</span><span style="flex:1;text-align:center">−40</span><span style="flex:1;text-align:center">−35</span><span style="flex:1;text-align:center">−30</span><span style="flex:1;text-align:center">−25</span><span style="flex:1;text-align:center">−20</span><span style="flex:1;text-align:center">−15</span><span style="flex:1;text-align:center">−10</span><span style="flex:1;text-align:center">−5</span><span style="flex:1;text-align:center">0</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="flex:none;display:flex;gap:14px;align-items:center;font-size:10px;color:#6B7280;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#C9DCF6"></span>arrivals within throughput</span><span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#DC2626"></span>arrivals above throughput · queue builds</span><span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:2px;background:#0D6EFD"></span>what the lanes can process</span></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:11px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Lanes</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">3 entrances · 11 lanes open</span></div>
+                <div style="display:grid;grid-template-columns:1.2fr .7fr .8fr .9fr 1fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Entrance</div><div style="text-align:right">Lanes</div><div style="text-align:right">Scan rate</div><div style="text-align:right">Per 5 min</div><div style="text-align:right">Share of admits</div></div>
+                <div style="display:grid;grid-template-columns:1.2fr .7fr .8fr .9fr 1fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">North · main</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8 / min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#5A6577">58%</div></div>
+                <div style="display:grid;grid-template-columns:1.2fr .7fr .8fr .9fr 1fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">East · members</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">9 / min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">22</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#5A6577">27%</div></div>
+                <div style="display:grid;grid-template-columns:1.2fr .7fr .8fr .9fr 1fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">West · accessible</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4 / min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">9</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#5A6577">15%</div></div>
+                <div style="display:grid;grid-template-columns:1.2fr .7fr .8fr .9fr 1fr;align-items:center;padding:8px 14px;font-size:11.5px;font-weight:700;background:#FBFCFE"><div>Total</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">71</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">100%</div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Modelled wait</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FFF3E0;color:#8A4708">8 min over target</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                  <div style="padding:8px 9px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3;display:flex;flex-direction:column;gap:2px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Average</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">6 min</span></div>
+                  <div style="padding:8px 9px;border-radius:9px;background:#FFF6EA;border:1px solid #F3DFC0;display:flex;flex-direction:column;gap:2px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A4708">At peak</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#7A3F06">18 min</span></div>
+                  <div style="padding:8px 9px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3;display:flex;flex-direction:column;gap:2px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Target</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">10 min</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">The peak is the fifteen minutes from −35 to −20. 214 guests arrive in that window against a capacity of 213, so the queue that forms does not clear before doors close.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What would bring it under 10</div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F4F8FF;border:1.5px solid #BBD6FF"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#0A4FB8">Open 2 more lanes at North</div><div style="font-size:10px;color:#0A4FB8;margin-top:1px">peak wait 18 → 9 min · 2 more staff for 40 min</div></div><span style="font-size:10px;font-weight:700;color:#0D6EFD;flex:none">Apply</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3"><div style="flex:1"><div style="font-size:11px;font-weight:600">Open doors 15 min earlier</div><div style="font-size:10px;color:#8494A8;margin-top:1px">peak wait 18 → 11 min · no staff change</div></div><span style="font-size:10px;font-weight:700;color:#5A6577;flex:none">Apply</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3"><div style="flex:1"><div style="font-size:11px;font-weight:600">Timed entry in 15-min bands</div><div style="font-size:10px;color:#8494A8;margin-top:1px">peak wait 18 → 5 min · changes what the guest buys</div></div><span style="font-size:10px;font-weight:700;color:#5A6577;flex:none">Apply</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Rules at the door</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Doors open before start</span><span style="font-family:'IBM Plex Mono',monospace">45 min</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Late admission until</span><span style="font-family:'IBM Plex Mono',monospace">+20 min</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Re-entry</span><span style="font-family:'IBM Plex Mono',monospace">allowed · wristband</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Accessible lane priority</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">always</span></div>
+                <div style="margin-top:auto;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3;font-size:10.5px;color:#5A6577;line-height:1.5">West stays at 4 scans per minute by design. An accessible lane that is optimised for speed is not an accessible lane.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getQueueConfiguration · saveQueueConfiguration · getArrivalCurve · modelQueueWait · copyQueueConfiguration</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">noHistory — no comparable sessions, curve assumed flat and labelled as such</b> · withinTarget · waitOverTarget · saving · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · venueId←context · sessionId←<a href="#seat-2a">calendar</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seat-2a">session calendar</a> · staffing roster</div>
+      </div>
+    </div>
+
+    <div id="seat-2d" data-screen-label="SEAT-2D" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEAT-2D · BO-019</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Closures &amp; Blackouts — the decision is the save button</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">284 sold</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">P08 Venue Management · Closures. Closing a date that has sold tickets is a refund decision wearing a calendar's clothes. This screen makes the money and the guest count visible in the same view as the date picker, and will not save without an option chosen.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Venue Management</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Opening Hours</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Calendar</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Templates</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Closures</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Queues</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue Maps</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">1 closure pending<br>284 tickets held</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Close 16 September · Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">4 sessions · 284 tickets · £18 460 taken · reason required</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Cancel</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#D7DEE8;color:#8494A8;font-size:11px;font-weight:700">Close the date · choose an option first</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1.12fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The closure</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">From</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">16 Sep 2026 · 00:00</div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">To</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">16 Sep 2026 · 24:00</div></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Scope</span>
+                  <div style="display:flex;gap:6px">
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Whole venue</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#F4F6FA;border:1px solid #E3E8F0;color:#5A6577;font-size:11px;font-weight:600">Sections</span>
+                    <span style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#F4F6FA;border:1px solid #E3E8F0;color:#5A6577;font-size:11px;font-weight:600">Single session</span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Reason · shown to guests</span><div style="height:32px;border:1px solid #D8E0EA;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-size:11.5px">Essential maintenance<span style="margin-left:auto;color:#9AA5B6">▾</span></div></div>
+                <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Internal note · audit only</span><div style="height:52px;border:1px solid #D8E0EA;border-radius:8px;padding:8px 10px;font-size:11px;color:#5A6577;line-height:1.45">Roof inspection moved forward by the contractor. Confirmed with operations 24 Aug.</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="padding:12px 14px 9px;display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Sessions affected</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">4 of 4 on this date</span></div>
+                <div style="display:grid;grid-template-columns:.8fr .8fr 1fr .9fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Starts</div><div style="text-align:right">Sold</div><div style="text-align:right">Value</div><div style="text-align:right">Groups</div></div>
+                <div style="display:grid;grid-template-columns:.8fr .8fr 1fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">10:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">62</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£3 980</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#5A6577">1 school</div></div>
+                <div style="display:grid;grid-template-columns:.8fr .8fr 1fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">13:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">104</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£6 740</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#5A6577">2 groups</div></div>
+                <div style="display:grid;grid-template-columns:.8fr .8fr 1fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">16:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">57</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£3 620</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div></div>
+                <div style="display:grid;grid-template-columns:.8fr .8fr 1fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">19:00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">61</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£4 120</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#5A6577">1 corporate</div></div>
+                <div style="display:grid;grid-template-columns:.8fr .8fr 1fr .9fr;align-items:center;padding:8px 14px;font-size:11.5px;font-weight:700;background:#FBFCFE"><div>Total</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">284</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£18 460</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div></div>
+                <div style="margin-top:auto;flex:none;padding:10px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#6B7280;line-height:1.5">The school booking at 10:00 has a 14-day cancellation term. Refunding it inside that window needs a manager override, recorded against this closure.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What happens to the 284 tickets</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">required</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;gap:10px;padding:10px 11px;border-radius:10px;background:#F4F8FF;border:1.5px solid #0D6EFD">
+                    <span style="flex:none;width:15px;height:15px;border-radius:50%;border:4px solid #0D6EFD;background:#fff;margin-top:1px"></span>
+                    <div style="flex:1"><div style="font-size:11.5px;font-weight:700;color:#0A4FB8">Offer a move, refund if declined</div><div style="font-size:10.5px;color:#0A4FB8;margin-top:2px;line-height:1.45">Each guest gets the same time on 17 or 18 Sep — 224 and 189 seats free. 21 days to answer, automatic refund after that.</div></div>
+                  </div>
+                  <div style="display:flex;gap:10px;padding:10px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E3E8F0">
+                    <span style="flex:none;width:15px;height:15px;border-radius:50%;border:1.5px solid #C7D3E4;background:#fff;margin-top:1px"></span>
+                    <div style="flex:1"><div style="font-size:11.5px;font-weight:600">Refund everyone now</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.45">£18 460 back to the original payment methods. Clean, and the whole day's revenue is gone.</div></div>
+                  </div>
+                  <div style="display:flex;gap:10px;padding:10px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E3E8F0">
+                    <span style="flex:none;width:15px;height:15px;border-radius:50%;border:1.5px solid #C7D3E4;background:#fff;margin-top:1px"></span>
+                    <div style="flex:1"><div style="font-size:11.5px;font-weight:600">Credit to account, no expiry</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.45">Keeps the money in the business. The four group bookings have contracts requiring a cash refund, so they would be refunded anyway.</div></div>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Who gets told, and when</div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:62px;flex:none">Guests</span><span style="flex:1;font-size:11px;color:#5A6577">Email + SMS on save · 284 recipients</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:62px;flex:none">Groups</span><span style="flex:1;font-size:11px;color:#5A6577">Phone call task to the sales owner · 4 tasks</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Closures already set</div>
+                <div style="display:flex;gap:9px;padding:7px 0;border-bottom:1px solid #F4F6FA"><span style="width:3px;border-radius:2px;background:#C7D3E4;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">25 Dec 2026 · closed</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Annual · nothing on sale</div></div></div>
+                <div style="display:flex;gap:9px;padding:7px 0"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1"><div style="font-size:11px;font-weight:600">9 Sep 2026 · reduced hours</div><div style="font-size:10px;color:#8494A8;margin-top:1px">Closes 18:00 · 2 sessions dropped, 61 tickets moved</div></div></div>
+                <div style="margin-top:auto;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3;font-size:10.5px;color:#5A6577;line-height:1.5">A closure is never deleted, only ended. The 9 Sep entry keeps its refund decision attached so the 61 moved tickets can be traced back to it.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listClosures · createClosure · endClosure · listAffectedOrders · previewRefundImpact · findAlternativeSessions · notifyAffectedGuests</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">noneSold — saves without a refund decision</b> · soldTicketsAffected · decisionRequired · contractBlocksCredit · saving · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · venueId←context · date←<a href="#seat-2a">calendar</a> or opening hours</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seat-2a">session calendar</a> · refund queue · group booking</div>
+      </div>
+    </div>
+
+    <div id="seat-2e" data-screen-label="SEAT-2E" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEAT-2E · BO-092</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Venue Maps — which version is selling right now</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">4 venues · 11 maps</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">P08 Venue Management · Venue Maps. The list a manager lands on. One column carries the only fact that matters at a glance — the published version, and whether a draft is waiting behind it.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Venue Management</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Opening Hours</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Calendar</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Session Templates</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Closures</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Queues</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Venue Maps</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">11 maps<br>2 drafts waiting</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Venue Maps</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">4 venues · 11 maps · 6 348 seats published · 2 drafts unpublished</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All venues<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Import a map</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">New map</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 300px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">All maps</div>
+                <div style="margin-left:auto;display:flex;gap:6px"><span style="height:26px;display:flex;align-items:center;padding:0 9px;border-radius:7px;background:#0D6EFD;color:#fff;font-size:10px;font-weight:700">All 11</span><span style="height:26px;display:flex;align-items:center;padding:0 9px;border:1px solid #E3E8F0;border-radius:7px;font-size:10px;font-weight:700;color:#5A6577">Published 9</span><span style="height:26px;display:flex;align-items:center;padding:0 9px;border:1px solid #BBD6FF;border-radius:7px;background:#EDF3FF;font-size:10px;font-weight:700;color:#0A4FB8">Draft 2</span></div>
+              </div>
+              <div style="flex:none;display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Map</div><div>Venue</div><div style="text-align:right">Seats</div><div style="text-align:right">Accessible</div><div>Selling now</div><div style="text-align:right">Last change</div></div>
+
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F4F8FF"><div style="font-weight:700;color:#0A4FB8">Main Arena · full house</div><div style="color:#0A4FB8">Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">396</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">8</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:#0A4FB8">v7</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#EDF3FF;border:1px solid #BBD6FF;color:#0A4FB8">v8 draft</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#0A4FB8">11:42 today</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Main Arena · reduced stage</div><div style="color:#5A6577">Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">312</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v3</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#DFF3EA;color:#0B5B41">published</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">14 Aug</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Main Arena · standing floor</div><div style="color:#5A6577">Main Arena</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">640</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v2</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#DFF3EA;color:#0B5B41">published</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">2 Jul</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Studio Theatre · seated</div><div style="color:#5A6577">Studio</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">184</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v5</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#DFF3EA;color:#0B5B41">published</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">3 Aug</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Studio Theatre · cabaret</div><div style="color:#5A6577">Studio</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">96</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v1</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#DFF3EA;color:#0B5B41">published</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">3 Aug</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Riverside Hall · main</div><div style="color:#7A3F06">Riverside</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">452</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E;font-weight:600">0</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:#7A3F06">v4</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#FFF3E0;border:1px solid #F3DFC0;color:#8A4708">no accessible seats</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8A4708">19 Aug</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Riverside Hall · gala</div><div style="color:#5A6577">Riverside</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">288</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v2</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#EEF2F7;color:#5A6577">not in use</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">11 Jun</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Park Stage · summer</div><div style="color:#5A6577">Park</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">24</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v9</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#DFF3EA;color:#0B5B41">published</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">28 Jul</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Park Stage · winter</div><div style="color:#5A6577">Park</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">24</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v1</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#EDF3FF;border:1px solid #BBD6FF;color:#0A4FB8">draft</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">21 Aug</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr .9fr .7fr .8fr 1.15fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px"><div style="font-weight:600">Park Stage · reduced</div><div style="color:#5A6577">Park</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">720</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18</div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">v3</span><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:#EEF2F7;color:#5A6577">not in use</span></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:10.5px;color:#8494A8">4 May</div></div>
+
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">10 of 11 shown · sorted by venue</span><span style="font-family:'IBM Plex Mono',monospace">6 348 seats published</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #BBD6FF;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Draft waiting on Main Arena</div><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EDF3FF;color:#0A4FB8">v8</span></div>
+                <div style="font-size:10.5px;color:#0A4FB8;line-height:1.5">Eleven grouped changes, one of them a drop in accessible seats. 148 tickets are already sold against v7.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700"><a href="Seat%20Board%201.dc.html#seat-1b" style="color:#fff">Review the diff</a></div><div style="flex:none;padding:0 11px;height:30px;display:flex;align-items:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11px;font-weight:700;color:#5A6577">Discard</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Riverside Hall has no accessible seats</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">452 seats, none marked accessible, and the map has been selling since 19 August. Either the import missed them or the venue genuinely has none — both need an answer on the record.</div>
+                <div style="display:flex;gap:6px"><div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Open the map</div><div style="flex:none;padding:0 11px;height:30px;display:flex;align-items:center;border:1px solid #E3E8F0;border-radius:9px;font-size:11px;font-weight:700;color:#5A6577">Record why</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Across all venues</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Seats published</span><span style="font-family:'IBM Plex Mono',monospace">6 348</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Accessible</span><span style="font-family:'IBM Plex Mono',monospace">106 · 1.7%</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Maps never used</span><span style="font-family:'IBM Plex Mono',monospace">2</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Imported, not hand-built</span><span style="font-family:'IBM Plex Mono',monospace">7 of 11</span></div>
+                <div style="margin-top:auto;padding:8px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #E8ECF3;font-size:10.5px;color:#5A6577;line-height:1.5">Two maps have never sold a ticket. Keeping them costs nothing until someone picks the wrong one for a session — which is why the selling column reads "not in use" rather than staying blank.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listSeatMaps · getSeatMap · createSeatMap · archiveSeatMap · listSeatMapVersions · getAccessibilitySummary</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">emptyFirstRun — no maps on any venue, import is the primary action</b> · draftPending · accessibilityMissing · archived · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · venueFilter←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="Seat%20Board%201.dc.html#seat-1a">import</a> · <a href="Seat%20Board%201.dc.html#seat-1b">version diff</a> · section editor</div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-size:14px;font-weight:800;letter-spacing:-.01em">Mapping table · Seat Board 2</div><div style="font-size:11.5px;color:#6B7280;margin-top:3px">Pointers are written by the deriver, not by hand.</div></div>
+      <div style="display:grid;grid-template-columns:.7fr .7fr .5fr 1.4fr;border:1px solid #EDF1F6;border-radius:9px;overflow:hidden">
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Frame id</div>
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Screen id</div>
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Platform</div>
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Drawn as</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">seat-2a</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;border-bottom:1px solid #F4F6FA">BO-015</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577;border-bottom:1px solid #F4F6FA">P08</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Session Calendar — week grid, occupancy, overrides</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">seat-2b</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;border-bottom:1px solid #F4F6FA">BO-016</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577;border-bottom:1px solid #F4F6FA">P08</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Session Template — rule plus generation preview</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">seat-2c</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;border-bottom:1px solid #F4F6FA">BO-002</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577;border-bottom:1px solid #F4F6FA">P08</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Queue Configuration — lanes against a measured arrival curve</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">seat-2d</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;border-bottom:1px solid #F4F6FA">BO-019</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577;border-bottom:1px solid #F4F6FA">P08</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Closures &amp; Blackouts — refund decision blocks the save</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;">seat-2e</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;">BO-092</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577;">P08</div>
+        <div style="padding:8px 11px;font-size:11.5px;">Venue Maps — list with published version and draft state</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:13px 15px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">note field · one line per drawn screen</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;color:#4A5566">BO-015 — <b>Drawn as SEAT-2A in the Seat Management pack.</b> The pack's frame is the specification — it carries operations, states, entry params and exits.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;color:#4A5566">BO-016 — <b>Drawn as SEAT-2B in the Seat Management pack.</b> The pack's frame is the specification — it carries operations, states, entry params and exits.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;color:#4A5566">BO-002 — <b>Drawn as SEAT-2C in the Seat Management pack.</b> The pack's frame is the specification — it carries operations, states, entry params and exits.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;color:#4A5566">BO-019 — <b>Drawn as SEAT-2D in the Seat Management pack.</b> The pack's frame is the specification — it carries operations, states, entry params and exits.</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;color:#4A5566">BO-092 — <b>Drawn as SEAT-2E in the Seat Management pack.</b> The pack's frame is the specification — it carries operations, states, entry params and exits.</div>
+      </div>
+      <div style="display:flex;gap:12px;padding:13px 15px;border-radius:10px;background:#FFF6EA;border:1px solid #F3DFC0;font-size:11.5px;color:#7A3F06;line-height:1.6">
+        <div style="width:3px;border-radius:2px;background:#B4530A;flex:none"></div>
+        <div><b>8 of 15 drawn.</b> P08 is now complete. Board 3 takes the seven remaining screens — the selling and map-viewing side across P04, P01, P02, P06 and P10, where the guest picks a seat rather than an operator defining one. <code style="font-family:'IBM Plex Mono',monospace;font-size:11px">copySeatMapSection</code> still has no frame.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

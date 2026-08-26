@@ -344,7 +344,8 @@
 
         <!-- The join the viewer could not make for itself: which tables an
              operation touches. Not derivable from the contracts, so it arrives
-             as data — and 318 of the 654 rows admit nobody has worked it out. -->
+             as data. Every row now resolves; when some did not, the count of the ones
+             that admitted it was the honest headline. -->
         <section class="view sheet" id="view-lineage" hidden>
           <div class="graph-toolbar">
             <!-- The three sheets answer "which tables does this touch", one row
@@ -361,11 +362,11 @@
             <div class="seg" id="lineage-scope">
               <button data-scope="operations" data-tip-title="By operation" data-tip="Every operation against the tables it reads and writes, its service, and where the read is routed. Grouped by contract.">Operations</button>
               <button data-scope="tables" data-tip-title="By table" data-tip="The other direction — each table with every operation that touches it. The busiest tables are the ones a schema change costs most to make.">Tables</button>
-              <button data-scope="services" data-tip-title="By service" data-tip="The 22 services the operations divide into, and the tables each one owns. A table written by two services is a boundary worth questioning.">Services</button>
+              <button data-scope="services" data-tip-title="By service" data-tip="The {services} services the operations divide into, and the tables each one owns. A table written by two services is a boundary worth questioning.">Services</button>
             </div>
             <label class="toggle">
               <input type="checkbox" id="lineage-unresolved" checked />
-              <span data-tip-title="Resolves to no table" data-tip="318 of the 654, marked `unresolved` by the file itself. Not a defect list: most return a computed projection, which has no persistence marker because there is nothing to mark. Shown by default, because hiding them would make the other 336 read as the whole set.">No table</span>
+              <span data-tip-title="Resolves to no table" data-tip="{unresolved} of the {operations}, marked `unresolved` by the file itself. Not a defect list: most return a computed projection, which has no persistence marker because there is nothing to mark. Shown by default, because hiding them would make the other 336 read as the whole set.">No table</span>
             </label>
             <input id="lineage-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
             <div class="spacer"></div>
@@ -451,7 +452,7 @@
         <section class="view sheet" id="view-decisions" hidden>
           <div class="graph-toolbar">
             <div class="seg" id="decisions-scope">
-              <button data-scope="adrs" data-tip-title="Decisions" data-tip="The 18 ADRs — what was decided, when, what it closes and what it constrains. An ADR that is Accepted and partly superseded is marked, because it reads as current in a list and is not.">Decisions</button>
+              <button data-scope="adrs" data-tip-title="Decisions" data-tip="The {adrs} ADRs — what was decided, when, what it closes and what it constrains. An ADR that is Accepted and partly superseded is marked, because it reads as current in a list and is not.">Decisions</button>
               <button data-scope="permissions" data-tip-title="Permission vectors" data-tip="The normative authorisation spec, executed. Each vector is a set of grants, a query and the verdict the platform must reach — and the viewer resolves each one rather than listing it.">Permissions</button>
               <button data-scope="gaps" data-tip-title="Artefact audit" data-tip="The delivery's own count of what the requirements demand and the package does not have. The only register here that measures absence.">Gaps</button>
               <button data-scope="registers" data-tip-title="Registers" data-tip="The reference data — capabilities, actors, AI applications, conflicts, external dependencies — and the handoff narratives.">Registers</button>

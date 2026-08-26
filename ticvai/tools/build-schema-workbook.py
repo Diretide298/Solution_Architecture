@@ -1,9 +1,36 @@
+"""Build the schema reference workbook.
+
+**Reads the package, not a working directory.** Until 26 August this opened `schema_v4.json`,
+`lineage.json`, `links.json` and `modules.json` by bare name — files that lived in whatever folder
+somebody happened to run it from, and **none of which is in the package.** So it could not run here
+at all, which is why the viewer's `module.written` read a column the workbook never wrote.
+
+**Same class as `derive-board-panel-map.py` reading `/tmp/reads.json`**: a tool whose inputs are
+outside the artefact it describes is a tool that works until the machine changes.
+
+`links.json` and `modules.json` have no package equivalent. **Where they are absent the sheets that
+need them are skipped and named**, rather than the whole workbook failing — the other seven sheets
+are the ones a backend engineer opens.
+"""
+from pathlib import Path as _P
+_ROOT = _P(__file__).resolve().parents[1]
+_H = _ROOT / "handoff"
+
+
+def _pkg(*names):
+    """First of `names` that exists in `handoff/`, else None."""
+    for n in names:
+        if (_H / n).exists():
+            return _H / n
+    return None
+
+
 import json, yaml, glob, os, re
 from collections import defaultdict
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
-D=json.load(open('schema_v4.json')); L=json.load(open('links.json'))
+D=json.load(open(_pkg('schema-reference.json','schema_v4.json'), encoding='utf-8')); L=(json.load(open(_pkg('links.json'), encoding='utf-8')) if _pkg('links.json') else {})
 cols=D['cols']; nomap=D['nomap']; origin=D['origin']; storage=D['storage']
 # **Where each table hangs, on the table's own row.** schema-roots.md answers it in prose and a
 # reader looking at a table in this sheet was not in that file. `anchors` is where the table's own
@@ -85,15 +112,23 @@ for i,(t_,f_) in enumerate([
 
 ws=wb.create_sheet('Modules')
 import json as _json
-MODROWS=_json.load(open('modules.json'))
+MODROWS=(_json.load(open(_pkg('modules.json'), encoding='utf-8')) if _pkg('modules.json') else [])
 ws.cell(1,1,'Schema modules').font=T
 ws.cell(2,1,'What each module is, and why the boundary is where it is. Spine modules are depended on; '
             'satellites depend on the spine and never on each other.').font=SUB
-hdr(ws,['Module','What it is','Why it is separate','Tables','Cols','Contract','Ops','Tier','Out','In','Cross'],
-       [13,52,66,7,7,18,6,10,7,6,7])
+# **`Written` added 26 August.** The viewer's Backend > Data view read `module.written` and the
+# sheet had no such column, so every schema drew amber — **a status nobody could act on because it
+# was the same for all 26 whatever the state of the build.**
+#
+# It counts tables with a `CREATE TABLE` in `backend/`. **That is zero today and the column is
+# still worth having**: a colour that means *nothing is built* is honest, and a colour that means
+# *the column is missing* is not. When the first migration lands, this moves without anybody
+# editing a viewer.
+hdr(ws,['Module','What it is','Why it is separate','Tables','Written','Cols','Contract','Ops','Tier','Out','In','Cross'],
+       [13,52,66,7,8,7,18,6,10,7,6,7])
 r=5
 for m in MODROWS:
-    vals=[m['module'],m['purpose'],m['why'],m['tables'],m['columns'],
+    vals=[m['module'],m['purpose'],m['why'],m['tables'],m.get('written',0),m['columns'],
           m['contracts'],m['ops'],m['tier'],m['refs_out'],m['refs_in'],m['cross']]
     for i,v in enumerate(vals,1):
         c=ws.cell(r,i,v); c.font=M if i in (1,6) else B; c.border=BOX
@@ -142,7 +177,7 @@ SVC_CONTRACTS = {name: set(v.get('contracts') or []) for name, v in _D.items()}
 # **Loaded here rather than reusing LIN**, which is read 150 lines further down for the lineage
 # sheet. A helper that depends on a variable defined after it is a helper that works only where
 # it happens to be called.
-_LINEAGE = json.load(open('lineage.json', encoding='utf-8'))
+_LINEAGE = json.load(open(_pkg('api-data-lineage.json','lineage.json'), encoding='utf-8'))
 
 def svc_of(table):
     """Owning service for a table, by its schema prefix."""
@@ -286,7 +321,7 @@ for i,val in enumerate(['TOTAL',tt['write'],tt['primary'],tt['replica'],tt['anal
 
 # ---- Data lineage
 import json as _j
-LIN=_j.load(open('lineage.json'))
+LIN=_j.load(open(_pkg('api-data-lineage.json','lineage.json'), encoding='utf-8'))
 SERVICE={'tenancy':'TenancyService','identity':'IdentityService','catalogue':'CatalogueService',
  'orders':'OrderService','shift':'ShiftService','access':'AccessService','finance':'LedgerService',
  'cross-cell':'CrossCellService','fnb':'FnbService','retail':'RetailService','inventory':'InventoryService',

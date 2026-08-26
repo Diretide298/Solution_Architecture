@@ -193,7 +193,31 @@ AUDIENCE_CHROME = {
         "brand": "TICVAI",
         "actions": [("This venue &#9662;", ""), ("Live", "live"), ("Primary action", "cta")],
     },
+    # **The package declares five audiences and this held three.** The lookup fell through to
+    # `staff` silently, so `P09 TICVAI Web` — the console that provisions cells and ships releases
+    # — drew "This venue" and a venue nav, and `P11 Accreditation Web`, a public application form,
+    # drew "Live": furniture for an operator on shift. **45 screens showing chrome nobody chose
+    # for them**, and the silent `.get(aud, staff)` is why it survived a rebuild.
+    "platformAdmin": {
+        "nav": ["Tenants", "Cells", "Releases", "Health", "Audit"],
+        "kpis": [("Tenants", "184"), ("Cells", "3"), ("Incidents", "2"), ("Releases", "11")],
+        "brand": "TICVAI",
+        "actions": [("All tenants &#9662;", ""), ("Deploy", "cta")],
+    },
+    "public": {
+        "nav": ["Apply", "My application", "Help"],
+        "kpis": None,          # an applicant is shown their own application, never a venue count
+        "brand": "the tenant's brand",
+        "actions": [("Start application", "cta")],
+    },
 }
+
+# **An audience with no chrome must report itself, not be absorbed.** The fallback below is a
+# safety net and not a decision — a platform whose audience is missing here draws staff furniture,
+# which is exactly the defect this comment exists to stop recurring.
+UNCHROMED: set = set()
+WRITTEN: list = []
+COVERED: set = set()
 
 
 def kpis(module: str, chrome: dict | None = None) -> str:
@@ -256,6 +280,8 @@ def render_screen(s: dict, dark: bool, offline_platform: bool, plat: dict) -> st
     comps = (regions.get("contentBody") or {}).get("components") or []
 
     aud = plat.get("audience") or "staff"
+    if aud not in AUDIENCE_CHROME:
+        UNCHROMED.add(aud)
     chrome = dict(AUDIENCE_CHROME.get(aud, AUDIENCE_CHROME["staff"]))
     chrome["audience"] = aud
     chrome["brandLabel"] = "TICVAI Partner" if aud == "partner" else (
@@ -431,6 +457,20 @@ DESIGNED_PREFIXES = ("wireframes/FnB", "wireframes/POS", "wireframes/Retail",
 DESIGNED: set = set()   # whole platforms; empty now that the check is per screen
 
 
+def _utf8_stdout() -> None:
+    """**The generator crashed on a Windows console after writing every board.**
+
+    `UnicodeEncodeError` on the `→` in its own progress line — a half-succeeded run reporting a
+    traceback, which reads as total failure. Fixed here rather than by asking callers to set
+    `PYTHONIOENCODING`, because `refresh.sh` runs this and a tool that needs an environment
+    variable to print is a tool that will crash for the next person.
+    """
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+
 def main() -> int:
     only = sys.argv[1:] or None
     WIRE.mkdir(exist_ok=True)
@@ -446,6 +486,8 @@ def main() -> int:
         out_name = f"{code} {doc['platform']['shortName']}.dc.html"
         body, n = build(f)
         (WIRE / out_name).write_text(body, encoding="utf-8")
+        WRITTEN.append(out_name)
+        COVERED.add(code)
         print(f"  {code}  {n:>3} screens  → wireframes/{out_name}")
         total += 1
     # **The index board is generated too.** It listed eight files that no longer exist the moment
@@ -497,12 +539,70 @@ display:inline-block;padding:2px 7px;border-radius:4px}}
     <span>{len(cards)} boards</span>
   </div>
 </div></body></html>"""
+        # **`wireframes/index.html` is the door.** The viewer opens it by name, and until
+        # 26 August this package never wrote one — it wrote `TICVAI Wireframe Boards.dc.html`,
+        # which the viewer does not look for. **A door nobody generates is a door that goes stale
+        # the moment somebody hand-makes one**, which is what happened: a 25 August `index.html`
+        # sat in the repo pointing at boards that had since been renamed.
+        #
+        # Two indexes exist and they are not duplicates. `TICVAI All Boards Index.dc.html` is the
+        # client-facing contents page across every board including the packs; this one is the
+        # generated platform index. **`index.html` is a copy of the generated one under the name
+        # the viewer opens**, so the door is always current.
         (WIRE / "TICVAI Wireframe Boards.dc.html").write_text(idx, encoding="utf-8")
-        print("  index    → wireframes/TICVAI Wireframe Boards.dc.html")
+        (WIRE / "index.html").write_text(idx, encoding="utf-8")
+        print("  index    → wireframes/TICVAI Wireframe Boards.dc.html + index.html")
+
+        # **A rename leaves a ghost, and the ghost looks authoritative.** A dump copies and never
+        # deletes, so `P08 Staff Web Back Office.dc.html` (733 KB, 25 August) outlived its
+        # replacement `P08 Venue Management.dc.html` (383 KB) and anyone opening the old name got
+        # an out-of-date board with no sign it was superseded.
+        #
+        # **The manifest is what the transfer needs.** It says what should exist; anything else in
+        # the folder is a leftover, and a consumer can delete or flag it without guessing.
+        manifest = {
+            "generatedBy": "tools/derive-wireframes.py",
+            "entryPoint": "wireframes/index.html",
+            "note": ("Boards this package generates. **Anything in `wireframes/` not listed here "
+                     "and not a client pack is a leftover** — most often a board renamed on one "
+                     "side of a dump, since a copy never deletes."),
+            "generated": sorted(WRITTEN),
+            "indexes": ["index.html", "TICVAI Wireframe Boards.dc.html",
+                        "TICVAI All Boards Index.dc.html"],
+        }
+        (WIRE / "manifest.json").write_text(
+            json.dumps(manifest, indent=1, ensure_ascii=False), encoding="utf-8")
+        print(f"  manifest → wireframes/manifest.json ({len(manifest['generated'])} generated)")
+
+        # **Delete the boards this generator no longer writes.** A rename used to leave both files
+        # and the old one looked authoritative — `P08 Staff Web Back Office.dc.html` at 733 KB
+        # against its 383 KB replacement, opening by name with nothing to say it was superseded.
+        #
+        # **Only files matching the generated shape are removed** — `P## Name.dc.html` where the
+        # code is a platform this run covered. **A client pack is never touched**, because the
+        # generator did not write it and has no business deleting it.
+        known = set(manifest["generated"]) | set(manifest["indexes"])
+        stale = []
+        for f in sorted(WIRE.glob("*.dc.html")):
+            if f.name in known:
+                continue
+            m = re.match(r"^(P\d\d) ", f.name)
+            if m and m.group(1) in COVERED:
+                stale.append(f)
+        for f in stale:
+            f.unlink()
+            print(f"  removed  {f.name} — superseded by a rename this generator now owns")
+        if stale:
+            print(f"  {len(stale)} stale board(s) deleted. A copy never deletes, so a rename "
+                  "leaves a ghost unless the writer clears it.")
+        if UNCHROMED:
+            print(f"  WARN  audiences with no chrome, drawing staff furniture: {sorted(UNCHROMED)}")
 
     print(f"  {total} board(s) generated")
     return 0
 
+
+_utf8_stdout()
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -868,6 +868,12 @@ export async function buildBackend(root, contractSchemas = []) {
     tables,
     columns,
     scaling,
+    // Whether the sheet was there at all, which is not the same as whether it
+    // had rows. A workbook can ship `Scaling` with a header and a `TOTAL 0 0 0
+    // 0` and nothing else — that is a generator that ran and found nothing, not
+    // a workbook that predates the sheet, and the two want different answers
+    // from the reader.
+    scalingSheet: sheets.has('Scaling'),
     adrs,
     docs,
     migrations,

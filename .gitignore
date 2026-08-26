@@ -40,3 +40,14 @@ viewer/api/*.db-shm
 .DS_Store
 Thumbs.db
 *.log
+
+# --- design drops, staged rather than delivered ---------------------------
+# `ticvai/Updating old wireframes/` is the 26 August Claude Design drop. Its 32
+# boards are installed in `ticvai/wireframes/` and tracked there; **148 of its
+# 205 files are byte-identical duplicates of what is already committed.** The
+# remaining 57 are 133 MB of PNG renders and uploads.
+#
+# Kept on disk, out of the repository, by decision: one of the remotes is a
+# public GitHub repo, and 133 MB of duplicated renders is not package.
+# Remove this line to commit it.
+ticvai/Updating old wireframes/

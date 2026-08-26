@@ -716,6 +716,35 @@ def main() -> int:
                 f"{_t}: written by {sorted(_w[_t])[:2]} and read by nothing, and it has no parent "
                 "to be read through — either an operation is missing or the table should not exist")
 
+    # 37. **A relationship naming a column the table does not have is an edge nobody can follow.**
+    # 185 lineage edges carried an operation name in `col` — `orders.order_line.via createOrder` —
+    # so a viewer comparing `col` against the columns reported them as undefined and a reader had
+    # no way to tell a real gap from a field used for two purposes.
+    #
+    # **Three kinds and only two are column joins**: `declared` and `convention` name a column,
+    # `lineage` names an act and puts it in `viaOperation`.
+    _g = ROOT / "handoff" / "relationship-graph.json"
+    _s = ROOT / "handoff" / "schema-reference.json"
+    if _g.exists() and _s.exists():
+        _cols = {t: {c["column"] for c in cs}
+                 for t, cs in (json.loads(_s.read_text(encoding="utf-8")).get("cols") or {}).items()}
+        for _r in (json.loads(_g.read_text(encoding="utf-8")).get("rels") or []):
+            # **A lineage edge has no column and says so with .** Skipping on a
+            # falsy `col` alone would also skip a declared edge whose column went missing, which
+            # is the defect this check exists to catch.
+            if (_r.get("how") or _r.get("kind")) == "lineage" or _r.get("viaOperation"):
+                continue
+            _c = _r.get("col")
+            if not _c:
+                ERRORS.append(f"relationship-graph: {_r.get('frm')} -> {_r.get('to')} has no "
+                              "column and is not a lineage edge")
+                continue
+            if _c not in _cols.get(_r.get("frm", ""), set()):
+                ERRORS.append(
+                    f"relationship-graph: {_r.get('frm')}.{_c} names a column that table does not "
+                    f"have (kind {_r.get('how') or _r.get('kind')}) — a lineage edge names an "
+                    "operation and belongs in viaOperation")
+
     # 13. The x-ticvai-* vocabularies are closed sets. `lastWriteWins` and `lastWriterWins` were
     # both in use on 17 August — one policy, two spellings, ten operations split between them, and
     # every checker passed because each value was individually plausible.

@@ -62,6 +62,20 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: login
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listMfaMethods
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: login
   states:
     loading: Session check against the local store, then the server if reachable
     emptyFirstRun: Not applicable
@@ -76,6 +90,10 @@ screens:
     error: Sign-in failed. The reason is shown — wrong PIN reads differently from no network
     offline: '**Signs in against the cached principal list from the last bundle.** A steward locked
       out at 08:00 because the venue wifi is down is a gate that does not open'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-002
@@ -160,6 +178,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAccessPoints
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: setTurnstileMode
+        label: Save turnstile mode
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setTurnstileMode
   states:
     loading: Access points from the bundle
     emptyFirstRun: No access points configured for this venue — a configuration error, shown as one
@@ -177,6 +210,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Cannot load. The last selection is offered
     offline: Fully offline. The access point list is in the bundle
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -235,6 +272,31 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listBlacklist
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Instant. This screen must never wait
     emptyFirstRun: Not applicable
@@ -268,6 +330,10 @@ screens:
       most likely to be examined after an incident, so it captures a reason and a principal. **A modal,
       because an override is a decision taken while looking at the denial**, not a page you navigate
       to afterwards.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -355,6 +421,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: validateGroupAccess
+        notes: The act the screen exists for.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: validateGroupAccess
   states:
     loading: Party resolution from the bundle
     emptyFirstRun: Party of one — falls through to a normal scan
@@ -372,6 +458,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Group could not be resolved
     offline: Fully offline. Admits what is valid and states the shortfall
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -433,6 +523,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Reference lookup, local first
     emptyFirstRun: No match for that reference
@@ -451,6 +561,10 @@ screens:
     error: Not found. Offers SCN-009 by name instead
     offline: Searches the bundle only. A reference issued after the last sync will not be found, and
       the screen says so rather than denying
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -512,6 +626,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Name search across the bundle
     emptyFirstRun: No match
@@ -529,6 +663,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Search unavailable
     offline: Bundle only, and the bundle age is shown beside the results
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -590,6 +728,15 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: consumeRedemptionRight
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: consumeRedemptionRight
   states:
     loading: Right resolution, which may cross cells
     emptyFirstRun: No delegated right on this media
@@ -654,6 +801,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Journal loads locally
     emptyFirstRun: Nothing journalled
@@ -671,6 +838,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Journal unreadable — the most serious failure on the device
     offline: The journal is the offline record. It is why an offline admit is recoverable
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -732,6 +903,31 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: syncScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: dataTable
+        derived: true
+        impliedBy: listSyncRejections
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Sync in progress, with a count
     emptyFirstRun: Nothing to sync
@@ -749,6 +945,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Sync failed. **The journal is kept** — a failed sync must never discard what it was carrying
     offline: Not applicable. This screen exists to end the offline period
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -821,6 +1021,26 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: overrideAccess
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Downloading. Size and progress shown
     emptyFirstRun: Not applicable
@@ -838,6 +1058,10 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Download failed. The previous bundle stays in place
     offline: Cannot refresh. The existing bundle continues to be used and its age is shown
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -900,6 +1124,21 @@ screens:
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+      - kind: primaryButton
+        derived: true
+        impliedBy: setTurnstileMode
+        label: Save turnstile mode
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAccessPoints
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setTurnstileMode
   states:
     loading: Current mode from the device
     emptyFirstRun: Not applicable
@@ -918,6 +1157,10 @@ screens:
     error: Turnstile unreachable — the mode is a request, not a confirmed hardware state
     offline: '**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding
       (CF-33)'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
+      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
+      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
+      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
