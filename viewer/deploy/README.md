@@ -1,9 +1,19 @@
 # Putting the viewer on a server
 
-Ubuntu or Debian, one command:
+Ubuntu or Debian, one command.
+
+The viewer and the delivery package are siblings in one repository, and this
+script lives inside the viewer half — so the clone is the repository and the
+`cd` is into `viewer`:
 
 ```
-git clone <this repo> /opt/ticvai-src && cd /opt/ticvai-src
+atlas/
+|-- viewer/     server.mjs, lib/, public/, api/, and deploy/ within it
+`-- ticvai/     the delivery package -- contracts, screens, flows, states
+```
+
+```
+git clone <this repo> /opt/atlas && cd /opt/atlas/viewer
 sudo ./deploy/deploy.sh --admin you@softlabsgroup.com
 ```
 
@@ -11,8 +21,18 @@ Run it again whenever you want to deploy. It is idempotent: every step checks
 before it acts.
 
 ```
-git pull && sudo ./deploy/deploy.sh
+cd /opt/atlas && git pull && cd viewer && sudo ./deploy/deploy.sh
 ```
+
+That copies **both** halves: `viewer/` into `/srv/ticvai/viewer`, and every
+package registered in `projects.json` to the place its own `root` points at, so
+`"root": "../ticvai"` means `/srv/ticvai/ticvai` on the server and `atlas/ticvai`
+in the checkout without either having to know about the other.
+
+It did not always. The packages were separate repositories placed beside the
+viewer by hand, and the script only ever *checked* they were there. Deploying
+this layout with that script put a new viewer on an old package and said
+nothing, because a package that is merely stale is a package that is present.
 
 The first run pauses once to ask for a password for the admin account. It does
 not take one as a flag, because a password given as an argument sits in the
@@ -110,9 +130,10 @@ pm2 logs ticvai-viewer         follow one of them
 pm2 restart ticvai-viewer      after a package drop
 ```
 
-A package drop into the repository needs `git pull` then a restart of
-`ticvai-viewer` — it reads the package at boot and watches for changes, but a
-`git pull` moves too many files at once to rely on the watcher.
+A package drop needs a **deploy**, not a restart: the package is a separate
+tree on the server and `git pull` in the checkout does not move it. The deploy
+copies it and restarts the viewer, which reads the package at boot and watches
+for changes — but a drop moves too many files at once to rely on the watcher.
 
 ## Your data survives a redeploy
 
@@ -123,8 +144,12 @@ to a deploy is the kind of mistake that is only noticed later:
    committed, so it cannot travel in a `git pull`. The second copy is because a
    package drop overwrites `.gitignore` at the repository root and on 18 August
    silently took the rule with it.
-2. **The copy step excludes it** — `--exclude 'viewer/api/ticvai.db*'`, so the
-   sync cannot overwrite the live file with whatever was in a working tree.
+2. **The copy step excludes it** — `api/ticvai.db` and its `-shm`/`-wal`
+   companions are named exclusions on the viewer sync, so it cannot overwrite
+   the live file with whatever was in a working tree. The package sync cannot
+   reach it at all: it writes a sibling tree, and a `root` that resolved to the
+   viewer directory or above is refused rather than copied, because that sync
+   runs with `--delete` and `"root": "."` is all it would take.
 3. **The script checks before creating** — an existing database is left alone
    and the script says so.
 

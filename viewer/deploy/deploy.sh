@@ -164,11 +164,72 @@ rsync -a --delete \
 ( cd "$APP_DIR/viewer" && npm install --omit=dev --silent >/dev/null 2>&1 || true )
 chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 
+# ── the packages, when they travel with the viewer ──────────────────────────
+#
+# They used to be separate checkouts placed beside this one by hand, and the
+# section below still only *checks* that they are there, because that was the
+# whole arrangement. In this tree they are siblings inside one repository:
+#
+#   atlas/
+#   ├── viewer/     this, with deploy/deploy.sh inside it
+#   └── ticvai/     the delivery package
+#
+# which is the same shape as the deployed layout, so each registered package is
+# copied to the place its own `root` in projects.json already points at and
+# `"root": "../ticvai"` goes on meaning one thing in both.
+#
+# Only roots that are relative and present beside the source checkout are
+# copied. An absolute root, or one that is not here, is the old by-hand case and
+# is left alone — the check below is what catches those going missing.
+#
+# --delete is scoped to one package at a time, for the reason the viewer's is
+# scoped to viewer/: a drop has to be able to remove a file as well as add one,
+# or a board deleted in the repo stays on the server for good.
+if [[ -f "$REPO/projects.json" ]]; then
+  # Assigned, not piped. `python3 … | while read` puts the failure in a
+  # subshell and hands the loop an empty list, so a broken enumeration reads
+  # exactly like a registry with nothing in it and the deploy copies no
+  # packages, quietly. An assignment fails the script.
+  PKG_ROOTS="$(python3 - "$REPO/projects.json" <<'PYROOTS'
+import json, os, sys
+doc = json.load(open(sys.argv[1], encoding="utf-8"))
+for entry in doc.get("projects", []):
+    if entry.get("active") is False:
+        continue
+    root = entry.get("root", "")
+    if not root or os.path.isabs(root):
+        continue
+    # The copy below runs with --delete, so a root that resolves to the viewer
+    # directory or anywhere above it would empty the deployment -- and the one
+    # thing in there that cannot be got back is api/ticvai.db. "." is all it
+    # takes. Refused here rather than guarded there, because this is where the
+    # value comes from.
+    here = os.path.normpath(os.path.join(os.sep, "viewer"))
+    there = os.path.normpath(os.path.join(here, root))
+    if there == here or here.startswith(there.rstrip(os.sep) + os.sep):
+        sys.exit('root %r is the viewer directory or a parent of it' % root)
+    print(root)
+PYROOTS
+)"
+  while IFS= read -r rel; do
+    [[ -n "$rel" ]] || continue
+    if [[ -d "$REPO/$rel" ]]; then
+      mkdir -p "$APP_DIR/viewer/$rel"
+      rsync -a --delete --exclude '.git' --exclude 'node_modules' \
+        "$REPO/$rel/" "$APP_DIR/viewer/$rel/"
+      note "package $rel copied from beside the checkout"
+    else
+      note "package $rel is not beside the checkout — left as it is"
+    fi
+  done <<< "$PKG_ROOTS"
+  chown -R "$APP_USER:$APP_USER" "$APP_DIR"
+fi
+
 # ── the packages ────────────────────────────────────────────────────────────
 #
-# Separate repositories, checked out beside the viewer, and not this script's to
-# fetch \u2014 it deploys a service, and which packages that service reads is a
-# question projects.json answers.
+# Whatever was not copied above: a package with an absolute root, or one that
+# lives in its own checkout beside the deployed viewer rather than beside the
+# source. Those are still not this script's to fetch.
 #
 # But a package that was never checked out is a viewer that starts, answers every
 # route and counts zero, which is the same shape as the bug that had the landing
@@ -371,9 +432,20 @@ if [[ -f "$NGINX_SITE" ]]; then
   # /pkg/<project>/. Matched on that form: the old pattern looked for
   # `url.pathname === '/api/index'`, which now finds nothing at all, and a
   # check comparing an empty list against an empty list passes every time.
+  # It read `$REPO/viewer/server.mjs` for a while after $REPO stopped being
+  # the tree that contained the viewer, which under `set -e` is not a check
+  # that passes vacuously but a deploy that dies here — after pm2 has already
+  # restarted both processes, so the services come up and the assertions
+  # below them never run.
+  #
+  # `diagrams/detail` is trimmed to `diagrams`, because the nginx names are
+  # matched with `(/|$)` and a parent already forwards its children. Left
+  # whole it is reported as missing forever, and a check that cries wolf is
+  # a check that gets ignored.
   OWNED="$(grep -oE "route === '[a-z-]+(/[a-z-]+)?'" \
-            "$REPO/viewer/server.mjs" \
-            | grep -oE "'[a-z-]+(/[a-z-]+)?" | tr -d "'" | sort -u)"
+            "$REPO/server.mjs" \
+            | grep -oE "'[a-z-]+(/[a-z-]+)?" | tr -d "'" \
+            | sed 's|/.*||' | sort -u)"
   FORWARDED="$(grep -oE '\^/api/\([a-z|-]+\)' "$NGINX_SITE" \
                 | tr -d '^()' | sed 's|/api/||' | tr '|' '\n' | sort -u)"
   # A `location /pkg/` covers every route of every project at once, so the
