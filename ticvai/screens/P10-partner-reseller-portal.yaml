@@ -187,6 +187,7 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-002
+    derivedFrom: wireframes/Dashboards Board.dc.html#ptr-002
   capability: C34
   apis:
   - operationId: listOrders
@@ -285,6 +286,8 @@ screens:
       an error.'
   requiresModule: partner
   statesDerived: true
+  boardFrames:
+  - PTR-002
 - id: PTR-003
   name: Profile & Company Details
   module: TODO

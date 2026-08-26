@@ -171,6 +171,7 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P12 Venue Support.dc.html#sup-002
+    derivedFrom: wireframes/Dashboards Board.dc.html#sup-002
   capability: C32
   apis:
   - operationId: listCases
@@ -237,6 +238,8 @@ screens:
       do not hold. Arrives with `caseId`.'
   requiresModule: marketing
   statesDerived: true
+  boardFrames:
+  - SUP-002
 - id: SUP-003
   name: Availability & Routing Settings
   module: TODO

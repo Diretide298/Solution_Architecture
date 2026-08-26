@@ -184,7 +184,7 @@ def main() -> int:
     data = json.loads(src.read_text(encoding="utf-8"))
     out = Path(args.out) if args.out else HANDOFF / f"{args.domain}-index.md"
     out.write_text(render(data), encoding="utf-8")
-    print(f"{args.domain}: {out.relative_to(ROOT)} ({len(out.read_text(encoding="utf-8").splitlines())} lines)")
+    print(f"{args.domain}: {out.relative_to(ROOT)} ({len(out.read_text(encoding='utf-8').splitlines())} lines)")
     return 0
 
 

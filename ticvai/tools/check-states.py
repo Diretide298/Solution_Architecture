@@ -53,6 +53,17 @@ def check_duplicate_paths() -> None:
     surviving half, because there was nothing left to be inconsistent with.
     """
     import re as _re
+
+# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
+# failure lands *after* the work is done — so the output is written, the summary
+# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
+# import means anything importing this module gets it too, refresh.sh included.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:      # a captured stream may not be reconfigurable; harmless
+    pass
+
     for f in list((CONTRACTS / "spine").glob("*.yaml")) + list((CONTRACTS / "satellite").glob("*.yaml")):
         seen: set[str] = set()
         for m in _re.finditer(r"^  (/[^\s:]*):\s*$", f.read_text(encoding="utf-8"), _re.M):

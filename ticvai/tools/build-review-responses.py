@@ -25,6 +25,18 @@ import openpyxl
 import yaml
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
+import sys
+
+# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
+# failure lands *after* the work is done — so the output is written, the summary
+# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
+# import means anything importing this module gets it too, refresh.sh included.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:      # a captured stream may not be reconfigurable; harmless
+    pass
+
 
 PKG = Path("/home/claude/ticvai-pkg")
 CSV = Path("/mnt/user-data/uploads/ticvai-review-activity-2026-08-24-filtered.csv")

@@ -22,6 +22,17 @@ from pathlib import Path
 
 import yaml
 
+# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
+# failure lands *after* the work is done — so the output is written, the summary
+# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
+# import means anything importing this module gets it too, refresh.sh included.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:      # a captured stream may not be reconfigurable; harmless
+    pass
+
+
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 FRONTEND = ROOT / "frontend"

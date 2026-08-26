@@ -1376,6 +1376,7 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-017
+    derivedFrom: wireframes/Dashboards Board.dc.html#web-017
   capability: C36
   apis:
   - operationId: addToWishlist
@@ -1436,6 +1437,8 @@ screens:
       screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came
       from.** Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
+  boardFrames:
+  - WEB-017
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service

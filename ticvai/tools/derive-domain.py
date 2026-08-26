@@ -41,6 +41,17 @@ from pathlib import Path
 
 import yaml
 
+# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
+# failure lands *after* the work is done — so the output is written, the summary
+# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
+# import means anything importing this module gets it too, refresh.sh included.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:      # a captured stream may not be reconfigurable; harmless
+    pass
+
+
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS = ROOT / "contracts"
 STATES = ROOT / "states"
@@ -423,7 +434,7 @@ def main() -> int:
             print("  reached outside the contract: " +
                   ", ".join(f"{s['file']} (in {s['contract']})" for s in foreign))
         print(f"  → {out.relative_to(ROOT)} and handoff/domain-markers.json "
-              f"({len(json.loads((HANDOFF / 'domain-markers.json').read_text(encoding="utf-8")))} marked artefacts)")
+              f"({len(json.loads((HANDOFF / 'domain-markers.json').read_text(encoding='utf-8')))} marked artefacts)")
     return 0
 
 

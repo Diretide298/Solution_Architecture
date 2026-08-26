@@ -161,6 +161,7 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-002
+    derivedFrom: wireframes/Dashboards Board.dc.html#adm-002
   capability: C95
   apis:
   - operationId: listTenants
@@ -222,6 +223,8 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: membership
   statesDerived: true
+  boardFrames:
+  - ADM-002
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
   module: TODO
@@ -254,6 +257,7 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-003
+    derivedFrom: wireframes/Dashboards Board.dc.html#adm-003
   capability: C95
   apis:
   - operationId: getCellHealth
@@ -327,6 +331,8 @@ screens:
       than one that shows nothing.** Arrives with `cellId`, `rightId`.'
   requiresModule: membership
   statesDerived: true
+  boardFrames:
+  - ADM-003
 - id: ADM-004
   name: Platform Audit Log
   module: TODO

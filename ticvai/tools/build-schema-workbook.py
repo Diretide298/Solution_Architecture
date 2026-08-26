@@ -30,6 +30,18 @@ from collections import defaultdict
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+import sys
+
+# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
+# failure lands *after* the work is done — so the output is written, the summary
+# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
+# import means anything importing this module gets it too, refresh.sh included.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:      # a captured stream may not be reconfigurable; harmless
+    pass
+
 D=json.load(open(_pkg('schema-reference.json','schema_v4.json'), encoding='utf-8')); L=(json.load(open(_pkg('links.json'), encoding='utf-8')) if _pkg('links.json') else {})
 cols=D['cols']; nomap=D['nomap']; origin=D['origin']; storage=D['storage']
 # **Where each table hangs, on the table's own row.** schema-roots.md answers it in prose and a
@@ -46,14 +58,40 @@ MIG={'platform':'V0001 / V0003 / V0003a','identity':'V0002','pii':'V0001a','sync
 # No migrations are written as of 14 August — the workbook is the working artefact and DDL
 # resumes when the design settles. The Written column stays in the sheet so it means something
 # again the moment a migration lands.
+def _globbed(pattern, what):
+    """glob, and refuse to be silent about finding nothing.
+
+    **Both of these used to point at `/home/claude/...`** — a path on the
+    machine the tool was written on. `glob.glob` on a directory that is not
+    there returns `[]` and raises nothing, so the workbook built, every sheet
+    appeared, and two of them were empty:
+
+      * `Scaling` shipped a header and one row reading `TOTAL 0 0 0 0`, which
+        took Backend › Routing in the viewer from 25 contracts and 776 routed
+        operations to a blank page
+      * the `Written` column went blank for every table, which is why
+        `module.written` read as false everywhere and every schema drew amber
+
+    Same class as the JSON inputs this file's docstring already describes, in
+    the same file, missed because a `glob` fails quietly where an `open` does
+    not. So it says so now.
+    """
+    hits = sorted(glob.glob(pattern))
+    if not hits:
+        print(f"  WARN  no {what} matched {pattern} — the sheets built from it "
+              f"will be empty, and they will not say so themselves")
+    return hits
+
+
+# DDL is read from the package's own `backend/`, which is where the .sql lives.
 written=set()
-for f in glob.glob('/home/claude/ticvai/ticvai-backend/src/Ticvai.Migrations/Scripts/V*.sql'):
-    s=open(f).read(); m=re.search(r"^-- =+\n-- ROLLBACK",s,re.M)
+for f in _globbed(str(_ROOT / 'backend' / 'V*.sql'), 'migrations'):
+    s=open(f, encoding='utf-8').read(); m=re.search(r"^-- =+\n-- ROLLBACK",s,re.M)
     written.update(re.findall(r'CREATE TABLE (?:IF NOT EXISTS )?([\w.]+)', s[:m.start() if m else len(s)]))
-C='/home/claude/ticvai/ticvai-contracts/openapi'
+C=str(_ROOT / 'contracts')
 routing=defaultdict(lambda: defaultdict(int))
-for f in glob.glob(f'{C}/spine/*.yaml')+glob.glob(f'{C}/satellite/*.yaml'):
-    d=yaml.safe_load(open(f)); ctx=os.path.basename(f)[:-5]
+for f in _globbed(f'{C}/spine/*.yaml', 'spine contracts')+_globbed(f'{C}/satellite/*.yaml', 'satellite contracts'):
+    d=yaml.safe_load(open(f, encoding='utf-8')); ctx=os.path.basename(f)[:-5]
     for p,i in (d.get('paths') or {}).items():
         for v,o in i.items():
             if not isinstance(o,dict) or v not in ('get','post','put','patch','delete'): continue
@@ -374,5 +412,17 @@ for t_ in ['Blue rows are the eight stored procedures. Amber were hand-mapped be
     ws.cell(r,1,t_).font=B; r+=1
 
 
-wb.save('TICVAI_Schema_Reference.xlsx')
+# Written to both copies the package carries, by absolute path.
+#
+# This was a bare relative name, so the workbook landed in whatever directory
+# the script happened to be run from — the output with the same fault the
+# docstring describes in the inputs. The package keeps a copy at the root and
+# one in `handoff/`, **and the viewer reads the `handoff/` one**, so a rebuild
+# from the root left the copy that is actually read a day stale with no sign of
+# it anywhere.
+_targets = [_ROOT / 'TICVAI_Schema_Reference.xlsx', _H / 'TICVAI_Schema_Reference.xlsx']
+for _t in _targets:
+    _t.parent.mkdir(parents=True, exist_ok=True)
+    wb.save(_t)
 print(f"{tot} tables | {len(written)} written | {len(PII)} PII | {len(NEW)} new")
+print("  wrote " + " and ".join(str(t.relative_to(_ROOT)) for t in _targets))
